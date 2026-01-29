@@ -1,10 +1,12 @@
 ---
 name: generate-skill
 description: Use when asked to "create a skill", "generate a SKILL.md", "make me a skill", "build a custom skill", or when user wants to extend Claude Code capabilities with a new skill
+license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.0.0"
+  version: "1.1.0"
   argument-hint: [skill-topic]
+tags: [skill-creation, meta, automation, documentation]
 ---
 
 # Generate Skill - Interactive Skill Builder
@@ -326,8 +328,25 @@ metadata:
   version: "1.0.0"
   argument-hint: <optional-args>
 tags: [relevant, tags, here]
+hooks:                           # Optional: automation triggers
+  post_tool_use:
+    - Action after Write/Edit operations
+  stop:
+    - Action before session ends
 ---
 ```
+
+**Required fields:**
+- `name` - kebab-case skill identifier (used in `/skill-name`)
+- `description` - Trigger-rich activation text (see best practices below)
+
+**Optional fields:**
+- `license` - License type (default: MIT)
+- `metadata.author` - Creator name
+- `metadata.version` - Semantic version (e.g., "1.0.0")
+- `metadata.argument-hint` - Hint shown for skill arguments (e.g., `<branch-name>`)
+- `tags` - Array of categorization tags
+- `hooks` - Automation triggers (post_tool_use, stop, etc.)
 
 **Description field best practices:**
 - ✅ Include 3-5 specific trigger phrases
@@ -336,6 +355,12 @@ tags: [relevant, tags, here]
 - ✅ Be concrete, not vague
 - ❌ Avoid: "A skill for..." (too vague)
 - ❌ Avoid: Single generic description
+
+**Hooks field (advanced):**
+Use hooks to automate actions at specific points:
+- `post_tool_use` - Runs after Write, Edit, or other tools
+- `stop` - Runs before session ends (verification, cleanup)
+- Example use: Auto-updating progress files, verification checklists
 
 #### 2. Overview Section
 ```markdown
@@ -684,10 +709,18 @@ Or explicitly: `/skill-name`
 When generating, customize these placeholders:
 
 ```markdown
-{{SKILL_NAME}}         # kebab-case name
-{{SKILL_TITLE}}        # Human-readable title
-{{DESCRIPTION}}        # Trigger-rich description
+# Frontmatter variables
+{{SKILL_NAME}}         # kebab-case name (required)
+{{DESCRIPTION}}        # Trigger-rich description (required)
+{{LICENSE}}            # License type (default: MIT)
 {{AUTHOR}}             # Author name
+{{VERSION}}            # Semantic version (default: "1.0.0")
+{{ARGUMENT_HINT}}      # Argument hint (e.g., <branch-name>)
+{{TAGS}}               # Array of tags
+{{HOOKS}}              # Optional automation hooks
+
+# Content variables
+{{SKILL_TITLE}}        # Human-readable title
 {{CORE_PRINCIPLE}}     # One-line principle
 {{TRIGGER_PHRASES}}    # List of activation phrases
 {{PATTERN_CONTENT}}    # Pattern-specific structure

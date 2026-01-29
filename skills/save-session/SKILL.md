@@ -1,6 +1,6 @@
 ---
 name: save-session
-description: When running long-running work, progress should be saved. Triggers on tasks where Claude and the user get to work together, need to plan something out, or want to save progress along the way. Allows for work to pause, stop, and resume from a checkpoint
+description: When running long-running work, progress should be saved. Triggers on tasks where Claude and the user get to work together, need to plan something out, or want to save progress along the way. Allows for work to pause, stop, and resume from a checkpoint of a working session
 metadata:
   author: Antonin Januska
   version: "1.0.0"
