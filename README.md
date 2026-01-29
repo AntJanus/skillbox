@@ -1,0 +1,219 @@
+# SkillBox
+
+A curated collection of utility skills for Claude Code. SkillBox provides reusable, battle-tested skills that enhance Claude Code's capabilities for common development workflows.
+
+## What are Skills?
+
+Skills are specialized instructions that teach Claude Code how to handle specific tasks or workflows. They activate automatically when relevant or can be invoked explicitly using `/skill-name`. Skills help enforce best practices, automate complex workflows, and provide consistent approaches to common development challenges.
+
+## Available Skills
+
+### 🔄 save-session
+
+Track progress and maintain state across long-running development sessions.
+
+**Use when:**
+- Working on multi-step implementations
+- Planning complex features
+- Need to pause and resume work
+- Want checkpoint-based recovery
+
+**Triggers:** Automatically activates on long-running collaborative work
+
+[View Documentation](./skills/save-session/SKILL.md)
+
+---
+
+### 🌳 git-worktree
+
+Manage multiple branches simultaneously using git worktrees for parallel Claude Code development.
+
+**Use when:**
+- Working on multiple features in parallel
+- Emergency hotfix needed during feature work
+- Reviewing PRs without switching branches
+- Running parallel Claude Code sessions
+
+**Triggers:** When asked to work on parallel branches, emergency fixes, or PR reviews
+
+[View Documentation](./skills/git-worktree/SKILL.md)
+
+---
+
+### ⚙️ generate-skill
+
+Interactive skill builder that generates high-quality SKILL.md files using proven patterns.
+
+**Use when:**
+- Asked to "create a skill"
+- Need to capture team workflows
+- Want to extend Claude Code capabilities
+- Building custom development methodologies
+
+**Triggers:** When asked to "create a skill", "generate a SKILL.md", "make me a skill"
+
+[View Documentation](./skills/generate-skill/SKILL.md)
+
+---
+
+## Installation
+
+### Global Installation (Available in All Projects)
+
+```bash
+# Clone the repository
+git clone https://github.com/antjanus/skillbox.git ~/.claude/skillbox
+
+# Symlink skills to Claude Code's global skills directory
+mkdir -p ~/.claude/skills
+ln -s ~/.claude/skillbox/skills/* ~/.claude/skills/
+```
+
+### Project-Specific Installation
+
+```bash
+# Add as git submodule
+git submodule add https://github.com/antjanus/skillbox.git .claude/skillbox
+
+# Or clone directly
+git clone https://github.com/antjanus/skillbox.git .claude/skillbox
+
+# Symlink desired skills
+mkdir -p .claude/skills
+ln -s ../.claude/skillbox/skills/save-session .claude/skills/save-session
+ln -s ../.claude/skillbox/skills/git-worktree .claude/skills/git-worktree
+```
+
+### Individual Skill Installation
+
+```bash
+# Copy specific skill to your project
+mkdir -p .claude/skills/save-session
+curl -o .claude/skills/save-session/SKILL.md \
+  https://raw.githubusercontent.com/antjanus/skillbox/main/skills/save-session/SKILL.md
+```
+
+## Usage
+
+### Automatic Activation
+
+Skills activate automatically when Claude detects relevant triggers:
+
+```
+user: I need to work on multiple features at the same time
+assistant: [Automatically activates git-worktree skill]
+```
+
+### Explicit Invocation
+
+Call skills directly using slash commands:
+
+```
+user: /git-worktree feature-auth main
+user: /save-session
+user: /generate-skill database-migration
+```
+
+### Session-Specific Skills
+
+Load skills for the current session only:
+
+```
+user: Load the save-session skill for this session
+```
+
+## Creating Custom Skills
+
+Use the `generate-skill` skill to create your own:
+
+```
+user: /generate-skill my-workflow
+```
+
+Or manually create following the [skill specification](https://agentskills.io/specification).
+
+## Skill Structure
+
+Each skill follows this standard structure:
+
+```
+skill-name/
+├── SKILL.md              # Core skill documentation
+├── reference/            # Optional: Extended documentation
+│   ├── STANDARDS.md      # Detailed rules
+│   └── EXAMPLES.md       # Code examples
+├── scripts/              # Optional: Automation scripts
+│   ├── setup.sh
+│   └── execute.sh
+└── lib/                  # Optional: Helper libraries
+    └── helpers.js
+```
+
+## Contributing
+
+We welcome contributions! Here's how:
+
+1. **Propose a New Skill**: Open an issue describing the workflow or problem
+2. **Fork & Create**: Use `/generate-skill` to scaffold your skill
+3. **Test Thoroughly**: Ensure activation triggers work correctly
+4. **Document Well**: Follow existing skill documentation patterns
+5. **Submit PR**: Include examples and use cases
+
+### Skill Quality Standards
+
+- **Trigger-rich descriptions**: Include 3-5 specific activation phrases
+- **Clear examples**: Show good/bad code comparisons
+- **Troubleshooting**: Address common issues
+- **Progressive disclosure**: Keep SKILL.md under 500 lines, use reference/ for extensive content
+- **Verification checklists**: For methodology enforcement skills
+
+See [generate-skill documentation](./skills/generate-skill/SKILL.md) for detailed guidelines.
+
+## Best Practices
+
+### For Skill Users
+
+1. **Trust the activation**: Skills activate when needed - no need to force them
+2. **Use explicit invocation for clarity**: `/skill-name` when you want specific behavior
+3. **Read the documentation**: Each skill has comprehensive usage examples
+4. **Combine skills**: Many skills work well together (e.g., git-worktree + save-session)
+
+### For Skill Creators
+
+1. **Clear triggers**: Write specific, recognizable activation phrases
+2. **Enforce when needed**: Use "Iron Laws" for critical workflows
+3. **Guide by default**: Provide recommendations, not just rules
+4. **Test activation**: Ensure your skill triggers reliably
+5. **Version properly**: Use semantic versioning in metadata
+
+## Philosophy
+
+SkillBox skills follow these principles:
+
+- **Activation over configuration**: Skills should activate when relevant
+- **Enforcement over suggestion**: Critical workflows get mandatory phases
+- **Examples over explanation**: Show, don't just tell
+- **Progressive disclosure**: Start simple, reveal complexity when needed
+- **Human and AI friendly**: Documentation that works for both
+
+## Resources
+
+- **Claude Code Documentation**: https://code.claude.com/docs/
+- **Skill Specification**: https://agentskills.io/specification
+- **Best Practices Article**: https://antjanus.com/ai/claude-code-best-practices
+- **CLAUDE.md Guide**: See [CLAUDE.md](./CLAUDE.md) in this repository
+- **Agent Patterns**: See [AGENTS.md](./AGENTS.md) in this repository
+
+## License
+
+MIT License - see individual skills for specific licensing
+
+## Acknowledgments
+
+- Inspired by [obra/superpowers](https://github.com/obra/superpowers)
+- Built on patterns from [Anthropic Skills](https://github.com/anthropics/skills)
+- Follows [Vercel's agent patterns](https://github.com/vercel-labs/agent-skills)
+
+---
+
+**Skill Count**: 3 | **Total Lines of Documentation**: 1400+ | **Made for**: Claude Code 2025+
