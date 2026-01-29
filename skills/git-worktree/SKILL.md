@@ -157,29 +157,140 @@ git worktree prune
 ```
 ## Examples
 
-**Create worktree for new feature:**
+### Example 1: Create worktree for new feature
+
+<Good>
 ```bash
-git worktree list  # Check current worktrees
+# Always check existing worktrees first
+git worktree list
+
+# Create worktree with descriptive branch name
 git worktree add ../myproject-auth -b feature/auth
 cd ../myproject-auth
-# Install dependencies, start work
+
+# Install dependencies and verify setup
+npm install
+npm test
 ```
 
-**Emergency hotfix pattern:**
+**Why this is good:** Checks existing worktrees, uses descriptive naming, verifies setup before work.
+</Good>
+
+<Bad>
 ```bash
-git worktree add ../myproject-hotfix -b hotfix/payment origin/main
+# Create worktree without checking existing ones
+git worktree add ../temp -b temp
+cd ../temp
+```
+
+**Why this is bad:** No verification of existing worktrees, vague naming makes tracking difficult, no setup verification.
+</Bad>
+
+### Example 2: Emergency hotfix pattern
+
+<Good>
+```bash
+# Create hotfix from main, not current branch
+git worktree add ../myproject-hotfix -b hotfix/payment-bug origin/main
 cd ../myproject-hotfix
-# Fix bug, commit, push, then remove worktree
+
+# Fix bug, test, commit
+npm test
+git add .
+git commit -m "Fix payment processor race condition"
+git push -u origin hotfix/payment-bug
+
+# Return to original work
+cd ../myproject
+git worktree remove ../myproject-hotfix
 ```
 
-**Review PR without switching:**
+**Why this is good:** Branches from correct base (main), tests before committing, cleans up after.
+</Good>
+
+<Bad>
 ```bash
+# Create hotfix from current feature branch
+git worktree add ../fix -b fix
+cd ../fix
+# Make changes, forget to clean up
+```
+
+**Why this is bad:** Wrong base branch (includes feature work), vague naming, no cleanup.
+</Bad>
+
+### Example 3: Review PR without switching
+
+<Good>
+```bash
+# Fetch PR and create read-only worktree
 git fetch origin pull/123/head:pr-123
 git worktree add ../myproject-pr-123 pr-123
 cd ../myproject-pr-123
-# Review code, test changes
+
+# Review and test
+npm install
+npm test
+# Leave comments, then clean up
+cd ../myproject
+git worktree remove ../myproject-pr-123
 ```
+
+**Why this is good:** Fetches PR properly, uses PR number in path, cleans up after review.
+</Good>
+
+<Bad>
+```bash
+# Try to checkout PR in main worktree
+git checkout pr-123  # Loses current work
+```
+
+**Why this is bad:** Switches branch in main worktree, loses current state, forces stashing.
+</Bad>
 
 ## Integration
 
-Use this skill when parallel branch work is needed. Pairs well with `/commit` for committing work in each worktree.
+**This skill enables:**
+- Working on multiple branches simultaneously without context switching
+- Running parallel Claude Code sessions (one per worktree)
+- Emergency hotfixes without disrupting feature work
+- Safe PR review in isolated environments
+
+**Pairs with:**
+- **save-session** - Create separate SESSION_PROGRESS.md in each worktree to track independent progress
+- **commit workflows** - Each worktree has its own staging area and commits independently
+- **Parallel Claude sessions** - Name each Claude session after its worktree branch for clarity
+
+**Integration pattern with save-session:**
+```bash
+# Create worktree
+git worktree add ../myproject-feature -b feature/new-api
+cd ../myproject-feature
+
+# Create independent progress tracking
+echo "# Session Progress - New API Feature" > SESSION_PROGRESS.md
+
+# Start Claude session named "myproject - New API Feature"
+# Work proceeds with independent progress tracking
+```
+
+**Multi-worktree workflow:**
+```bash
+# Terminal 1: Feature work in main worktree
+cd ~/myproject
+# Claude session: "myproject - main"
+
+# Terminal 2: Hotfix in separate worktree
+cd ~/myproject-hotfix
+# Claude session: "myproject - hotfix"
+
+# Terminal 3: PR review in separate worktree
+cd ~/myproject-pr-123
+# Claude session: "myproject - PR review"
+```
+
+**Best practices:**
+- Name Claude sessions to match worktree purpose
+- Each worktree tracks progress independently
+- Use `git worktree list` to see all active work
+- Clean up worktrees when branches are merged
