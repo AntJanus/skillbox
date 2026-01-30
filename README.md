@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="./logo.png" alt="SkillBox Logo" width="200" />
+</div>
+
 # SkillBox
 
 A curated collection of utility skills for Claude Code. SkillBox provides reusable, battle-tested skills that enhance Claude Code's capabilities for common development workflows.
@@ -53,6 +57,23 @@ Interactive skill builder that generates high-quality SKILL.md files using prove
 **Triggers:** When asked to "create a skill", "generate a SKILL.md", "make me a skill"
 
 [View Documentation](./skills/generate-skill/SKILL.md)
+
+---
+
+### ⚛️ ideal-react-component
+
+Battle-tested React component structure pattern for building maintainable, consistent components.
+
+**Use when:**
+- Creating new React components
+- Refactoring existing components
+- Debugging React hooks issues
+- Reviewing component structure
+- Organizing component code
+
+**Triggers:** When asked to "create a React component", "structure this component", "review component structure", "refactor this component", "fix infinite loop", "useEffect not working"
+
+[View Documentation](./skills/ideal-react-component/SKILL.md)
 
 ---
 
@@ -216,4 +237,4 @@ MIT License - see individual skills for specific licensing
 
 ---
 
-**Skill Count**: 3 | **Total Lines of Documentation**: 1400+ | **Made for**: Claude Code 2025+
+**Skill Count**: 4 | **Total Lines of Documentation**: 2800+ | **Made for**: Claude Code 2025+
