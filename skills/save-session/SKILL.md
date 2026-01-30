@@ -1,10 +1,11 @@
 ---
 name: save-session
-description: When running long-running work, progress should be saved. Triggers on tasks where Claude and the user get to work together, need to plan something out, or want to save progress along the way. Allows for work to pause, stop, and resume from a checkpoint of a working session.
+description: |
+  Track and save progress on long-running work. Use when asked to "start a work session", "save progress", "track this work", "let's get to work on something big", "continue where we left off", "resume work", or when planning multi-phase implementations, complex refactoring, or tasks spanning multiple sessions.
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "2.0.0"
+  version: "2.1.0"
 hooks:
   post_tool_use:
     - Update SESSION_PROGRESS.md after Write/Edit operations
@@ -12,6 +13,8 @@ hooks:
     - Verify all plan items are completed before ending
 ---
 # Session Progress
+
+> **🔄 Session tracking activated** - I'll use SESSION_PROGRESS.md to track our work so we can pause and resume anytime.
 
 ## Overview
 

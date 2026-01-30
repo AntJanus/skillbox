@@ -2,12 +2,13 @@
 name: ideal-react-component
 description: |
   Use when creating React components, structuring component files, organizing component code,
-  or when asked to "create a React component", "structure this component", "review component structure",
-  or "refactor this component". Applies to both TypeScript and JavaScript React components.
+  debugging React hooks issues, or when asked to "create a React component", "structure this component",
+  "review component structure", "refactor this component", "fix infinite loop", or "useEffect not working".
+  Applies to both TypeScript and JavaScript React components. Includes hooks antipatterns.
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.0.0"
+  version: "1.1.0"
 tags: [react, component, structure, organization, best-practices]
 ---
 
@@ -553,6 +554,332 @@ export const usePost = (postId) => {
 };
 ```
 
+## React Hooks: Antipatterns and Gotchas
+
+**Common mistakes that cause bugs, performance issues, and infinite loops:**
+
+### Antipattern 1: useEffect "onChange" Callback
+
+**Problem:** Using `useEffect` to notify parent components whenever state changes.
+
+<Bad>
+```tsx
+type FormProps = {
+  initialValue: string;
+  onChange: (value: string) => void;
+};
+
+export const Form = ({ initialValue, onChange }: FormProps) => {
+  const [formValue, setFormValue] = useState(initialValue);
+
+  // ❌ Bad: Creates extra re-render cycle
+  useEffect(() => {
+    onChange(formValue);
+  }, [formValue, onChange]);
+
+  return (
+    <input
+      value={formValue}
+      onChange={(e) => setFormValue(e.target.value)}
+    />
+  );
+};
+```
+</Bad>
+
+**Why it's problematic:**
+- Causes double render: state update → component re-render → `useEffect` queued → `useEffect` runs → parent updates → child re-renders again
+- If parent's `onChange` modifies `formValue`, creates infinite loop
+- ESLint exhaustive-deps forces including `onChange`, worsening the issue
+
+<Good>
+```tsx
+// ✅ Good: Call onChange directly when setting state
+export const Form = ({ initialValue, onChange }: FormProps) => {
+  const [formValue, setFormValue] = useState(initialValue);
+
+  const handleChange = (value: string) => {
+    setFormValue(value);
+    onChange(value); // Notify parent immediately
+  };
+
+  return (
+    <input
+      value={formValue}
+      onChange={(e) => handleChange(e.target.value)}
+    />
+  );
+};
+```
+
+```tsx
+// ✅ Good: Or inline if simple
+export const Form = ({ initialValue, onChange }: FormProps) => {
+  const [formValue, setFormValue] = useState(initialValue);
+
+  return (
+    <input
+      value={formValue}
+      onChange={(e) => {
+        const value = e.target.value;
+        setFormValue(value);
+        onChange(value);
+      }}
+    />
+  );
+};
+```
+</Good>
+
+**JavaScript version:**
+```jsx
+// Same pattern applies
+export const Form = ({ initialValue, onChange }) => {
+  const [formValue, setFormValue] = useState(initialValue);
+
+  const handleChange = (value) => {
+    setFormValue(value);
+    onChange(value);
+  };
+
+  return (
+    <input
+      value={formValue}
+      onChange={(e) => handleChange(e.target.value)}
+    />
+  );
+};
+```
+
+### Antipattern 2: useState Initial Value Confusion
+
+**Problem:** Expecting `useState` to update when props change after initial render.
+
+<Bad>
+```tsx
+type UserProfileProps = {
+  initialName: string;
+};
+
+export const UserProfile = ({ initialName }: UserProfileProps) => {
+  // ❌ Bad: Only uses initialName on first render
+  // If initialName prop changes, userName stays the same!
+  const [userName, setUserName] = useState(initialName);
+
+  return (
+    <div>
+      <input
+        value={userName}
+        onChange={(e) => setUserName(e.target.value)}
+      />
+    </div>
+  );
+};
+```
+</Bad>
+
+**Why it's problematic:**
+- `useState` initializer runs only once (first render)
+- Prop changes don't update state automatically
+- Function initializers (`useState(() => expensive())`) also run every render but discard results after first render
+
+<Good>
+```tsx
+// ✅ Good: Use useEffect to sync when prop changes
+export const UserProfile = ({ initialName }: UserProfileProps) => {
+  const [userName, setUserName] = useState(initialName);
+
+  useEffect(() => {
+    setUserName(initialName);
+  }, [initialName]);
+
+  return (
+    <div>
+      <input
+        value={userName}
+        onChange={(e) => setUserName(e.target.value)}
+      />
+    </div>
+  );
+};
+```
+
+```tsx
+// ✅ Better: Use key prop to reset component
+// Parent component
+<UserProfile key={userId} initialName={user.name} />
+
+// This forces React to create fresh component when userId changes
+```
+
+```tsx
+// ✅ Best: Don't duplicate state if you don't need local modifications
+export const UserProfile = ({ name }: UserProfileProps) => {
+  return (
+    <div>
+      <p>{name}</p>
+    </div>
+  );
+};
+```
+</Good>
+
+**When to use expensive function initializer:**
+```tsx
+// ✅ Good: Function only runs once
+const [state, setState] = useState(() => {
+  return expensiveComputation(props.value);
+});
+
+// ❌ Bad: expensiveComputation runs every render
+const [state, setState] = useState(expensiveComputation(props.value));
+```
+
+**JavaScript version:**
+```jsx
+// Same patterns apply
+export const UserProfile = ({ initialName }) => {
+  const [userName, setUserName] = useState(initialName);
+
+  useEffect(() => {
+    setUserName(initialName);
+  }, [initialName]);
+
+  return <div>{/* ... */}</div>;
+};
+```
+
+### Antipattern 3: Non-Exhaustive useEffect Dependencies
+
+**Problem:** Omitting dependencies from `useEffect` to avoid triggering effects.
+
+<Bad>
+```tsx
+type ModalProps = {
+  onOpen: () => void;
+  onClose: () => void;
+};
+
+export const Modal = ({ onOpen, onClose }: ModalProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      onOpen(); // ❌ Uses onOpen but not in dependencies
+    } else {
+      onClose(); // ❌ Uses onClose but not in dependencies
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]); // Missing onOpen, onClose
+
+  // ...
+};
+```
+</Bad>
+
+**Why it's problematic:**
+- **Stale closures:** Effect captures old versions of callbacks with outdated data
+- **Async bugs:** If `onOpen`/`onClose` dependencies change, incorrect callbacks run
+- **Data inconsistency:** Cascading issues when unmemoized callbacks throughout component tree
+- **Silent failures:** Logic appears to work but operates on stale data
+
+<Good>
+```tsx
+// ✅ Good: Include all dependencies
+export const Modal = ({ onOpen, onClose }: ModalProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      onOpen();
+    } else {
+      onClose();
+    }
+  }, [isOpen, onOpen, onClose]); // All dependencies included
+
+  // ...
+};
+```
+
+```tsx
+// ✅ Better: Memoize callbacks in parent
+const Parent = () => {
+  const handleOpen = useCallback(() => {
+    console.log('Modal opened');
+  }, []);
+
+  const handleClose = useCallback(() => {
+    console.log('Modal closed');
+  }, []);
+
+  return <Modal onOpen={handleOpen} onClose={handleClose} />;
+};
+```
+
+```tsx
+// ✅ Best: Refactor to eliminate effect dependency issues
+export const Modal = ({ onOpen, onClose }: ModalProps) => {
+  const handleToggle = (nextIsOpen: boolean) => {
+    if (nextIsOpen) {
+      onOpen();
+    } else {
+      onClose();
+    }
+  };
+
+  return (
+    <button onClick={() => handleToggle(!isOpen)}>
+      Toggle Modal
+    </button>
+  );
+};
+```
+</Good>
+
+**Key principle:** Missing dependencies reveal design issues. Fix the design, don't silence the warning.
+
+**JavaScript version:**
+```jsx
+// Same pattern - dependencies matter regardless of types
+export const Modal = ({ onOpen, onClose }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      onOpen();
+    } else {
+      onClose();
+    }
+  }, [isOpen, onOpen, onClose]);
+
+  // ...
+};
+```
+
+### Hooks Best Practices Summary
+
+**DO:**
+- ✅ Call `onChange` callbacks directly when setting state (not in `useEffect`)
+- ✅ Use `useEffect` with full dependency arrays (trust ESLint)
+- ✅ Memoize callbacks with `useCallback` when passed as props
+- ✅ Use function initializers for expensive `useState` computations
+- ✅ Reset state via `key` prop instead of syncing with `useEffect`
+
+**DON'T:**
+- ❌ Use `useEffect` to notify parent of state changes
+- ❌ Expect `useState` initial value to update with prop changes
+- ❌ Omit dependencies from `useEffect` to prevent re-runs
+- ❌ Disable exhaustive-deps ESLint rule to hide issues
+- ❌ Run expensive computations in `useState` initializer without function wrapper
+
+**When you see these patterns:**
+| Pattern | Problem | Solution |
+|---------|---------|----------|
+| `useEffect(() => onChange(value), [value])` | Double render | Call `onChange` when setting state |
+| `useState(props.value)` with changing prop | Stale state | Use `key` prop or `useEffect` to sync |
+| `useEffect(..., [])` with missing deps | Stale closures | Include all dependencies |
+| `useState(expensive())` | Runs every render | Use `useState(() => expensive())` |
+
 ## Complete Example: TypeScript
 
 ```tsx
@@ -975,6 +1302,72 @@ export const UserProfile = ({ userId }: UserProfileProps) => {
 };
 ```
 
+### Problem: Component causing infinite re-render loop
+
+**Cause:** Using `useEffect` to call parent `onChange` callback
+
+**Solution:**
+Call `onChange` directly when setting state, not in `useEffect`:
+
+```tsx
+// ❌ Bad
+useEffect(() => {
+  onChange(value);
+}, [value, onChange]); // Can cause infinite loop
+
+// ✅ Good
+const handleChange = (newValue: string) => {
+  setValue(newValue);
+  onChange(newValue);
+};
+```
+
+See "React Hooks: Antipatterns and Gotchas" section for more details.
+
+### Problem: State not updating when prop changes
+
+**Cause:** `useState` only uses initial value on first render
+
+**Solution:**
+Either sync with `useEffect`, use component `key` prop, or don't duplicate state:
+
+```tsx
+// Option 1: Sync with useEffect
+useEffect(() => {
+  setValue(propValue);
+}, [propValue]);
+
+// Option 2: Reset component with key (preferred)
+<Component key={userId} initialValue={value} />
+
+// Option 3: Don't duplicate state if not needed
+const displayValue = localValue ?? propValue;
+```
+
+### Problem: useEffect running with stale data
+
+**Cause:** Missing dependencies from dependency array
+
+**Solution:**
+Include all dependencies. If that causes issues, refactor the code:
+
+```tsx
+// ❌ Bad
+useEffect(() => {
+  doSomething(value);
+}, []); // Missing 'value'
+
+// ✅ Good
+useEffect(() => {
+  doSomething(value);
+}, [value]);
+
+// ✅ Better: Memoize if needed
+const doSomethingMemoized = useCallback(() => {
+  doSomething(value);
+}, [value]);
+```
+
 ## Integration
 
 **This pattern works with:**
@@ -1010,10 +1403,12 @@ export const UserProfile = ({ userId }: UserProfileProps) => {
 ## References
 
 **Based on:**
-- [The Anatomy of My Ideal React Component](https://antjanus.com/digital-garden/the-anatomy-of-my-ideal-react-component) - Original article by Antonin Januska
+- [The Anatomy of My Ideal React Component](https://antjanus.com/digital-garden/the-anatomy-of-my-ideal-react-component) - Component structure by Antonin Januska
+- [Common React Hooks Antipatterns and Gotchas](https://antjanus.com/digital-garden/common-react-hooks-antipatterns-and-gotchas) - Hooks best practices by Antonin Januska
 
 **Official Documentation:**
 - [React Docs: Function Components](https://react.dev/reference/react/Component)
+- [React Hooks Rules](https://react.dev/reference/rules/rules-of-hooks)
 - [styled-components Documentation](https://styled-components.com/)
 - [TypeScript React Cheatsheet](https://react-typescript-cheatsheet.netlify.app/)
 
