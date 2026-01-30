@@ -4,7 +4,11 @@
 
 # SkillBox
 
-A curated collection of utility skills for Claude Code. SkillBox provides reusable, battle-tested skills that enhance Claude Code's capabilities for common development workflows.
+A curated collection of utility skills for Claude Code and AI agents. SkillBox provides reusable, battle-tested skills that enhance agent capabilities for common development workflows.
+
+**Compatible with:** Claude Code, Cursor, Cline, GitHub Copilot, and 40+ other AI agents via [Vercel Skills](https://skills.sh)
+
+**Install with:** `npx skills add antjanus/skillbox`
 
 ## What are Skills?
 
@@ -79,7 +83,35 @@ Battle-tested React component structure pattern for building maintainable, consi
 
 ## Installation
 
-### Global Installation (Available in All Projects)
+### Using Vercel Skills CLI (Recommended)
+
+The easiest way to install SkillBox skills using the [Vercel Skills](https://skills.sh) ecosystem:
+
+```bash
+# Install all skills
+npx skills add antjanus/skillbox
+
+# Install specific skills
+npx skills add antjanus/skillbox@save-session
+npx skills add antjanus/skillbox@git-worktree
+npx skills add antjanus/skillbox@ideal-react-component
+
+# Install globally (available in all projects)
+npx skills add antjanus/skillbox -g
+
+# List installed skills
+npx skills list
+
+# Check for updates
+npx skills check
+```
+
+The skills CLI automatically detects your agent (Claude Code, Cursor, Cline, etc.) and installs skills to the correct location.
+
+### Alternative Installation Methods
+
+<details>
+<summary>Manual Global Installation</summary>
 
 ```bash
 # Clone the repository
@@ -89,8 +121,10 @@ git clone https://github.com/antjanus/skillbox.git ~/.claude/skillbox
 mkdir -p ~/.claude/skills
 ln -s ~/.claude/skillbox/skills/* ~/.claude/skills/
 ```
+</details>
 
-### Project-Specific Installation
+<details>
+<summary>Project-Specific Installation</summary>
 
 ```bash
 # Add as git submodule
@@ -104,8 +138,10 @@ mkdir -p .claude/skills
 ln -s ../.claude/skillbox/skills/save-session .claude/skills/save-session
 ln -s ../.claude/skillbox/skills/git-worktree .claude/skills/git-worktree
 ```
+</details>
 
-### Individual Skill Installation
+<details>
+<summary>Individual Skill Installation (curl)</summary>
 
 ```bash
 # Copy specific skill to your project
@@ -113,6 +149,7 @@ mkdir -p .claude/skills/save-session
 curl -o .claude/skills/save-session/SKILL.md \
   https://raw.githubusercontent.com/antjanus/skillbox/main/skills/save-session/SKILL.md
 ```
+</details>
 
 ## Usage
 
@@ -151,7 +188,13 @@ Use the `generate-skill` skill to create your own:
 user: /generate-skill my-workflow
 ```
 
-Or manually create following the [skill specification](https://agentskills.io/specification).
+Or use the Vercel Skills CLI to scaffold a new skill:
+
+```bash
+npx skills init my-workflow
+```
+
+Manually create following the [skill specification](https://agentskills.io/specification).
 
 ## Skill Structure
 
@@ -219,6 +262,8 @@ SkillBox skills follow these principles:
 
 ## Resources
 
+- **Skills Directory**: https://skills.sh (discover and track SkillBox installations)
+- **Vercel Skills CLI**: https://github.com/vercel-labs/skills (official CLI tool)
 - **Claude Code Documentation**: https://code.claude.com/docs/
 - **Skill Specification**: https://agentskills.io/specification
 - **Best Practices Article**: https://antjanus.com/ai/claude-code-best-practices

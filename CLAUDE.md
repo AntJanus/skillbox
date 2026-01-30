@@ -4,9 +4,13 @@ This file helps Claude Code understand how to work with the SkillBox project eff
 
 ## Project Description
 
-SkillBox is a collection of utility skills for Claude Code. Each skill is a specialized instruction set that teaches Claude Code how to handle specific development workflows.
+SkillBox is a collection of utility skills for Claude Code and AI agents. Each skill is a specialized instruction set that teaches agents how to handle specific development workflows.
 
-**Core purpose:** Provide reusable, battle-tested skills that enhance Claude Code's capabilities.
+**Core purpose:** Provide reusable, battle-tested skills that enhance AI agent capabilities across multiple platforms.
+
+**Compatible with:** Claude Code, Cursor, Cline, GitHub Copilot, and 40+ other AI agents via the [Vercel Skills](https://skills.sh) ecosystem.
+
+**Installation:** `npx skills add antjanus/skillbox`
 
 **This is NOT:** A code project with tests and builds. This is a documentation and skill repository.
 
