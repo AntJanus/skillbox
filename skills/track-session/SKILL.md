@@ -5,7 +5,8 @@ description: |
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "3.0.0"
+  version: "3.1.0"
+  argument-hint: "[save|resume]"
 hooks:
   post_tool_use:
     - Update SESSION_PROGRESS.md after Write/Edit operations
@@ -21,6 +22,26 @@ hooks:
 Use SESSION_PROGRESS.md in the project root to track plans and progress. All planned work should be saved to SESSION_PROGRESS.md and updated over time. If the plan changes, update SESSION_PROGRESS.
 
 **Core principle:** Maintain recoverable state so work can pause and resume without losing context.
+
+## Usage Modes
+
+This skill supports three modes via optional arguments:
+
+**No argument (default):** `/track-session`
+- Automatically save current session progress to SESSION_PROGRESS.md
+- Then immediately resume from that progress and continue work
+- Use when you want to create a checkpoint and keep working
+
+**Save only:** `/track-session save`
+- Save current session state to SESSION_PROGRESS.md
+- Stop and wait for user to continue
+- Use when pausing work or reaching a natural stopping point
+
+**Resume only:** `/track-session resume`
+- Read existing SESSION_PROGRESS.md
+- Load the plan, current status, and failed attempts
+- Continue from where work was left off
+- Use when starting a new session or returning after a break
 
 ## When to Use
 
@@ -74,6 +95,60 @@ Next: [immediate next step]
 - [timestamp] Task 2: [brief summary of what was done]
 ```
 
+## Workflow by Mode
+
+### Mode 1: Save and Resume (No Argument)
+
+**When invoked:** `/track-session`
+
+**Actions:**
+1. Check if SESSION_PROGRESS.md exists
+2. If exists, update it with current status
+3. If not exists, create it with initial plan
+4. Mark current checkpoint with timestamp
+5. Immediately continue working from that state
+
+**Use when:**
+- Creating checkpoints during active work
+- Before attempting risky changes
+- At natural breaking points (completed phase, before refactor)
+
+### Mode 2: Save Only
+
+**When invoked:** `/track-session save`
+
+**Actions:**
+1. Check if SESSION_PROGRESS.md exists
+2. If exists, update "Current Status" and "Completed Work"
+3. If not exists, create new SESSION_PROGRESS.md with current plan
+4. Add timestamp to "Last updated" field
+5. Stop and wait for user input
+
+**Use when:**
+- Ending a work session
+- Pausing work to switch tasks
+- Creating handoff documentation for team
+- Before taking a break or context reset
+
+### Mode 3: Resume Only
+
+**When invoked:** `/track-session resume`
+
+**Actions:**
+1. Check if SESSION_PROGRESS.md exists (error if missing)
+2. Read the entire file to understand context
+3. Identify what's completed (checked items)
+4. Identify current task from "Working on" field
+5. Read "Next" field for immediate action
+6. Check "Failed Attempts" to avoid repeating mistakes
+7. Continue work from the exact point left off
+
+**Use when:**
+- Starting new session after break
+- Recovering from context reset
+- Taking over work from another agent
+- Returning to task after interruption
+
 ## Rules
 
 1. **Never repeat failures** - Log every failed approach with reason
@@ -82,6 +157,50 @@ Next: [immediate next step]
 4. **Be specific** - Include enough detail to resume work after context loss
 
 ## Examples
+
+### Example 0: Argument Usage Patterns
+
+<Good>
+```bash
+# Scenario 1: Starting a big feature
+user: "Let's implement user authentication"
+assistant: "/track-session"
+# Creates SESSION_PROGRESS.md with plan, then starts working immediately
+
+# Scenario 2: Taking a lunch break
+user: "Save my progress, I'll be back in an hour"
+assistant: "/track-session save"
+# Saves current state and stops
+
+# Scenario 3: Coming back from break
+user: "I'm back, let's continue"
+assistant: "/track-session resume"
+# Reads SESSION_PROGRESS.md and continues from checkpoint
+
+# Scenario 4: Creating checkpoint mid-work
+assistant: "Completed Phase 2, creating checkpoint before Phase 3"
+assistant: "/track-session"
+# Updates SESSION_PROGRESS.md with Phase 2 completion, continues to Phase 3
+```
+
+**Why this is good:** Clear separation of concerns - save for pausing, resume for continuing, no-arg for checkpointing during active work.
+</Good>
+
+<Bad>
+```bash
+# Always using save even when you want to continue
+user: "Let's build authentication"
+assistant: "/track-session save"
+# Saves and STOPS, now user has to manually ask to resume
+
+# Using resume without a saved session
+user: "Start working on the feature"
+assistant: "/track-session resume"
+# ERROR: No SESSION_PROGRESS.md exists yet
+```
+
+**Why this is bad:** Using save when you want to continue wastes time. Using resume without prior save fails. Use no-arg mode to save+continue.
+</Bad>
 
 ### Example 1: Complex Feature Implementation
 
@@ -223,6 +342,34 @@ Before trying new approach:
 2. Verify approach is different
 3. Document why this attempt should work
 4. Add failed attempt immediately when it fails
+
+### Problem: Resume fails with "No SESSION_PROGRESS.md found"
+
+**Cause:** Trying to resume without first saving a session.
+
+**Solution:**
+- Use `/track-session` (no argument) to create initial session
+- Or use `/track-session save` to create SESSION_PROGRESS.md first
+- Resume only works when SESSION_PROGRESS.md already exists
+
+### Problem: Save mode stops work when you wanted to continue
+
+**Cause:** Using `save` argument instead of no argument.
+
+**Solution:**
+- Use `/track-session save` ONLY when pausing work
+- Use `/track-session` (no arg) to checkpoint and continue
+- Default no-arg mode is for active work with checkpoints
+
+### Problem: Unclear which mode to use
+
+**Cause:** Not understanding the difference between modes.
+
+**Solution:**
+Quick decision guide:
+- **Continuing work?** Use no argument (default)
+- **Stopping for a break?** Use `save`
+- **Coming back to work?** Use `resume`
 
 ## Integration
 
