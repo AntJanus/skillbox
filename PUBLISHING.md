@@ -28,7 +28,7 @@ All requirements for Vercel Skills ecosystem are met:
 
 All skills are ready for publishing:
 
-1. **save-session** - Session progress tracking
+1. **track-session** - Session progress tracking
 2. **git-worktree** - Parallel branch development
 3. **generate-skill** - Interactive skill builder
 4. **ideal-react-component** - React component structure pattern
@@ -46,7 +46,7 @@ npx skills add antjanus/skillbox
 ### Install Specific Skills
 
 ```bash
-npx skills add antjanus/skillbox@save-session
+npx skills add antjanus/skillbox@track-session
 npx skills add antjanus/skillbox@git-worktree
 npx skills add antjanus/skillbox@ideal-react-component
 npx skills add antjanus/skillbox@generate-skill

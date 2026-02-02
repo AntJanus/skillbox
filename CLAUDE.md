@@ -22,7 +22,7 @@ skillbox/
 ├── CLAUDE.md             # This file - AI onboarding doc
 ├── AGENTS.md             # Agent workflow documentation
 ├── skills/               # All skills live here
-│   ├── save-session/
+│   ├── track-session/
 │   │   └── SKILL.md      # Skill definition
 │   ├── git-worktree/
 │   │   └── SKILL.md
@@ -216,7 +216,7 @@ Before marking skill work complete:
 
 ```
 user: I need to track progress on this long task
-[Should activate save-session]
+[Should activate track-session]
 
 user: I want to work on multiple features in parallel
 [Should activate git-worktree]
@@ -329,11 +329,11 @@ If you catch yourself doing any of these:
 
 ## Integration with Other Skills
 
-### git-worktree + save-session
+### git-worktree + track-session
 
 When working with worktrees in parallel sessions:
 - Each worktree should have its own SESSION_PROGRESS.md
-- Use save-session to track progress in each worktree
+- Use track-session to track progress in each worktree
 - Name Claude sessions after worktree branches
 
 ### generate-skill + existing skills

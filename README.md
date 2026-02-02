@@ -16,9 +16,9 @@ Skills are specialized instructions that teach Claude Code how to handle specifi
 
 ## Available Skills
 
-### 🔄 save-session
+### 🔄 track-session
 
-Track progress and maintain state across long-running development sessions.
+Track, stop, resume, and save progress on long-running development sessions.
 
 **Use when:**
 - Working on multi-step implementations
@@ -28,7 +28,7 @@ Track progress and maintain state across long-running development sessions.
 
 **Triggers:** Automatically activates on long-running collaborative work
 
-[View Documentation](./skills/save-session/SKILL.md)
+[View Documentation](./skills/track-session/SKILL.md)
 
 ---
 
@@ -92,7 +92,7 @@ The easiest way to install SkillBox skills using the [Vercel Skills](https://ski
 npx skills add antjanus/skillbox
 
 # Install specific skills
-npx skills add antjanus/skillbox@save-session
+npx skills add antjanus/skillbox@track-session
 npx skills add antjanus/skillbox@git-worktree
 npx skills add antjanus/skillbox@ideal-react-component
 
@@ -135,7 +135,7 @@ git clone https://github.com/antjanus/skillbox.git .claude/skillbox
 
 # Symlink desired skills
 mkdir -p .claude/skills
-ln -s ../.claude/skillbox/skills/save-session .claude/skills/save-session
+ln -s ../.claude/skillbox/skills/track-session .claude/skills/track-session
 ln -s ../.claude/skillbox/skills/git-worktree .claude/skills/git-worktree
 ```
 </details>
@@ -145,9 +145,9 @@ ln -s ../.claude/skillbox/skills/git-worktree .claude/skills/git-worktree
 
 ```bash
 # Copy specific skill to your project
-mkdir -p .claude/skills/save-session
-curl -o .claude/skills/save-session/SKILL.md \
-  https://raw.githubusercontent.com/antjanus/skillbox/main/skills/save-session/SKILL.md
+mkdir -p .claude/skills/track-session
+curl -o .claude/skills/track-session/SKILL.md \
+  https://raw.githubusercontent.com/antjanus/skillbox/main/skills/track-session/SKILL.md
 ```
 </details>
 
@@ -168,7 +168,7 @@ Call skills directly using slash commands:
 
 ```
 user: /git-worktree feature-auth main
-user: /save-session
+user: /track-session
 user: /generate-skill database-migration
 ```
 
@@ -177,7 +177,7 @@ user: /generate-skill database-migration
 Load skills for the current session only:
 
 ```
-user: Load the save-session skill for this session
+user: Load the track-session skill for this session
 ```
 
 ## Creating Custom Skills
@@ -240,7 +240,7 @@ See [generate-skill documentation](./skills/generate-skill/SKILL.md) for detaile
 1. **Trust the activation**: Skills activate when needed - no need to force them
 2. **Use explicit invocation for clarity**: `/skill-name` when you want specific behavior
 3. **Read the documentation**: Each skill has comprehensive usage examples
-4. **Combine skills**: Many skills work well together (e.g., git-worktree + save-session)
+4. **Combine skills**: Many skills work well together (e.g., git-worktree + track-session)
 
 ### For Skill Creators
 

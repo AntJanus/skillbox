@@ -257,11 +257,11 @@ git checkout pr-123  # Loses current work
 - Safe PR review in isolated environments
 
 **Pairs with:**
-- **save-session** - Create separate SESSION_PROGRESS.md in each worktree to track independent progress
+- **track-session** - Create separate SESSION_PROGRESS.md in each worktree to track independent progress
 - **commit workflows** - Each worktree has its own staging area and commits independently
 - **Parallel Claude sessions** - Name each Claude session after its worktree branch for clarity
 
-**Integration pattern with save-session:**
+**Integration pattern with track-session:**
 ```bash
 # Create worktree
 git worktree add ../myproject-feature -b feature/new-api

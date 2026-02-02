@@ -274,7 +274,7 @@ List forbidden actions explicitly with literal language.
 - DO reference official docs
 
 **Examples in SkillBox:**
-- Aspects of save-session (progress tracking patterns)
+- Aspects of track-session (progress tracking patterns)
 
 ## Agent Communication Templates
 
@@ -433,7 +433,7 @@ Can't check all boxes? Return to failed phase.
 
 ## Agent Integration with SkillBox Skills
 
-### Using save-session as an Agent
+### Using track-session as an Agent
 
 When working on complex SkillBox tasks:
 
@@ -474,12 +474,12 @@ When asked to work on SkillBox in parallel:
 
 **Example:**
 ```
-user: Work on two skills at once - save-session improvements and a new testing skill
+user: Work on two skills at once - track-session improvements and a new testing skill
 
 A: I can work on both skills by tracking them separately:
 
-Context A (save-session improvements):
-- Reading current save-session/SKILL.md
+Context A (track-session improvements):
+- Reading current track-session/SKILL.md
 - Planning updates to progress tracking
 
 Context B (new testing skill):

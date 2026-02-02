@@ -1,11 +1,11 @@
 ---
-name: save-session
+name: track-session
 description: |
-  Track and save progress on long-running work. Use when asked to "start a work session", "save progress", "track this work", "let's get to work on something big", "continue where we left off", "resume work", or when planning multi-phase implementations, complex refactoring, or tasks spanning multiple sessions.
+  Track, stop, resume, and save progress on long-running work. Use when asked to "start a work session", "track this work", "save progress", "stop session", "resume work", "continue where we left off", "let's get to work on something big", or when planning multi-phase implementations, complex refactoring, or tasks spanning multiple sessions.
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "2.1.0"
+  version: "3.0.0"
 hooks:
   post_tool_use:
     - Update SESSION_PROGRESS.md after Write/Edit operations

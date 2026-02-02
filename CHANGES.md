@@ -58,7 +58,7 @@ Documents all changes made for Vercel Skills integration.
 ### All Skills Validated ✅
 
 Tested with `./test-skills.sh`:
-- **save-session**: ✅ 249 lines, all checks pass
+- **track-session**: ✅ 249 lines, all checks pass
 - **git-worktree**: ✅ 296 lines, all checks pass
 - **generate-skill**: ✅ 1042 lines, has frontmatter (⚠️ could use progressive disclosure)
 - **ideal-react-component**: ✅ 1417 lines, has frontmatter (⚠️ could use progressive disclosure)
@@ -77,7 +77,7 @@ Successfully discovers all 4 skills from the repository.
 ```
 skillbox/
 ├── skills/
-│   ├── save-session/SKILL.md
+│   ├── track-session/SKILL.md
 │   ├── git-worktree/SKILL.md
 │   ├── generate-skill/SKILL.md
 │   └── ideal-react-component/SKILL.md
@@ -111,7 +111,7 @@ Users can install with:
 npx skills add antjanus/skillbox
 
 # Specific skill
-npx skills add antjanus/skillbox@save-session
+npx skills add antjanus/skillbox@track-session
 
 # Global installation
 npx skills add antjanus/skillbox -g
