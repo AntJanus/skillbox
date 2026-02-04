@@ -21,6 +21,9 @@ skillbox/
 ├── README.md              # User-facing documentation
 ├── CLAUDE.md             # This file - AI onboarding doc
 ├── AGENTS.md             # Agent workflow documentation
+├── CHANGELOG.md          # Version history and release notes
+├── reference/            # Extended documentation
+│   └── VERSION-CONTROL.md # Complete versioning workflow
 ├── skills/               # All skills live here
 │   ├── track-session/
 │   │   └── SKILL.md      # Skill definition
@@ -177,6 +180,54 @@ Maybe you should do these things:
 Run some commands to set up.
 ```
 
+## Version Control & Changelog
+
+SkillBox uses:
+- **Conventional commits**: `type(scope): description` format
+- **Dual versioning**: Individual skills (in frontmatter) + SkillBox releases (git tags)
+- **CHANGELOG.md**: Tracks all changes by release
+
+### Essential Workflow
+
+**Update a skill:**
+```bash
+# Edit SKILL.md, bump version in frontmatter
+git commit -m "fix(skill-name): description"
+```
+
+**Create a release:**
+```bash
+# 1. Update CHANGELOG.md with version and date
+# 2. Commit changelog
+git commit -m "docs(changelog): prepare v1.2.0 release"
+
+# 3. Create and push annotated tag
+git tag -a v1.2.0 -m "Release v1.2.0 - summary"
+git push && git push origin v1.2.0
+```
+
+**Semantic versioning (skills and releases):**
+- **MAJOR**: Breaking changes
+- **MINOR**: New features (backward compatible)
+- **PATCH**: Bug fixes and typos
+
+### Deep Reference
+
+For complete workflow details:
+
+**[📋 Version Control & Changelog Guide](./reference/VERSION-CONTROL.md)**
+
+Includes:
+- Commit message conventions and examples
+- When to increment skill versions
+- Step-by-step release process (4 phases)
+- CHANGELOG.md structure and guidelines
+- Release checklist
+- Git commands for viewing history
+- Troubleshooting version issues
+
+**Load reference/ docs only when specifically needed to save context.**
+
 ## Workflow and Testing
 
 ### Creating a New Skill
@@ -279,6 +330,31 @@ user: Create a skill for running database migrations
 6. Note: "Only load these when specifically needed to save context"
 ```
 
+### Task: Create a SkillBox release
+
+```markdown
+1. Read reference/VERSION-CONTROL.md for complete process
+2. Update CHANGELOG.md with new version section
+3. Commit changelog
+4. Create annotated git tag
+5. Push tag to remote
+6. Verify tag exists on remote
+
+For detailed steps, see reference/VERSION-CONTROL.md
+```
+
+### Task: Update skill and document change
+
+```markdown
+1. Read the current SKILL.md
+2. Make your changes
+3. Increment metadata.version (PATCH/MINOR/MAJOR)
+4. Commit with conventional format: type(skill-name): description
+5. Add change to CHANGELOG.md [Unreleased] section
+
+For versioning rules, see reference/VERSION-CONTROL.md
+```
+
 ## Red Flags - STOP
 
 If you catch yourself doing any of these:
@@ -291,6 +367,10 @@ If you catch yourself doing any of these:
 - **Over 500 lines without progressive disclosure** - Split content
 - **No verification checklist in methodology skills** - Required for enforcement
 - **Testing by reading code instead of trigger phrases** - Test activation properly
+- **Creating git tag without updating CHANGELOG.md** - Document first!
+- **Non-conventional commit messages** - Follow the format
+- **Forgetting to increment skill version** - Update metadata.version
+- **Creating tag for individual skill update** - Tags are for SkillBox releases only
 
 **ALL of these mean: STOP. Read this CLAUDE.md again.**
 
@@ -370,7 +450,7 @@ Methodology skills include checkboxes and completion criteria.
 
 ### Updating Skill
 ```
-Read SKILL.md → Make changes → Increment version → Test triggers
+Read SKILL.md → Make changes → Increment version → Commit → Update CHANGELOG
 ```
 
 ### Validating Skill
@@ -381,6 +461,21 @@ Check: Frontmatter | Triggers | Examples | Troubleshooting | < 500 lines
 ### Testing Activation
 ```
 Try trigger phrases → Verify activation → Adjust description if needed
+```
+
+### Creating Release
+```
+Review changes → Update CHANGELOG → Commit → Tag → Push
+```
+
+### Commit Message
+```
+type(scope): description
+
+# Examples:
+feat(track-session): add new checkpoint feature
+fix(git-worktree): correct branch switching logic
+docs(readme): update installation instructions
 ```
 
 ## Meta
@@ -397,6 +492,6 @@ Treat every issue working with SkillBox as an opportunity to update this file.
 
 ---
 
-**Last Updated:** 2025-01-29
+**Last Updated:** 2026-02-04
 **Applies To:** Claude Code 2025+
 **Source:** https://antjanus.com/ai/claude-code-best-practices
