@@ -1,12 +1,12 @@
 ---
 name: track-session
 description: |
-  Track, stop, resume, and save progress on long-running work. Use when asked to "start a work session", "track this work", "save progress", "stop session", "resume work", "continue where we left off", "let's get to work on something big", or when planning multi-phase implementations, complex refactoring, or tasks spanning multiple sessions.
+  Track, stop, resume, verify, and save progress on long-running work. Use when asked to "start a work session", "track this work", "save progress", "stop session", "resume work", "continue where we left off", "verify work", "check if we're done", "validate progress", "let's get to work on something big", or when planning multi-phase implementations, complex refactoring, or tasks spanning multiple sessions.
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "3.1.0"
-  argument-hint: "[save|resume]"
+  version: "3.3.0"
+  argument-hint: "[save|resume|verify]"
 hooks:
   post_tool_use:
     - Update SESSION_PROGRESS.md after Write/Edit operations
@@ -25,7 +25,7 @@ Use SESSION_PROGRESS.md in the project root to track plans and progress. All pla
 
 ## Usage Modes
 
-This skill supports three modes via optional arguments:
+This skill supports four modes via optional arguments:
 
 **No argument (default):** `/track-session`
 - Automatically save current session progress to SESSION_PROGRESS.md
@@ -42,6 +42,13 @@ This skill supports three modes via optional arguments:
 - Load the plan, current status, and failed attempts
 - Continue from where work was left off
 - Use when starting a new session or returning after a break
+
+**Verify only:** `/track-session verify`
+- Read SESSION_PROGRESS.md and verify all work against initial requirements
+- Check that completed tasks actually meet their goals
+- Validate dependencies are satisfied
+- Report gaps, incomplete work, or deviations from plan
+- Use when work appears complete or before final delivery
 
 ## When to Use
 
@@ -73,6 +80,16 @@ Update after:
 - Every 2-3 file modifications
 - Before asking user questions
 
+## When to Verify
+
+Run verification:
+- Before declaring work complete
+- After all planned tasks are checked off
+- Before final delivery or handoff
+- When returning to work after a long break (verify nothing regressed)
+- After major refactoring (verify functionality preserved)
+- When user asks "are we done?" or "did we finish everything?"
+
 ## Format
 
 ```markdown
@@ -93,61 +110,51 @@ Next: [immediate next step]
 
 ## Completed Work
 - [timestamp] Task 2: [brief summary of what was done]
+
+## Verification Results
+(Added by /track-session verify command)
+
+### ✅ Successfully Verified
+- Task/Phase: Evidence of completion and correctness
+
+### ⚠️ Minor Issues Found
+- Issue: Description and impact
+
+### ❌ Blocking Issues
+- Critical problem: What's broken and why it blocks delivery
+
+### 📋 Recommended Next Steps
+1. Specific action to address issues
+2. Next action after that
 ```
 
 ## Workflow by Mode
 
-### Mode 1: Save and Resume (No Argument)
+### Mode 1: Save and Resume (Default)
 
-**When invoked:** `/track-session`
+**Command:** `/track-session`
 
-**Actions:**
-1. Check if SESSION_PROGRESS.md exists
-2. If exists, update it with current status
-3. If not exists, create it with initial plan
-4. Mark current checkpoint with timestamp
-5. Immediately continue working from that state
-
-**Use when:**
-- Creating checkpoints during active work
-- Before attempting risky changes
-- At natural breaking points (completed phase, before refactor)
+Create/update SESSION_PROGRESS.md with current status, then immediately continue work. Use for checkpoints during active work, before risky changes, or at natural breaking points.
 
 ### Mode 2: Save Only
 
-**When invoked:** `/track-session save`
+**Command:** `/track-session save`
 
-**Actions:**
-1. Check if SESSION_PROGRESS.md exists
-2. If exists, update "Current Status" and "Completed Work"
-3. If not exists, create new SESSION_PROGRESS.md with current plan
-4. Add timestamp to "Last updated" field
-5. Stop and wait for user input
-
-**Use when:**
-- Ending a work session
-- Pausing work to switch tasks
-- Creating handoff documentation for team
-- Before taking a break or context reset
+Save current state to SESSION_PROGRESS.md and stop. Use when ending a work session, pausing work, creating handoff documentation, or before taking a break.
 
 ### Mode 3: Resume Only
 
-**When invoked:** `/track-session resume`
+**Command:** `/track-session resume`
 
-**Actions:**
-1. Check if SESSION_PROGRESS.md exists (error if missing)
-2. Read the entire file to understand context
-3. Identify what's completed (checked items)
-4. Identify current task from "Working on" field
-5. Read "Next" field for immediate action
-6. Check "Failed Attempts" to avoid repeating mistakes
-7. Continue work from the exact point left off
+Read SESSION_PROGRESS.md (error if missing), load plan/status/failed attempts, continue from checkpoint. Use when starting new session after break, recovering from context reset, or taking over work.
 
-**Use when:**
-- Starting new session after break
-- Recovering from context reset
-- Taking over work from another agent
-- Returning to task after interruption
+### Mode 4: Verify Only
+
+**Command:** `/track-session verify`
+
+Validate completed tasks against original requirements. Checks: work actually done, requirements met, dependencies satisfied, no scope gaps. Generates report with ✅ verified, ⚠️ minor issues, ❌ blockers, 📋 next steps. Use before declaring done or delivery.
+
+**See:** [Detailed Verification Guide](./reference/VERIFICATION.md) for full methodology.
 
 ## Rules
 
@@ -155,6 +162,8 @@ Next: [immediate next step]
 2. **Resume from checkpoint** - Check for existing SESSION_PROGRESS.md at session start
 3. **Keep current** - File should always reflect actual state
 4. **Be specific** - Include enough detail to resume work after context loss
+5. **Verify before declaring done** - Always run `/track-session verify` before claiming work is complete
+6. **Verification is not optional** - Checked boxes don't mean work meets requirements; verification does
 
 ## Examples
 
@@ -181,9 +190,20 @@ assistant: "/track-session resume"
 assistant: "Completed Phase 2, creating checkpoint before Phase 3"
 assistant: "/track-session"
 # Updates SESSION_PROGRESS.md with Phase 2 completion, continues to Phase 3
+
+# Scenario 5: Verifying work is complete
+user: "Are we done? Did we complete everything?"
+assistant: "/track-session verify"
+# Reads SESSION_PROGRESS.md, checks all completed tasks against requirements
+# Reports: "✅ Phases 1-3 verified. ⚠️ Phase 4 tests not run. Recommend: Run test suite"
+
+# Scenario 6: End of work session verification
+assistant: "All tasks appear complete. Let me verify before we finish."
+assistant: "/track-session verify"
+# Validates all work, generates verification report
 ```
 
-**Why this is good:** Clear separation of concerns - save for pausing, resume for continuing, no-arg for checkpointing during active work.
+**Why this is good:** Clear separation of concerns - save for pausing, resume for continuing, no-arg for checkpointing during active work, verify for validation before delivery.
 </Good>
 
 <Bad>
@@ -197,9 +217,13 @@ assistant: "/track-session save"
 user: "Start working on the feature"
 assistant: "/track-session resume"
 # ERROR: No SESSION_PROGRESS.md exists yet
+
+# Marking tasks complete without verification
+assistant: "All tasks are checked off, we're done!"
+# Never ran verify to confirm work actually meets requirements
 ```
 
-**Why this is bad:** Using save when you want to continue wastes time. Using resume without prior save fails. Use no-arg mode to save+continue.
+**Why this is bad:** Using save when you want to continue wastes time. Using resume without prior save fails. Skipping verify means potentially incomplete or incorrect work. Use no-arg mode to save+continue, and always verify before declaring completion.
 </Bad>
 
 ### Example 1: Complex Feature Implementation
@@ -294,6 +318,41 @@ Debugging payment bug. Tried a few things. Need to fix it.
 **Why this is bad:** No systematic approach, no record of what was tried, no hypothesis tracking.
 </Bad>
 
+### Example 3: Verification Workflow
+
+<Good>
+```markdown
+# Session Progress
+
+## Plan
+- [x] Phase 1: Set up authentication system
+- [x] Phase 2: Implement user registration
+- [x] Phase 3: Add email verification
+- [x] Phase 4: Write tests
+
+## Verification Results
+✅ All phases verified with passing tests (23/23)
+⚠️ Minor: Email template styling, no rate limiting
+📋 Next: Add rate limiting, customize templates
+```
+
+**Why this is good:** Verification report shows evidence (test counts, specific issues), separates critical vs. nice-to-have, provides actionable next steps.
+</Good>
+
+<Bad>
+```markdown
+## Plan
+- [x] Phase 1: Authentication
+- [x] Phase 2: Registration
+- [x] Phase 3: Email stuff
+- [x] Phase 4: Tests
+
+Everything is done! ✨
+```
+
+**Why this is bad:** No verification performed, no evidence work meets requirements, potentially incomplete work.
+</Bad>
+
 ## Troubleshooting
 
 ### Problem: SESSION_PROGRESS.md getting too large (>1000 lines)
@@ -370,6 +429,40 @@ Quick decision guide:
 - **Continuing work?** Use no argument (default)
 - **Stopping for a break?** Use `save`
 - **Coming back to work?** Use `resume`
+- **Think you're done?** Use `verify`
+
+### Problem: Verify reports work incomplete but all tasks are checked
+
+**Cause:** Tasks were marked complete without actually finishing the work, or requirements changed.
+
+**Solution:**
+1. Review each flagged item in the verification report
+2. Either:
+   - Complete the missing work and re-verify, OR
+   - Update SESSION_PROGRESS.md if requirements changed
+3. Never skip verification - checked boxes don't mean work is actually done
+
+### Problem: Verify mode takes too long
+
+**Cause:** Too many completed tasks to verify at once.
+
+**Solution:**
+- Run verify incrementally after each major phase
+- Don't wait until the end to verify everything
+- Use `/track-session verify` after completing each group of related tasks
+- Archive verified phases to SESSION_ARCHIVE.md to reduce scope
+
+### Problem: Verify passes but work still has bugs
+
+**Cause:** Verification wasn't thorough enough (didn't run tests, check edge cases, etc.)
+
+**Solution:**
+Verification should include:
+- Running test suites (unit, integration, e2e)
+- Manual testing of key user flows
+- Checking error handling and edge cases
+- Validating against original acceptance criteria
+- Code review of critical changes
 
 ## Integration
 
