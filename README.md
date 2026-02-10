@@ -81,6 +81,22 @@ Battle-tested React component structure pattern for building maintainable, consi
 
 ---
 
+### 📊 rate-skill
+
+Evaluate skill quality against best practices with letter grades (A-F) and actionable recommendations.
+
+**Use when:**
+- Reviewing skills before publishing
+- Validating skill structure and formatting
+- Checking if skill meets quality standards
+- Auditing skill repositories
+
+**Triggers:** When asked to "rate this skill", "review skill quality", "check skill formatting", "evaluate SKILL.md", "grade this skill"
+
+[View Documentation](./skills/rate-skill/SKILL.md)
+
+---
+
 ## Installation
 
 ### Using Vercel Skills CLI (Recommended)
@@ -282,4 +298,4 @@ MIT License - see individual skills for specific licensing
 
 ---
 
-**Skill Count**: 4 | **Total Lines of Documentation**: 2800+ | **Made for**: Claude Code 2025+
+**Skill Count**: 5 | **Made for**: Claude Code 2025+

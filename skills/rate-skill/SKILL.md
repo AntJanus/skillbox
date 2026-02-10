@@ -5,7 +5,7 @@ description: |
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.0.0"
+  version: "1.0.1"
   argument-hint: "<path/to/SKILL.md>"
 tags: [quality, auditing, validation, skills]
 ---
@@ -134,7 +134,7 @@ Audit SKILL.md files against quality standards from generate-skill best practice
    - Impact: [Why this matters]
    - Fix: [Specific action to take]
 
-### 📋 Recommendations (Nice to Have)
+### 📋 Nice to Have
 1. [Suggestion]
    - Benefit: [Why this helps]
 
@@ -142,7 +142,7 @@ Audit SKILL.md files against quality standards from generate-skill best practice
 - [What this skill does well]
 - [Another strength]
 
-## Recommendations
+## Priority Action Items
 1. [Priority 1 action]
 2. [Priority 2 action]
 3. [Priority 3 action]
@@ -200,10 +200,9 @@ Audit SKILL.md files against quality standards from generate-skill best practice
 
 ### Example 1: High-Quality Skill
 
-**Input:**
-```bash
-/rate-skill skills/track-session/SKILL.md
-```
+<Good>
+
+**Input:** `/rate-skill skills/track-session/SKILL.md`
 
 **Output:**
 ```markdown
@@ -229,24 +228,21 @@ Audit SKILL.md files against quality standards from generate-skill best practice
 
 ## Strengths
 - Excellent progressive disclosure with reference/VERIFICATION.md
-- Highly concise mode descriptions
 - 10+ diverse trigger phrases
 - Strong examples with Good/Bad comparisons
-- Comprehensive troubleshooting (9 entries)
 
-## Recommendations
+## Priority Action Items
 1. Consider adding one more example for edge cases (optional)
-
-## Estimated Improvements
-- Already at A grade - no critical improvements needed
 ```
+
+**Why this is good:** Specific evidence (test counts), clear strengths, actionable next steps.
+</Good>
 
 ### Example 2: Needs Improvement
 
-**Input:**
-```bash
-/rate-skill skills/problematic-skill/SKILL.md
-```
+<Bad>
+
+**Input:** `/rate-skill skills/problematic-skill/SKILL.md`
 
 **Output:**
 ```markdown
@@ -283,32 +279,23 @@ Audit SKILL.md files against quality standards from generate-skill best practice
 
 ### ⚠️ Important Issues
 1. **Verbose mode descriptions (30+ lines each)**
-   - Impact: Reduced scannability
    - Fix: Condense to 2-3 lines per mode
 
-2. **Redundant format in examples**
-   - Impact: Wastes context tokens
-   - Fix: Reference Format section instead of repeating
-
-### 📋 Recommendations
+### 📋 Nice to Have
 1. Add 2-3 more troubleshooting entries
-2. Improve paragraph breaks for scannability
 
-## Strengths
-- Good structure with required sections
-- Examples use Good/Bad pattern correctly
-
-## Recommendations
+## Priority Action Items
 1. Implement progressive disclosure (move 200+ lines to reference/)
 2. Add 3+ trigger phrases to description
 3. Condense verbose sections
-4. Remove redundant content
 
 ## Estimated Improvements
 - Fix critical issues: +12 points → 86 (B)
-- Address important issues: +4 points → 90 (A)
 - Potential grade: C → A
 ```
+
+**Why this is bad:** Multiple critical issues (length, triggers) drag the grade down. This skill needs progressive disclosure and better activation phrases before publishing.
+</Bad>
 
 ## Troubleshooting
 
@@ -386,31 +373,6 @@ git commit -m "Add new-feature skill"
 - A-B: Merge to main ✅
 - C: Request changes ⚠️
 - D-F: Reject until improved ❌
-
-## Scoring Algorithm
-
-**Category scores:**
-1. Length: Line count + progressive disclosure
-2. Conciseness: Paragraph length + info density
-3. Repetitiveness: Duplicate content detection
-4. Structure: Section presence + organization
-5. Triggers: Count + quality of trigger phrases
-6. Examples: Count + Good/Bad presence
-7. Troubleshooting: Entry count + completeness
-
-**Weight application:**
-```
-Total = (Length × 0.20) + (Conciseness × 0.20) + (Repetitiveness × 0.15)
-      + (Structure × 0.15) + (Triggers × 0.15) + (Examples × 0.10)
-      + (Troubleshooting × 0.05)
-```
-
-**Grade assignment:**
-- 90-100: A
-- 80-89: B
-- 70-79: C
-- 60-69: D
-- 0-59: F
 
 ## References
 

@@ -5,7 +5,7 @@ description: |
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "3.3.0"
+  version: "3.3.1"
   argument-hint: "[save|resume|verify]"
 hooks:
   post_tool_use:
@@ -167,7 +167,7 @@ Validate completed tasks against original requirements. Checks: work actually do
 
 ## Examples
 
-### Example 0: Argument Usage Patterns
+### Example: Mode Selection
 
 <Good>
 ```bash
@@ -247,7 +247,6 @@ assistant: "All tasks are checked off, we're done!"
   - Test session persistence
 
 ## Current Status
-Last updated: 2025-01-29 14:30
 Working on: Phase 3 - Implementing Redis session storage
 Next: Add Redis client configuration, then implement session middleware
 
@@ -256,8 +255,8 @@ Next: Add Redis client configuration, then implement session middleware
 - Attempted express-session default store: Performance issues with concurrent users, Redis solves this
 
 ## Completed Work
-- 2025-01-29 14:00: Phase 2 completed - OAuth flow working with Google provider
-- 2025-01-29 13:30: Phase 1 completed - Selected Passport.js after comparing 3 libraries
+- Phase 2 completed - OAuth flow working with Google provider
+- Phase 1 completed - Selected Passport.js after comparing 3 libraries
 ```
 
 **Why this is good:** Specific tasks with clear dependencies, documented decisions, failed attempts recorded with reasons, concrete next steps.
@@ -291,7 +290,6 @@ Working on auth. Tried some things that didn't work.
 - [ ] Phase 4: Verify fix with tests [dependency: Phase 3]
 
 ## Current Status
-Last updated: 2025-01-29 15:00
 Working on: Phase 3 - Implementing race condition fix
 Next: Add mutex lock around shared resource access in payment processor
 
@@ -301,8 +299,8 @@ Next: Add mutex lock around shared resource access in payment processor
 - Increased timeout values: Made it worse, confirms race condition hypothesis
 
 ## Completed Work
-- 2025-01-29 14:45: Phase 2 - Root cause identified: race condition in payment state management
-- 2025-01-29 14:15: Phase 1 - Bug reproduced consistently with concurrent payment attempts
+- Phase 2 - Root cause identified: race condition in payment state management
+- Phase 1 - Bug reproduced consistently with concurrent payment attempts
 ```
 
 **Why this is good:** Clear progression through debugging phases, failed attempts inform next steps, root cause documented.

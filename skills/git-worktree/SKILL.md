@@ -3,8 +3,8 @@ name: git-worktree
 description: Use when you need to work on multiple branches simultaneously, run parallel Claude Code sessions, handle emergency hotfixes during feature work, review PRs without switching branches, or test across branches without losing current work
 license: MIT
 metadata:
-  author: antonin
-  version: "2.0.0"
+  author: Antonin Januska
+  version: "2.0.1"
   argument-hint: <branch-name> [base-branch]
 ---
 
@@ -57,18 +57,12 @@ git worktree add ../project-hotfix -b hotfix-critical origin/main
 git worktree add ../project-review pr-123
 ```
 
-**Safety check:**
-Ensure worktrees are either outside the repo or in `.gitignore` to avoid tracking them.
-
-```bash
-# Check if path would be tracked
-git check-ignore ../project-feature-name
-```
+**Tip:** Place worktrees outside the repo directory (e.g., `../project-feature-name`) so they aren't tracked by Git.
 
 **Recommended configuration (run once):**
 ```bash
 git config worktree.guessRemote true
-git config worktree.useRelativePaths true
+git config worktree.useRelativePaths true  # Requires Git 2.45+
 ```
 
 ### Step 3: Work in Worktree
@@ -155,6 +149,7 @@ git worktree list --verbose
 # Clean up stale metadata
 git worktree prune
 ```
+
 ## Examples
 
 ### Example 1: Create worktree for new feature
