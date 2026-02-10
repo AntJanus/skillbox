@@ -7,19 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### New Skills
-- TBD
+---
+
+## [1.1.0] - 2026-02-10
+
+Quality review and progressive disclosure refactor across all skills.
 
 ### Enhancements
-- TBD
+
+- **ideal-react-component** (v1.2.0): Refactored from 1418 → 499 lines with progressive disclosure; moved hooks antipatterns and complete examples to reference/; consolidated TS/JS duplication
+- **generate-skill** (v1.2.0): Refactored from 1043 → 393 lines with progressive disclosure; moved pattern templates and advanced topics to reference/; removed redundant content
+- **rate-skill** (v1.0.1): Added Good/Bad tags to examples; removed redundant scoring algorithm section; fixed duplicate section naming
 
 ### Fixes
-- TBD
+
+- **git-worktree** (v2.0.1): Fixed author metadata inconsistency; removed incorrect `git check-ignore` advice; added Git 2.45+ note for `useRelativePaths`; fixed formatting
+- **track-session** (v3.3.1): Renamed "Example 0" to descriptive title; removed hardcoded timestamps from examples
 
 ### Documentation
-- Added comprehensive version control and changelog workflow to CLAUDE.md
-- Established conventional commit message format
-- Created CHANGELOG.md with proper structure
+
+- Added rate-skill to README.md Available Skills section
+- Updated skill count from 4 to 5 in README.md
 
 ---
 
@@ -92,5 +100,6 @@ When creating a release:
 
 ---
 
-[Unreleased]: https://github.com/antjanus/skillbox/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/antjanus/skillbox/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/antjanus/skillbox/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/antjanus/skillbox/releases/tag/v1.0.0
