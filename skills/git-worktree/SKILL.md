@@ -1,10 +1,15 @@
 ---
 name: git-worktree
-description: Use when you need to work on multiple branches simultaneously, run parallel Claude Code sessions, handle emergency hotfixes during feature work, review PRs without switching branches, or test across branches without losing current work
+description: |
+  Use when you need to work on multiple branches simultaneously, run parallel Claude Code sessions,
+  handle emergency hotfixes during feature work, review PRs without switching branches, or test
+  across branches without losing current work. Use when asked to "work on two branches at once",
+  "parallel development", "switch without losing work", "create a worktree", or "hotfix while
+  working on a feature".
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "2.0.1"
+  version: "2.0.2"
   argument-hint: <branch-name> [base-branch]
 ---
 
@@ -289,3 +294,8 @@ cd ~/myproject-pr-123
 - Each worktree tracks progress independently
 - Use `git worktree list` to see all active work
 - Clean up worktrees when branches are merged
+
+## References
+
+- [Git Worktree Documentation](https://git-scm.com/docs/git-worktree)
+- [Git Worktree Tutorial](https://git-scm.com/docs/git-worktree#_examples)

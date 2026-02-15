@@ -8,7 +8,7 @@ description: |
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.2.0"
+  version: "1.3.0"
 tags: [react, component, structure, organization, best-practices]
 ---
 
@@ -122,9 +122,11 @@ import { useQuery } from 'react-query';
 3. Internal/aliased imports (`@/`) (followed by blank line)
 4. Local component imports (same directory)
 
-## Section 2: Styled Components
+## Section 2: Styling
 
-**Prefix styling-only components with `Styled` for instant recognition:**
+**The key principle is separating styling from logic.** The approach depends on your styling solution:
+
+**styled-components / emotion:** Prefix with `Styled` for instant recognition:
 
 <Good>
 ```tsx
@@ -166,7 +168,30 @@ const Title = styled.h2`
 - Import as `import * as S from './ComponentName.styled'`
 - Use as `<S.Container>`, `<S.Title>`, etc.
 
-**JavaScript:** Same pattern works for `.js`/`.jsx` files.
+**Tailwind CSS:** Extract repeated utility sets into components or use `@apply`:
+```tsx
+// Wrapper component keeps JSX clean
+const Card = ({ title, children }: CardProps) => (
+  <div className="border border-gray-300 rounded-lg p-4">
+    <h2 className="text-xl mb-2">{title}</h2>
+    {children}
+  </div>
+);
+```
+
+**CSS Modules:** Import as `styles` and use bracket notation:
+```tsx
+import styles from './Card.module.css';
+
+const Card = ({ title, children }: CardProps) => (
+  <div className={styles.container}>
+    <h2 className={styles.title}>{title}</h2>
+    {children}
+  </div>
+);
+```
+
+**JavaScript:** Same patterns work for `.js`/`.jsx` files.
 
 ## Section 3: Type Definitions
 
@@ -375,11 +400,41 @@ export const PostView = ({ postId }: PostViewProps): JSX.Element => {
 
 **JavaScript:** Same pattern without type annotations.
 
+## Common Hooks Antipatterns (Quick Reference)
+
+These are the most frequent causes of infinite loops, stale data, and unexpected re-renders:
+
+**1. useEffect as onChange callback** - Causes double renders or infinite loops:
+```tsx
+// ❌ Bad: Effect syncs state derived from other state
+useEffect(() => { setFullName(`${first} ${last}`); }, [first, last]);
+
+// ✅ Good: Derive during render instead
+const fullName = `${first} ${last}`;
+```
+
+**2. useState initial value not updating with props:**
+```tsx
+// ❌ Bad: Initial value only runs once, won't track prop changes
+const [value, setValue] = useState(props.initialValue);
+
+// ✅ Good: Use a key to reset, or useEffect to sync
+<Component key={itemId} initialValue={data.value} />
+```
+
+**3. Non-exhaustive dependency arrays** - Causes stale closures:
+```tsx
+// ❌ Bad: Missing dependency means stale count value
+useEffect(() => { setTotal(count * price); }, [price]);
+
+// ✅ Good: Include all dependencies
+useEffect(() => { setTotal(count * price); }, [count, price]);
+```
+
+For detailed explanations and more patterns, see **[React Hooks Antipatterns](./reference/HOOKS-ANTIPATTERNS.md)**.
+
 ## Deep Reference
 
-For detailed guides, load these files when needed:
-
-- **[React Hooks Antipatterns](./reference/HOOKS-ANTIPATTERNS.md)** - Common useEffect, useState, and dependency array mistakes with fixes
 - **[Complete Component Examples](./reference/COMPLETE-EXAMPLES.md)** - Full TypeScript and JavaScript component examples
 
 *Only load these when specifically needed to save context.*
@@ -389,34 +444,12 @@ For detailed guides, load these files when needed:
 | Section | What Goes Here | Why |
 |---------|----------------|-----|
 | 1. Imports | React, libraries, internal, local | Easy to find dependencies |
-| 2. Styled Components | `Styled*` prefixed styling | Visual separation from logic |
+| 2. Styling | Styled components, Tailwind, CSS Modules | Visual separation from logic |
 | 3. Type Definitions | `*Props`, `*Return` types | Component API visibility |
 | 4. Component Function | `export const Component =` | Named exports for refactoring |
 | 5. Logic Flow | State -> Hooks -> Effects -> Handlers | Respects hook rules, logical order |
 | 6. Conditional Rendering | Early returns for edge cases | Reduces nesting |
 | 7. Default Render | Success state JSX | Most important case most visible |
-
-## Best Practices Summary
-
-**DO:**
-- Group imports by source with blank lines
-- Prefix styled components with `Styled`
-- Declare types above component (not inline)
-- Use const + arrow functions for components
-- Follow logic order: state -> hooks -> effects -> handlers
-- Exit early for loading/error states
-- Extract complex logic to custom hooks
-- Use named exports
-
-**DON'T:**
-- Mix import sources randomly
-- Use generic names for styled components
-- Inline complex types in parameters
-- Use default exports
-- Put effects before state they depend on
-- Nest conditional renders in JSX
-- Let component logic exceed 100 lines
-- Forget to move styles to separate file when large
 
 ## Troubleshooting
 
@@ -430,70 +463,37 @@ For detailed guides, load these files when needed:
 3. Split into smaller sub-components
 4. Extract complex calculations to utility functions
 
-```tsx
-// After: Extract hook + co-locate styles = 80 line component
-import { useUserProfile } from './useUserProfile';
-import * as S from './UserProfile.styled';
-
-export const UserProfile = () => {
-  const { user, handlers } = useUserProfile();
-  // 30 lines of presentation logic + 50 lines of JSX
-};
-```
-
 ### Problem: Can't decide if something should be a styled component or a sub-component
 
 **Solution:**
 - **Styled component** if it only adds styling (no props, no logic)
 - **Sub-component** if it has its own props, state, or logic
 
-### Problem: Import organization feels arbitrary
-
-**Solution:** Use this checklist:
-1. Is it from `react` or `react-*`? -> Group 1 (React imports)
-2. Is it from `node_modules`? -> Group 2 (Third-party)
-3. Is it using path alias (`@/`)? -> Group 3 (Internal)
-4. Is it in same directory (`./`)? -> Group 4 (Local)
-
-Add blank line between groups.
-
 ### Problem: TypeScript types getting complex
 
-**Solution:**
-1. Split component into smaller pieces
-2. Extract shared types to `types.ts`
-3. Use utility types (`Pick`, `Omit`, `Partial`)
+**Solution:** Split component into smaller pieces, extract shared types to `types.ts`, use utility types (`Pick`, `Omit`, `Partial`).
 
-### Problem: Hooks causing infinite re-render loop, state not syncing with props, or useEffect using stale data
+### Problem: Hooks causing infinite re-render loop, stale data, or state not syncing
 
-**Cause:** Common hooks antipatterns. See **[React Hooks Antipatterns](./reference/HOOKS-ANTIPATTERNS.md)** for detailed explanations and fixes covering:
-- `useEffect` "onChange" callback pattern (causes double renders / infinite loops)
-- `useState` initial value not updating with prop changes
-- Non-exhaustive `useEffect` dependency arrays (stale closures)
+**Solution:** See the **Common Hooks Antipatterns** section above for the top 3 patterns, or load **[React Hooks Antipatterns](./reference/HOOKS-ANTIPATTERNS.md)** for the full guide.
 
 ## Variations and Flexibility
 
-**Remember:** This is a pattern, not a law. Adapt as needed:
+**This is a pattern, not a law.** Adapt as needed:
 
 - **Small components** (< 50 lines) can skip some structure
 - **Simple components** without state can skip logic sections
-- **Presentational components** may not need data hooks
-- **Different styling solutions** (CSS Modules, Tailwind) can replace styled-components section
-
-**Core principle remains:** Predictable organization helps teams maintain code.
+- **React Server Components** don't use hooks or client state - skip logic sections, focus on data fetching and render
 
 ## Integration
 
-**Works with:** styled-components, twin.macro, emotion, React Query / TanStack Query, SWR, Zustand / Redux
+**Works with:** styled-components, emotion, Tailwind CSS, CSS Modules, React Query / TanStack Query, SWR, Zustand / Redux
 
-**Pairs well with:** ESLint (`eslint-plugin-import` for import ordering), Prettier, TypeScript, Storybook
-
-**Use in combination with:** Component testing patterns (Vitest, Jest), code review checklists, team style guides
+**Pairs well with:** ESLint (`eslint-plugin-import`), Prettier, TypeScript, Storybook, Vitest / Jest
 
 ## References
 
 - [The Anatomy of My Ideal React Component](https://antjanus.com/digital-garden/the-anatomy-of-my-ideal-react-component) - Antonin Januska
 - [Common React Hooks Antipatterns and Gotchas](https://antjanus.com/digital-garden/common-react-hooks-antipatterns-and-gotchas) - Antonin Januska
-- [React Docs: Function Components](https://react.dev/reference/react/Component) | [React Hooks Rules](https://react.dev/reference/rules/rules-of-hooks)
-- [styled-components](https://styled-components.com/) | [TypeScript React Cheatsheet](https://react-typescript-cheatsheet.netlify.app/)
-- [Custom Hooks Guide](https://react.dev/learn/reusing-logic-with-custom-hooks) | [Thinking in React](https://react.dev/learn/thinking-in-react)
+- [React Hooks Rules](https://react.dev/reference/rules/rules-of-hooks) | [Custom Hooks Guide](https://react.dev/learn/reusing-logic-with-custom-hooks)
+- [TypeScript React Cheatsheet](https://react-typescript-cheatsheet.netlify.app/) | [Thinking in React](https://react.dev/learn/thinking-in-react)

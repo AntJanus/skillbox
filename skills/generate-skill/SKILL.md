@@ -4,7 +4,7 @@ description: Use when asked to "create a skill", "generate a SKILL.md", "make me
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.2.0"
+  version: "1.2.1"
   argument-hint: [skill-topic]
 tags: [skill-creation, meta, automation, documentation]
 ---
@@ -207,7 +207,7 @@ Include source links: inspiration, official docs, and community resources.
 - [ ] Troubleshooting section complete
 - [ ] Integration points documented
 
-### Phase 6: Finalization and Output
+### Phase 4: Finalization and Output
 
 **Before presenting skill to user:**
 
@@ -302,25 +302,6 @@ If you catch yourself:
 - Output format: `file.py:123 CRITICAL: SQL injection risk`
 - Quick reference table, vulnerable-to-secure examples
 
-## Quality Standards Checklist
-
-Before delivering a generated skill, verify:
-
-- [ ] Description has 3-5 trigger phrases
-- [ ] Overview explains core principle (1-2 sentences)
-- [ ] "When to Use" lists specific situations
-- [ ] Examples show Good/Bad comparisons
-- [ ] SKILL.md under 500 lines (or progressive disclosure)
-- [ ] Sections in logical order with proper Markdown
-- [ ] Code blocks have language specified
-- [ ] Step-by-step instructions clear
-- [ ] Phases have completion criteria (methodology skills)
-- [ ] Red flags documented (methodology skills)
-- [ ] Troubleshooting addresses real issues
-- [ ] Integration points documented
-- [ ] Auto-detection where possible
-- [ ] Helpful error messages and clear prompts
-
 ## Troubleshooting Skill Generation
 
 ### Problem: User request is too vague
@@ -359,8 +340,8 @@ This skill itself follows Pattern B (Technical Implementation):
 - **Phase 1:** Discovery (questions to user)
 - **Phase 2:** Pattern Selection (match type to structure)
 - **Phase 3:** Content Generation (create SKILL.md)
-- **Phase 6:** Finalization (quality check and output)
-- **Phases 4-5:** Available in [Advanced Topics](./reference/ADVANCED.md)
+- **Phase 4:** Finalization (quality check and output)
+- **Advanced topics:** Available in [Advanced Topics](./reference/ADVANCED.md)
 
 ## References
 

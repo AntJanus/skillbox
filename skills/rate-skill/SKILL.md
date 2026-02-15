@@ -5,7 +5,7 @@ description: |
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.0.1"
+  version: "1.0.2"
   argument-hint: "<path/to/SKILL.md>"
 tags: [quality, auditing, validation, skills]
 ---
@@ -198,9 +198,7 @@ Audit SKILL.md files against quality standards from generate-skill best practice
 
 ## Examples
 
-### Example 1: High-Quality Skill
-
-<Good>
+### Example 1: Rating a High-Quality Skill
 
 **Input:** `/rate-skill skills/track-session/SKILL.md`
 
@@ -212,19 +210,19 @@ Audit SKILL.md files against quality standards from generate-skill best practice
 - **File:** skills/track-session/SKILL.md
 - **Lines:** 489 lines
 - **Overall Grade:** A (92/100)
-- **Status:** Production Ready ✅
+- **Status:** Production Ready
 
 ## Category Scores
 
 | Category | Score | Grade | Status |
 |----------|-------|-------|--------|
-| Length | 20/20 | A | ✅ |
-| Conciseness | 18/20 | A | ✅ |
-| Repetitiveness | 14/15 | A | ✅ |
-| Structure | 15/15 | A | ✅ |
-| Triggers | 15/15 | A | ✅ |
-| Examples | 9/10 | A | ✅ |
-| Troubleshooting | 5/5 | A | ✅ |
+| Length | 20/20 | A | Pass |
+| Conciseness | 18/20 | A | Pass |
+| Repetitiveness | 14/15 | A | Pass |
+| Structure | 15/15 | A | Pass |
+| Triggers | 15/15 | A | Pass |
+| Examples | 9/10 | A | Pass |
+| Troubleshooting | 5/5 | A | Pass |
 
 ## Strengths
 - Excellent progressive disclosure with reference/VERIFICATION.md
@@ -235,12 +233,9 @@ Audit SKILL.md files against quality standards from generate-skill best practice
 1. Consider adding one more example for edge cases (optional)
 ```
 
-**Why this is good:** Specific evidence (test counts), clear strengths, actionable next steps.
-</Good>
+**Note:** High-scoring skills get a short report focused on strengths and optional improvements.
 
-### Example 2: Needs Improvement
-
-<Bad>
+### Example 2: Rating a Skill That Needs Work
 
 **Input:** `/rate-skill skills/problematic-skill/SKILL.md`
 
@@ -252,23 +247,11 @@ Audit SKILL.md files against quality standards from generate-skill best practice
 - **File:** skills/problematic-skill/SKILL.md
 - **Lines:** 742 lines
 - **Overall Grade:** C (74/100)
-- **Status:** Needs Work ⚠️
-
-## Category Scores
-
-| Category | Score | Grade | Status |
-|----------|-------|-------|--------|
-| Length | 14/20 | C | ⚠️ |
-| Conciseness | 12/20 | D | ❌ |
-| Repetitiveness | 9/15 | C | ⚠️ |
-| Structure | 13/15 | B | ✅ |
-| Triggers | 9/15 | C | ⚠️ |
-| Examples | 8/10 | B | ✅ |
-| Troubleshooting | 3/5 | C | ⚠️ |
+- **Status:** Needs Work
 
 ## Findings by Priority
 
-### ❌ Critical Issues
+### Critical Issues
 1. **Length: 742 lines without progressive disclosure**
    - Impact: High context usage, harder to scan
    - Fix: Move detailed content to reference/ directory
@@ -277,12 +260,9 @@ Audit SKILL.md files against quality standards from generate-skill best practice
    - Impact: Poor activation reliability
    - Fix: Add 3-5 specific user phrases and situations
 
-### ⚠️ Important Issues
+### Important Issues
 1. **Verbose mode descriptions (30+ lines each)**
    - Fix: Condense to 2-3 lines per mode
-
-### 📋 Nice to Have
-1. Add 2-3 more troubleshooting entries
 
 ## Priority Action Items
 1. Implement progressive disclosure (move 200+ lines to reference/)
@@ -290,12 +270,11 @@ Audit SKILL.md files against quality standards from generate-skill best practice
 3. Condense verbose sections
 
 ## Estimated Improvements
-- Fix critical issues: +12 points → 86 (B)
-- Potential grade: C → A
+- Fix critical issues: +12 points -> 86 (B)
+- Potential grade: C -> A
 ```
 
-**Why this is bad:** Multiple critical issues (length, triggers) drag the grade down. This skill needs progressive disclosure and better activation phrases before publishing.
-</Bad>
+**Note:** Lower-scoring skills get detailed findings with specific fixes and an improvement roadmap.
 
 ## Troubleshooting
 

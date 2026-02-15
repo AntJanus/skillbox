@@ -5,7 +5,7 @@ description: |
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "3.3.1"
+  version: "3.3.2"
   argument-hint: "[save|resume|verify]"
 hooks:
   post_tool_use:
@@ -27,28 +27,12 @@ Use SESSION_PROGRESS.md in the project root to track plans and progress. All pla
 
 This skill supports four modes via optional arguments:
 
-**No argument (default):** `/track-session`
-- Automatically save current session progress to SESSION_PROGRESS.md
-- Then immediately resume from that progress and continue work
-- Use when you want to create a checkpoint and keep working
-
-**Save only:** `/track-session save`
-- Save current session state to SESSION_PROGRESS.md
-- Stop and wait for user to continue
-- Use when pausing work or reaching a natural stopping point
-
-**Resume only:** `/track-session resume`
-- Read existing SESSION_PROGRESS.md
-- Load the plan, current status, and failed attempts
-- Continue from where work was left off
-- Use when starting a new session or returning after a break
-
-**Verify only:** `/track-session verify`
-- Read SESSION_PROGRESS.md and verify all work against initial requirements
-- Check that completed tasks actually meet their goals
-- Validate dependencies are satisfied
-- Report gaps, incomplete work, or deviations from plan
-- Use when work appears complete or before final delivery
+| Mode | Command | What it does | Use when |
+|------|---------|-------------|----------|
+| **Default** | `/track-session` | Save progress, then continue working | Checkpoint during active work |
+| **Save** | `/track-session save` | Save progress and stop | Pausing work or taking a break |
+| **Resume** | `/track-session resume` | Load SESSION_PROGRESS.md and continue | Starting new session after break |
+| **Verify** | `/track-session verify` | Validate completed work against requirements | Before declaring done or delivery |
 
 ## When to Use
 
@@ -128,31 +112,11 @@ Next: [immediate next step]
 2. Next action after that
 ```
 
-## Workflow by Mode
-
-### Mode 1: Save and Resume (Default)
-
-**Command:** `/track-session`
-
-Create/update SESSION_PROGRESS.md with current status, then immediately continue work. Use for checkpoints during active work, before risky changes, or at natural breaking points.
-
-### Mode 2: Save Only
-
-**Command:** `/track-session save`
-
-Save current state to SESSION_PROGRESS.md and stop. Use when ending a work session, pausing work, creating handoff documentation, or before taking a break.
-
-### Mode 3: Resume Only
-
-**Command:** `/track-session resume`
-
-Read SESSION_PROGRESS.md (error if missing), load plan/status/failed attempts, continue from checkpoint. Use when starting new session after break, recovering from context reset, or taking over work.
-
-### Mode 4: Verify Only
+## Verification
 
 **Command:** `/track-session verify`
 
-Validate completed tasks against original requirements. Checks: work actually done, requirements met, dependencies satisfied, no scope gaps. Generates report with ✅ verified, ⚠️ minor issues, ❌ blockers, 📋 next steps. Use before declaring done or delivery.
+Validates completed tasks against original requirements. Checks that work is actually done, requirements met, dependencies satisfied, no scope gaps. Generates report with verified items, minor issues, blockers, and next steps.
 
 **See:** [Detailed Verification Guide](./reference/VERIFICATION.md) for full methodology.
 
