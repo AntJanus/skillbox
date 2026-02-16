@@ -37,7 +37,7 @@ SkillBox follows a dual-versioning system:
 
 ### Scopes
 
-- Skill names: `track-session`, `git-worktree`, `generate-skill`, `ideal-react-component`, `rate-skill`
+- Skill names: `track-session`, `git-worktree`, `generate-skill`, `ideal-react-component`, `rate-skill`, `setup-semantic-release`
 - Repository areas: `docs`, `workflow`, `meta`
 
 ### Examples

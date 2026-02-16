@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [1.2.0] - 2026-02-16
+
+New skill addition and quality refinements across existing skills.
+
+### New Skills
+
+- **setup-semantic-release** (v1.0.0): Set up automated versioning and release pipeline using conventional commits, commitlint, husky git hooks, and semantic-release
+
 ### Enhancements
 
 - **ideal-react-component** (v1.3.0): Modernized styling section with Tailwind CSS and CSS Modules alternatives; added inline hooks antipatterns quick reference; added React Server Components note; removed redundant Best Practices Summary section
@@ -17,6 +27,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **track-session** (v3.3.2): Deduplicated Usage Modes and Workflow by Mode into single concise table; extracted Verification as standalone section
 - **generate-skill** (v1.2.1): Fixed phase numbering (3 jumped to 6); removed duplicate Quality Standards Checklist; updated meta section references
 - **rate-skill** (v1.0.2): Reframed examples from misleading Good/Bad tags to descriptive headers; trimmed verbose example output
+
+### Documentation
+
+- Added setup-semantic-release to README.md Available Skills section
+- Updated skill count from 5 to 6 in README.md
 
 ---
 
@@ -111,6 +126,7 @@ When creating a release:
 
 ---
 
-[Unreleased]: https://github.com/antjanus/skillbox/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/antjanus/skillbox/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/antjanus/skillbox/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/antjanus/skillbox/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/antjanus/skillbox/releases/tag/v1.0.0

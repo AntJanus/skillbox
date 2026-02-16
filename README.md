@@ -97,6 +97,22 @@ Evaluate skill quality against best practices with letter grades (A-F) and actio
 
 ---
 
+### 📦 setup-semantic-release
+
+Set up a fully automated versioning and release pipeline using conventional commits, commitlint, husky, and semantic-release.
+
+**Use when:**
+- Setting up automated versioning for a new project
+- Adding conventional commits to an existing repo
+- Migrating from manual versioning to automated releases
+- Need commitlint, husky hooks, and CI/CD release workflow
+
+**Triggers:** When asked to "set up semantic release", "add conventional commits", "configure automated versioning", "set up commitlint", "add husky hooks"
+
+[View Documentation](./skills/setup-semantic-release/SKILL.md)
+
+---
+
 ## Installation
 
 ### Using Vercel Skills CLI (Recommended)
@@ -298,4 +314,4 @@ MIT License - see individual skills for specific licensing
 
 ---
 
-**Skill Count**: 5 | **Made for**: Claude Code 2025+
+**Skill Count**: 6 | **Made for**: Claude Code 2025+
