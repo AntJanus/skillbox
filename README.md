@@ -97,6 +97,22 @@ Evaluate skill quality against best practices with letter grades (A-F) and actio
 
 ---
 
+### 🗺️ track-roadmap
+
+Plan, update, and audit a high-level project roadmap with interactive feature discovery.
+
+**Use when:**
+- Starting a new project and need to map out features
+- Want to review what's been built vs. what's planned
+- Need to audit and reprioritize the roadmap
+- Capturing feature ideas before they're lost
+
+**Triggers:** When asked to "create a roadmap", "plan features", "what should we build next", "update the roadmap", "audit the roadmap"
+
+[View Documentation](./skills/track-roadmap/SKILL.md)
+
+---
+
 ### 📦 setup-semantic-release
 
 Set up a fully automated versioning and release pipeline using conventional commits, commitlint, husky, and semantic-release.
@@ -314,4 +330,4 @@ MIT License - see individual skills for specific licensing
 
 ---
 
-**Skill Count**: 6 | **Made for**: Claude Code 2025+
+**Skill Count**: 7 | **Made for**: Claude Code 2025+

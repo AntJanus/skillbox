@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.0] - 2026-02-16
+
+New skill for high-level project roadmap planning and tracking.
+
+### New Skills
+
+- **track-roadmap** (v1.0.0): Plan, update, and audit a high-level project roadmap with interactive feature discovery, codebase scanning, and progress/relevance auditing
+
+### Documentation
+
+- Added track-roadmap to README.md Available Skills section
+- Updated skill count from 6 to 7 in README.md
+
+---
+
 ## [1.2.0] - 2026-02-16
 
 New skill addition and quality refinements across existing skills.
@@ -126,7 +141,8 @@ When creating a release:
 
 ---
 
-[Unreleased]: https://github.com/antjanus/skillbox/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/antjanus/skillbox/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/antjanus/skillbox/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/antjanus/skillbox/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/antjanus/skillbox/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/antjanus/skillbox/releases/tag/v1.0.0
