@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.0] - 2026-02-23
+
+Two new skills for visual project documentation — terminal recordings and web UI screenshots.
+
+### New Skills
+
+- **record-tui** (v1.0.0): Record polished terminal demos using Charmbracelet VHS. Write `.tape` scripts that produce reproducible GIFs, MP4s, and WebMs. Covers tape authoring, smart generation, optimization, and CI/CD integration
+- **screenshot-local** (v1.0.0): Capture screenshots of local development projects using shot-scraper via pipx. Supports single shots, batch YAML configs, element selectors, and CI/CD integration
+
+### Documentation
+
+- Added record-tui and screenshot-local to README.md Available Skills section
+- Updated skill count from 7 to 9 in README.md
+
+---
+
 ## [1.3.0] - 2026-02-16
 
 New skill for high-level project roadmap planning and tracking.
