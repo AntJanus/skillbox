@@ -129,6 +129,22 @@ Set up a fully automated versioning and release pipeline using conventional comm
 
 ---
 
+### 📼 record-tui
+
+Record polished terminal demos using Charmbracelet VHS. Write `.tape` scripts that produce reproducible GIFs, MP4s, and WebMs — version-controlled and CI-friendly.
+
+**Use when:**
+- Recording a demo GIF for a README or docs
+- Creating video walkthroughs of CLI/TUI applications
+- Writing VHS `.tape` files
+- Setting up automated demo recording in CI/CD
+
+**Triggers:** When asked to "record a demo", "create a GIF of my CLI", "write a VHS tape", "make a terminal recording", "generate a demo for my TUI"
+
+[View Documentation](./skills/record-tui/SKILL.md)
+
+---
+
 ## Installation
 
 ### Using Vercel Skills CLI (Recommended)
@@ -330,4 +346,4 @@ MIT License - see individual skills for specific licensing
 
 ---
 
-**Skill Count**: 7 | **Made for**: Claude Code 2025+
+**Skill Count**: 8 | **Made for**: Claude Code 2025+
