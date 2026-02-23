@@ -145,6 +145,22 @@ Record polished terminal demos using Charmbracelet VHS. Write `.tape` scripts th
 
 ---
 
+### 📸 screenshot-local
+
+Capture screenshots of local development projects using shot-scraper (via pipx). Turn localhost URLs and local HTML files into PNGs, JPEGs, and PDFs for documentation and READMEs.
+
+**Use when:**
+- Capturing screenshots of a local dev server for docs
+- Batch screenshotting multiple pages/states via YAML config
+- Documenting UI changes or new features visually
+- Automating screenshot generation in CI/CD
+
+**Triggers:** When asked to "screenshot my app", "capture the UI", "take a screenshot of localhost", "generate screenshots for docs", "batch screenshot my pages"
+
+[View Documentation](./skills/screenshot-local/SKILL.md)
+
+---
+
 ## Installation
 
 ### Using Vercel Skills CLI (Recommended)
@@ -346,4 +362,4 @@ MIT License - see individual skills for specific licensing
 
 ---
 
-**Skill Count**: 8 | **Made for**: Claude Code 2025+
+**Skill Count**: 9 | **Made for**: Claude Code 2025+
