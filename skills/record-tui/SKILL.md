@@ -8,7 +8,7 @@ description: |
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.0.0"
+  version: "1.1.0"
   argument-hint: <app-command> [output-format]
 tags: [vhs, recording, tui, demo, gif, terminal, cli, charmbracelet]
 ---
@@ -97,6 +97,7 @@ Hide
 Type "export TERM=xterm-256color"
 Enter
 Sleep 500ms
+Ctrl+L
 Show
 
 # 5. Visible interactions
@@ -287,11 +288,12 @@ Set WindowBar Colorful
 Set TypingSpeed 75ms
 Set Padding 20
 
-# Hidden setup
+# Hidden setup — always Ctrl+L before Show to clear the screen
 Hide
 Type "export GLAMOUR_STYLE=dark"
 Enter
 Sleep 500ms
+Ctrl+L
 Show
 
 # Deliberate pacing — viewer can follow
@@ -391,6 +393,7 @@ Env TERM "xterm-256color"
 Type "stty rows 50 cols 120"
 Enter
 Sleep 500ms
+Ctrl+L
 Show
 ```
 

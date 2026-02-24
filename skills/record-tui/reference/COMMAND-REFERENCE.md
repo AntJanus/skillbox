@@ -141,6 +141,17 @@ Use `Hide`/`Show` to:
 - Navigate to the right directory
 - Clean up after the demo
 
+**Always `Ctrl+L` before `Show`** — clears the screen so the visible recording starts clean without leftover output from hidden setup commands:
+
+```tape
+Hide
+Type "some-setup-command"
+Enter
+Sleep 1s
+Ctrl+L
+Show
+```
+
 ## Capture
 
 ```tape

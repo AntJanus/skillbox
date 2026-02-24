@@ -93,6 +93,7 @@ Hide
 Type "go build -o my-app ."
 Enter
 Sleep 5s
+Ctrl+L
 Show
 
 # Show the app in action
@@ -129,6 +130,7 @@ Sleep 1s
 Type "echo 'hello' > file.txt && git add . && git commit -m 'init'"
 Enter
 Sleep 2s
+Ctrl+L
 Show
 
 # Launch
