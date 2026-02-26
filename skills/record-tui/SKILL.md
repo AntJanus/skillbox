@@ -8,7 +8,7 @@ description: |
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.1.0"
+  version: "1.1.1"
   argument-hint: <app-command> [output-format]
 tags: [vhs, recording, tui, demo, gif, terminal, cli, charmbracelet]
 ---
@@ -215,7 +215,7 @@ gifsicle -O3 --lossy=80 demo.gif -o demo-optimized.gif
 - `Sleep 500ms` after typing a command — lets the viewer read it
 - `Sleep 2-3s` after Enter — lets the viewer see the output
 - `Sleep 3-5s` on the final frame — prevents abrupt loop restart
-- `Set LoopOffset 60%` — smoother GIF looping
+- `Set LoopOffset 0%` smoother GIF looping
 - Use `Type@100ms` for important text the viewer should follow
 - Use `Type@30ms` for boilerplate the viewer doesn't need to read
 
