@@ -492,6 +492,6 @@ Treat every issue working with SkillBox as an opportunity to update this file.
 
 ---
 
-**Last Updated:** 2026-02-04
+**Last Updated:** 2026-03-02
 **Applies To:** Claude Code 2025+
 **Source:** https://antjanus.com/ai/claude-code-best-practices
