@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.5.0] - 2026-03-01
+
+New resume mode for track-roadmap — bridge the gap between roadmap planning and active session work.
+
+### Enhanced Skills
+
+- **track-roadmap** (v1.0.0 → v1.1.0): Add `resume` mode that checks session state, presents roadmap features for selection, and starts a tracked work session for the chosen feature
+
+---
+
 ## [1.4.0] - 2026-02-23
 
 Two new skills for visual project documentation — terminal recordings and web UI screenshots.
