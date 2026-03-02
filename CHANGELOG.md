@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.6.0] - 2026-03-02
+
+New skill for rebuilding context from previous Claude Code sessions.
+
+### New Skills
+
+- **remember** (v1.0.0): Rebuild context from previous Claude Code sessions by scanning conversation history, auto-memory, SESSION_PROGRESS.md, ROADMAP.md, and git state. Produces a structured summary of past work and suggested next steps, then offers to hand off to track-session or track-roadmap.
+
+### Documentation
+
+- Added remember to README.md Available Skills section
+- Updated skill count from 9 to 10 in README.md
+
+---
+
 ## [1.5.0] - 2026-03-01
 
 New resume mode for track-roadmap — bridge the gap between roadmap planning and active session work.
@@ -167,7 +182,10 @@ When creating a release:
 
 ---
 
-[Unreleased]: https://github.com/antjanus/skillbox/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/antjanus/skillbox/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/antjanus/skillbox/compare/v1.5.0...v1.6.0
+[1.5.0]: https://github.com/antjanus/skillbox/compare/v1.4.0...v1.5.0
+[1.4.0]: https://github.com/antjanus/skillbox/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/antjanus/skillbox/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/antjanus/skillbox/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/antjanus/skillbox/compare/v1.0.0...v1.1.0

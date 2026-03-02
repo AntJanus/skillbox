@@ -161,6 +161,22 @@ Capture screenshots of local development projects using shot-scraper (via pipx).
 
 ---
 
+### 🧠 remember
+
+Rebuild context from previous Claude Code sessions. Scans conversation history, auto-memory, SESSION_PROGRESS.md, ROADMAP.md, and git state to produce a structured summary of past work and next steps.
+
+**Use when:**
+- Starting a new session and need to catch up
+- Returning to a project after a break
+- Want a recap of recent work before deciding what to do
+- Unsure what was accomplished or what's next
+
+**Triggers:** When asked to "remember", "what was I working on", "recap last session", "summarize recent work", "catch me up"
+
+[View Documentation](./skills/remember/SKILL.md)
+
+---
+
 ## Installation
 
 ### Using Vercel Skills CLI (Recommended)
@@ -362,4 +378,4 @@ MIT License - see individual skills for specific licensing
 
 ---
 
-**Skill Count**: 9 | **Made for**: Claude Code 2025+
+**Skill Count**: 10 | **Made for**: Claude Code 2025+
