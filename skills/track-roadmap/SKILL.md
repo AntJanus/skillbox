@@ -1,15 +1,15 @@
 ---
 name: track-roadmap
 description: |
-  Plan, update, and audit a high-level project roadmap. Use when asked to "create a roadmap",
+  Plan, update, audit, and resume work from a high-level project roadmap. Use when asked to "create a roadmap",
   "plan features", "what should we build next", "update the roadmap", "audit the roadmap",
-  "review project direction", "prioritize features", or when starting a new project and
-  needing to map out future work.
+  "review project direction", "prioritize features", "resume from roadmap", "pick up where I left off",
+  "what should I work on next", or when starting a new project and needing to map out future work.
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.0.0"
-  argument-hint: "[generate|update|audit]"
+  version: "1.1.0"
+  argument-hint: "[generate|update|audit|resume]"
 tags: [planning, roadmap, features, project-management]
 ---
 
@@ -32,12 +32,14 @@ This skill supports three modes via optional arguments:
 | **Generate** | `/track-roadmap` or `/track-roadmap generate` | Interactive feature discovery and ROADMAP.md creation | Starting a project or first-time roadmap |
 | **Update** | `/track-roadmap update` | Add, remove, or modify features in existing roadmap | Scope changes, new ideas, completed work |
 | **Audit** | `/track-roadmap audit` | Check progress against codebase and re-evaluate relevance | Periodic review, before planning next sprint |
+| **Resume** | `/track-roadmap resume` | Check session state, pick next roadmap item, start working | Returning to a project, deciding what to build next |
 
 ## When to Use
 
 **Always use when:**
 - Starting a new project and need to plan features
 - User asks "what should we build?" or "what's the plan?"
+- User returns to a project and wants to pick up the next feature
 - Project has grown organically and needs direction
 - Before a major planning session or milestone
 
@@ -157,6 +159,57 @@ For each feature, ask whether it's still relevant:
 ### Part 3: Update
 
 Apply any changes from the review and write the updated ROADMAP.md. See the Audit example below for output format.
+
+---
+
+## Mode: Resume
+
+**Command:** `/track-roadmap resume`
+
+Bridges the roadmap to active work by checking session state and helping the user pick the next roadmap item to work on.
+
+### Process
+
+**Step 1 - Check current session:**
+
+Check for an existing SESSION_PROGRESS.md (invoke `/track-session resume` logic):
+
+- **If an active session exists** (uncompleted tasks remain) → Ask the user: "You have an active session in progress. Would you like to continue that work, or pick a new item from the roadmap?"
+  - If continue → delegate to `/track-session resume` and stop here
+  - If new item → proceed to Step 2
+- **If session is done, empty, or missing** → proceed to Step 2
+
+**Step 2 - Load and present roadmap:**
+
+1. **Read ROADMAP.md** from the project root
+2. **Filter out** completed features (those in the "Completed" section)
+3. **Present remaining features** to the user grouped by category, using AskUserQuestion
+4. **Ask:** "Which feature would you like to work on next?"
+
+**Step 3 - Confirm and plan:**
+
+Once the user picks a feature:
+
+1. **Confirm the selection** with a brief summary of what the feature involves
+2. **Ask clarifying questions** if the feature description is too high-level to start working (e.g., "User authentication - do you want to start with OAuth, email/password, or both?")
+3. **Get user approval** before proceeding
+
+**Step 4 - Start session:**
+
+After confirmation:
+
+1. **Invoke `/track-session`** to create a new SESSION_PROGRESS.md
+2. **Populate the session plan** with tasks derived from the selected roadmap feature
+3. **Include context:** Reference the ROADMAP.md feature in the session so it's clear what roadmap item this work maps to
+4. **Begin working** on the first task in the plan
+
+### Resume Rules
+
+1. **Always check session state first** - Don't skip straight to the roadmap
+2. **User picks the feature** - Never auto-select the next item
+3. **One feature at a time** - Don't let the user start multiple features in one session
+4. **Link back to roadmap** - SESSION_PROGRESS.md should reference which ROADMAP.md feature is being worked on
+5. **No ROADMAP.md, no resume** - If ROADMAP.md doesn't exist, tell the user to run `/track-roadmap generate` first
 
 ---
 
@@ -326,6 +379,58 @@ User says: *"We decided not to do offline support, and I want to add calendar in
 **Why this is bad:** Removed features the user didn't ask about. Never make unilateral roadmap decisions.
 </Bad>
 
+### Example: Resuming from Roadmap
+
+<Good>
+```bash
+# User returns to project after a break
+user: "/track-roadmap resume"
+
+# Agent checks for SESSION_PROGRESS.md → not found
+# Agent reads ROADMAP.md → presents features
+
+assistant: "No active session found. Here are the features from your roadmap:"
+# Uses AskUserQuestion with roadmap features:
+# - Due date reminders (Core Features)
+# - Dark mode (User Experience)
+# - Cloud sync (Technical Infrastructure)
+
+user: selects "Due date reminders"
+
+assistant: "Great - Due date reminders: Notify users when tasks are approaching
+their due date. Before we start, a couple of questions:
+- Should reminders be push notifications, email, or in-app?
+- How far in advance should reminders trigger?"
+
+user: "In-app only, 1 hour and 1 day before"
+
+# Agent creates SESSION_PROGRESS.md:
+# ## Plan
+# Feature: Due date reminders (from ROADMAP.md → Core Features)
+# - [ ] Phase 1: Add due date reminder model/schema
+# - [ ] Phase 2: Implement reminder check logic (1hr and 1day thresholds)
+# - [ ] Phase 3: Build in-app notification UI
+# - [ ] Phase 4: Test reminder flows
+
+# Agent starts working on Phase 1
+```
+
+**Why this is good:** Checks session state first, presents roadmap features for user to choose, asks clarifying questions before starting, creates a session plan that references the roadmap feature, then starts working.
+</Good>
+
+<Bad>
+```bash
+# Agent skips session check, auto-picks feature
+user: "/track-roadmap resume"
+assistant: "I'll start working on Cloud sync since it's the most important feature."
+# Never checked for active session
+# Never asked user which feature
+# Picked feature unilaterally
+```
+
+**Why this is bad:** Skipped session check (might have overwritten active work), auto-selected a feature without asking the user, violated the "user drives the roadmap" rule.
+</Bad>
+
 ## Troubleshooting
 
 ### Problem: ROADMAP.md has too many features (30+)
@@ -366,6 +471,23 @@ User says: *"We decided not to do offline support, and I want to add calendar in
 - Always confirm with user before adding to roadmap
 - Focus on user-facing capabilities, not internal architecture
 
+### Problem: Resume can't find ROADMAP.md
+
+**Cause:** No roadmap has been created for this project yet.
+
+**Solution:**
+- Run `/track-roadmap generate` to create a ROADMAP.md first
+- Then use `/track-roadmap resume` to pick a feature and start working
+
+### Problem: Resume finds an active session but user wants to switch features
+
+**Cause:** User changed their mind about what to work on.
+
+**Solution:**
+- Resume will ask whether to continue the active session or pick a new item
+- If switching: the current SESSION_PROGRESS.md will be overwritten with the new feature's plan
+- Consider running `/track-session save` first to preserve progress if needed
+
 ### Problem: User can't decide on features
 
 **Cause:** Too many options or unclear project direction.
@@ -385,6 +507,7 @@ User says: *"We decided not to do offline support, and I want to add calendar in
 **Workflow pattern:**
 ```
 /track-roadmap generate  →  Pick a feature  →  /track-session  →  Build it
+/track-roadmap resume    →  Check session    →  Pick feature    →  /track-session  →  Build it
 /track-roadmap audit     →  Review progress  →  /track-roadmap update  →  Adjust plan
 ```
 
