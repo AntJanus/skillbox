@@ -2,6 +2,23 @@
 
 This file provides guidance on how to work effectively as an AI agent within the SkillBox project. It complements CLAUDE.md with workflow patterns and agent-specific best practices.
 
+## Skill Inventory
+
+SkillBox currently contains **10 skills**:
+
+| Skill | Version | Pattern | Description |
+|-------|---------|---------|-------------|
+| **track-session** | v3.3.2 | A (Methodology) | Track, stop, resume, and verify progress on long-running sessions |
+| **git-worktree** | v2.0.2 | B (Technical) | Manage multiple branches simultaneously using git worktrees |
+| **generate-skill** | v1.2.1 | D (Automation) | Interactive skill builder that generates high-quality SKILL.md files |
+| **ideal-react-component** | v1.3.0 | E (Reference) | Battle-tested React component structure pattern with hooks antipatterns |
+| **rate-skill** | v1.0.2 | C (Auditing) | Evaluate skill quality against best practices with letter grades (A-F) |
+| **setup-semantic-release** | v1.0.0 | D (Automation) | Set up automated versioning with conventional commits, husky, and semantic-release |
+| **track-roadmap** | v1.1.0 | A (Methodology) | Plan, update, audit, and resume work from a high-level project roadmap |
+| **record-tui** | v1.1.1 | B (Technical) | Record polished terminal demos using Charmbracelet VHS |
+| **screenshot-local** | v1.0.0 | B (Technical) | Capture screenshots of local dev projects using shot-scraper |
+| **remember** | v1.0.0 | B (Technical) | Rebuild context from previous Claude Code sessions |
+
 ## Core Agent Principles
 
 ### 1. Imperative Direct Language
@@ -17,7 +34,8 @@ Verify triggers are specific.
 
 **DO NOT:**
 ```
-You might want to consider reading the skill file, and then perhaps checking if the frontmatter looks correct, and maybe verifying whether the triggers seem specific enough.
+You might want to consider reading the skill file, and then perhaps
+checking if the frontmatter looks correct.
 ```
 
 ### 2. Repetition for Reinforcement
@@ -28,7 +46,6 @@ Repeat critical information liberally. Agents benefit from seeing important rule
 - Description MUST have 3-5 triggers (stated in standards)
 - Description MUST have 3-5 triggers (stated in validation)
 - Description MUST have 3-5 triggers (stated in troubleshooting)
-- Description MUST have 3-5 triggers (stated in checklist)
 
 ### 3. Text-Based Diagrams
 
@@ -36,9 +53,9 @@ Use ASCII diagrams and structured text instead of abstract descriptions.
 
 **Good:**
 ```
-Phase 1 → Phase 2 → Phase 3
-   ↓         ↓         ↓
- Check    Verify   Complete
+Phase 1 -> Phase 2 -> Phase 3
+   |          |          |
+ Check     Verify    Complete
 ```
 
 **Also Good:**
@@ -186,14 +203,16 @@ List forbidden actions explicitly with literal language.
 
 ## Pattern Recognition
 
+SkillBox skills follow five recognized patterns. Each pattern has specific structural characteristics and real examples in the current skill set.
+
 ### Pattern A: Methodology Enforcement
 
 **You will recognize this pattern by:**
-- "The Iron Law" section
-- Phase-based workflow
+- Phase-based workflow with strict completion gates
 - Verification checklists with `[ ]`
-- "Red Flags - STOP" section
-- "Common Rationalizations" table
+- "Rules" or "Iron Laws" section
+- "Red Flags - STOP" section (in some)
+- Mode-based operation (e.g., generate/update/audit)
 
 **When you see this pattern:**
 - DO enforce strict phase completion
@@ -201,16 +220,26 @@ List forbidden actions explicitly with literal language.
 - DO add "Red Flags" for common mistakes
 - DO use "YOU MUST" language
 
-**Examples in SkillBox:**
-- None currently (but generate-skill can create them)
+**Real examples in SkillBox:**
+- **track-session** - Phases: checkpoint, save, resume, verify. Rules like "Never repeat failures" and "Verify before declaring done." Verification checklists at every step.
+- **track-roadmap** - Modes: generate, update, audit, resume. Rules like "User drives the roadmap" and "Keep it high-level." Phase-gated discovery process before writing.
+
+**Structural signature from track-session:**
+```markdown
+## Rules
+
+1. **Never repeat failures** - Log every failed approach with reason
+2. **Resume from checkpoint** - Check for existing SESSION_PROGRESS.md
+3. **Keep current** - File should always reflect actual state
+4. **Verify before declaring done** - Always run verify before claiming complete
+```
 
 ### Pattern B: Technical Implementation
 
 **You will recognize this pattern by:**
+- Step-by-step instructions with bash commands
+- Configuration examples and file templates
 - "Quick Start" or "The Process" section
-- Step-by-step instructions
-- Bash commands with examples
-- Configuration options
 - Troubleshooting with Problem/Solution format
 
 **When you see this pattern:**
@@ -219,53 +248,112 @@ List forbidden actions explicitly with literal language.
 - DO provide multiple approaches
 - DO include verification steps
 
-**Examples in SkillBox:**
-- git-worktree (parallel development)
+**Real examples in SkillBox:**
+- **git-worktree** - Step-by-step worktree creation, branch management, and cleanup commands.
+- **record-tui** - VHS tape file syntax, recording commands, CI integration for automated demos.
+- **screenshot-local** - shot-scraper setup, single/batch capture commands, YAML config templates.
+- **remember** - Phase-based source gathering (conversations, git, SESSION_PROGRESS) with concrete commands.
+
+**Structural signature from git-worktree:**
+```markdown
+## Quick Start
+
+**Create a worktree:**
+```bash
+git worktree add ../project-feature feature-branch
+cd ../project-feature
+```
+
+**List worktrees:**
+```bash
+git worktree list
+```
+```
 
 ### Pattern C: Rule-Based Auditing
 
 **You will recognize this pattern by:**
-- Rule categories (CRITICAL, HIGH, MEDIUM)
-- Priority tables
+- Rule categories with severity levels (CRITICAL, HIGH, MEDIUM)
+- Weighted scoring criteria
+- Standardized output format (letter grades, tables)
 - "Quick Reference" section
-- Standardized output format
-- Rule IDs (e.g., `rule-id-1`)
 
 **When you see this pattern:**
 - DO organize by severity
-- DO provide rule IDs
-- DO show impact and fix
+- DO provide clear scoring criteria
+- DO show impact and fix for each finding
 - DO include quick reference
 
-**Examples in SkillBox:**
-- None currently (but generate-skill can create them)
+**Real example in SkillBox:**
+- **rate-skill** - Seven weighted categories (Length 20%, Conciseness 20%, Repetitiveness 15%, Structure 15%, Triggers 15%, Examples 10%, Troubleshooting 5%). Letter grades A-F with score ranges. Structured output: Summary, Category Scores, Findings by Priority, Strengths, Action Items.
+
+**Structural signature from rate-skill:**
+```markdown
+## Quality Criteria
+
+| Category | Weight | Criteria |
+|----------|--------|----------|
+| Length | 20% | Under 500 lines (or progressive disclosure) |
+| Conciseness | 20% | Clear, scannable, no fluff |
+| Triggers | 15% | 3-5+ specific activation phrases |
+
+## Grading Scale
+
+| Grade | Score | Meaning |
+|-------|-------|---------|
+| A | 90-100 | Excellent - Production ready |
+| B | 80-89 | Good - Minor improvements recommended |
+| D-F | 0-69 | Not Ready |
+```
 
 ### Pattern D: Automation/Integration
 
 **You will recognize this pattern by:**
-- "Critical Workflow" section
-- Auto-detection logic
-- Helper functions or scripts
-- Configuration templates
-- Integration with external tools
+- Configuration templates and file creation
+- Multi-phase setup workflow
+- Auto-detection logic or tool installation
+- Integration with external tools and services
+- Helper scripts or generated config files
 
 **When you see this pattern:**
-- DO implement auto-detection
-- DO provide scripts in `scripts/`
-- DO include helper libraries
+- DO implement step-by-step setup phases
+- DO provide complete config file templates
+- DO include verification at each phase
 - DO handle errors gracefully
 
-**Examples in SkillBox:**
-- None currently (but generate-skill can create them)
+**Real examples in SkillBox:**
+- **setup-semantic-release** - 8-phase setup: install deps, configure commitlint, configure semantic-release, init husky, add hooks, add prepare script, create changelog, set up CI. Provides complete config file templates for `commitlint.config.js`, `.releaserc.json`, `.github/workflows/release.yml`.
+- **generate-skill** - Multi-phase discovery and generation: ask questions, select pattern, generate SKILL.md, enhance, finalize. Produces a complete skill file from interactive inputs.
+
+**Structural signature from setup-semantic-release:**
+```markdown
+### Phase 1: Install Dependencies
+
+```bash
+npm install --save-dev \
+  @commitlint/cli@^19.0.0 \
+  semantic-release@^24.0.0 \
+  husky@^9.0.0
+```
+
+**Verification:**
+- [ ] All packages appear in `devDependencies`
+- [ ] No install errors
+
+### Phase 2: Configure Commitlint
+
+Create `commitlint.config.js` in the project root:
+[complete config template]
+```
 
 ### Pattern E: Reference/Knowledge
 
 **You will recognize this pattern by:**
-- "Patterns Library" section
-- "Core Concepts" explanations
-- Multiple code examples
+- "Core Concepts" or "Patterns Library" section
+- Multiple code examples showing structural patterns
 - "Best Practices" guidelines
 - "When NOT to Use" section
+- Anti-pattern documentation
 
 **When you see this pattern:**
 - DO provide extensive examples
@@ -273,8 +361,21 @@ List forbidden actions explicitly with literal language.
 - DO show anti-patterns
 - DO reference official docs
 
-**Examples in SkillBox:**
-- Aspects of track-session (progress tracking patterns)
+**Real example in SkillBox:**
+- **ideal-react-component** - Defines a predictable ordering pattern for React component files (imports, styles, types, sub-components, hooks, render). Includes hooks antipatterns (infinite loops, stale closures) with Good/Bad comparisons.
+
+**Structural signature from ideal-react-component:**
+```markdown
+## Component Structure Order
+
+1. Imports (external, then internal)
+2. Styled components / CSS modules
+3. Types and interfaces
+4. Sub-components
+5. Custom hooks
+6. Main component (props -> state -> effects -> handlers -> render)
+7. Exports
+```
 
 ## Agent Communication Templates
 
@@ -293,14 +394,14 @@ Phase 2: Generation
 [Generate SKILL.md with all required sections]
 
 Phase 3: Validation
-- Description: [specific] ✓ / [vague] ✗
-- Examples: [present] ✓ / [missing] ✗
-- Troubleshooting: [comprehensive] ✓ / [missing] ✗
-- Length: [under 500 lines] ✓ / [needs progressive disclosure] ✗
+- Description: [specific] / [vague]
+- Examples: [present] / [missing]
+- Troubleshooting: [comprehensive] / [missing]
+- Length: [under 500 lines] / [needs progressive disclosure]
 
 Phase 4: Testing
 - Tested triggers: [list results]
-- Conflicts: [none] ✓ / [found] ✗
+- Conflicts: [none] / [found]
 
 Ready for review.
 ```
@@ -311,28 +412,28 @@ Ready for review.
 Updating skill: [name] from v[old] to v[new]
 
 Phase 1: Understanding
-- Read complete: ✓
+- Read complete
 - Pattern identified: [A/B/C/D/E]
 - Current sections: [list]
 
 Phase 2: Modification
 Changes:
 - [section]: [description of change]
-- Version: [old] → [new]
+- Version: [old] -> [new]
 
 Preserved:
-- All existing sections ✓
-- Skill name unchanged ✓
-- Pattern consistency ✓
+- All existing sections
+- Skill name unchanged
+- Pattern consistency
 
 Phase 3: Verification
-- No accidental deletions ✓
-- Markdown valid ✓
-- Triggers still specific ✓
+- No accidental deletions
+- Markdown valid
+- Triggers still specific
 
 Phase 4: Testing
 - Activation test: [result]
-- No regressions: ✓
+- No regressions
 
 Update complete.
 ```
@@ -357,9 +458,9 @@ Applied fix: [description]
 New triggers: [list]
 
 Phase 4: Validation
-- Tested all triggers: ✓
-- No conflicts: ✓
-- Works as expected: ✓
+- Tested all triggers
+- No conflicts
+- Works as expected
 
 Fix verified.
 ```
@@ -454,40 +555,24 @@ When working on complex SkillBox tasks:
 - [ ] Test activation triggers [dependency: Validate]
 
 ## Current Status
-Last updated: 2025-01-29 14:30
+Last updated: 2026-03-09 14:30
 Working on: Writing SKILL.md
 Next: Validate against checklist
 
 ## Completed Work
-- 2025-01-29 14:15: Created skill directory structure
-- 2025-01-29 14:20: Generated YAML frontmatter
+- 2026-03-09 14:15: Created skill directory structure
+- 2026-03-09 14:20: Generated YAML frontmatter
 ```
 
-### Using git-worktree as an Agent
+### Using remember as an Agent
 
-When asked to work on SkillBox in parallel:
+When starting a new SkillBox session:
 
-1. DO NOT actually create worktrees (no code to run)
-2. DO explain how worktrees would help
-3. DO document multiple skills in parallel
-4. DO track which "branch" (context) is which skill
-
-**Example:**
-```
-user: Work on two skills at once - track-session improvements and a new testing skill
-
-A: I can work on both skills by tracking them separately:
-
-Context A (track-session improvements):
-- Reading current track-session/SKILL.md
-- Planning updates to progress tracking
-
-Context B (new testing skill):
-- Using generate-skill pattern
-- Creating testing-workflow/SKILL.md
-
-I'll maintain separate progress for each and avoid mixing contexts.
-```
+1. Check for SESSION_PROGRESS.md first
+2. Scan recent git log for skill changes
+3. Read auto-memory for project context
+4. Present structured summary of recent work
+5. Offer to continue active work or pick a new task
 
 ### Using generate-skill as an Agent
 
@@ -523,6 +608,6 @@ Phase 6: Finalization (validate and present)
 - Explicit "Do Not Do" lists
 - Verification at every phase
 
-**Last Updated:** 2025-01-29
+**Last Updated:** 2026-03-09
 **Applies To:** AI agents working with SkillBox
 **Companion To:** CLAUDE.md (project-specific guidance)
