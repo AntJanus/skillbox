@@ -35,35 +35,73 @@ A curated collection of utility skills for Claude Code and AI agents. SkillBox p
 
 ---
 
-## Short-term
+## Milestone: v1.7.0 -- Documentation Cleanup (Deadline: 2026-03-28)
 
-### New Skills
+Priority: Highest. Unblocks contribution workflow and CI.
 
-- **testing-workflow**: Skill for running and managing test suites, interpreting failures, and iterating on fixes
-- **code-review**: Skill for structured code review with severity levels, security checks, and actionable feedback
-- **database-migration**: Skill for planning and executing database schema migrations safely
-- **docker-workflow**: Skill for managing Docker containers, Compose files, and multi-service development environments
-- **debug-systematic**: Skill for structured debugging using bisection, isolation, and hypothesis-driven investigation
+### AGENTS.md Refresh
 
-### Quality Improvements
+- [ ] Update "Last Updated" date from stale 2025-01-29
+- [ ] Add real pattern examples from existing skills:
+  - Pattern A (Methodology Enforcement): map to track-session (phases, iron laws, verification)
+  - Pattern C (Rule-Based Auditing): map to rate-skill (severity levels, rule categories)
+  - Pattern D (Automation/Integration): map to setup-semantic-release (config templates, scripts, external tools)
+- [ ] Review all workflow sections for accuracy against current skill set (10 skills)
 
-- Add progressive disclosure (reference/ directories) to skills that lack them: setup-semantic-release, track-roadmap, remember
-- Add CI/CD pipeline for validating SKILL.md frontmatter and structure on PRs
-- Create a `.github/ISSUE_TEMPLATE` for new skill proposals
-- Create a `.github/PULL_REQUEST_TEMPLATE` for skill contributions
-- Ensure all skills have reference/ docs where content approaches the 500-line limit
+### Progressive Disclosure Fixes
 
-### Documentation Gaps
+- [ ] Add `reference/` directory to `track-roadmap` skill (currently 517 lines, exceeds 500-line threshold)
+- [ ] Audit `setup-semantic-release` and `remember` for progressive disclosure need
+- [ ] Ensure all skills at or near 500 lines use the reference/ pattern
 
-- AGENTS.md "Last Updated" date is stale (2025-01-29) -- needs refresh
-- Pattern examples in AGENTS.md list "None currently" for Patterns A, C, and D -- update with real examples from existing skills
-- Add a CONTRIBUTING.md with detailed contributor guidelines beyond what README covers
-- Add usage examples and screenshots/GIFs to README for each skill
-- Document cross-skill integration patterns (e.g., remember + track-session + track-roadmap)
+### Contribution Infrastructure
+
+- [ ] Create `.github/ISSUE_TEMPLATE/skill-proposal.md` for new skill proposals
+- [ ] Create `.github/PULL_REQUEST_TEMPLATE.md` for skill contributions
+- [ ] Create `CONTRIBUTING.md` with contributor guidelines (skill creation process, quality standards, PR workflow)
 
 ---
 
-## v2.0 Ideas
+## Milestone: v1.8.0 -- CI and Quality Gates (Deadline: 2026-04-25)
+
+Priority: High. Required before community contributions.
+
+### CI/CD Pipeline
+
+- [ ] Create `.github/workflows/validate-skills.yml` that runs `test-skills.sh` on PRs
+- [ ] Validate SKILL.md YAML frontmatter structure (required fields, format)
+- [ ] Validate SKILL.md section presence (Overview, When to Use, Examples, Troubleshooting, Integration)
+- [ ] Enforce 500-line limit per SKILL.md (flag violations)
+- [ ] Lint markdown formatting
+
+### Documentation Polish
+
+- [ ] Add usage examples and screenshots/GIFs to README for each skill
+- [ ] Document cross-skill integration patterns (remember + track-session + track-roadmap)
+
+---
+
+## Milestone: v2.0.0 -- New High-Value Skills (Deadline: 2026-06-06)
+
+Priority: High. Expand the skill catalog with developer workflow skills.
+
+### New Skills (Prioritized)
+
+1. **testing-workflow**: Run and manage test suites, interpret failures, iterate on fixes. High value -- every developer needs this.
+2. **code-review**: Structured code review with severity levels, security checks, actionable feedback. High value -- complements rate-skill for non-skill code.
+3. **debug-systematic**: Structured debugging using bisection, isolation, hypothesis-driven investigation. Methodology skill (Pattern A).
+4. **database-migration**: Plan and execute database schema migrations safely. Technical implementation skill (Pattern B).
+5. **docker-workflow**: Manage Docker containers, Compose files, multi-service development. Technical implementation skill (Pattern B).
+
+### Skill Quality
+
+- [ ] Each new skill passes rate-skill with grade B or higher
+- [ ] Each new skill uses progressive disclosure if over 300 lines
+- [ ] Each new skill has at least 3 trigger phrase variations tested
+
+---
+
+## v2.x Ideas -- Community and Ecosystem
 
 ### Community Contributions
 
@@ -89,7 +127,7 @@ A curated collection of utility skills for Claude Code and AI agents. SkillBox p
 
 ---
 
-## v3.0 Ideas
+## v3.0 Ideas -- Advanced Skill Architecture
 
 ### Skill Composition and Orchestration
 
@@ -118,4 +156,4 @@ A curated collection of utility skills for Claude Code and AI agents. SkillBox p
 
 ---
 
-**Last Updated:** 2026-03-06
+**Last Updated:** 2026-03-09
