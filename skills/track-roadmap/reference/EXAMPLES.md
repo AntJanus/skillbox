@@ -8,32 +8,55 @@ Extended examples for the track-roadmap skill. See the main [SKILL.md](../SKILL.
 
 <Good>
 ```markdown
+---
+schema: cc-dash/roadmap@1
+project: my-task-manager
+description: A personal task manager that syncs across devices.
+last_updated: 2026-03-16T10:00:00-07:00
+---
+
 # Roadmap
 
 > A personal task manager that syncs across devices.
 
 ## Core Features
-- **Task CRUD** - Create, read, update, and delete tasks with title, description, and due date.
-- **Task lists** - Organize tasks into named lists (e.g., Work, Personal, Shopping).
-- **Due date reminders** - Notify users when tasks are approaching their due date.
+
+<!-- category:core -->
+
+- <!-- id:r_k8x2m status:done completed:2026-01-15 --> ~~**Task CRUD**~~ - Create, read, update, and delete tasks with title, description, and due date. *(Completed: 2026-01-15)*
+- <!-- id:r_m3p7q status:in-progress started:2026-02-01 --> **Task lists** - Organize tasks into named lists (e.g., Work, Personal, Shopping).
+- <!-- id:r_x9w1n status:planned --> **Due date reminders** - Notify users when tasks are approaching their due date.
 
 ## User Experience
-- **Dark mode** - Support system-level dark/light theme preference.
-- **Keyboard shortcuts** - Power users can manage tasks without touching the mouse.
-- **Drag-and-drop reordering** - Reorder tasks within and across lists.
+
+<!-- category:ux -->
+
+- <!-- id:r_j4t8v status:planned --> **Dark mode** - Support system-level dark/light theme preference.
+- <!-- id:r_b2c6d status:planned --> **Keyboard shortcuts** - Power users can manage tasks without touching the mouse.
+- <!-- id:r_q7r3f status:planned --> **Drag-and-drop reordering** - Reorder tasks within and across lists.
 
 ## Technical Infrastructure
-- **Cloud sync** - Sync tasks across devices via a backend API.
-- **Offline support** - App works without internet, syncs when reconnected.
+
+<!-- category:infra -->
+
+- <!-- id:r_w5e9h status:planned --> **Cloud sync** - Sync tasks across devices via a backend API.
+- <!-- id:r_n1y6k status:planned --> **Offline support** - App works without internet, syncs when reconnected.
 
 ## Future Ideas
-- **Shared lists** - Collaborate on task lists with other users.
-- **Recurring tasks** - Tasks that repeat on a schedule.
+
+<!-- category:future -->
+
+- <!-- id:r_p4s8a status:idea --> **Shared lists** - Collaborate on task lists with other users.
+- <!-- id:r_v2g7c status:idea --> **Recurring tasks** - Tasks that repeat on a schedule.
 
 ## Completed
+
+<!-- category:completed -->
+
+- <!-- id:r_k8x2m status:done completed:2026-01-15 --> ~~**Task CRUD**~~ - Create, read, update, and delete tasks with title, description, and due date. *(Completed: 2026-01-15)*
 ```
 
-**Why this is good:** Clear project purpose, logical groupings, each feature is one line with a concise description, Future Ideas captures uncommitted work, Completed section ready for use.
+**Why this is good:** Includes frontmatter with schema version, every item has a unique ID and status, categories have slug comments, completed items have strikethrough and date, Future Ideas uses `idea` status, human-readable AND machine-parseable.
 </Good>
 
 <Bad>
