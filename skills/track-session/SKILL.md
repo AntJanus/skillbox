@@ -5,7 +5,7 @@ description: |
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "3.3.2"
+  version: "4.0.0"
   argument-hint: "[save|resume|verify]"
 hooks:
   post_tool_use:
@@ -77,40 +77,81 @@ Run verification:
 ## Format
 
 ```markdown
+---
+schema: cc-dash/session@1
+project: project-name-here
+session_id: s_YYYY-MM-DD_topic-slug
+roadmap_ref: r_XXXXX
+started: YYYY-MM-DDTHH:MM:SS-TZ
+last_updated: YYYY-MM-DDTHH:MM:SS-TZ
+status: in-progress
+---
+
 # Session Progress
 
 ## Plan
-- [ ] Task 1: Description [dependency: none]
-- [x] Task 2: Description [dependency: Task 1]
-- [ ] Task 3: Description [dependency: Task 2]
+
+- [ ] <!-- id:t_XXXXX dep:none --> Task 1: Description
+- [x] <!-- id:t_XXXXX dep:t_XXXXX --> Task 2: Description
+- [ ] <!-- id:t_XXXXX dep:t_XXXXX --> Task 3: Description
 
 ## Current Status
+
 Last updated: [timestamp]
 Working on: [current task]
 Next: [immediate next step]
 
+## Decisions
+
+- [decision description]
+
 ## Failed Attempts
-- Tried [approach]: Failed because [reason], trying [alternative] instead
+
+- <!-- id:f_XXXXX task:t_XXXXX --> Tried [approach]: Failed because [reason], trying [alternative] instead
 
 ## Completed Work
-- [timestamp] Task 2: [brief summary of what was done]
+
+- <!-- ref:t_XXXXX at:YYYY-MM-DDTHH:MM:SS-TZ --> Task 2: [brief summary of what was done]
 
 ## Verification Results
+
 (Added by /track-session verify command)
 
-### ✅ Successfully Verified
+### Successfully Verified
+
 - Task/Phase: Evidence of completion and correctness
 
-### ⚠️ Minor Issues Found
+### Minor Issues Found
+
 - Issue: Description and impact
 
-### ❌ Blocking Issues
-- Critical problem: What's broken and why it blocks delivery
+### Blocking Issues
 
-### 📋 Recommended Next Steps
-1. Specific action to address issues
-2. Next action after that
+- Critical problem: What's broken and why it blocks delivery
 ```
+
+### Format Rules
+
+1. **Frontmatter is required** - Must include `schema`, `project`, `session_id`, `started`, `last_updated`, `status`
+2. **Every plan item gets an ID** - Format: `t_` + 5 random alphanumeric characters
+3. **Every plan item declares dependencies** - `dep:t_XXXXX` or `dep:none`
+4. **`roadmap_ref` links to the roadmap** - Set when session implements a specific roadmap feature
+5. **Checkboxes are the primary status** - `[ ]` = not done, `[x]` = done
+6. **Failed attempts reference tasks** - `task:t_XXXXX` links the failure to what was being attempted
+7. **Completed work references tasks** - `ref:t_XXXXX at:timestamp` for traceability
+8. **Session status in frontmatter** - `in-progress`, `paused`, `completed`, or `blocked`
+
+### ID Generation
+
+Generate IDs using 5 random characters from `[a-z0-9]`. Prefixes:
+
+- `t_` = task (plan items)
+- `f_` = failed attempt
+- `s_` = session (in session_id, uses date + slug instead of random)
+
+### Migration from v1
+
+If you encounter a SESSION_PROGRESS.md without frontmatter or IDs, see the [Migration Guide](./reference/MIGRATION.md) for step-by-step instructions on upgrading to v2 format.
 
 ## Verification
 
@@ -194,36 +235,50 @@ assistant: "All tasks are checked off, we're done!"
 
 <Good>
 ```markdown
+---
+schema: cc-dash/session@1
+project: my-web-app
+session_id: s_2026-03-10_user-auth
+roadmap_ref: r_k8x2m
+started: 2026-03-10T09:00:00-07:00
+last_updated: 2026-03-10T14:30:00-07:00
+status: in-progress
+---
+
 # Session Progress
 
 ## Plan
-- [x] Phase 1: Research authentication libraries [dependency: none]
+
+- [x] <!-- id:t_a1b2c dep:none --> Phase 1: Research authentication libraries
   - Evaluated OAuth.js, Passport.js, Auth0
   - Chose Passport.js for flexibility
-- [x] Phase 2: Set up OAuth flow [dependency: Phase 1]
+- [x] <!-- id:t_d3e4f dep:t_a1b2c --> Phase 2: Set up OAuth flow
   - Configured Google OAuth provider
   - Added callback routes
-- [ ] Phase 3: Add user session management [dependency: Phase 2]
+- [ ] <!-- id:t_g5h6i dep:t_d3e4f --> Phase 3: Add user session management
   - Implement Redis session store
   - Add session cleanup job
-- [ ] Phase 4: Test authentication flows [dependency: Phase 3]
+- [ ] <!-- id:t_j7k8l dep:t_g5h6i --> Phase 4: Test authentication flows
   - Test login/logout
   - Test session persistence
 
 ## Current Status
+
 Working on: Phase 3 - Implementing Redis session storage
 Next: Add Redis client configuration, then implement session middleware
 
 ## Failed Attempts
-- Tried in-memory sessions: Failed because sessions not persistent across server restarts, switching to Redis instead
-- Attempted express-session default store: Performance issues with concurrent users, Redis solves this
+
+- <!-- id:f_m9n0p task:t_g5h6i --> Tried in-memory sessions: Failed because sessions not persistent across server restarts, switching to Redis instead
+- <!-- id:f_q1r2s task:t_g5h6i --> Attempted express-session default store: Performance issues with concurrent users, Redis solves this
 
 ## Completed Work
-- Phase 2 completed - OAuth flow working with Google provider
-- Phase 1 completed - Selected Passport.js after comparing 3 libraries
+
+- <!-- ref:t_d3e4f at:2026-03-10T13:00:00-07:00 --> Phase 2 completed - OAuth flow working with Google provider
+- <!-- ref:t_a1b2c at:2026-03-10T11:00:00-07:00 --> Phase 1 completed - Selected Passport.js after comparing 3 libraries
 ```
 
-**Why this is good:** Specific tasks with clear dependencies, documented decisions, failed attempts recorded with reasons, concrete next steps.
+**Why this is good:** Frontmatter with schema and session metadata, specific tasks with IDs and explicit dependencies, failed attempts linked to tasks, completed work with timestamps and task references, concrete next steps.
 </Good>
 
 <Bad>
@@ -245,29 +300,42 @@ Working on auth. Tried some things that didn't work.
 
 <Good>
 ```markdown
+---
+schema: cc-dash/session@1
+project: payment-service
+session_id: s_2026-03-12_payment-race-condition
+started: 2026-03-12T10:00:00-07:00
+last_updated: 2026-03-12T15:00:00-07:00
+status: in-progress
+---
+
 # Session Progress
 
 ## Plan
-- [x] Phase 1: Reproduce bug [dependency: none]
-- [x] Phase 2: Identify root cause [dependency: Phase 1]
-- [ ] Phase 3: Implement fix [dependency: Phase 2]
-- [ ] Phase 4: Verify fix with tests [dependency: Phase 3]
+
+- [x] <!-- id:t_p1a2b dep:none --> Phase 1: Reproduce bug
+- [x] <!-- id:t_c3d4e dep:t_p1a2b --> Phase 2: Identify root cause
+- [ ] <!-- id:t_f5g6h dep:t_c3d4e --> Phase 3: Implement fix
+- [ ] <!-- id:t_i7j8k dep:t_f5g6h --> Phase 4: Verify fix with tests
 
 ## Current Status
+
 Working on: Phase 3 - Implementing race condition fix
 Next: Add mutex lock around shared resource access in payment processor
 
 ## Failed Attempts
-- Checked payment API logs: No errors found, bug is client-side
-- Added try-catch around payment call: Still crashes, race condition suspected
-- Increased timeout values: Made it worse, confirms race condition hypothesis
+
+- <!-- id:f_l9m0n task:t_c3d4e --> Checked payment API logs: No errors found, bug is client-side
+- <!-- id:f_o1p2q task:t_c3d4e --> Added try-catch around payment call: Still crashes, race condition suspected
+- <!-- id:f_r3s4t task:t_c3d4e --> Increased timeout values: Made it worse, confirms race condition hypothesis
 
 ## Completed Work
-- Phase 2 - Root cause identified: race condition in payment state management
-- Phase 1 - Bug reproduced consistently with concurrent payment attempts
+
+- <!-- ref:t_c3d4e at:2026-03-12T14:00:00-07:00 --> Phase 2 - Root cause identified: race condition in payment state management
+- <!-- ref:t_p1a2b at:2026-03-12T12:00:00-07:00 --> Phase 1 - Bug reproduced consistently with concurrent payment attempts
 ```
 
-**Why this is good:** Clear progression through debugging phases, failed attempts inform next steps, root cause documented.
+**Why this is good:** Clear progression through debugging phases, failed attempts linked to tasks with IDs, root cause documented, frontmatter tracks session metadata.
 </Good>
 
 <Bad>
@@ -284,21 +352,40 @@ Debugging payment bug. Tried a few things. Need to fix it.
 
 <Good>
 ```markdown
+---
+schema: cc-dash/session@1
+project: my-web-app
+session_id: s_2026-03-08_auth-system
+started: 2026-03-08T09:00:00-07:00
+last_updated: 2026-03-09T16:00:00-07:00
+status: completed
+---
+
 # Session Progress
 
 ## Plan
-- [x] Phase 1: Set up authentication system
-- [x] Phase 2: Implement user registration
-- [x] Phase 3: Add email verification
-- [x] Phase 4: Write tests
+
+- [x] <!-- id:t_v1w2x dep:none --> Phase 1: Set up authentication system
+- [x] <!-- id:t_y3z4a dep:t_v1w2x --> Phase 2: Implement user registration
+- [x] <!-- id:t_b5c6d dep:t_y3z4a --> Phase 3: Add email verification
+- [x] <!-- id:t_e7f8g dep:t_b5c6d --> Phase 4: Write tests
 
 ## Verification Results
-✅ All phases verified with passing tests (23/23)
-⚠️ Minor: Email template styling, no rate limiting
-📋 Next: Add rate limiting, customize templates
+
+### Successfully Verified
+
+- All phases verified with passing tests (23/23)
+
+### Minor Issues Found
+
+- Email template styling needs polish, no rate limiting on registration endpoint
+
+### Blocking Issues
+
+- None
 ```
 
-**Why this is good:** Verification report shows evidence (test counts, specific issues), separates critical vs. nice-to-have, provides actionable next steps.
+**Why this is good:** Verification report uses plain headings (no emojis), shows evidence (test counts, specific issues), separates critical vs. nice-to-have, frontmatter shows session is completed.
 </Good>
 
 <Bad>
