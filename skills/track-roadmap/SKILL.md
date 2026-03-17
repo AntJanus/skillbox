@@ -8,7 +8,7 @@ description: |
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.1.0"
+  version: "2.0.0"
   argument-hint: "[generate|update|audit|resume]"
 tags: [planning, roadmap, features, project-management]
 ---
@@ -216,35 +216,75 @@ After confirmation:
 ## ROADMAP.md Format
 
 ```markdown
+---
+schema: cc-dash/roadmap@1
+project: project-name-here
+description: One-line project purpose
+last_updated: YYYY-MM-DDTHH:MM:SS-TZ
+---
+
 # Roadmap
 
 > Project purpose in one sentence.
 
 ## Core Features
-- **Feature Name** - Short description of what it does and why it matters.
-- **Feature Name** - Short description.
+
+<!-- category:core -->
+
+- <!-- id:r_XXXXX status:planned --> **Feature Name** - Short description of what it does and why it matters.
+- <!-- id:r_XXXXX status:in-progress started:YYYY-MM-DD --> **Feature Name** - Short description.
 
 ## User Experience
-- **Feature Name** - Short description.
-- **Feature Name** - Short description.
+
+<!-- category:ux -->
+
+- <!-- id:r_XXXXX status:planned --> **Feature Name** - Short description.
 
 ## Technical Infrastructure
-- **Feature Name** - Short description.
+
+<!-- category:infra -->
+
+- <!-- id:r_XXXXX status:planned --> **Feature Name** - Short description.
 
 ## Future Ideas
-- **Feature Name** - Short description. (Not committed, just captured.)
+
+<!-- category:future -->
+
+- <!-- id:r_XXXXX status:idea --> **Feature Name** - Short description.
 
 ## Completed
-- ~~**Feature Name**~~ - Short description. *(Completed: YYYY-MM-DD)*
+
+<!-- category:completed -->
+
+- <!-- id:r_XXXXX status:done completed:YYYY-MM-DD --> ~~**Feature Name**~~ - Short description. *(Completed: YYYY-MM-DD)*
 ```
 
 ### Format Rules
 
-1. **Categories are flexible** - Use whatever groupings make sense for the project (the above are suggestions)
-2. **One line per feature** - Title in bold + 1-2 sentence description
-3. **Future Ideas** section is a parking lot for uncommitted ideas
-4. **Completed** section preserves history of what's been built
-5. **Keep it scannable** - The whole file should be readable in under 2 minutes
+1. **Frontmatter is required** - Must include `schema`, `project`, `description`, `last_updated`
+2. **Every item gets an ID** - Format: `r_` + 5 random alphanumeric characters (e.g., `r_k8x2m`)
+3. **Every item gets a status** - `planned`, `in-progress`, `done`, or `idea`
+4. **Every category heading gets a comment** - `<!-- category:slug -->` on the line after the `##`
+5. **Categories are flexible** - Use whatever groupings make sense for the project
+6. **One line per feature** - Title in bold + 1-2 sentence description
+7. **Keep it scannable** - The whole file should be readable in under 2 minutes
+8. **IDs are permanent** - Once assigned, never change an item's ID
+
+### ID Generation
+
+Generate IDs using 5 random characters from `[a-z0-9]`. Example: `r_k8x2m`, `r_3pq7z`.
+
+IDs are embedded in HTML comments so they're invisible when rendered but parseable by tools.
+
+### Migration from v1
+
+If you encounter a ROADMAP.md without frontmatter or IDs:
+
+1. Add the frontmatter block with `schema: cc-dash/roadmap@1`
+2. Add IDs to each existing item
+3. Add category comments to each heading
+4. Infer status from context (strikethrough = done, in Completed section = done, etc.)
+5. Set `last_updated` to current timestamp
 
 ---
 
@@ -267,19 +307,32 @@ Each mode has a Good/Bad comparison example. For the full set of detailed exampl
 
 <Good>
 ```markdown
+---
+schema: cc-dash/roadmap@1
+project: my-task-manager
+description: A personal task manager that syncs across devices.
+last_updated: 2026-03-16T10:00:00-07:00
+---
+
 # Roadmap
 
 > A personal task manager that syncs across devices.
 
 ## Core Features
-- **Task CRUD** - Create, read, update, and delete tasks with title, description, and due date.
-- **Task lists** - Organize tasks into named lists (e.g., Work, Personal, Shopping).
+
+<!-- category:core -->
+
+- <!-- id:r_k8x2m status:done completed:2026-01-15 --> ~~**Task CRUD**~~ - Create, read, update, and delete tasks with title, description, and due date. *(Completed: 2026-01-15)*
+- <!-- id:r_m3p7q status:in-progress started:2026-02-01 --> **Task lists** - Organize tasks into named lists (e.g., Work, Personal, Shopping).
 
 ## Completed
-- ~~**User registration**~~ - Sign up with email. *(Completed: 2026-01-15)*
+
+<!-- category:completed -->
+
+- <!-- id:r_k8x2m status:done completed:2026-01-15 --> ~~**Task CRUD**~~ - Create, read, update, and delete tasks with title, description, and due date. *(Completed: 2026-01-15)*
 ```
 
-**Why this is good:** Clear purpose, logical groupings, one line per feature, Completed section with dates.
+**Why this is good:** Includes frontmatter with schema version, every item has a unique ID and status, categories have slug comments, completed items have strikethrough and date, human-readable AND machine-parseable.
 </Good>
 
 <Bad>
