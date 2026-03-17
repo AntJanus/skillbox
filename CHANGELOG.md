@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+V2 schema format updates for cc-dash dashboard compatibility.
+
+### Enhanced Skills
+
+- **track-roadmap** (v1.1.0 -> v2.0.0): Updated ROADMAP.md format to v2 schema (`cc-dash/roadmap@1`) with YAML frontmatter, HTML comment IDs on items, category slug comments, format rules, ID generation guidance, and v1-to-v2 migration instructions. Breaking change: new required format.
+- **track-session** (v3.3.2 -> v4.0.0): Updated SESSION_PROGRESS.md format to v2 schema (`cc-dash/session@1`) with YAML frontmatter, task IDs, dependency tracking, failed attempt IDs, completion references, format rules, ID generation guidance, and v1-to-v2 migration instructions. Breaking change: new required format.
+
+### Documentation
+
+- Updated all Good examples in both skills to use v2 format
+- Updated track-roadmap reference/EXAMPLES.md to v2 format
+
 ---
 
 ## [1.6.0] - 2026-03-02
