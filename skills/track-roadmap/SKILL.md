@@ -1,15 +1,16 @@
 ---
 name: track-roadmap
 description: |
-  Plan, update, audit, and resume work from a high-level project roadmap. Use when asked to "create a roadmap",
+  Plan, update, audit, brainstorm, and resume work from a high-level project roadmap. Use when asked to "create a roadmap",
   "plan features", "what should we build next", "update the roadmap", "audit the roadmap",
   "review project direction", "prioritize features", "resume from roadmap", "pick up where I left off",
-  "what should I work on next", or when starting a new project and needing to map out future work.
+  "what should I work on next", "brainstorm features", "brainstorm ideas", "let's brainstorm",
+  "what could we build", "explore ideas", or when starting a new project and needing to map out future work.
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "2.0.0"
-  argument-hint: "[generate|update|audit|resume]"
+  version: "2.1.0"
+  argument-hint: "[generate|update|audit|brainstorm|resume]"
 tags: [planning, roadmap, features, project-management]
 ---
 
@@ -25,13 +26,14 @@ Use ROADMAP.md in the project root to plan and track high-level project features
 
 ## Usage Modes
 
-This skill supports three modes via optional arguments:
+This skill supports five modes via optional arguments:
 
 | Mode | Command | What it does | Use when |
 |------|---------|-------------|----------|
 | **Generate** | `/track-roadmap` or `/track-roadmap generate` | Interactive feature discovery and ROADMAP.md creation | Starting a project or first-time roadmap |
 | **Update** | `/track-roadmap update` | Add, remove, or modify features in existing roadmap | Scope changes, new ideas, completed work |
 | **Audit** | `/track-roadmap audit` | Check progress against codebase and re-evaluate relevance | Periodic review, before planning next sprint |
+| **Brainstorm** | `/track-roadmap brainstorm` | Exploratory ideation to discover what a project could become | Exploring directions, expanding scope, "what if" sessions |
 | **Resume** | `/track-roadmap resume` | Check session state, pick next roadmap item, start working | Returning to a project, deciding what to build next |
 
 ## When to Use
@@ -66,31 +68,18 @@ Creates a new ROADMAP.md through an interactive process.
 
 **Step 1 - Optional codebase scan:**
 
-Ask the user if they want a codebase scan to inform the roadmap:
-
-```
-"Would you like me to scan the project to understand what exists before we plan features?"
-```
-
-If yes, examine:
-- README.md, CLAUDE.md, or any project description files
-- Directory structure and existing features
-- TODO/FIXME comments in source files
-- Package dependencies (package.json, requirements.txt, etc.)
-- Existing issues or task lists
-
-Summarize findings briefly to the user before proceeding.
+Ask the user if they want a codebase scan. If yes, examine: project description files, directory structure, TODO/FIXME comments, package dependencies, existing issues. Summarize findings before proceeding.
 
 **Step 2 - Interactive questioning:**
 
-Ask the user about their vision using AskUserQuestion. Adapt questions to what you learned from the codebase scan (if performed). Core questions:
+Adapt questions based on codebase scan results. Core questions:
 
-1. **"What is the core purpose of this project?"** - Understand the project's reason to exist.
-2. **"What are the must-have features you already know about?"** - Capture what's already in the user's head.
-3. **"Who is the target user and what workflows should the project support?"** - Uncover features the user hasn't thought of yet.
-4. **"Are there any technical capabilities you know you'll need?"** - Infrastructure, integrations, platform support, etc.
+1. **"What is the core purpose of this project?"**
+2. **"What are the must-have features you already know about?"**
+3. **"Who is the target user and what workflows should it support?"**
+4. **"Are there any technical capabilities you know you'll need?"** (integrations, platforms, etc.)
 
-After gathering answers, propose a draft feature list and ask the user to confirm, add, or remove items before writing ROADMAP.md.
+Propose a draft feature list and ask the user to confirm, add, or remove items before writing ROADMAP.md.
 
 ### Phase 2: Organize and Write
 
@@ -149,16 +138,68 @@ Scan the codebase to assess each roadmap feature:
 
 ### Part 2: Relevance Review
 
-For each feature, ask whether it's still relevant:
-
-- Present the audit findings to the user
-- Ask: "Are there features that are no longer needed?"
-- Ask: "Are there new features that should be added?"
-- Ask: "Should any priorities change based on what we've learned?"
+Present audit findings to the user and ask: Are any features no longer needed? Any new features to add? Any priority changes based on what we've learned?
 
 ### Part 3: Update
 
-Apply any changes from the review and write the updated ROADMAP.md. See the Audit example below for output format.
+Apply changes from the review and write the updated ROADMAP.md. See the Audit example below for output format.
+
+---
+
+## Mode: Brainstorm
+
+**Command:** `/track-roadmap brainstorm`
+
+Exploratory ideation to discover what a project could become. Unlike Generate (which creates a structured plan), Brainstorm encourages divergent thinking before committing ideas to the roadmap.
+
+### Phase 1: Context
+
+1. **Read existing artifacts** — ROADMAP.md (if exists), README.md, CLAUDE.md, package manifests
+2. **Summarize current state** — What exists, what's planned, what gaps might exist
+
+### Phase 2: Divergent Exploration
+
+Ask open-ended questions adapted to the project's maturity:
+
+**For new/early projects:**
+- "What problem does this solve, and for whom?"
+- "What would make this 10x more useful than alternatives?"
+- "What projects or products inspire you? What would you borrow from them?"
+
+**For mature projects:**
+- "What do users complain about or request most?"
+- "What's the most tedious part of using this today?"
+- "If you had unlimited time, what would you add?"
+
+**For all projects:**
+- "What technical capabilities could unlock new features?" (APIs, integrations, platforms)
+- "What's one wild idea you've had but dismissed as too ambitious?"
+
+### Phase 3: Deepen Each Idea
+
+For each promising idea the user raises, explore:
+
+| Dimension | Prompt |
+|-----------|--------|
+| **User journey** | Walk through one complete interaction with this feature |
+| **Inspirations** | What existing tools or products do something similar? |
+| **Requirements** | What technical capabilities does this need? |
+| **Open questions** | What's unclear or needs research before building? |
+| **Effort/impact** | Rough sense — weekend project or multi-month effort? |
+
+### Phase 4: Capture
+
+1. **Filter with user** — Which ideas are worth keeping? Which are scope creep or separate projects?
+2. **Add to ROADMAP.md** — Viable ideas go to "Future Ideas" with `status:idea`
+3. **Note rejected ideas** — Briefly state why in the conversation (prevents re-brainstorming the same thing)
+
+### Brainstorm Rules
+
+1. **Diverge before converging** — Don't filter ideas too early in Phase 2
+2. **User drives selection** — Agent suggests and explores, user decides what stays
+3. **Ideas are cheap, commitment is expensive** — Everything starts as `status:idea`
+4. **Link inspirations** — Reference existing tools/projects when the user mentions them
+5. **Open questions are valuable output** — Unanswered questions guide future research
 
 ---
 
@@ -170,46 +211,18 @@ Bridges the roadmap to active work by checking session state and helping the use
 
 ### Process
 
-**Step 1 - Check current session:**
-
-Check for an existing SESSION_PROGRESS.md (invoke `/track-session resume` logic):
-
-- **If an active session exists** (uncompleted tasks remain) → Ask the user: "You have an active session in progress. Would you like to continue that work, or pick a new item from the roadmap?"
-  - If continue → delegate to `/track-session resume` and stop here
-  - If new item → proceed to Step 2
-- **If session is done, empty, or missing** → proceed to Step 2
-
-**Step 2 - Load and present roadmap:**
-
-1. **Read ROADMAP.md** from the project root
-2. **Filter out** completed features (those in the "Completed" section)
-3. **Present remaining features** to the user grouped by category, using AskUserQuestion
-4. **Ask:** "Which feature would you like to work on next?"
-
-**Step 3 - Confirm and plan:**
-
-Once the user picks a feature:
-
-1. **Confirm the selection** with a brief summary of what the feature involves
-2. **Ask clarifying questions** if the feature description is too high-level to start working (e.g., "User authentication - do you want to start with OAuth, email/password, or both?")
-3. **Get user approval** before proceeding
-
-**Step 4 - Start session:**
-
-After confirmation:
-
-1. **Invoke `/track-session`** to create a new SESSION_PROGRESS.md
-2. **Populate the session plan** with tasks derived from the selected roadmap feature
-3. **Include context:** Reference the ROADMAP.md feature in the session so it's clear what roadmap item this work maps to
-4. **Begin working** on the first task in the plan
+1. **Check current session** — If SESSION_PROGRESS.md has uncompleted tasks, ask the user whether to continue that work or pick a new roadmap item. If continuing, delegate to `/track-session resume` and stop.
+2. **Load and present roadmap** — Read ROADMAP.md, filter out completed features, present remaining features grouped by category. Ask the user which feature to work on next.
+3. **Confirm and plan** — Summarize the selected feature, ask clarifying questions if too high-level, get user approval.
+4. **Start session** — Invoke `/track-session` to create SESSION_PROGRESS.md, populate with tasks derived from the feature, reference the ROADMAP.md item's ID, begin working.
 
 ### Resume Rules
 
-1. **Always check session state first** - Don't skip straight to the roadmap
-2. **User picks the feature** - Never auto-select the next item
-3. **One feature at a time** - Don't let the user start multiple features in one session
-4. **Link back to roadmap** - SESSION_PROGRESS.md should reference which ROADMAP.md feature is being worked on
-5. **No ROADMAP.md, no resume** - If ROADMAP.md doesn't exist, tell the user to run `/track-roadmap generate` first
+1. **Always check session state first** — Don't skip straight to the roadmap
+2. **User picks the feature** — Never auto-select the next item
+3. **One feature at a time** — Don't start multiple features in one session
+4. **Link back to roadmap** — SESSION_PROGRESS.md must reference the ROADMAP.md feature ID
+5. **No ROADMAP.md = no resume** — Tell the user to run `/track-roadmap generate` first
 
 ---
 
@@ -346,6 +359,70 @@ last_updated: 2026-03-16T10:00:00-07:00
 **Why this is bad:** No descriptions, no groupings, mixes features with tasks, no project purpose.
 </Bad>
 
+### Quick Example: Auditing a Roadmap
+
+<Good>
+```markdown
+# Roadmap Audit — 2026-03-20
+
+## Progress Assessment
+
+| Feature | ID | Status | Evidence |
+|---------|-----|--------|----------|
+| Task CRUD | r_k8x2m | Done | Full CRUD in src/tasks/, tests passing |
+| Task lists | r_m3p7q | In Progress | Model exists, UI missing list picker |
+| Due date reminders | r_9xw4n | Not Started | No scheduler or notification code found |
+| Cloud sync | r_p2v8j | Not Started | No sync/API code |
+
+## Recommendations
+
+1. Mark r_k8x2m as `status:done completed:2026-03-20` in ROADMAP.md
+2. r_m3p7q needs UI work — keep as `status:in-progress`
+3. r_9xw4n and r_p2v8j still relevant per user confirmation
+4. User wants to add: **Recurring tasks** — new item for Core Features
+```
+
+**Why this is good:** References items by ID, provides codebase evidence, categorizes status clearly, ties back to cc-dash schema IDs for traceability, gets user confirmation before changes.
+</Good>
+
+<Bad>
+```markdown
+# Audit
+
+Looks like tasks work. Lists are half done. Reminders and sync not started.
+I'll update the roadmap now.
+```
+
+**Why this is bad:** No evidence, no IDs referenced, no user confirmation, applies changes without asking.
+</Bad>
+
+### Quick Example: Brainstorming Ideas
+
+<Good>
+```bash
+user: "/track-roadmap brainstorm"
+# Agent reads ROADMAP.md -> summarizes current state -> asks divergent questions
+# "What's the most tedious part of using task managers today?"
+# User: "I always forget to check them."
+# Agent explores pain point: "What if tasks came to you?"
+# Deepens: user journey, inspirations (Todoist scheduling), requirements, open questions
+# User confirms 2 ideas, rejects 1 as scope creep
+# Agent adds to ROADMAP.md Future Ideas with status:idea and cc-dash IDs
+```
+
+**Why this is good:** Starts with pain points, explores "why" before "what", deepens each idea, user filters, output uses `status:idea`.
+</Good>
+
+<Bad>
+```bash
+user: "/track-roadmap brainstorm"
+assistant: "Here are 15 features: 1. Dark mode 2. Notifications 3. Calendar..."
+# Generic list without questions, no exploration, no user filtering
+```
+
+**Why this is bad:** No divergent exploration, no pain points, skipped filtering.
+</Bad>
+
 ### Quick Example: Resuming from Roadmap
 
 <Good>
@@ -382,15 +459,6 @@ assistant: "I'll start working on Cloud sync since it's the most important."
 - Consider splitting into multiple projects or milestones
 - A healthy roadmap has 5-15 committed features
 
-### Problem: Roadmap doesn't match what's actually being built
-
-**Cause:** Roadmap wasn't updated as priorities shifted.
-
-**Solution:**
-- Run `/track-roadmap audit` to reconcile plan vs. reality
-- Update the roadmap to reflect actual direction
-- Set a habit: audit after every major feature completion
-
 ### Problem: Features are too granular
 
 **Cause:** Mixing task-level work with feature-level planning.
@@ -401,32 +469,6 @@ assistant: "I'll start working on Cloud sync since it's the most important."
 - Good: "User authentication"
 - Use `track-session` for task-level tracking within a feature
 
-### Problem: Codebase scan suggests irrelevant features
-
-**Cause:** Discovery picked up on implementation details, not user features.
-
-**Solution:**
-- Treat scan results as suggestions, not requirements
-- Always confirm with user before adding to roadmap
-- Focus on user-facing capabilities, not internal architecture
-
-### Problem: Resume can't find ROADMAP.md
-
-**Cause:** No roadmap has been created for this project yet.
-
-**Solution:**
-- Run `/track-roadmap generate` to create a ROADMAP.md first
-- Then use `/track-roadmap resume` to pick a feature and start working
-
-### Problem: Resume finds an active session but user wants to switch features
-
-**Cause:** User changed their mind about what to work on.
-
-**Solution:**
-- Resume will ask whether to continue the active session or pick a new item
-- If switching: the current SESSION_PROGRESS.md will be overwritten with the new feature's plan
-- Consider running `/track-session save` first to preserve progress if needed
-
 ### Problem: User can't decide on features
 
 **Cause:** Too many options or unclear project direction.
@@ -435,6 +477,9 @@ assistant: "I'll start working on Cloud sync since it's the most important."
 - Start with the core question: "What problem does this project solve?"
 - Ask: "If you could only build 3 features, what would they be?"
 - Use the "Future Ideas" section as a pressure valve for uncommitted items
+- Try `/track-roadmap brainstorm` to explore ideas before committing
+
+**[Extended Troubleshooting](./reference/TROUBLESHOOTING.md)** — Resume edge cases, codebase scan issues, and more.
 
 ## Integration
 
@@ -445,9 +490,10 @@ assistant: "I'll start working on Cloud sync since it's the most important."
 
 **Workflow pattern:**
 ```
-/track-roadmap generate  →  Pick a feature  →  /track-session  →  Build it
-/track-roadmap resume    →  Check session    →  Pick feature    →  /track-session  →  Build it
-/track-roadmap audit     →  Review progress  →  /track-roadmap update  →  Adjust plan
+/track-roadmap generate    →  Pick a feature  →  /track-session  →  Build it
+/track-roadmap brainstorm  →  Explore ideas   →  /track-roadmap update  →  Commit to plan
+/track-roadmap resume      →  Check session   →  Pick feature    →  /track-session  →  Build it
+/track-roadmap audit       →  Review progress →  /track-roadmap update  →  Adjust plan
 ```
 
 **Pairs with:**
