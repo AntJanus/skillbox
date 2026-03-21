@@ -204,3 +204,70 @@ assistant: "I'll start working on Cloud sync since it's the most important featu
 
 **Why this is bad:** Skipped session check (might have overwritten active work), auto-selected a feature without asking the user, violated the "user drives the roadmap" rule.
 </Bad>
+
+---
+
+## Example: Brainstorming Ideas
+
+<Good>
+```bash
+user: "/track-roadmap brainstorm"
+# Agent reads ROADMAP.md -> summarizes 3 planned features, 0 future ideas
+# Agent asks divergent questions
+
+assistant: "Your roadmap covers task management basics. Let's explore what else
+this could become. What's the most tedious part of using task managers today?"
+
+user: "I always forget to check them. The tasks just sit there."
+
+assistant: "Interesting — so the core problem is engagement, not features. Let me
+explore that. What if tasks could come to you instead of you going to them?"
+
+# Agent deepens the idea:
+# - User journey: tasks surface in Slack/email/calendar based on due date + priority
+# - Inspirations: Todoist smart scheduling, Hey's "screener" pattern
+# - Requirements: Integration APIs, notification system, priority algorithm
+# - Open questions: Which channels matter most? Push vs. digest?
+
+assistant: "I also want to explore the opposite angle — instead of more
+notifications, what about radical simplification? A mode that hides everything
+except today's 3 most important tasks."
+
+user: "Oh I love that. The first idea is interesting but might be scope creep for
+a personal task manager. The focus mode idea — yes, keep that."
+
+# Agent captures:
+# - Smart surfacing: REJECTED — scope creep, better suited for enterprise product
+# - Focus mode: ACCEPTED → added to ROADMAP.md Future Ideas
+
+# Agent adds to ROADMAP.md:
+# ## Future Ideas
+# <!-- category:future -->
+# - <!-- id:r_w2j6q status:idea --> **Focus mode** - Hide everything except
+#   today's 3 most important tasks. Inspired by: "one thing at a time" productivity
+#   methods. Open question: how to auto-select the 3 tasks (due date? manual pin?).
+```
+
+**Why this is good:** Starts with user pain points (not a feature list), explores the "why" before the "what", deepens each idea with journey/inspirations/requirements/questions, presents multiple angles, user decides what stays, rejected ideas are noted with reasons, captured ideas use `status:idea` with cc-dash IDs and include open questions.
+</Good>
+
+<Bad>
+```bash
+user: "/track-roadmap brainstorm"
+assistant: "Based on similar task managers, here are 15 features you should add:
+1. Dark mode
+2. Notifications
+3. Calendar view
+4. AI task suggestions
+5. Recurring tasks
+6. Tags and labels
+7. Team collaboration
+8. Mobile app
+9. Integrations
+10. Analytics dashboard
+..."
+# Then immediately adds all 15 to ROADMAP.md without asking
+```
+
+**Why this is bad:** Dumped a generic feature list without asking about user's pain points or vision, no exploration of ideas, no user filtering, added items to roadmap without confirmation, features are generic (could apply to any app), no inspirations or open questions captured.
+</Bad>
