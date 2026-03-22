@@ -177,6 +177,22 @@ Rebuild context from previous Claude Code sessions. Scans conversation history, 
 
 ---
 
+### 🪞 reflect
+
+Extract learnings from today's Claude Code conversations and save them to CLAUDE.md or auto-memory. Identifies corrections, discoveries, architecture decisions, debugging breakthroughs, and workflow insights.
+
+**Use when:**
+- Ending a work session where you learned something new
+- After debugging sessions that revealed important insights
+- Want to capture architecture decisions with rationale
+- End of day to preserve cross-session discoveries
+
+**Triggers:** When asked to "reflect on today", "what did I learn today", "extract learnings", "save what I learned", "learn from today", "capture insights"
+
+[View Documentation](./skills/reflect/SKILL.md)
+
+---
+
 ## Installation
 
 ### Using Vercel Skills CLI (Recommended)
@@ -378,4 +394,4 @@ MIT License - see individual skills for specific licensing
 
 ---
 
-**Skill Count**: 10 | **Made for**: Claude Code 2025+
+**Skill Count**: 11 | **Made for**: Claude Code 2025+
