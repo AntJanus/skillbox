@@ -7,17 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### New Skills
+
+- **reflect** (v1.0.0): Extract learnings from today's Claude Code conversations — identifies corrections, discoveries, architecture decisions, debugging breakthroughs, and workflow insights. User chooses per learning whether to save to project CLAUDE.md, global CLAUDE.md, or auto-memory.
+
+### Documentation
+
+- Added reflect to README.md Available Skills section
+- Updated skill count from 10 to 11 in README.md
+
+---
+
+## [2.0.0] - 2026-03-21
+
 V2 schema format updates for cc-dash dashboard compatibility.
+
+### Breaking Changes
+
+- **track-roadmap** (v2.0.1): ROADMAP.md now requires `cc-dash/roadmap@1` YAML frontmatter, HTML comment IDs (`r_XXXXX`) on items, and `<!-- category:slug -->` comments on headings. See migration instructions in skill.
+- **track-session** (v4.0.1): SESSION_PROGRESS.md now requires `cc-dash/session@1` YAML frontmatter, task IDs (`t_XXXXX`), dependency declarations (`dep:none`/`dep:t_XXXXX`), and structured failed attempt/completion references. See migration instructions in skill.
+
+### New Features
+
+- **track-roadmap** (v2.0.0 -> v2.1.0): Added `brainstorm` mode for exploratory ideation — divergent questioning adapted to project maturity, idea deepening (user journey, inspirations, requirements, open questions), user-driven filtering, and capture to "Future Ideas" with `status:idea`
 
 ### Enhanced Skills
 
-- **track-roadmap** (v1.1.0 -> v2.0.0): Updated ROADMAP.md format to v2 schema (`cc-dash/roadmap@1`) with YAML frontmatter, HTML comment IDs on items, category slug comments, format rules, ID generation guidance, and v1-to-v2 migration instructions. Breaking change: new required format.
-- **track-session** (v3.3.2 -> v4.0.0): Updated SESSION_PROGRESS.md format to v2 schema (`cc-dash/session@1`) with YAML frontmatter, task IDs, dependency tracking, failed attempt IDs, completion references, format rules, ID generation guidance, and v1-to-v2 migration instructions. Breaking change: new required format.
+- **track-roadmap** (v2.1.0): Added inline Good/Bad audit example with cc-dash ID references; condensed Resume and Audit modes for conciseness; moved 4 troubleshooting entries to reference/TROUBLESHOOTING.md; removed internal tool name references
+- **track-session** (v4.0.0 -> v4.0.1): Moved 7 extended troubleshooting entries to reference/TROUBLESHOOTING.md (538 -> 474 lines); kept 4 most common issues inline with progressive disclosure link
 
 ### Documentation
 
 - Updated all Good examples in both skills to use v2 format
-- Updated track-roadmap reference/EXAMPLES.md to v2 format
+- Updated track-roadmap reference/EXAMPLES.md to v2 format with brainstorm example
+- Added track-session reference/TROUBLESHOOTING.md
+- Added track-roadmap reference/TROUBLESHOOTING.md
 
 ---
 
@@ -194,7 +218,8 @@ When creating a release:
 
 ---
 
-[Unreleased]: https://github.com/antjanus/skillbox/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/antjanus/skillbox/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/antjanus/skillbox/compare/v1.6.0...v2.0.0
 [1.6.0]: https://github.com/antjanus/skillbox/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/antjanus/skillbox/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/antjanus/skillbox/compare/v1.3.0...v1.4.0
