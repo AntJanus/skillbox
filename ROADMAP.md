@@ -2,7 +2,7 @@
 schema: cc-dash/roadmap@1
 project: skillbox
 description: Curated collection of reusable utility skills for Claude Code and AI agents.
-last_updated: 2026-03-13T10:00:00-07:00
+last_updated: 2026-03-23T16:00:00-07:00
 ---
 
 # Roadmap
@@ -46,20 +46,7 @@ last_updated: 2026-03-13T10:00:00-07:00
 
 <!-- category:completed -->
 
-- <!-- id:r_e2mzg status:done completed:2026-03-02 --> ~~**v1.6.0**~~ - Added remember skill for session context restoration. *(Completed: 2026-03-02)*
-- <!-- id:r_gvb0t status:done completed:2026-03-01 --> ~~**v1.5.0**~~ - Added resume mode to track-roadmap for roadmap-to-session workflow. *(Completed: 2026-03-01)*
-- <!-- id:r_cwxdt status:done completed:2026-02-23 --> ~~**v1.4.0**~~ - Added record-tui and screenshot-local for visual documentation. *(Completed: 2026-02-23)*
-- <!-- id:r_skz5h status:done completed:2026-02-16 --> ~~**v1.3.0**~~ - Added track-roadmap for project planning and tracking. *(Completed: 2026-02-16)*
-- <!-- id:r_l4eqy status:done completed:2026-02-16 --> ~~**v1.2.0**~~ - Added setup-semantic-release; quality refinements across existing skills. *(Completed: 2026-02-16)*
-- <!-- id:r_thmj8 status:done completed:2026-02-10 --> ~~**v1.1.0**~~ - Quality review and progressive disclosure refactor across all skills. *(Completed: 2026-02-10)*
-- <!-- id:r_ngxyx status:done completed:2026-02-04 --> ~~**v1.0.0**~~ - Initial stable release with 5 core skills (track-session, git-worktree, generate-skill, ideal-react-component, rate-skill), documentation, and Vercel Skills CLI support. *(Completed: 2026-02-04)*
-- <!-- id:r_b2guu status:done completed:2026-03-02 --> ~~**remember**~~ - Rebuild context from previous Claude Code sessions. v1.0.0. *(Completed: 2026-03-02)*
-- <!-- id:r_noi5p status:done completed:2026-02-23 --> ~~**screenshot-local**~~ - Capture screenshots of local dev projects using shot-scraper. v1.0.0. *(Completed: 2026-02-23)*
-- <!-- id:r_vwujm status:done completed:2026-02-23 --> ~~**record-tui**~~ - Record polished terminal demos using Charmbracelet VHS. v1.0.0. *(Completed: 2026-02-23)*
-- <!-- id:r_dffmu status:done completed:2026-02-16 --> ~~**track-roadmap**~~ - Plan, update, and audit a high-level project roadmap. v1.1.0. *(Completed: 2026-02-16)*
-- <!-- id:r_zp7wj status:done completed:2026-02-16 --> ~~**setup-semantic-release**~~ - Automated versioning pipeline with conventional commits and husky. v1.0.0. *(Completed: 2026-02-16)*
-- <!-- id:r_bybun status:done completed:2026-02-04 --> ~~**rate-skill**~~ - Evaluate skill quality against best practices with letter grades. v1.0.2. *(Completed: 2026-02-04)*
-- <!-- id:r_embi8 status:done completed:2026-02-04 --> ~~**ideal-react-component**~~ - Battle-tested React component structure pattern. v1.3.0. *(Completed: 2026-02-04)*
-- <!-- id:r_6bgrf status:done completed:2026-02-04 --> ~~**generate-skill**~~ - Interactive skill builder that generates high-quality SKILL.md files. v1.2.1. *(Completed: 2026-02-04)*
-- <!-- id:r_tdnjs status:done completed:2026-02-04 --> ~~**git-worktree**~~ - Manage multiple branches simultaneously using git worktrees. v2.0.2. *(Completed: 2026-02-04)*
-- <!-- id:r_nhs6j status:done completed:2026-02-04 --> ~~**track-session**~~ - Track, stop, resume, and save progress on long-running sessions. v3.3.2. *(Completed: 2026-02-04)*
+- <!-- id:r_q3m7x status:done completed:2026-03-23 --> ~~**rate-skill v2.0.0**~~ - New rubric: replaced Repetitiveness/Troubleshooting with Frontmatter (15%) and Type Compliance (5%). Positive framing throughout (Strong signals, Watch for). Output adds Detected Type, Spec Compliance, concrete fix examples. *(Completed: 2026-03-23)*
+- <!-- id:r_w8k4p status:done completed:2026-03-23 --> ~~**Batch Frontmatter Fix**~~ - Moved argument-hint to top-level across 7 skills (Claude Code autocomplete). Removed tags (7 skills) and hooks (2 skills) from frontmatter. Updated generate-skill template. *(Completed: 2026-03-23)*
+- <!-- id:r_j2v9n status:done completed:2026-03-23 --> ~~**Full Collection Audit**~~ - Audited all 11 skills against CLAUDE.md standards. Overall grade: A (89/100). Identified frontmatter spec gaps, positive framing opportunities, progressive disclosure patterns. Saved to SKILL_AUDIT_2026-03-23.md. *(Completed: 2026-03-23)*
+- <!-- id:r_f5t1r status:done completed:2026-03-21 --> ~~**reflect v1.0.0**~~ - Added reflect skill for extracting learnings from conversations into CLAUDE.md or auto-memory. *(Completed: 2026-03-21)*
