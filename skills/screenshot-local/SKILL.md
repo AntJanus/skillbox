@@ -6,11 +6,10 @@ description: |
   Use when asked to "screenshot my app", "capture the UI", "take a screenshot of localhost",
   "generate screenshots for docs", "batch screenshot my pages", or "set up shot-scraper".
 license: MIT
+argument-hint: "<url-or-file> [--output filename.png]"
 metadata:
   author: Antonin Januska
   version: "1.0.0"
-  argument-hint: <url-or-file> [--output filename.png]
-tags: [screenshot, shot-scraper, docs, localhost, ui, documentation, pipx]
 ---
 
 # Screenshot Local - Capture Project Screenshots with shot-scraper

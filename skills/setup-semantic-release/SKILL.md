@@ -9,7 +9,6 @@ license: MIT
 metadata:
   author: Antonin Januska
   version: "1.0.0"
-tags: [git, semantic-release, commitlint, husky, versioning, changelog, ci-cd]
 ---
 
 # Setup Semantic Release & Conventional Commits

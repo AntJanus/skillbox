@@ -9,7 +9,6 @@ license: MIT
 metadata:
   author: Antonin Januska
   version: "1.3.0"
-tags: [react, component, structure, organization, best-practices]
 ---
 
 # Ideal React Component Structure

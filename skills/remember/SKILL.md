@@ -9,7 +9,6 @@ license: MIT
 metadata:
   author: Antonin Januska
   version: "1.0.0"
-tags: [context, session, history, memory, resume]
 ---
 
 # Remember
