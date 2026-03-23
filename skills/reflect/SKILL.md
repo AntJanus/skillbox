@@ -7,11 +7,10 @@ description: |
   or at the end of a work session when the user wants to preserve discoveries, corrections,
   and decisions as persistent knowledge.
 license: MIT
+argument-hint: "[global]"
 metadata:
   author: Antonin Januska
   version: "1.0.0"
-  argument-hint: "[global]"
-tags: [memory, learning, reflection, context, session, knowledge]
 ---
 
 # Reflect

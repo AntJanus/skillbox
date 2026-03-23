@@ -6,11 +6,10 @@ description: |
   "create a GIF of my CLI", "write a VHS tape", "make a terminal recording",
   "generate a demo for my TUI", or "set up VHS for CI".
 license: MIT
+argument-hint: "<app-command> [output-format]"
 metadata:
   author: Antonin Januska
   version: "1.1.1"
-  argument-hint: <app-command> [output-format]
-tags: [vhs, recording, tui, demo, gif, terminal, cli, charmbracelet]
 ---
 
 # Record TUI - Terminal Demo Recording with VHS

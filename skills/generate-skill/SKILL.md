@@ -2,11 +2,10 @@
 name: generate-skill
 description: Use when asked to "create a skill", "generate a SKILL.md", "make me a skill", "build a custom skill", or when user wants to extend Claude Code capabilities with a new skill
 license: MIT
+argument-hint: "[skill-topic]"
 metadata:
   author: Antonin Januska
   version: "1.2.1"
-  argument-hint: [skill-topic]
-tags: [skill-creation, meta, automation, documentation]
 ---
 
 # Generate Skill - Interactive Skill Builder
@@ -135,16 +134,10 @@ description: |
   or when [situation]. Include multiple trigger variations for
   better activation. Be specific about WHEN to activate.
 license: MIT
+argument-hint: "<optional-args>"
 metadata:
   author: [author-name]
   version: "1.0.0"
-  argument-hint: <optional-args>
-tags: [relevant, tags, here]
-hooks:                           # Optional: automation triggers
-  post_tool_use:
-    - Action after Write/Edit operations
-  stop:
-    - Action before session ends
 ---
 ```
 
@@ -156,9 +149,7 @@ hooks:                           # Optional: automation triggers
 - `license` - License type (default: MIT)
 - `metadata.author` - Creator name
 - `metadata.version` - Semantic version (e.g., "1.0.0")
-- `metadata.argument-hint` - Hint shown for skill arguments (e.g., `<branch-name>`)
-- `tags` - Array of categorization tags
-- `hooks` - Automation triggers (post_tool_use, stop, etc.)
+- `argument-hint` - Top-level hint shown for skill arguments (e.g., `<branch-name>`)
 
 **Description field best practices:**
 - Include 3-5 specific trigger phrases

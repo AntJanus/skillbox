@@ -7,11 +7,10 @@ description: |
   "what should I work on next", "brainstorm features", "brainstorm ideas", "let's brainstorm",
   "what could we build", "explore ideas", or when starting a new project and needing to map out future work.
 license: MIT
+argument-hint: "[generate|update|audit|brainstorm|resume]"
 metadata:
   author: Antonin Januska
   version: "2.1.0"
-  argument-hint: "[generate|update|audit|brainstorm|resume]"
-tags: [planning, roadmap, features, project-management]
 ---
 
 # Track Roadmap

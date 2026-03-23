@@ -3,15 +3,10 @@ name: track-session
 description: |
   Track, stop, resume, verify, and save progress on long-running work. Use when asked to "start a work session", "track this work", "save progress", "stop session", "resume work", "continue where we left off", "verify work", "check if we're done", "validate progress", "let's get to work on something big", or when planning multi-phase implementations, complex refactoring, or tasks spanning multiple sessions.
 license: MIT
+argument-hint: "[save|resume|verify]"
 metadata:
   author: Antonin Januska
   version: "4.0.1"
-  argument-hint: "[save|resume|verify]"
-hooks:
-  post_tool_use:
-    - Update SESSION_PROGRESS.md after Write/Edit operations
-  stop:
-    - Verify all plan items are completed before ending
 ---
 # Session Progress
 

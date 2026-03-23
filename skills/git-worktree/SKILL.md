@@ -7,10 +7,10 @@ description: |
   "parallel development", "switch without losing work", "create a worktree", or "hotfix while
   working on a feature".
 license: MIT
+argument-hint: "<branch-name> [base-branch]"
 metadata:
   author: Antonin Januska
   version: "2.0.2"
-  argument-hint: <branch-name> [base-branch]
 ---
 
 # Git Worktree - Parallel Development
