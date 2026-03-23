@@ -490,8 +490,13 @@ This CLAUDE.md follows its own advice:
 
 Treat every issue working with SkillBox as an opportunity to update this file.
 
+## Learnings
+
+- **Progressive disclosure via reference/ for 500-line limits** — When a SKILL.md approaches 500 lines, move troubleshooting (highest line count, lowest immediate-need) to `reference/TROUBLESHOOTING.md`, keeping only 3-4 most common issues inline with a progressive disclosure link. This saved ~65 lines for track-session and ~30 lines for track-roadmap. The reference/ dir can also hold EXAMPLES.md and STANDARDS.md. _(captured 2026-03-21)_
+- **Release commit ordering matters** — SkillBox releases follow specific ordering: (1) one commit per skill change with `type(skill-name): description`, (2) separate `docs(changelog): prepare vX.Y.Z release` commit, (3) annotated tag `git tag -a vX.Y.Z`, (4) push with `git push && git push origin vX.Y.Z`. Don't bundle skill changes and changelog into one commit. _(captured 2026-03-21)_
+
 ---
 
-**Last Updated:** 2026-03-02
+**Last Updated:** 2026-03-21
 **Applies To:** Claude Code 2025+
 **Source:** https://antjanus.com/ai/claude-code-best-practices
