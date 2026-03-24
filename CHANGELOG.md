@@ -7,14 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [2.1.0] - 2026-03-23
+
 ### New Skills
 
 - **reflect** (v1.0.0): Extract learnings from today's Claude Code conversations — identifies corrections, discoveries, architecture decisions, debugging breakthroughs, and workflow insights. User chooses per learning whether to save to project CLAUDE.md, global CLAUDE.md, or auto-memory.
+
+### Fixed
+
+- **remember** (v1.0.0): Replaced personal path in example with generic path
+- **reflect** (v1.0.0): Replaced personal path in example with generic path
+
+### Enhanced Skills
+
+- **rate-skill** (v2.0.0): Added frontmatter validation, skill type detection, spec compliance checks, and positive framing evaluation
 
 ### Documentation
 
 - Added reflect to README.md Available Skills section
 - Updated skill count from 10 to 11 in README.md
+- Audited roadmap — cleared stale items, added recent completions
+- Fixed `argument-hint` nesting across all skills (moved to top-level per Claude Code spec)
+- Removed non-functional `tags` and `hooks` fields from frontmatter
 
 ---
 
