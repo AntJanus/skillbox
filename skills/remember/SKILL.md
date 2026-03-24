@@ -56,7 +56,7 @@ Read conversation JSONL files from the project's Claude directory:
 ```
 
 The slug is derived from the git repository root path with `/` replaced by `-` and prefixed with `-`. All worktrees and subdirectories within the same repo share one project directory. For example:
-- `/Users/antonin/projects/myapp` → `-Users-antonin-projects-myapp`
+- `/Users/jane/projects/myapp` → `-Users-jane-projects-myapp`
 
 If unsure, list `~/.claude/projects/` and match by checking the `cwd` field in conversation files.
 

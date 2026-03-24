@@ -61,7 +61,7 @@ Reads today's Claude Code conversation history for the current project, identifi
 **1. Determine project slug**
 
 The project slug is derived from the git repo root path with `/` replaced by `-` and prefixed with `-`:
-- `/Users/antonin/projects/myapp` → `-Users-antonin-projects-myapp`
+- `/Users/jane/projects/myapp` → `-Users-jane-projects-myapp`
 
 If unsure, list `~/.claude/projects/` and match by checking the `cwd` field in conversation files.
 
