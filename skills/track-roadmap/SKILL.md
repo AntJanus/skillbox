@@ -10,7 +10,7 @@ license: MIT
 argument-hint: "[generate|update|audit|brainstorm|resume]"
 metadata:
   author: Antonin Januska
-  version: "2.1.0"
+  version: "2.2.0"
 ---
 
 # Track Roadmap
@@ -445,6 +445,17 @@ assistant: "I'll start working on Cloud sync since it's the most important."
 
 **Why this is bad:** Skipped session check, auto-selected a feature without asking the user.
 </Bad>
+
+## Quality Signals
+
+A well-maintained roadmap has these properties:
+
+- **5-15 committed features** — not a wish list, each feature has clear scope
+- **Features are user-visible capabilities** — "User authentication", not "Add bcrypt"
+- **Every item has a cc-dash ID and status** — machine-parseable for dashboard ingestion
+- **Categories group related work** — navigation is instant, not a scroll-hunt
+- **Audit shows recent updates** — stale roadmaps with no progress for 30+ days need review
+- **"Future Ideas" absorbs uncommitted work** — keeps the main plan focused
 
 ## Troubleshooting
 

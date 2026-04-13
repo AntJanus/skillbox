@@ -6,7 +6,7 @@ license: MIT
 argument-hint: "[save|resume|verify]"
 metadata:
   author: Antonin Januska
-  version: "4.0.1"
+  version: "4.1.0"
 ---
 # Session Progress
 
@@ -396,6 +396,17 @@ Everything is done! ✨
 
 **Why this is bad:** No verification performed, no evidence work meets requirements, potentially incomplete work.
 </Bad>
+
+## Quality Signals
+
+A well-tracked session has these properties:
+
+- **Frontmatter has schema, project, session_id, and timestamps** — machine-parseable for dashboard ingestion
+- **Every task has an ID and explicit dependency** — `dep:none` or `dep:t_XXXXX`, never omitted
+- **"Current Status" reflects actual state** — updated within the last 2-3 file modifications
+- **Failed attempts reference the task they belong to** — with a clear reason why it failed
+- **"Next" field names specific files and functions** — not just "fix the bug"
+- **Completed work has timestamps** — `ref:t_XXXXX at:timestamp` for traceability
 
 ## Troubleshooting
 

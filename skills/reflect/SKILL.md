@@ -240,6 +240,16 @@ If MEMORY.md is approaching 200 lines, warn the user: "MEMORY.md is near the 200
 
 ---
 
+## Quality Signals
+
+A well-extracted learning has these properties:
+
+- **Actionable rule, not anecdote** — "pytest -n requires pytest-xdist" beats "we debugged pytest"
+- **Context explains what prompted the insight** — 1-2 sentences linking to the situation
+- **Category is accurate** — corrections vs discoveries vs architecture decisions are distinct
+- **Suggested scope matches the learning** — project-specific config stays in project CLAUDE.md, universal patterns go global
+- **No sensitive data** — API keys, tokens, credentials stripped before saving
+
 ## Examples
 
 ### Example: Correction Learning
