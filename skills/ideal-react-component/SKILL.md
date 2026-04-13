@@ -501,6 +501,8 @@ A well-structured React component has these properties:
 
 **Pairs well with:** ESLint (`eslint-plugin-import`), Prettier, TypeScript, Storybook, Vitest / Jest
 
+**Note on GSD workflows:** When using GSD skills (discuss-phase, execute-phase) for React work, this skill won't auto-activate — GSD owns the execution pipeline. Reference this skill explicitly with `/ideal-react-component` during GSD phases that create React components, or add it to your project's CLAUDE.md as a convention to follow.
+
 ## References
 
 - [The Anatomy of My Ideal React Component](https://antjanus.com/digital-garden/the-anatomy-of-my-ideal-react-component) - Antonin Januska
