@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "[skill-topic]"
 metadata:
   author: Antonin Januska
-  version: "1.2.1"
+  version: "1.3.0"
 ---
 
 # Generate Skill - Interactive Skill Builder
@@ -256,19 +256,17 @@ For detailed guides, load these files when needed:
 
 *Only load these when specifically needed to save context.*
 
-## Red Flags During Generation
+## Quality Signals
 
-If you catch yourself:
+A well-generated skill has these properties:
 
-- **Generating without asking questions** - Need user input first!
-- **Using vague description field** - Add specific triggers
-- **Skipping examples section** - Always include Good/Bad examples
-- **No troubleshooting** - Users will encounter issues
-- **Wrong pattern for skill type** - Review pattern selection
-- **Over 500 lines without progressive disclosure** - Split into reference/
-- **No verification checklist for methodology skills** - Required for enforcement
-
-**ALL of these mean: STOP. Return to appropriate phase.**
+- **Description field has 5+ trigger phrases** covering natural user language variations
+- **Discovery questions answered** before any content was generated
+- **Pattern matches skill type** — methodology skills have phases and checklists, not just prose
+- **Good/Bad examples use real scenarios** — not abstract placeholder code
+- **Troubleshooting addresses actual pain points** — problems users encounter, not hypothetical edge cases
+- **Under 500 lines** or uses progressive disclosure with reference/ links
+- **Verification checklists present** in methodology skills — enforcement requires measurable checkpoints
 
 ## Examples of Generated Skills
 

@@ -8,7 +8,7 @@ description: |
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.3.0"
+  version: "1.4.0"
 ---
 
 # Ideal React Component Structure
@@ -437,6 +437,17 @@ For detailed explanations and more patterns, see **[React Hooks Antipatterns](./
 - **[Complete Component Examples](./reference/COMPLETE-EXAMPLES.md)** - Full TypeScript and JavaScript component examples
 
 *Only load these when specifically needed to save context.*
+
+## Quality Signals
+
+A well-structured React component has these properties:
+
+- **Imports grouped by source** — React, third-party, internal, local — with blank lines between
+- **Types declared above the component** — component API visible at a glance
+- **Logic follows the strict order** — state, hooks, effects, post-processing, handlers
+- **Early returns for edge cases** — loading/error/empty states exit before the main render
+- **Success render at the bottom** — the happy path is the most visible code
+- **Under 200 lines** or logic extracted to custom hooks
 
 ## Quick Reference
 

@@ -9,7 +9,7 @@ license: MIT
 argument-hint: "<app-command> [output-format]"
 metadata:
   author: Antonin Januska
-  version: "1.1.1"
+  version: "1.2.0"
 ---
 
 # Record TUI - Terminal Demo Recording with VHS
@@ -367,6 +367,17 @@ Enter
 </Bad>
 
 For a complete well-structured TUI example (lazygit, k9s), see **[Templates](./reference/TEMPLATES.md)**.
+
+## Quality Signals
+
+A well-written tape file has these properties:
+
+- **Output declared first, settings grouped before commands** — structure follows the required order
+- **`Require` checks for dependencies** — fails fast instead of producing broken output
+- **Hidden setup with `Ctrl+L` before `Show`** — clean screen, no shell noise visible
+- **Deliberate pacing** — `Sleep 500ms` after typing, `Sleep 2-3s` after Enter, `Sleep 3-5s` on final frame
+- **GIF under 5MB for README use** — reduced via framerate, dimensions, or gifsicle post-processing
+- **Reproducible from the tape file alone** — no manual steps required
 
 ## Troubleshooting
 
