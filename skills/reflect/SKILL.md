@@ -10,7 +10,7 @@ license: MIT
 argument-hint: "[global]"
 metadata:
   author: Antonin Januska
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Reflect
@@ -193,7 +193,7 @@ Options:
 
 **When saving to auto-memory:**
 
-1. Read `~/.claude/projects/{project-slug}/memory/MEMORY.md`
+1. Read the project's `MEMORY.md` from the auto-memory directory
 2. Create the file if it doesn't exist
 3. Look for a `## Session Learnings` section
 4. Append the learning:
