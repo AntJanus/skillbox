@@ -368,7 +368,7 @@ ERROR: No learnings detected. Reflection failed.
 ## Integration
 
 **This skill works with:**
-- **remember** - `/remember` reconstructs context from past sessions. `/reflect` extracts and persists learnings from today's sessions. Use `/remember` when returning to a project, `/reflect` when ending a session.
+- **track-session** (replaces remember) - `/track-session resume` reconstructs context from past sessions. `/reflect` extracts and persists learnings from today's sessions. Use `/track-session resume` when returning to a project, `/reflect` when ending a session.
 - **track-session** - If a session is active, `/reflect` can include SESSION_PROGRESS.md context when analyzing what was learned during tracked work.
 - **track-roadmap** - Architecture decisions captured by `/reflect` often relate to roadmap features in progress.
 
@@ -382,7 +382,7 @@ Work session → /reflect → Save learnings → /track-session save → End ses
 | Command | Purpose | Use when |
 |---------|---------|----------|
 | `/reflect` | Extract and save learnings from today | End of session, want to preserve knowledge |
-| `/remember` | Reconstruct context from past sessions | Starting a session, need to catch up |
+| `/track-session resume` | Reconstruct context and continue work | Starting a session, need to catch up |
 | `/memory` | View/edit Claude's auto-memory directly | Manual memory management |
 | `claude --continue` | Resume last conversation | Want to keep the same context window |
 

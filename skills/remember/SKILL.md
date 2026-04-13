@@ -1,6 +1,7 @@
 ---
 name: remember
 description: |
+  **DEPRECATED — use `/track-session resume` instead.**
   Rebuild context from previous Claude Code sessions in the current directory.
   Use when asked to "remember", "what was I working on", "recap last session",
   "summarize recent work", "catch me up", or when starting a new session and needing
@@ -8,10 +9,12 @@ description: |
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Remember
+
+> **⚠️ Deprecated** — This skill is superseded by `/track-session resume`, which provides the same context restoration with better integration into the session tracking workflow. This skill will be removed in a future release.
 
 > **Context rebuild activated** - I'll scan previous sessions, git history, and project files to reconstruct what happened and what's next.
 
@@ -20,6 +23,8 @@ metadata:
 Reconstructs working context from previous Claude Code sessions in the current directory. Reads conversation history, auto-memory, SESSION_PROGRESS.md, ROADMAP.md, and recent git activity to produce a structured summary of past work and suggested next steps.
 
 **Core principle:** Never start from zero. Previous sessions contain valuable context - surface it so the user can pick up where they left off.
+
+**Prefer `/track-session resume`** — It reads SESSION_PROGRESS.md, checks git state, and continues work in one step. Use `/remember` only if no SESSION_PROGRESS.md exists and you need deep conversation history scanning.
 
 ## When to Use
 
