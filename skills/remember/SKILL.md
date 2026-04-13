@@ -70,7 +70,7 @@ Filter out lines with `isSidechain: true` (subagent conversations) when reading 
 
 **2. Auto-memory**
 
-Check `~/.claude/projects/{project-path-slug}/memory/` for `MEMORY.md` and any topic files (e.g., `debugging.md`, `patterns.md`). These contain Claude's accumulated project knowledge - build commands, architecture notes, and lessons learned from prior sessions.
+Check the project's auto-memory directory for `MEMORY.md` and any topic files (e.g., `debugging.md`, `patterns.md`). These contain Claude's accumulated project knowledge - build commands, architecture notes, and lessons learned from prior sessions.
 
 **3. SESSION_PROGRESS.md**
 
