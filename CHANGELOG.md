@@ -5,7 +5,25 @@ All notable changes to SkillBox will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.2.0] - 2026-04-13
+
+### Enhanced Skills
+
+- **generate-skill** (v1.3.0): Replaced "Red Flags" with "Quality Signals" section — positive framing of what good output looks like
+- **track-session** (v4.1.0): Added Quality Signals section describing well-tracked session properties
+- **track-roadmap** (v2.2.0): Added Quality Signals section describing well-maintained roadmap properties
+- **reflect** (v1.0.1): Added Quality Signals section; fixed hardcoded memory path — now lets Claude Code discover its own memory directory
+- **ideal-react-component** (v1.4.0): Added Quality Signals section; documented GSD workflow activation gap with workaround
+- **record-tui** (v1.2.0): Added Quality Signals section; added README/documentation trigger phrases ("add a demo GIF to the README", "show what this app looks like", "document the UI")
+
+### Deprecated
+
+- **remember** (v1.1.0): Marked as deprecated — superseded by `/track-session resume` which got 23 uses vs 0 for remember over a 2-week period. Will be removed in a future release.
+
+### Fixed
+
+- **reflect** (v1.0.1): Removed hardcoded `~/.claude/projects/` memory path that failed on installations using `~/.claude-personal/`
+- **remember** (v1.1.0): Same memory path fix as reflect
 
 ---
 
@@ -234,7 +252,9 @@ When creating a release:
 
 ---
 
-[Unreleased]: https://github.com/antjanus/skillbox/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/antjanus/skillbox/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/antjanus/skillbox/compare/v2.1.0...v2.2.0
+[2.1.0]: https://github.com/antjanus/skillbox/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/antjanus/skillbox/compare/v1.6.0...v2.0.0
 [1.6.0]: https://github.com/antjanus/skillbox/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/antjanus/skillbox/compare/v1.4.0...v1.5.0
