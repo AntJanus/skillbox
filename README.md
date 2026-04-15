@@ -161,17 +161,11 @@ Capture screenshots of local development projects using shot-scraper (via pipx).
 
 ---
 
-### 🧠 remember
+### 🧠 remember *(deprecated)*
+
+> **Deprecated in v2.2.0** — Superseded by `/track-session resume`. Will be removed in a future release.
 
 Rebuild context from previous Claude Code sessions. Scans conversation history, auto-memory, SESSION_PROGRESS.md, ROADMAP.md, and git state to produce a structured summary of past work and next steps.
-
-**Use when:**
-- Starting a new session and need to catch up
-- Returning to a project after a break
-- Want a recap of recent work before deciding what to do
-- Unsure what was accomplished or what's next
-
-**Triggers:** When asked to "remember", "what was I working on", "recap last session", "summarize recent work", "catch me up"
 
 [View Documentation](./skills/remember/SKILL.md)
 
