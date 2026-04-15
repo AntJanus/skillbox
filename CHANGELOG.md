@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- **reflect** (v1.0.1): Removed hardcoded `~/.claude/projects/` memory path that failed on installations using `~/.claude-personal/`
+- **reflect** (v1.0.1): Removed hardcoded `~/.claude/projects/` memory path that failed on non-default installations
 - **remember** (v1.1.0): Same memory path fix as reflect
 
 ---
