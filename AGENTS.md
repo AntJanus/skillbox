@@ -4,20 +4,21 @@ This file provides guidance on how to work effectively as an AI agent within the
 
 ## Skill Inventory
 
-SkillBox currently contains **10 skills**:
+SkillBox currently contains **11 skills** (1 deprecated):
 
 | Skill | Version | Pattern | Description |
 |-------|---------|---------|-------------|
-| **track-session** | v3.3.2 | A (Methodology) | Track, stop, resume, and verify progress on long-running sessions |
+| **track-session** | v4.1.0 | A (Methodology) | Track, stop, resume, and verify progress on long-running sessions |
 | **git-worktree** | v2.0.2 | B (Technical) | Manage multiple branches simultaneously using git worktrees |
-| **generate-skill** | v1.2.1 | D (Automation) | Interactive skill builder that generates high-quality SKILL.md files |
-| **ideal-react-component** | v1.3.0 | E (Reference) | Battle-tested React component structure pattern with hooks antipatterns |
-| **rate-skill** | v1.0.2 | C (Auditing) | Evaluate skill quality against best practices with letter grades (A-F) |
+| **generate-skill** | v1.3.0 | D (Automation) | Interactive skill builder that generates high-quality SKILL.md files |
+| **ideal-react-component** | v1.4.0 | E (Reference) | Battle-tested React component structure pattern with hooks antipatterns |
+| **rate-skill** | v2.0.0 | C (Auditing) | Evaluate skill quality against best practices with letter grades (A-F) |
 | **setup-semantic-release** | v1.0.0 | D (Automation) | Set up automated versioning with conventional commits, husky, and semantic-release |
-| **track-roadmap** | v1.1.0 | A (Methodology) | Plan, update, audit, and resume work from a high-level project roadmap |
-| **record-tui** | v1.1.1 | B (Technical) | Record polished terminal demos using Charmbracelet VHS |
+| **track-roadmap** | v2.2.0 | A (Methodology) | Plan, update, audit, brainstorm, and resume work from a high-level project roadmap |
+| **record-tui** | v1.2.0 | B (Technical) | Record polished terminal demos using Charmbracelet VHS |
 | **screenshot-local** | v1.0.0 | B (Technical) | Capture screenshots of local dev projects using shot-scraper |
-| **remember** | v1.0.0 | B (Technical) | Rebuild context from previous Claude Code sessions |
+| **reflect** | v1.0.1 | A (Methodology) | Extract learnings from conversations and save to CLAUDE.md or auto-memory |
+| ~~**remember**~~ | v1.1.0 | B (Technical) | *(Deprecated)* Rebuild context from previous sessions — use `/track-session resume` instead |
 
 ## Core Agent Principles
 
@@ -222,7 +223,8 @@ SkillBox skills follow five recognized patterns. Each pattern has specific struc
 
 **Real examples in SkillBox:**
 - **track-session** - Phases: checkpoint, save, resume, verify. Rules like "Never repeat failures" and "Verify before declaring done." Verification checklists at every step.
-- **track-roadmap** - Modes: generate, update, audit, resume. Rules like "User drives the roadmap" and "Keep it high-level." Phase-gated discovery process before writing.
+- **track-roadmap** - Modes: generate, update, audit, brainstorm, resume. Rules like "User drives the roadmap" and "Keep it high-level." Phase-gated discovery process before writing.
+- **reflect** - Scans conversations for learnings, categorizes by type (correction, discovery, decision, debugging, workflow), user chooses save destination per learning.
 
 **Structural signature from track-session:**
 ```markdown
@@ -252,7 +254,7 @@ SkillBox skills follow five recognized patterns. Each pattern has specific struc
 - **git-worktree** - Step-by-step worktree creation, branch management, and cleanup commands.
 - **record-tui** - VHS tape file syntax, recording commands, CI integration for automated demos.
 - **screenshot-local** - shot-scraper setup, single/batch capture commands, YAML config templates.
-- **remember** - Phase-based source gathering (conversations, git, SESSION_PROGRESS) with concrete commands.
+- ~~**remember**~~ *(deprecated)* - Phase-based source gathering (conversations, git, SESSION_PROGRESS) with concrete commands. Use `/track-session resume` instead.
 
 **Structural signature from git-worktree:**
 ```markdown
@@ -564,9 +566,11 @@ Next: Validate against checklist
 - 2026-03-09 14:20: Generated YAML frontmatter
 ```
 
-### Using remember as an Agent
+### Using remember as an Agent *(Deprecated)*
 
-When starting a new SkillBox session:
+> **Deprecated in v2.2.0** — Use `/track-session resume` instead, which provides the same context-rebuilding functionality with better integration.
+
+When starting a new SkillBox session, use track-session's resume mode:
 
 1. Check for SESSION_PROGRESS.md first
 2. Scan recent git log for skill changes
@@ -608,6 +612,6 @@ Phase 6: Finalization (validate and present)
 - Explicit "Do Not Do" lists
 - Verification at every phase
 
-**Last Updated:** 2026-03-09
+**Last Updated:** 2026-04-15
 **Applies To:** AI agents working with SkillBox
 **Companion To:** CLAUDE.md (project-specific guidance)
