@@ -1,0 +1,30 @@
+name: Validate Skills
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'skills/**'
+      - '.github/scripts/validate-skills.sh'
+      - '.github/workflows/validate-skills.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'skills/**'
+      - '.github/scripts/validate-skills.sh'
+      - '.github/workflows/validate-skills.yml'
+
+jobs:
+  validate:
+    name: Validate SKILL.md files
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Make validation script executable
+        run: chmod +x .github/scripts/validate-skills.sh
+
+      - name: Run skill validation
+        run: .github/scripts/validate-skills.sh skills/
