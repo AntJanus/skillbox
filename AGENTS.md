@@ -287,17 +287,21 @@ git worktree list
 - DO include quick reference
 
 **Real example in SkillBox:**
-- **rate-skill** - Seven weighted categories (Length 20%, Conciseness 20%, Repetitiveness 15%, Structure 15%, Triggers 15%, Examples 10%, Troubleshooting 5%). Letter grades A-F with score ranges. Structured output: Summary, Category Scores, Findings by Priority, Strengths, Action Items.
+- **rate-skill** (v2.0.0) - Seven weighted categories (Length 20%, Conciseness 20%, Structure 15%, Triggers 15%, Frontmatter 15%, Examples 10%, Type Compliance 5%). Positive framing with "Strong signals" and "Watch for" per category. Letter grades A-F with score ranges. Structured output: Detected Type, Summary, Category Scores, Spec Compliance, Findings by Priority, Strengths, Action Items.
 
 **Structural signature from rate-skill:**
 ```markdown
 ## Quality Criteria
 
-| Category | Weight | Criteria |
-|----------|--------|----------|
-| Length | 20% | Under 500 lines (or progressive disclosure) |
-| Conciseness | 20% | Clear, scannable, no fluff |
-| Triggers | 15% | 3-5+ specific activation phrases |
+| Category | Weight | Strong Signals (A-grade) |
+|----------|--------|--------------------------|
+| Length | 20% | Under 500 lines, or progressive disclosure with well-structured reference/ |
+| Conciseness | 20% | High info density, scannable, short paragraphs, no redundancy |
+| Structure | 15% | All required sections present and ordered |
+| Triggers | 15% | 5+ natural-language phrases, "when asked to X" format |
+| Frontmatter | 15% | All required fields valid, name matches directory, spec-compliant |
+| Examples | 10% | 3+ Good/Bad comparisons, Good shown first, real scenarios |
+| Type Compliance | 5% | Skill type correctly identified, type-specific patterns present |
 
 ## Grading Scale
 
