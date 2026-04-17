@@ -5,6 +5,35 @@ All notable changes to SkillBox will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2026-04-17
+
+Full skill audit release. Removed deprecated `remember` skill (0 usage over 4 weeks). Tightened description fields based on activation analysis. Enforced 500-line progressive-disclosure cap across all skills.
+
+### Removed
+
+- **remember** (v1.1.0): Deleted — deprecated in v2.2.0 with no usage since. Use `/track-session resume` for context restoration.
+
+### Enhanced Skills
+
+- **track-session** (v4.2.0): Reordered Usage Modes table to put `resume` first (primary entry for returning users); rewrote description to front-load resume triggers ("pick up where I left off", "what was I doing", "where was I") after transcript analysis showed these phrases weren't firing reliably
+- **track-roadmap** (v2.2.1): Trimmed description from 18+ triggers to 6 highest-signal phrases; expanded `reference/TROUBLESHOOTING.md` from 4 to 9 edge cases (ballooning features, scope drift, priority decisions, rename/merge flows)
+- **generate-skill** (v1.4.0): Expanded description to meet its own 5+ triggers standard — added "turn this workflow into a skill", "capture this as a reusable pattern", "extract this into a skill"
+- **ideal-react-component** (v1.5.0): Moved Refactoring section to `reference/REFACTORING.md` with expanded extraction criteria and hook composition patterns (511 → 474 lines, under 500 cap)
+- **record-tui** (v1.3.0): Moved Phase 4 Optimization and Phase 5 CI/CD to `reference/OPTIMIZATION.md` and `reference/CI-INTEGRATION.md` (511 → 452 lines, under 500 cap)
+- **screenshot-local** (v1.1.0): Added Quality Signals section; moved CI/CD guide to `reference/CI-INTEGRATION.md` (497 → 474 lines)
+
+### Documentation
+
+- Removed `remember` from README.md Available Skills section; updated skill count from 11 to 10
+- Removed `remember` from AGENTS.md inventory table; removed "Using remember as an Agent" section
+- Updated all skill versions in AGENTS.md inventory table
+
+### Quality Coverage
+
+Quality Signals coverage: 8/10 skills (added screenshot-local). Remaining 2 skills (git-worktree, setup-semantic-release) are procedural and use built-in verification checklists instead.
+
+---
+
 ## [2.2.0] - 2026-04-13
 
 ### Enhanced Skills
@@ -252,7 +281,8 @@ When creating a release:
 
 ---
 
-[Unreleased]: https://github.com/antjanus/skillbox/compare/v2.2.0...HEAD
+[Unreleased]: https://github.com/antjanus/skillbox/compare/v2.3.0...HEAD
+[2.3.0]: https://github.com/antjanus/skillbox/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/antjanus/skillbox/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/antjanus/skillbox/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/antjanus/skillbox/compare/v1.6.0...v2.0.0
