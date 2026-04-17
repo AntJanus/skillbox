@@ -161,16 +161,6 @@ Capture screenshots of local development projects using shot-scraper (via pipx).
 
 ---
 
-### 🧠 remember *(deprecated)*
-
-> **Deprecated in v2.2.0** — Superseded by `/track-session resume`. Will be removed in a future release.
-
-Rebuild context from previous Claude Code sessions. Scans conversation history, auto-memory, SESSION_PROGRESS.md, ROADMAP.md, and git state to produce a structured summary of past work and next steps.
-
-[View Documentation](./skills/remember/SKILL.md)
-
----
-
 ### 🪞 reflect
 
 Extract learnings from today's Claude Code conversations and save them to CLAUDE.md or auto-memory. Identifies corrections, discoveries, architecture decisions, debugging breakthroughs, and workflow insights.
@@ -388,4 +378,4 @@ MIT License - see individual skills for specific licensing
 
 ---
 
-**Skill Count**: 11 | **Made for**: Claude Code 2025+
+**Skill Count**: 10 | **Made for**: Claude Code 2025+
