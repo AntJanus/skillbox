@@ -8,7 +8,7 @@ description: |
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.4.0"
+  version: "1.5.0"
 ---
 
 # Ideal React Component Structure
@@ -356,48 +356,9 @@ return (
 
 ## Refactoring: Extract to Custom Hooks
 
-**When components grow complex, extract logic into custom hooks:**
+When components exceed 50 lines of logic or 200 lines total, extract stateful logic into a `use[Domain]` custom hook. The component becomes presentation-focused; the hook owns state and data flow.
 
-<Good>
-```tsx
-// usePost.ts - All logic extracted into a custom hook
-export const usePost = (postId: string) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const { data: post, isLoading, error } = useQuery(['post', postId], () => api.getPost(postId));
-  const { mutate: updatePost } = useMutation(api.updatePost);
-
-  const handleEdit = () => setIsEditing(true);
-  const handleSave = (updates: Partial<Post>) => {
-    updatePost(updates);
-    setIsEditing(false);
-  };
-
-  return { post, isLoading, error, isEditing, handleEdit, handleSave };
-};
-
-// PostView.tsx - Clean component focused on presentation
-export const PostView = ({ postId }: PostViewProps): JSX.Element => {
-  const { post, isLoading, error, isEditing, handleEdit, handleSave } = usePost(postId);
-
-  if (isLoading) return <Loading />;
-  if (error) return <Error message={error.message} />;
-  if (!post) return <Empty />;
-
-  return <StyledContainer>{/* Presentation-focused JSX */}</StyledContainer>;
-};
-```
-</Good>
-
-**When to extract to custom hooks:**
-- Component logic exceeds 50 lines
-- State management becomes complex
-- Multiple effects interact
-- Logic is reusable across components
-- Component file exceeds 200 lines
-
-**Hook naming:** `use[Domain]` pattern (e.g., `usePost`, `useAuth`, `useCart`)
-
-**JavaScript:** Same pattern without type annotations.
+See **[Refactoring to Custom Hooks](./reference/REFACTORING.md)** for full examples, extraction criteria, and hook composition patterns.
 
 ## Common Hooks Antipatterns (Quick Reference)
 
@@ -435,6 +396,8 @@ For detailed explanations and more patterns, see **[React Hooks Antipatterns](./
 ## Deep Reference
 
 - **[Complete Component Examples](./reference/COMPLETE-EXAMPLES.md)** - Full TypeScript and JavaScript component examples
+- **[Refactoring to Custom Hooks](./reference/REFACTORING.md)** - Extraction criteria, full examples, hook composition
+- **[React Hooks Antipatterns](./reference/HOOKS-ANTIPATTERNS.md)** - Deep dive on infinite loops, stale closures, dependency arrays
 
 *Only load these when specifically needed to save context.*
 
