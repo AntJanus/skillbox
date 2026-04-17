@@ -10,7 +10,7 @@ license: MIT
 argument-hint: "<app-command> [output-format]"
 metadata:
   author: Antonin Januska
-  version: "1.2.0"
+  version: "1.3.0"
 ---
 
 # Record TUI - Terminal Demo Recording with VHS
@@ -190,80 +190,19 @@ For complete copy-paste templates, see **[Templates](./reference/TEMPLATES.md)**
 
 ## Phase 4: Optimize Output
 
-### GIF Optimization
+Tune framerate, dimensions, and pacing so GIFs stay under 5 MB for README use. Quick summary:
 
-GIFs can get large. Reduce size with:
+- Lower framerate to 15 and reduce dimensions if file too large
+- `Sleep 500ms` after typing, `Sleep 2-3s` after Enter, `Sleep 3-5s` on final frame
+- Post-process with `gifsicle -O3 --lossy=80` if still over target
 
-```tape
-Set Framerate 15          # Lower framerate (default 30)
-Set PlaybackSpeed 1.5     # Speed up slow parts
-Set Width 800             # Smaller dimensions
-```
-
-**Post-processing with gifsicle (optional):**
-```bash
-gifsicle -O3 --lossy=80 demo.gif -o demo-optimized.gif
-```
-
-**Target sizes:**
-- README GIF: < 5 MB (GitHub renders inline)
-- Docs GIF: < 10 MB
-- If over 10 MB, consider MP4 or WebM instead
-
-### Timing Tips
-
-- `Sleep 500ms` after typing a command — lets the viewer read it
-- `Sleep 2-3s` after Enter — lets the viewer see the output
-- `Sleep 3-5s` on the final frame — prevents abrupt loop restart
-- `Set LoopOffset 0%` smoother GIF looping
-- Use `Type@100ms` for important text the viewer should follow
-- Use `Type@30ms` for boilerplate the viewer doesn't need to read
+See **[Optimization Guide](./reference/OPTIMIZATION.md)** for target sizes, timing rules, and format decision tree.
 
 ## Phase 5: CI/CD Integration
 
-### GitHub Actions
+Automate recording with GitHub Actions so README demos stay current. ASCII output enables golden-file regression testing.
 
-```yaml
-name: Record Demo
-on:
-  push:
-    branches: [main]
-    paths:
-      - "demo.tape"
-      - "src/**"
-
-jobs:
-  record:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Record demo
-        uses: charmbracelet/vhs-action@v2
-        with:
-          path: "demo.tape"
-
-      - name: Commit updated GIF
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "docs: update demo recording"
-          file_pattern: "*.gif"
-```
-
-### Golden File Testing
-
-Use ASCII output to detect visual regressions:
-
-```tape
-Output demo.ascii
-# ... your interactions ...
-```
-
-```bash
-# In CI: compare against committed golden file
-vhs demo.tape
-diff demo.ascii demo.ascii.golden
-```
+See **[CI Integration Guide](./reference/CI-INTEGRATION.md)** for the GitHub Actions workflow, golden-file setup, and cost control tips.
 
 ## Examples
 
@@ -499,6 +438,8 @@ For detailed guides, load these files when needed:
 
 - **[Command Reference](./reference/COMMAND-REFERENCE.md)** — All VHS commands, settings, timing guidelines
 - **[Templates](./reference/TEMPLATES.md)** — Copy-paste tape file templates for common scenarios
+- **[Optimization Guide](./reference/OPTIMIZATION.md)** — File size reduction, timing rules, format decision tree
+- **[CI Integration Guide](./reference/CI-INTEGRATION.md)** — GitHub Actions workflow, golden-file testing
 
 *Only load these when specifically needed to save context.*
 
