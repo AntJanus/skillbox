@@ -1,12 +1,15 @@
 ---
 name: track-session
 description: |
-  Track, stop, resume, verify, and save progress on long-running work. Use when asked to "start a work session", "track this work", "save progress", "stop session", "resume work", "continue where we left off", "verify work", "check if we're done", "validate progress", "let's get to work on something big", or when planning multi-phase implementations, complex refactoring, or tasks spanning multiple sessions.
+  Resume work from previous sessions, track progress on long tasks, or verify completion.
+  Use when asked to "continue where we left off", "resume work", "pick up where I left off",
+  "what was I doing", "where was I", "track this work", "save progress", "verify work",
+  or for multi-phase implementations, complex refactoring, and tasks spanning multiple sessions.
 license: MIT
 argument-hint: "[save|resume|verify]"
 metadata:
   author: Antonin Januska
-  version: "4.1.0"
+  version: "4.2.0"
 ---
 # Session Progress
 
@@ -24,9 +27,9 @@ This skill supports four modes via optional arguments:
 
 | Mode | Command | What it does | Use when |
 |------|---------|-------------|----------|
+| **Resume** | `/track-session resume` | Load SESSION_PROGRESS.md and continue | Returning to a project, picking up where you left off |
 | **Default** | `/track-session` | Save progress, then continue working | Checkpoint during active work |
 | **Save** | `/track-session save` | Save progress and stop | Pausing work or taking a break |
-| **Resume** | `/track-session resume` | Load SESSION_PROGRESS.md and continue | Starting new session after break |
 | **Verify** | `/track-session verify` | Validate completed work against requirements | Before declaring done or delivery |
 
 ## When to Use
