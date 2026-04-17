@@ -4,21 +4,20 @@ This file provides guidance on how to work effectively as an AI agent within the
 
 ## Skill Inventory
 
-SkillBox currently contains **11 skills** (1 deprecated):
+SkillBox currently contains **10 skills**:
 
 | Skill | Version | Pattern | Description |
 |-------|---------|---------|-------------|
-| **track-session** | v4.1.0 | A (Methodology) | Track, stop, resume, and verify progress on long-running sessions |
+| **track-session** | v4.2.0 | A (Methodology) | Track, stop, resume, and verify progress on long-running sessions |
 | **git-worktree** | v2.0.2 | B (Technical) | Manage multiple branches simultaneously using git worktrees |
-| **generate-skill** | v1.3.0 | D (Automation) | Interactive skill builder that generates high-quality SKILL.md files |
-| **ideal-react-component** | v1.4.0 | E (Reference) | Battle-tested React component structure pattern with hooks antipatterns |
+| **generate-skill** | v1.4.0 | D (Automation) | Interactive skill builder that generates high-quality SKILL.md files |
+| **ideal-react-component** | v1.5.0 | E (Reference) | Battle-tested React component structure pattern with hooks antipatterns |
 | **rate-skill** | v2.0.0 | C (Auditing) | Evaluate skill quality against best practices with letter grades (A-F) |
 | **setup-semantic-release** | v1.0.0 | D (Automation) | Set up automated versioning with conventional commits, husky, and semantic-release |
-| **track-roadmap** | v2.2.0 | A (Methodology) | Plan, update, audit, brainstorm, and resume work from a high-level project roadmap |
-| **record-tui** | v1.2.0 | B (Technical) | Record polished terminal demos using Charmbracelet VHS |
-| **screenshot-local** | v1.0.0 | B (Technical) | Capture screenshots of local dev projects using shot-scraper |
+| **track-roadmap** | v2.2.1 | A (Methodology) | Plan, update, audit, brainstorm, and resume work from a high-level project roadmap |
+| **record-tui** | v1.3.0 | B (Technical) | Record polished terminal demos using Charmbracelet VHS |
+| **screenshot-local** | v1.1.0 | B (Technical) | Capture screenshots of local dev projects using shot-scraper |
 | **reflect** | v1.0.1 | A (Methodology) | Extract learnings from conversations and save to CLAUDE.md or auto-memory |
-| ~~**remember**~~ | v1.1.0 | B (Technical) | *(Deprecated)* Rebuild context from previous sessions — use `/track-session resume` instead |
 
 ## Core Agent Principles
 
@@ -254,7 +253,6 @@ SkillBox skills follow five recognized patterns. Each pattern has specific struc
 - **git-worktree** - Step-by-step worktree creation, branch management, and cleanup commands.
 - **record-tui** - VHS tape file syntax, recording commands, CI integration for automated demos.
 - **screenshot-local** - shot-scraper setup, single/batch capture commands, YAML config templates.
-- ~~**remember**~~ *(deprecated)* - Phase-based source gathering (conversations, git, SESSION_PROGRESS) with concrete commands. Use `/track-session resume` instead.
 
 **Structural signature from git-worktree:**
 ```markdown
@@ -570,11 +568,9 @@ Next: Validate against checklist
 - 2026-03-09 14:20: Generated YAML frontmatter
 ```
 
-### Using remember as an Agent *(Deprecated)*
+### Using track-session resume as an Agent
 
-> **Deprecated in v2.2.0** — Use `/track-session resume` instead, which provides the same context-rebuilding functionality with better integration.
-
-When starting a new SkillBox session, use track-session's resume mode:
+When starting a new SkillBox session:
 
 1. Check for SESSION_PROGRESS.md first
 2. Scan recent git log for skill changes
@@ -616,6 +612,6 @@ Phase 6: Finalization (validate and present)
 - Explicit "Do Not Do" lists
 - Verification at every phase
 
-**Last Updated:** 2026-04-15
+**Last Updated:** 2026-04-17
 **Applies To:** AI agents working with SkillBox
 **Companion To:** CLAUDE.md (project-specific guidance)
