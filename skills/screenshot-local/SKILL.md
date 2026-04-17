@@ -9,7 +9,7 @@ license: MIT
 argument-hint: "<url-or-file> [--output filename.png]"
 metadata:
   author: Antonin Januska
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Screenshot Local - Capture Project Screenshots with shot-scraper
@@ -248,45 +248,9 @@ shot-scraper http://localhost:3000 -s ".component" --omit-background -o widget.p
 
 ## Phase 5: CI/CD Integration
 
-### GitHub Actions
+Automate screenshot regeneration with GitHub Actions so docs stay current. Use the YAML `server` key to auto-start a dev server during capture.
 
-```yaml
-name: Update Screenshots
-on:
-  push:
-    branches: [main]
-    paths: ["src/**", "shots.yml"]
-
-jobs:
-  screenshots:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install shot-scraper
-        run: |
-          pip install shot-scraper
-          shot-scraper install
-
-      - name: Capture screenshots
-        run: |
-          npm ci && npm run dev &
-          sleep 5
-          shot-scraper multi shots.yml
-
-      - name: Commit updated screenshots
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "docs: update screenshots"
-          file_pattern: "screenshots/*.png"
-```
-
-**Tip:** Use the `server` key in YAML to auto-start a dev server — see **[Templates](./reference/TEMPLATES.md)**.
+See **[CI Integration Guide](./reference/CI-INTEGRATION.md)** for the GitHub Actions workflow, `server` key usage, and cost-control tips.
 
 ## Examples
 
@@ -381,6 +345,18 @@ shot-scraper http://localhost:3000 -s ".chart" -o chart.png
 ```
 
 </Bad>
+
+## Quality Signals
+
+A well-configured screenshot setup has these properties:
+
+- **Explicit `width` on every capture** — default is fine but intentional beats accidental
+- **`wait` or `wait-for` on SPA routes** — captures content, not loading spinners
+- **Organized output paths** — `screenshots/homepage.png`, not `homepage.png` at project root
+- **YAML config committed to the repo** — reproducible across machines and CI, not one-off `shot-scraper` commands
+- **`--retina` for README hero images** — crisp on high-DPI displays where it matters
+- **JS cleanup for modals/banners** — `-j "document.querySelector('.banner')?.remove()"` before capture
+- **Selector + padding for component shots** — `-s ".hero" -p 20` beats full-page crops
 
 ## Troubleshooting
 
@@ -485,6 +461,7 @@ For detailed guides, load these files when needed:
 
 - **[Command Reference](./reference/COMMAND-REFERENCE.md)** — All shot-scraper commands, flags, and subcommands
 - **[Templates](./reference/TEMPLATES.md)** — Copy-paste YAML configs for common project types
+- **[CI Integration Guide](./reference/CI-INTEGRATION.md)** — GitHub Actions workflow, server management, cost control
 
 *Only load these when specifically needed to save context.*
 
