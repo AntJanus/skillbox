@@ -2,7 +2,7 @@
 schema: cc-dash/roadmap@1
 project: skillbox
 description: Curated collection of reusable utility skills for Claude Code and AI agents.
-last_updated: 2026-03-23T16:00:00-07:00
+last_updated: 2026-04-17T00:00:00-06:00
 ---
 
 # Roadmap
@@ -13,15 +13,15 @@ last_updated: 2026-03-23T16:00:00-07:00
 
 <!-- category:core -->
 
-- <!-- id:r_si6j5 status:planned --> **AGENTS.md Refresh** - Update stale "Last Updated" date (2025-01-29), add real pattern examples from existing skills (Pattern A: track-session, Pattern C: rate-skill, Pattern D: setup-semantic-release), review all workflow sections for accuracy against current 10-skill set.
-- <!-- id:r_oulw2 status:planned --> **Progressive Disclosure Fixes** - Add reference/ directory to track-roadmap (currently 517 lines, exceeds 500-line threshold). Audit setup-semantic-release and remember for progressive disclosure need. Ensure all skills at or near 500 lines use the reference/ pattern.
+- <!-- id:r_si6j5 status:done completed:2026-04-15 --> ~~**AGENTS.md Refresh**~~ - AGENTS.md refreshed with rate-skill v2.0.0 rubric; workflow sections aligned to current skill set. *(Completed: 2026-04-15)*
+- <!-- id:r_oulw2 status:done completed:2026-04-15 --> ~~**Progressive Disclosure Fixes**~~ - track-roadmap trimmed from 512 → 426 lines via inline-example extraction; TROUBLESHOOTING expanded in reference/. Similar patterns applied to record-tui, ideal-react-component, screenshot-local. *(Completed: 2026-04-15)*
 - <!-- id:r_6ctoj status:planned --> **Contribution Infrastructure** - Create .github/ISSUE_TEMPLATE/skill-proposal.md, .github/PULL_REQUEST_TEMPLATE.md, and CONTRIBUTING.md with contributor guidelines (skill creation process, quality standards, PR workflow).
 
 ## Infra
 
 <!-- category:infra -->
 
-- <!-- id:r_xd69x status:planned --> **CI/CD Pipeline** - Create .github/workflows/validate-skills.yml that runs test-skills.sh on PRs. Validate SKILL.md YAML frontmatter structure, section presence (Overview, When to Use, Examples, Troubleshooting, Integration), enforce 500-line limit, and lint markdown formatting.
+- <!-- id:r_xd69x status:done completed:2026-04-15 --> ~~**CI/CD Pipeline**~~ - GitHub Actions workflow shipped in `.github/workflows/` with `test-skills.sh` validation: frontmatter, required sections, 500-line ceiling, markdown lint. *(Completed: 2026-04-15)*
 - <!-- id:r_gb7ss status:planned --> **Documentation Polish** - Add usage examples and screenshots/GIFs to README for each skill. Document cross-skill integration patterns (remember + track-session + track-roadmap).
 
 ## UX
