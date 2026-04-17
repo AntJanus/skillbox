@@ -1,16 +1,14 @@
 ---
 name: track-roadmap
 description: |
-  Plan, update, audit, brainstorm, and resume work from a high-level project roadmap. Use when asked to "create a roadmap",
-  "plan features", "what should we build next", "update the roadmap", "audit the roadmap",
-  "review project direction", "prioritize features", "resume from roadmap", "pick up where I left off",
-  "what should I work on next", "brainstorm features", "brainstorm ideas", "let's brainstorm",
-  "what could we build", "explore ideas", or when starting a new project and needing to map out future work.
+  Plan, audit, and resume work from a project roadmap. Use when asked to "create a roadmap",
+  "what should we build next", "pick up where I left off", "brainstorm features",
+  "audit the roadmap", or when starting a new project and need to map out future work.
 license: MIT
 argument-hint: "[generate|update|audit|brainstorm|resume]"
 metadata:
   author: Antonin Januska
-  version: "2.2.0"
+  version: "2.2.1"
 ---
 
 # Track Roadmap
