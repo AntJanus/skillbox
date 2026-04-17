@@ -1,11 +1,15 @@
 ---
 name: generate-skill
-description: Use when asked to "create a skill", "generate a SKILL.md", "make me a skill", "build a custom skill", or when user wants to extend Claude Code capabilities with a new skill
+description: |
+  Use when asked to "create a skill", "generate a SKILL.md", "make me a skill",
+  "build a custom skill", "turn this workflow into a skill", "capture this as a reusable pattern",
+  or "extract this into a skill". Activates when the user wants to extend Claude Code
+  capabilities with a new skill or codify an existing workflow as reusable instructions.
 license: MIT
 argument-hint: "[skill-topic]"
 metadata:
   author: Antonin Januska
-  version: "1.3.0"
+  version: "1.4.0"
 ---
 
 # Generate Skill - Interactive Skill Builder
