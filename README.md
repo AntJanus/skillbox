@@ -177,6 +177,22 @@ Extract learnings from today's Claude Code conversations and save them to CLAUDE
 
 ---
 
+### 🔍 code-review
+
+Run a multi-agent code review over local changes. Dispatches four specialized reviewers in parallel (basics, architecture, clarity, testing) and synthesizes their findings into a severity-tagged report.
+
+**Use when:**
+- Self-reviewing a change before committing
+- Before opening a PR to flush issues you would fix anyway
+- After a large refactor to catch structural drift
+- Want pattern-aware feedback (architecture agent reads siblings first)
+
+**Triggers:** When asked to "review my code", "review these changes", "do a code review", "review this diff", "check my changes before I commit"
+
+[View Documentation](./skills/code-review/SKILL.md)
+
+---
+
 ## Installation
 
 ### Using Vercel Skills CLI (Recommended)
@@ -378,4 +394,4 @@ MIT License - see individual skills for specific licensing
 
 ---
 
-**Skill Count**: 10 | **Made for**: Claude Code 2025+
+**Skill Count**: 11 | **Made for**: Claude Code 2025+
