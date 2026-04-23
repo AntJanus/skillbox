@@ -5,6 +5,19 @@ All notable changes to SkillBox will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0] - 2026-04-23
+
+Added `code-review` skill — multi-agent local code review with four specialized reviewers dispatched in parallel, synthesized into a severity-tagged report at the repo root.
+
+### Added
+
+- **code-review** (v1.0.0): Multi-agent local code review skill. Four specialized reviewers in parallel lanes — basics (hygiene + orphaned-symbol detection), architecture (pattern consistency + structural holes, with a mandated sibling-read step), clarity (reader comprehension), testing (coverage + assertion strength). Writes `REVIEW.md` at the repo root; chat receives only a one-line summary. Language-agnostic — no framework, tool, or extension assumptions baked in. Security review deferred to built-in `/security-review`; PR review to built-in `/review`; design-health and simplification to `/simplify`. Progressive disclosure: full reviewer prompt skeletons live in `reference/AGENTS.md`.
+
+### Documentation
+
+- Added `code-review` to README.md Available Skills section; skill count 10 → 11
+- Added `code-review` to AGENTS.md Skill Inventory table
+
 ## [2.3.0] - 2026-04-17
 
 Full skill audit release. Removed deprecated `remember` skill (0 usage over 4 weeks). Tightened description fields based on activation analysis. Enforced 500-line progressive-disclosure cap across all skills.
