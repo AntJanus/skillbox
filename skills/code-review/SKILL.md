@@ -3,22 +3,22 @@ name: code-review
 description: |
   Run a multi-agent code review over local changes. Use when asked to "review my code",
   "review these changes", "do a code review", "review this diff", "check my changes before I commit",
-  "review the work in this PR", or "give me a thorough review". Dispatches four specialized
-  reviewers in parallel (basics, architecture, clarity, testing) and synthesizes their findings
-  into a single severity-tagged report written to REVIEW.md at the repo root.
+  "review the work in this PR", or "give me a thorough review". Dispatches five specialized
+  reviewers in parallel (basics, architecture, clarity, testing, repo-hygiene) and synthesizes
+  their findings into a single severity-tagged report written to REVIEW.md at the repo root.
 license: MIT
 argument-hint: "[path | --staged | --branch <base>]"
 allowed-tools: Read, Write, Glob, Grep, Bash, Task
 metadata:
   author: Antonin Januska
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Code Review - Multi-Agent Local Review
 
 ## Overview
 
-Runs four specialized review agents in parallel, each focused on exactly one concern, then merges their findings into a single report sorted by severity. Keeps each reviewer in its lane so nothing drifts into generic "looks fine" commentary.
+Runs five specialized review agents in parallel, each focused on exactly one concern, then merges their findings into a single report sorted by severity. Keeps each reviewer in its lane so nothing drifts into generic "looks fine" commentary.
 
 **Core principle:** Narrow-scope reviewers find more real issues than one broad reviewer trying to cover everything.
 
@@ -53,13 +53,14 @@ Runs four specialized review agents in parallel, each focused on exactly one con
  └────────┬────────┘
           │
           ▼
- ┌─────────────────────────────────────────────────┐
- │ 2. Dispatch 4 agents in parallel (Task tool)    │
- │   ├─ basics        (lint-level hygiene)         │
- │   ├─ architecture  (reads siblings first)       │
- │   ├─ clarity       (readability, naming)        │
- │   └─ testing       (coverage of the change)     │
- └────────┬────────────────────────────────────────┘
+ ┌──────────────────────────────────────────────────────┐
+ │ 2. Dispatch 5 agents in parallel (Task tool)         │
+ │   ├─ basics        (lint-level hygiene)              │
+ │   ├─ architecture  (reads siblings first)            │
+ │   ├─ clarity       (readability, naming)             │
+ │   ├─ testing       (coverage of the change)          │
+ │   └─ repo-hygiene  (secrets, env vars, deps, docs)   │
+ └────────┬─────────────────────────────────────────────┘
           │
           ▼
  ┌───────────────────────────────────┐
@@ -68,7 +69,7 @@ Runs four specialized review agents in parallel, each focused on exactly one con
  └───────────────────────────────────┘
 ```
 
-All four agents run concurrently. The skill does no review reasoning itself — it only scopes, dispatches, and merges. The final report is written to `REVIEW.md` at the repo root (overwriting any previous review).
+All five agents run concurrently. The skill does no review reasoning itself — it only scopes, dispatches, and merges. The final report is written to `REVIEW.md` at the repo root (overwriting any previous review).
 
 ## Phase 1: Scope Detection
 
@@ -89,10 +90,16 @@ git diff <base>...HEAD --name-only  # branch diff
 ```
 
 **Filter out:**
-- Dependency lockfiles (typically `*.lock`, `*-lock.*`, or whatever the package manager produces)
 - Binary files, images, and other non-text assets
 - Generated files (marked with a generator header, or living under an output directory)
 - Files in build output, dependency, or virtual-environment directories
+
+**Do NOT filter out:**
+- Dependency lockfiles (`*.lock`, `*-lock.*`, etc.) — `repo-hygiene` needs to see whether they moved with the manifest
+- Package manifests (`package.json`, `pyproject.toml`, `requirements.txt`, `go.mod`, `Cargo.toml`, etc.)
+- Env templates (`.env.example`, `.env.sample`) and project docs (`README.md`, `CLAUDE.md`, `AGENTS.md`)
+
+The other four agents skip lockfiles by lane definition; only `repo-hygiene` reads them. Pass the full file list to all five and let each stay in its lane.
 
 **Before proceeding, you MUST:**
 - [ ] Have a concrete list of file paths
@@ -103,9 +110,9 @@ If the scope is empty, stop and tell the user — don't invent work.
 
 ## Phase 2: Parallel Agent Dispatch
 
-**Send all four Task tool calls in a single message so they run concurrently.**
+**Send all five Task tool calls in a single message so they run concurrently.**
 
-Use `subagent_type: Explore` for all four — they are read-only review tasks and Explore is tuned for fast codebase traversal.
+Use `subagent_type: Explore` for all five — they are read-only review tasks and Explore is tuned for fast codebase traversal.
 
 Each agent prompt must:
 - Include the explicit file list and diff (or instructions to read specific files)
@@ -153,15 +160,38 @@ For each changed non-test file, locate the corresponding test file using whateve
 
 **Out of scope:** test file architecture, test readability beyond assertion strength. If no test file exists for changed production code, that's at least a Major.
 
+### Agent 5: repo-hygiene
+
+**Focus:** The repo's hygiene around the change — secrets, env vars, dependencies, and documentation alignment. Things a linter doesn't catch and a code reviewer often forgets.
+
+**Looks for:**
+- **Secrets / credentials:** hardcoded API keys, tokens, passwords, private keys, signed JWTs, connection strings with embedded credentials, OAuth client secrets, real values in committed `.env` files. Run pattern checks for common provider key shapes (AWS, GitHub, Stripe, Slack, GCP service-account JSON, SSH/PGP private-key headers) and language-specific secret accessors (`process.env.X = "..."` rather than reading from env).
+- **Env var documentation drift:** every env var the change reads (`process.env.X`, `os.getenv("X")`, `os.environ["X"]`, `ENV["X"]`, `Deno.env.get`, etc.) must appear in `.env.example` (or `.env.sample` / `.env.template`), and ideally be mentioned in `README.md` or `CLAUDE.md` if it's user-configurable. Reverse direction matters too — if a documented env var was removed from code, the docs should follow.
+- **Dependencies / lockfiles:**
+  - New imports/requires/uses with no entry in the package manifest (`package.json`, `pyproject.toml`, `requirements.txt`, `go.mod`, `Cargo.toml`, `Gemfile`, etc.)
+  - Manifest changed but the lockfile (`package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `poetry.lock`, `uv.lock`, `Pipfile.lock`, `go.sum`, `Cargo.lock`, `Gemfile.lock`) wasn't updated in the same diff
+  - Removed dependencies still imported somewhere
+  - Pinned versions in code disagreeing with the manifest
+- **Doc alignment:**
+  - `README.md` references commands, flags, files, or features that no longer exist (or aren't yet implemented)
+  - `CLAUDE.md` / `AGENTS.md` describes architecture, directories, or commands that the change has shifted
+  - Doc-comments / docstrings in source files referring to renamed or removed functions, files, or modules
+  - CHANGELOG entries that don't reflect the diff (when CHANGELOG is part of the scope)
+  - Public API surface changed without corresponding docs update
+
+**Read these (when present):** the package manifest(s), the matching lockfile(s), `.env.example`, `.env.sample`, `.env.template`, `README.md`, `CLAUDE.md`, `AGENTS.md`, `CHANGELOG.md`, and any `docs/` directory that would normally cover the changed area.
+
+**Out of scope:** code-level cleanups (basics owns), architectural fit (architecture owns), test coverage (testing owns), readability (clarity owns). If a docstring is misleading because it's *unclear*, that's clarity; if it's misleading because the function it documents has moved or been renamed, that's repo-hygiene.
+
 ## Phase 3: Synthesis
 
-**After all four agents return, merge their findings and write REVIEW.md:**
+**After all five agents return, merge their findings and write REVIEW.md:**
 
 1. Parse each agent's output into individual findings
 2. Group by severity (Critical → Major → Minor → Nit)
 3. Within each severity, group by file path
 4. Annotate each finding with which agent surfaced it
-5. Deduplicate: if two agents flag the same line, keep the more severe one and note both lanes
+5. Deduplicate: if multiple agents flag the same line, keep the most severe one and note all lanes
 6. **Write the report to `REVIEW.md` at the repo root using the Write tool** — overwrite any existing REVIEW.md
 7. Tell the user the report is at `REVIEW.md` and print a one-line summary to the conversation: `REVIEW.md written — X Critical, Y Major, Z Minor, W Nit`
 
@@ -186,7 +216,7 @@ For each changed non-test file, locate the corresponding test file using whateve
 
 **Generated:** YYYY-MM-DD HH:MM
 **Scope:** N files (list)
-**Agents:** basics, architecture, clarity, testing
+**Agents:** basics, architecture, clarity, testing, repo-hygiene
 **Total findings:** X Critical, Y Major, Z Minor, W Nit
 
 ---
@@ -204,6 +234,11 @@ For each changed non-test file, locate the corresponding test file using whateve
   - Risk: if the downstream API returns 429, the retry loop silently exits
   - Fix: add a test case that simulates a 429 response and asserts the retry counter
 
+- **[repo-hygiene]** `line 12` — Hardcoded API key committed
+  - Evidence: `STRIPE_KEY = "sk_live_..."` literal in source
+  - Risk: secret enters git history; rotate immediately, then move to env
+  - Fix: read from `process.env.STRIPE_KEY`, add `STRIPE_KEY=` to `.env.example`, document in README
+
 ## Major
 
 ### src/api/fetch-user
@@ -218,6 +253,13 @@ For each changed non-test file, locate the corresponding test file using whateve
   - Existing pattern: `internal/worker/http-client` wraps external calls in the shared retry/backoff helper
   - This change: calls the downstream service once, propagates the error
   - Fix: wrap the call with the same retry/backoff helper siblings use
+
+### package.json
+
+- **[repo-hygiene]** — Manifest changed but lockfile not updated
+  - `package.json` adds `pino@^9.0.0`; `package-lock.json` is unchanged in this diff
+  - Risk: CI install will resolve a different version than developers; reproducible builds break
+  - Fix: run the package manager's install/lock command and commit the lockfile
 
 ## Minor
 ...
@@ -238,7 +280,7 @@ For each changed non-test file, locate the corresponding test file using whateve
 **Scope:** N files
 **Total findings:** 0
 
-All four reviewers returned NO FINDINGS. Ship it.
+All five reviewers returned NO FINDINGS. Ship it.
 ```
 
 **Chat-side one-liner after writing the file:**
@@ -259,14 +301,14 @@ Scope: 3 files
   src/lib/auth
   tests/auth
 
-[Dispatches 4 agents in parallel via Task]
-[Waits for all 4 to complete]
+[Dispatches 5 agents in parallel via Task]
+[Waits for all 5 to complete]
 [Writes REVIEW.md at repo root]
 [Prints one-liner: "REVIEW.md written — 2 Critical, 1 Major, 4 Minor, 3 Nit"]
 ```
 </Good>
 
-All four agents fire in one message, scope line shown before dispatch, full report lands in REVIEW.md, chat stays terse with a one-line summary.
+All five agents fire in one message, scope line shown before dispatch, full report lands in REVIEW.md, chat stays terse with a one-line summary.
 
 <Bad>
 ```
@@ -281,7 +323,7 @@ User: /code-review
 ```
 </Bad>
 
-Two problems: sequential dispatch wastes time, and dumping the report into the chat bypasses the REVIEW.md artifact. The four agents are independent — send them in a single message. The report belongs in REVIEW.md.
+Two problems: sequential dispatch wastes time, and dumping the report into the chat bypasses the REVIEW.md artifact. The five agents are independent — send them in a single message. The report belongs in REVIEW.md.
 
 ### Example 2: A good agent finding
 
@@ -308,13 +350,14 @@ No file, no line, no specific risk, no actionable fix. Agents that produce outpu
 
 <Good>
 ```
-[basics]  internal/auth/token:12  Unused import
-[clarity] internal/auth/token:45  Function is 60 lines and hard to follow
-[arch]    internal/auth/token:8   Error-handling style doesn't match sibling modules — peers wrap errors with the shared error-chaining helper; this change returns raw errors
+[basics]        internal/auth/token:12  Unused import
+[clarity]       internal/auth/token:45  Function is 60 lines and hard to follow
+[arch]          internal/auth/token:8   Error-handling style doesn't match sibling modules — peers wrap errors with the shared error-chaining helper; this change returns raw errors
+[repo-hygiene]  internal/auth/token:22  New env var AUTH_TOKEN_TTL referenced but not added to .env.example or documented in README
 ```
 </Good>
 
-Three agents each found something distinct in the same file. No overlap, no "also this".
+Four agents each found something distinct in the same file. No overlap, no "also this".
 
 <Bad>
 ```
@@ -329,13 +372,14 @@ Basics bleeding into clarity's lane and vice versa. Duplicates the finding and d
 
 A well-run code review has these properties:
 
-- **All four agents dispatched in a single message** — visible as four Task calls in one turn
+- **All five agents dispatched in a single message** — visible as five Task calls in one turn
 - **Scope reported before dispatch** — user sees which files are under review
 - **Every finding has file:line** — no "consider reviewing the error handling"
 - **Every finding has a concrete fix** — not just the problem
 - **Severities are used meaningfully** — not everything is Major
-- **Lane discipline** — basics doesn't comment on architecture, testing doesn't comment on style
+- **Lane discipline** — basics doesn't comment on architecture, testing doesn't comment on style, repo-hygiene doesn't comment on code structure
 - **Architecture agent actually reads siblings** — you can see the sibling references in its findings
+- **repo-hygiene actually reads `.env.example`, manifests, and lockfiles** — you can see those filenames cited in its findings, not just guesses about what's documented
 - **Clean code gets "Ship it."** — no manufactured findings to look thorough
 - **REVIEW.md is the deliverable** — full report lives in the file at repo root, chat gets a one-line summary
 - **REVIEW.md is overwritten in place** — there is only ever one current review, not a history
@@ -356,9 +400,21 @@ A well-run code review has these properties:
 
 ### Problem: Two agents flag the same issue
 
-**Cause:** Natural overlap (e.g., a dead function is both "basics: dead code" and "testing: no test for it").
+**Cause:** Natural overlap (e.g., a dead function is both "basics: dead code" and "testing: no test for it"; a stale comment can be flagged by both `basics` and `repo-hygiene`).
 
-**Solution:** In synthesis, keep the more severe finding and add a `(also flagged by X)` note. Don't print both.
+**Solution:** In synthesis, keep the most severe finding and add a `(also flagged by X)` note. Don't print both. Lane attribution rule of thumb: if it's *unused/dead*, it's basics; if it points at a renamed/moved/missing target, it's repo-hygiene.
+
+### Problem: repo-hygiene flags every env var as undocumented
+
+**Cause:** The `.env.example` (or equivalent) file isn't in the repo, so the agent has nothing to compare against — and reads that as "all env vars undocumented."
+
+**Solution:** If the project genuinely has no env-template file, that itself is one Major finding ("no `.env.example` exists; document required env vars there"), not one finding per env var. If the file lives under a non-standard name (`env.template`, `config.example.yml`), tell the agent where to look in the prompt.
+
+### Problem: repo-hygiene flags secrets that are obviously fixtures
+
+**Cause:** Test fixtures and example values look like real secrets to a pattern matcher (e.g., `"sk_test_..."` keys, fake JWTs in tests).
+
+**Solution:** Findings should be **Critical only** when the value looks live (production-shaped key, real domain, non-test path). Test files, `*.example`, `*.sample`, and anything under a fixtures directory should be Minor at most, or skipped entirely if clearly placeholder. Re-dispatch the agent with that distinction stated explicitly.
 
 ### Problem: Scope is empty
 
@@ -370,7 +426,7 @@ A well-run code review has these properties:
 
 **Cause:** Review scope caught a merge commit or a rebase.
 
-**Solution:** Show the user the file count and ask whether to narrow scope (e.g., only files touched in the last commit). A 300-file review from four agents will be slow and the signal will be buried.
+**Solution:** Show the user the file count and ask whether to narrow scope (e.g., only files touched in the last commit). A 300-file review from five agents will be slow and the signal will be buried.
 
 ### Problem: Report is too long to be useful
 
