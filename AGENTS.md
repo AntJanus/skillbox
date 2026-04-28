@@ -18,7 +18,7 @@ SkillBox currently contains **11 skills**:
 | **record-tui** | v1.3.0 | B (Technical) | Record polished terminal demos using Charmbracelet VHS |
 | **screenshot-local** | v1.1.0 | B (Technical) | Capture screenshots of local dev projects using shot-scraper |
 | **reflect** | v1.0.1 | A (Methodology) | Extract learnings from conversations and save to CLAUDE.md or auto-memory |
-| **code-review** | v1.0.0 | C (Auditing) | Multi-agent local code review — basics, architecture, clarity, testing — writes REVIEW.md |
+| **code-review** | v1.1.0 | C (Auditing) | Multi-agent local code review — basics, architecture, clarity, testing, repo-hygiene — writes REVIEW.md |
 
 ## Core Agent Principles
 
