@@ -5,6 +5,18 @@ All notable changes to SkillBox will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.0] - 2026-04-28
+
+Added `repo-hygiene` reviewer to `code-review` — fifth lane covering committed secrets, undocumented env vars, dependency/lockfile drift, and documentation alignment.
+
+### Enhanced Skills
+
+- **code-review** (v1.1.0): Added fifth reviewer `repo-hygiene` covering project-level hygiene the other four lanes miss — committed secrets/credentials, undocumented env vars, dependency/lockfile drift, and documentation alignment (README/CLAUDE.md/AGENTS.md/docstrings pointing at renamed or removed targets). Reads the project's package manifests, lockfiles, env templates, and project docs as a mandatory first step. Scope detection no longer filters lockfiles or manifests so this agent can see them; the other four still skip them by lane. Includes fixture-vs-real-secret distinction to suppress false positives in test files. Full prompt skeleton added to `reference/AGENTS.md`.
+
+### Documentation
+
+- Updated README.md and root AGENTS.md skill inventory to reflect five reviewers
+
 ## [2.4.0] - 2026-04-23
 
 Added `code-review` skill — multi-agent local code review with four specialized reviewers dispatched in parallel, synthesized into a severity-tagged report at the repo root.
