@@ -5,6 +5,12 @@ All notable changes to SkillBox will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Enhanced Skills
+
+- **code-review** (v1.3.0): Six refinements informed by transcript audit (`code-review` actually used in 3 projects since v1.2.0), web research on Anthropic's official Code Review pipeline + skill-authoring docs, and the obra/superpowers and HAMY 9-agent precedents. **Pre-existing severity tier**: clarity (and any agent that finds a same-scope issue) can now surface pre-existing problems into a separate `## Pre-existing` bucket at the bottom of REVIEW.md instead of suppressing them — preserves signal without crowding change-focused findings. **5-Nit cap promoted to primary rule**: Phase 3 synthesis now enforces a hard cap of 5 Nits, collapsing the rest into a single `_…plus N similar nits_` line; matches Anthropic's explicit recommendation. **Verifier pass added as Phase 2.5**: after the five reviewer agents return, a sixth verifier agent re-checks each finding against the actual code, demoting unsubstantiated ones one severity tier with `[Unverified]` tag and recording the verification summary in REVIEW.md; mirrors Anthropic's official two-stage filter pattern (Datadog reports 60%→13% false-positive reduction with this pattern). **Evidence bar in basics, architecture, repo-hygiene prompts**: each high-noise lane gets a positively-framed instruction to flag findings they can substantiate with concrete code citations, returning NO FINDINGS when evidence is thin. **Model-tier note in Overview**: explicit guidance that the skill is designed for Opus/Sonnet-tier models. **Evals follow-up note in Integration**: recommends maintainers create `evals/` with 3+ representative diff scenarios to catch agent-prompt regressions.
+
 ## [2.8.0] - 2026-05-02
 
 `deep-research` v2.0.0 — major rewrite informed by transcript audit (220 sessions in `~/projects/notes`), web research on the four leading deep-research products (OpenAI / Perplexity / Gemini / Anthropic), and audit of skillbox skill-design conventions. The skill moves from advisory to enforcing: every phase has a `MUST` checkbox gate; output adopts a Tl;dr lead, per-section confidence labels, mandatory comparison matrix for 3+ items, and grouped-and-dated source lists.
