@@ -5,7 +5,9 @@ All notable changes to SkillBox will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.9.0] - 2026-05-02
+
+`code-review` v1.3.0 — six refinements applied after a focused audit of the skill itself: transcript review across three projects, web research on Anthropic's official Code Review pipeline and skill-authoring docs, and the obra/superpowers and HAMY 9-agent precedents. The skill gains an always-on verifier pass, a Pre-existing severity bucket, a hard 5-Nit cap, evidence-bar prompts in three lanes, a model-tier note, and an evals follow-up. Personal-content audit found nothing to remove. SKILL.md stays under 500 lines via Troubleshooting extraction to `reference/TROUBLESHOOTING.md`.
 
 ### Enhanced Skills
 
