@@ -4,12 +4,14 @@ description: |
   Resume work from previous sessions, track progress on long tasks, or verify completion.
   Use when asked to "continue where we left off", "resume work", "pick up where I left off",
   "what was I doing", "where was I", "track this work", "save progress", "verify work",
-  or for multi-phase implementations, complex refactoring, and tasks spanning multiple sessions.
+  "start a session", "start a session together", "save this in a session",
+  "save this plan in a session", or for multi-phase implementations, complex refactoring,
+  and tasks spanning multiple sessions.
 license: MIT
 argument-hint: "[save|resume|verify]"
 metadata:
   author: Antonin Januska
-  version: "4.2.0"
+  version: "4.3.0"
 ---
 # Session Progress
 
