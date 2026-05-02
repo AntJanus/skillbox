@@ -5,6 +5,27 @@ All notable changes to SkillBox will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **deep-research** (v1.0.0): New skill for multi-source web research with structured synthesis. Adapted from the `quick-research` command in the personal `notes/` repo, generalized for portable skillbox use. Runs 5-10+ web searches with diverse angles (official docs, comparative, criticism, community), cross-references claims, prioritizes current sources, and outputs a structured summary with annotated source list. Defaults to in-conversation output (no files). Triggers on "research X", "deep dive on Y", "look into Z", "investigate this topic".
+
+## [2.6.0] - 2026-05-02
+
+Activation tuning release. Transcript audit (854 prompts, 335 transcripts since 2026-04-13) revealed phrase-trigger gaps in three skills and a discoverability gap in `code-review`. All four patches address specific missed activations or user friction observed in real sessions.
+
+### Enhanced Skills
+
+- **track-session** (v4.3.0): Added four trigger phrases observed in transcripts but not firing — `"start a session"`, `"start a session together"`, `"save this in a session"`, `"save this plan in a session"`. Three of ten window activations were `/track-session` slash; phrase activations dropped to zero because session-start naturalese wasn't covered.
+- **generate-skill** (v1.5.0): Added present-progressive trigger forms — `"we're creating a new skill"`, `"creating a new skill"`, `"build a new skill"`. Real prompt during code-review skill construction did not activate because the description had `"create a skill"` but not the conversational form actually used.
+- **track-roadmap** (v2.3.0): Added `"generate a roadmap"` and `"let's generate a roadmap"`. Description had `"create a roadmap"` only; users said `"generate a roadmap"` instead.
+- **code-review** (v1.2.0): Added `## The Five Reviewers` inventory directly below `## Overview` so the lane breakdown is visible at the top of the SKILL.md instead of buried in Phase 2. Triggered by mid-flow user question (`"wait what are the subagents offered by the skill?"`) caused by 480-line SKILL.md hiding the agent list.
+
+### Documentation
+
+- Memory file refreshed with 2026-05-01 audit state (track-session usage trend, code-review activation success, MEMORY.md note that `remember` was already removed in v2.3.0)
+
 ## [2.5.0] - 2026-04-28
 
 Added `repo-hygiene` reviewer to `code-review` — fifth lane covering committed secrets, undocumented env vars, dependency/lockfile drift, and documentation alignment.
