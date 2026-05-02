@@ -5,6 +5,14 @@ All notable changes to SkillBox will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.8.0] - 2026-05-02
+
+`deep-research` v2.0.0 — major rewrite informed by transcript audit (220 sessions in `~/projects/notes`), web research on the four leading deep-research products (OpenAI / Perplexity / Gemini / Anthropic), and audit of skillbox skill-design conventions. The skill moves from advisory to enforcing: every phase has a `MUST` checkbox gate; output adopts a Tl;dr lead, per-section confidence labels, mandatory comparison matrix for 3+ items, and grouped-and-dated source lists.
+
+### Enhanced Skills
+
+- **deep-research** (v2.0.0): Major rewrite. **Process** — added Phase 0 (mandatory local-first check), Phase 2 disambiguation phase for ambiguous nouns, Phase 4 sufficiency-check reflection gate, and Phase 6 cite-verify pass; replaced prose phases with `[ ] you MUST` checkbox gates between every phase; kept the 5-search hard floor. **Output** — synthesis template now leads with `## Tl;dr`, includes per-section confidence labels (high/medium/low + why), mandatory `## Comparison Matrix` when comparing 3+ items, optional `## What we still don't know` when gaps are non-trivial, grouped References sub-headers when sources >5, publication dates on source citations. **Activation** — added comparative phrasings (`compare X and Y`, `pros and cons of X`, `should I use X or Y`), freshness phrasings (`what's new with X`, `is X still relevant`), pre-implementation phrasings (`before I build X`, `survey the landscape of Y`), natural research phrasings (`I'd like you to do some research on Z`, `do some research on Y`), and the literal `deep research` phrase. **Failure modes** — new section with named one-line defenses for Sycophancy, Anchoring, Source laundering / SEO bias, Fabricated citations, and Drift. **Modes** — top-of-skill mode table with `quick` / default / `comparison` / `landscape` modes; documented multi-agent / consensus sub-mode for landscape work; generic save-as-note handoff template. **Visual** — inline "The Five Search Angles" inventory near top (mirroring code-review's "Five Reviewers" pattern); ASCII pipeline diagram of the seven phases. **Quick-Answer-Before-Research** guidance to prevent over-launching deep-research on opinion-shaped questions.
+
 ## [2.7.0] - 2026-05-02
 
 New skill release. Adds `deep-research` for multi-source web research synthesis — generalized from the `quick-research` command in the personal `notes/` repo into a portable, vault-agnostic skill.
