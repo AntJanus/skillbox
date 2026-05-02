@@ -11,7 +11,7 @@ argument-hint: "[path | --staged | --branch <base>]"
 allowed-tools: Read, Write, Glob, Grep, Bash, Task
 metadata:
   author: Antonin Januska
-  version: "1.1.0"
+  version: "1.2.0"
 ---
 
 # Code Review - Multi-Agent Local Review
@@ -21,6 +21,16 @@ metadata:
 Runs five specialized review agents in parallel, each focused on exactly one concern, then merges their findings into a single report sorted by severity. Keeps each reviewer in its lane so nothing drifts into generic "looks fine" commentary.
 
 **Core principle:** Narrow-scope reviewers find more real issues than one broad reviewer trying to cover everything.
+
+## The Five Reviewers
+
+1. **basics** — surface-level hygiene (unused imports, dead code, stale comments, debug statements, orphaned symbols)
+2. **architecture** — pattern fit with siblings (must read 3-5 sibling files first; flags structural holes peers would have filled)
+3. **clarity** — readability, naming, function length, nesting (review what changed, not pre-existing issues)
+4. **testing** — coverage of the change and assertion strength (membership checks, weak truthiness, missing error-path tests)
+5. **repo-hygiene** — secrets, env var documentation drift, manifest/lockfile alignment, README/CLAUDE.md/AGENTS.md drift
+
+All five run concurrently as a single `Task` dispatch. Findings merge into one severity-sorted `REVIEW.md` at the repo root. Full per-lane prompts in [Phase 2](#phase-2-parallel-agent-dispatch).
 
 ## When to Use
 
