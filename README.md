@@ -194,6 +194,22 @@ Run a multi-agent code review over local changes. Dispatches five specialized re
 
 ---
 
+### 🔬 deep-research
+
+Run multi-source web research on a topic and synthesize a comprehensive, well-sourced summary in the conversation. Cross-references claims across 5-10+ searches, prioritizes current and authoritative sources, and surfaces disagreements honestly. No files created unless explicitly requested.
+
+**Use when:**
+- Pre-implementation research (libraries, patterns, trade-offs)
+- Comparative analysis (Tool A vs Tool B vs Tool C)
+- Catching up on recent developments in a fast-moving space
+- Sanity-checking assumptions against authoritative sources
+
+**Triggers:** When asked to "research X", "do a deep dive on Y", "look into Z", "investigate this topic", "what's the current state of X", "give me a thorough overview of Y"
+
+[View Documentation](./skills/deep-research/SKILL.md)
+
+---
+
 ## Installation
 
 ### Using Vercel Skills CLI (Recommended)
@@ -395,4 +411,4 @@ MIT License - see individual skills for specific licensing
 
 ---
 
-**Skill Count**: 11 | **Made for**: Claude Code 2025+
+**Skill Count**: 12 | **Made for**: Claude Code 2025+
