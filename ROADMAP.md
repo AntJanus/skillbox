@@ -2,7 +2,7 @@
 schema: cc-dash/roadmap@1
 project: skillbox
 description: Curated collection of reusable utility skills for Claude Code and AI agents.
-last_updated: 2026-04-17T00:00:00-06:00
+last_updated: 2026-05-02T17:00:00-06:00
 ---
 
 # Roadmap
@@ -15,20 +15,17 @@ last_updated: 2026-04-17T00:00:00-06:00
 
 - <!-- id:r_si6j5 status:done completed:2026-04-15 --> ~~**AGENTS.md Refresh**~~ - AGENTS.md refreshed with rate-skill v2.0.0 rubric; workflow sections aligned to current skill set. *(Completed: 2026-04-15)*
 - <!-- id:r_oulw2 status:done completed:2026-04-15 --> ~~**Progressive Disclosure Fixes**~~ - track-roadmap trimmed from 512 → 426 lines via inline-example extraction; TROUBLESHOOTING expanded in reference/. Similar patterns applied to record-tui, ideal-react-component, screenshot-local. *(Completed: 2026-04-15)*
-- <!-- id:r_6ctoj status:planned --> **Contribution Infrastructure** - Create .github/ISSUE_TEMPLATE/skill-proposal.md, .github/PULL_REQUEST_TEMPLATE.md, and CONTRIBUTING.md with contributor guidelines (skill creation process, quality standards, PR workflow).
 
 ## Infra
 
 <!-- category:infra -->
 
 - <!-- id:r_xd69x status:done completed:2026-04-15 --> ~~**CI/CD Pipeline**~~ - GitHub Actions workflow shipped in `.github/workflows/` with `test-skills.sh` validation: frontmatter, required sections, 500-line ceiling, markdown lint. *(Completed: 2026-04-15)*
-- <!-- id:r_gb7ss status:planned --> **Documentation Polish** - Add usage examples and screenshots/GIFs to README for each skill. Document cross-skill integration patterns (remember + track-session + track-roadmap).
 
 ## UX
 
 <!-- category:ux -->
 
-- <!-- id:r_1ksmi status:planned --> **New Skills (v2.0.0)** - testing-workflow (run/manage test suites), code-review (structured review with severity levels), debug-systematic (bisection/isolation/hypothesis-driven debugging), database-migration (safe schema migrations), docker-workflow (containers and Compose management). Each must pass rate-skill with grade B+, use progressive disclosure if over 300 lines, and have 3+ trigger phrase variations tested. Deadline: 2026-06-06.
 - <!-- id:r_5idsf status:idea --> **Community Contributions** - Accept community skill submissions via PR with automated quality checks. Publish SkillBox to Vercel Skills registry. Create submission template using generate-skill's validation checklist. Add CONTRIBUTORS.md.
 - <!-- id:r_agpsg status:idea --> **Skill Marketplace** - Curate featured skills section on README. Add skill categories/tags for browsable discovery. Support skill dependencies. Skill ratings and download metrics via Vercel Skills CLI integration. Searchable skill index page.
 - <!-- id:r_e1itv status:idea --> **Platform Expansion** - Test and document compatibility with Cursor, Cline, and GitHub Copilot agents. Platform-specific installation guides. Adapter layer for agents that do not support the full skills specification.
