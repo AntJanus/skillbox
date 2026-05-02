@@ -24,6 +24,12 @@ Diff:
 For each file, read the current contents (not just the diff) to verify
 claims like "unused" or "dead" — check callers before flagging.
 
+EVIDENCE BAR: Flag findings you can substantiate by reading the cited
+file. When the evidence is thin or you'd need to guess at intent,
+return NO FINDINGS for that line. Each kept finding should reference
+a concrete snippet, identifier, or grep result — your downstream
+verifier will re-check every citation, so make them solid.
+
 ORPHANED NEW SYMBOLS (run this check explicitly):
 For each newly-introduced exported symbol in the diff (import pulled in,
 new exported function/type/const/class), use Grep to search the repo for
@@ -70,6 +76,13 @@ Diff:
 MANDATORY FIRST STEP: For each changed file, find and read 3-5 sibling or
 similar files (same directory, same layer, similar purpose). Use Glob and
 Read. Only after you have a baseline pattern, evaluate the change.
+
+EVIDENCE BAR: Flag a deviation when you can name the sibling pattern AND
+the specific way this change diverges. "Peer X handles this case at
+file:line; this change handles it differently at file:line." When you
+cannot point at a concrete sibling that establishes the pattern, return
+NO FINDINGS for that line — your downstream verifier will re-check every
+sibling citation, so make them real.
 
 Look for (consistency):
 - File organization deviations (where tests live, helper placement, naming)
@@ -133,8 +146,12 @@ Files in scope: <list>
 Diff:
 <diff content>
 
-Review ONLY what changed in the diff. Read the file for context, but don't
-flag pre-existing issues outside the diff.
+Focus on what changed in the diff. If you encounter a clarity issue that
+*shares scope* with the change (same function, same block, immediately
+adjacent code) but predates the diff, surface it as a [Pre-existing]
+finding — separate bucket, distinct severity. Pre-existing findings
+should be informative ("noticed while reviewing the change") rather than
+blocking. Skip clarity issues that are far from the change scope.
 
 Out of scope:
 - unused imports/vars (basics owns)
@@ -156,10 +173,15 @@ Why it matters: <what a reader would get wrong or have to re-read>
 Fix: <rename suggestion, extraction, comment to add, restructure>
 
 Severities:
-- Critical: misleading name or hidden side effect likely to cause bugs
+- Critical: misleading name or hidden side effect likely to cause bugs in
+  the changed code
 - Major: function too long/nested to follow; control flow genuinely unclear
-- Minor: unclear name, missing comment where logic is non-obvious
+  in the changed code
+- Minor: unclear name, missing comment where logic is non-obvious in the
+  changed code
 - Nit: could be clearer, not confusing
+- Pre-existing: clarity issue noticed while reviewing the change but the
+  problem predates the diff and shares scope with the change
 
 If you find nothing, output: NO FINDINGS
 ```
@@ -269,6 +291,13 @@ Use Glob and Read to find whichever exist:
 You can't evaluate "is this documented" or "is the lockfile in sync"
 without reading these first.
 
+EVIDENCE BAR: Flag a finding when you can cite the specific file you
+read to confirm the gap — "checked .env.example, var X is not present"
+or "checked package-lock.json, the new manifest line is not reflected."
+Generic suspicions without a citation should return NO FINDINGS for
+that line. Your downstream verifier will re-check every file/line
+citation, so make them concrete.
+
 Look for (1) — SECRETS / CREDENTIALS in the diff:
 - Hardcoded API keys, tokens, passwords, private keys, OAuth client
   secrets, webhook signing secrets, database connection strings with
@@ -355,8 +384,74 @@ If you find nothing, output exactly: NO FINDINGS
 
 ---
 
+## Verifier
+
+```
+You are the verifier for a multi-agent code review. Five reviewer agents
+have produced candidate findings; your job is to keep the ones whose
+evidence holds up against the actual code, so the final report is
+high-signal.
+
+Files in scope: <list>
+Diff:
+<diff content>
+
+Candidate findings (merged from all five agents):
+<merged findings list>
+
+Process each candidate finding:
+
+1. Read the cited file at the cited line. Confirm the issue is present
+   in the current code (not just the diff snippet).
+2. Confirm the agent's claim by reading enough surrounding context to
+   judge — check sibling references for architecture findings, the
+   .env.example for repo-hygiene env-var findings, the test file for
+   testing findings, etc. Re-do the small read the agent should have
+   done; trust nothing on faith.
+3. Decide one of three outcomes for each finding:
+
+   KEEP — evidence holds. The cited line shows the issue; the fix is
+          actionable. Pass through unchanged.
+
+   DEMOTE — evidence is partial. The cited line shows something, but
+            it's weaker than the agent claimed (e.g. a "Critical
+            layering violation" turns out to be a deliberate sibling
+            pattern; a "missing test" turns out to have a parametrized
+            test that does cover it). Demote one severity tier
+            (Critical→Major, Major→Minor, Minor→Nit, Nit→drop) and
+            tag the finding with [Unverified]. Add a one-line
+            "Verifier note:" explaining why.
+
+   DROP — evidence does not hold. The cited file:line does not show
+          the claimed issue, or the citation points at a line that no
+          longer exists. Remove from the kept list. Record only the
+          count, not the dropped findings.
+
+4. Pre-existing findings get verified the same way — does the issue
+   exist at the cited line? If yes, keep. If no, drop.
+
+5. Return the kept and demoted findings in the same per-finding format
+   the agents used, then a single summary line at the bottom:
+
+   Verifier summary: kept N of M; demoted K; dropped J
+
+EVIDENCE BAR: This pass exists to ensure every finding in REVIEW.md is
+something the user can act on with confidence. When in doubt about a
+finding, demote rather than drop — the [Unverified] tag preserves the
+signal at lower severity and gives the user a chance to assess.
+
+If all findings drop, output exactly:
+
+Verifier summary: kept 0 of M; demoted 0; dropped M
+NO FINDINGS
+```
+
+---
+
 ## Dispatch Pattern
 
-All five prompts must be dispatched **in a single message** with five Task tool calls. Use `subagent_type: Explore` for all five — they are read-only review tasks.
+All five reviewer prompts must be dispatched **in a single message** with five Task tool calls. Use `subagent_type: Explore` for all five — they are read-only review tasks.
 
-After all five return, the orchestrating skill parses findings into the synthesis report described in SKILL.md.
+After all five return, dispatch the verifier in a single Task call with the merged candidate list. The verifier is also `subagent_type: Explore`.
+
+After the verifier returns, the orchestrating skill parses kept and demoted findings into the synthesis report described in SKILL.md.
