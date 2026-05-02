@@ -11,26 +11,28 @@ argument-hint: "[path | --staged | --branch <base>]"
 allowed-tools: Read, Write, Glob, Grep, Bash, Task
 metadata:
   author: Antonin Januska
-  version: "1.2.0"
+  version: "1.3.0"
 ---
 
 # Code Review - Multi-Agent Local Review
 
 ## Overview
 
-Runs five specialized review agents in parallel, each focused on exactly one concern, then merges their findings into a single report sorted by severity. Keeps each reviewer in its lane so nothing drifts into generic "looks fine" commentary.
+Runs five specialized review agents in parallel, each focused on exactly one concern, then runs a verifier pass that keeps only the evidence-backed findings, then merges them into a single report sorted by severity. Keeps each reviewer in its lane so nothing drifts into generic "looks fine" commentary.
 
 **Core principle:** Narrow-scope reviewers find more real issues than one broad reviewer trying to cover everything.
+
+**Model tier:** Designed for Opus or Sonnet-tier models. Haiku may need more guidance — prefer Sonnet+ for the reviewer agents.
 
 ## The Five Reviewers
 
 1. **basics** — surface-level hygiene (unused imports, dead code, stale comments, debug statements, orphaned symbols)
 2. **architecture** — pattern fit with siblings (must read 3-5 sibling files first; flags structural holes peers would have filled)
-3. **clarity** — readability, naming, function length, nesting (review what changed, not pre-existing issues)
+3. **clarity** — readability, naming, function length, nesting (focus on what changed; same-scope pre-existing issues surface as `[Pre-existing]`)
 4. **testing** — coverage of the change and assertion strength (membership checks, weak truthiness, missing error-path tests)
 5. **repo-hygiene** — secrets, env var documentation drift, manifest/lockfile alignment, README/CLAUDE.md/AGENTS.md drift
 
-All five run concurrently as a single `Task` dispatch. Findings merge into one severity-sorted `REVIEW.md` at the repo root. Full per-lane prompts in [Phase 2](#phase-2-parallel-agent-dispatch).
+All five run concurrently as a single `Task` dispatch. A sixth **verifier** pass then filters the merged candidates down to the evidence-backed findings before they reach `REVIEW.md` at the repo root. Full per-lane prompts in [Phase 2](#phase-2-parallel-agent-dispatch); verifier prompt in [Phase 2.5](#phase-25-verification).
 
 ## When to Use
 
@@ -73,13 +75,20 @@ All five run concurrently as a single `Task` dispatch. Findings merge into one s
  └────────┬─────────────────────────────────────────────┘
           │
           ▼
+ ┌──────────────────────────────────────────────────────┐
+ │ 2.5. Verifier pass (single Task)                     │
+ │      Re-checks each candidate against actual code,   │
+ │      keeps the evidence-backed findings              │
+ └────────┬─────────────────────────────────────────────┘
+          │
+          ▼
  ┌───────────────────────────────────┐
  │ 3. Synthesize → write REVIEW.md   │
  │    at the repo root               │
  └───────────────────────────────────┘
 ```
 
-All five agents run concurrently. The skill does no review reasoning itself — it only scopes, dispatches, and merges. The final report is written to `REVIEW.md` at the repo root (overwriting any previous review).
+All five agents run concurrently. A verifier then keeps the substantiated findings before synthesis. The skill does no review reasoning itself — it only scopes, dispatches, verifies, and merges. The final report is written to `REVIEW.md` at the repo root (overwriting any previous review).
 
 ## Phase 1: Scope Detection
 
@@ -193,29 +202,37 @@ For each changed non-test file, locate the corresponding test file using whateve
 
 **Out of scope:** code-level cleanups (basics owns), architectural fit (architecture owns), test coverage (testing owns), readability (clarity owns). If a docstring is misleading because it's *unclear*, that's clarity; if it's misleading because the function it documents has moved or been renamed, that's repo-hygiene.
 
+## Phase 2.5: Verification
+
+**After all five agents return, dispatch one verifier agent (single Task, `subagent_type: Explore`) with the file list, the diff, and the merged candidate findings.** The verifier:
+
+1. Re-reads each cited `file:line` against the current code
+2. Keeps findings whose evidence holds up
+3. Tags unsubstantiated findings as `[Unverified]` and demotes one severity tier (Critical→Major→Minor→Nit→drop) — preserves the paper trail rather than dropping silently
+4. Returns kept findings in the agents' format plus a summary line (`Verified N of M; demoted K; dropped J`)
+
+Full verifier prompt: [reference/AGENTS.md](./reference/AGENTS.md#verifier). Mirrors Anthropic's official two-stage filter pattern; Datadog reports a 60%→13% false-positive reduction with this approach.
+
 ## Phase 3: Synthesis
 
-**After all five agents return, merge their findings and write REVIEW.md:**
+**After the verifier returns, merge its kept findings and write REVIEW.md:**
 
-1. Parse each agent's output into individual findings
-2. Group by severity (Critical → Major → Minor → Nit)
+1. Parse each kept finding into a structured entry
+2. Group by severity (Critical → Major → Minor → Nit), then add a separate **Pre-existing** bucket at the bottom for findings the agents flagged outside the diff scope
 3. Within each severity, group by file path
-4. Annotate each finding with which agent surfaced it
+4. Annotate each finding with which agent surfaced it; if the verifier demoted it, mark it `[Unverified]` and apply the demoted severity
 5. Deduplicate: if multiple agents flag the same line, keep the most severe one and note all lanes
-6. **Write the report to `REVIEW.md` at the repo root using the Write tool** — overwrite any existing REVIEW.md
-7. Tell the user the report is at `REVIEW.md` and print a one-line summary to the conversation: `REVIEW.md written — X Critical, Y Major, Z Minor, W Nit`
+6. **Cap nits at 5.** If more than 5 Nits remain after verification, keep the top 5 (most actionable) and collapse the rest into a single closing line: `_…plus N similar nits across <file list>._` This is a primary rule, not a fallback — it keeps reviews actionable. Anthropic's official guidance recommends the same cap.
+7. **Write the report to `REVIEW.md` at the repo root using the Write tool** — overwrite any existing REVIEW.md
+8. Tell the user the report is at `REVIEW.md` and print a one-line summary to the conversation: `REVIEW.md written — X Critical, Y Major, Z Minor, W Nit, P Pre-existing`
 
 **Always:**
 - Write REVIEW.md even when the report is clean (so the user sees a clean report, not missing output)
 - Put REVIEW.md at the **repo root** (use `git rev-parse --show-toplevel` to locate it)
 - Overwrite in place — there is only ever one current review
+- Keep agent findings in the agents' words — synthesis is structural, not editorial
 
-**Do not:**
-- Add your own findings — you are a synthesizer, not a fifth reviewer
-- Soften or reword agent findings to sound nicer
-- Drop findings you personally disagree with
-- Dump the full report into the chat — REVIEW.md is the deliverable; the chat gets only the one-line summary
-- Write to a different filename, a subdirectory, or append to an existing file
+**Synthesizer scope:** parse, group, dedupe, cap nits, write the file. Anything beyond that — fresh findings, rewordings, dropping things you disagree with, dumping the full report into the chat — belongs to a different role.
 
 ## Output Format
 
@@ -227,7 +244,8 @@ For each changed non-test file, locate the corresponding test file using whateve
 **Generated:** YYYY-MM-DD HH:MM
 **Scope:** N files (list)
 **Agents:** basics, architecture, clarity, testing, repo-hygiene
-**Total findings:** X Critical, Y Major, Z Minor, W Nit
+**Verifier:** kept N of M; demoted K; dropped J
+**Total findings:** X Critical, Y Major, Z Minor, W Nit, P Pre-existing
 
 ---
 
@@ -275,7 +293,23 @@ For each changed non-test file, locate the corresponding test file using whateve
 ...
 
 ## Nit
-...
+
+(Up to 5 most actionable shown.)
+
+- **[basics]** `src/utils/format:14` — Stale TODO from 2024
+- **[clarity]** `src/utils/format:42` — Variable `x` could be `formattedValue`
+- **[basics]** `src/utils/format:88` — Unused import `lodash/get`
+- **[clarity]** `src/api/handler:12` — Comment restates the code
+- **[basics]** `tests/format.test:5` — Leftover `console.log`
+
+_…plus 8 similar nits across `src/utils/`, `src/api/`, `tests/`._
+
+## Pre-existing
+
+Issues found outside the change scope. Listed for awareness; not blocking the current change.
+
+- **[architecture]** `src/legacy/auth:200` — Layering violation predates this diff
+- **[clarity]** `src/legacy/auth:88` — 200-line function predates this diff
 
 ---
 
@@ -288,6 +322,7 @@ For each changed non-test file, locate the corresponding test file using whateve
 
 **Generated:** YYYY-MM-DD HH:MM
 **Scope:** N files
+**Verifier:** kept 0 of 0
 **Total findings:** 0
 
 All five reviewers returned NO FINDINGS. Ship it.
@@ -295,7 +330,7 @@ All five reviewers returned NO FINDINGS. Ship it.
 
 **Chat-side one-liner after writing the file:**
 ```
-REVIEW.md written — 0 Critical, 0 Major, 0 Minor, 0 Nit. Clean review.
+REVIEW.md written — 0 Critical, 0 Major, 0 Minor, 0 Nit, 0 Pre-existing. Clean review.
 ```
 
 ## Examples
@@ -383,11 +418,15 @@ Basics bleeding into clarity's lane and vice versa. Duplicates the finding and d
 A well-run code review has these properties:
 
 - **All five agents dispatched in a single message** — visible as five Task calls in one turn
+- **Verifier pass runs after the agents** — visible as one additional Task call before synthesis; its summary line appears in REVIEW.md
 - **Scope reported before dispatch** — user sees which files are under review
 - **Every finding has file:line** — no "consider reviewing the error handling"
 - **Every finding has a concrete fix** — not just the problem
+- **Findings are evidence-backed** — each cites concrete code; the verifier kept it because the citation matched
 - **Severities are used meaningfully** — not everything is Major
-- **Lane discipline** — basics doesn't comment on architecture, testing doesn't comment on style, repo-hygiene doesn't comment on code structure
+- **Nits cap at 5** — anything beyond that collapses into a single "_…plus N similar nits_" line
+- **Pre-existing issues sit in their own bucket** — agents may surface them; they appear at the bottom of REVIEW.md, not mixed with change-focused findings
+- **Lane discipline** — each agent stays focused on what it owns; basics covers hygiene, architecture covers fit, clarity covers readability, testing covers coverage, repo-hygiene covers project health
 - **Architecture agent actually reads siblings** — you can see the sibling references in its findings
 - **repo-hygiene actually reads `.env.example`, manifests, and lockfiles** — you can see those filenames cited in its findings, not just guesses about what's documented
 - **Clean code gets "Ship it."** — no manufactured findings to look thorough
@@ -396,11 +435,13 @@ A well-run code review has these properties:
 
 ## Troubleshooting
 
+The three most-common issues are inline. Full troubleshooting catalog in **[reference/TROUBLESHOOTING.md](./reference/TROUBLESHOOTING.md)** — load when you hit something not covered below.
+
 ### Problem: Agent returns vague findings
 
 **Cause:** Agent drifted from the output format, usually because the prompt was paraphrased.
 
-**Solution:** Re-dispatch that one agent with the exact output format skeleton from this skill. Include the phrase "no preamble, no summary — only findings in the specified format."
+**Solution:** Re-dispatch that one agent with the exact output format skeleton from `reference/AGENTS.md`. Include the phrase "no preamble, no summary — only findings in the specified format."
 
 ### Problem: Architecture agent didn't read siblings
 
@@ -408,53 +449,13 @@ A well-run code review has these properties:
 
 **Solution:** Look at its output — if there are no sibling file references in the findings, re-dispatch with "MANDATORY FIRST STEP" capitalized and first in the prompt body. Consider listing specific sibling candidates in the prompt.
 
-### Problem: Two agents flag the same issue
+### Problem: Verifier kept everything (no demotions, no drops)
 
-**Cause:** Natural overlap (e.g., a dead function is both "basics: dead code" and "testing: no test for it"; a stale comment can be flagged by both `basics` and `repo-hygiene`).
+**Cause:** Verifier prompt was paraphrased and lost the substantiation requirement, or the agent findings were already strong enough.
 
-**Solution:** In synthesis, keep the most severe finding and add a `(also flagged by X)` note. Don't print both. Lane attribution rule of thumb: if it's *unused/dead*, it's basics; if it points at a renamed/moved/missing target, it's repo-hygiene.
+**Solution:** Check the verifier's summary line — if it says `kept N of N; demoted 0; dropped 0` on a large finding set, re-dispatch with the exact verifier prompt from `reference/AGENTS.md#verifier`, emphasizing "re-read the cited line and confirm the issue is present in the current code."
 
-### Problem: repo-hygiene flags every env var as undocumented
-
-**Cause:** The `.env.example` (or equivalent) file isn't in the repo, so the agent has nothing to compare against — and reads that as "all env vars undocumented."
-
-**Solution:** If the project genuinely has no env-template file, that itself is one Major finding ("no `.env.example` exists; document required env vars there"), not one finding per env var. If the file lives under a non-standard name (`env.template`, `config.example.yml`), tell the agent where to look in the prompt.
-
-### Problem: repo-hygiene flags secrets that are obviously fixtures
-
-**Cause:** Test fixtures and example values look like real secrets to a pattern matcher (e.g., `"sk_test_..."` keys, fake JWTs in tests).
-
-**Solution:** Findings should be **Critical only** when the value looks live (production-shaped key, real domain, non-test path). Test files, `*.example`, `*.sample`, and anything under a fixtures directory should be Minor at most, or skipped entirely if clearly placeholder. Re-dispatch the agent with that distinction stated explicitly.
-
-### Problem: Scope is empty
-
-**Cause:** No uncommitted changes and no branch diff against main.
-
-**Solution:** Stop and tell the user — "No changes detected. Pass a path to review specific files, or use --branch <base> to compare against another branch." Do not fabricate a review.
-
-### Problem: Diff is huge (hundreds of files)
-
-**Cause:** Review scope caught a merge commit or a rebase.
-
-**Solution:** Show the user the file count and ask whether to narrow scope (e.g., only files touched in the last commit). A 300-file review from five agents will be slow and the signal will be buried.
-
-### Problem: Report is too long to be useful
-
-**Cause:** Many Nit findings crowding out Critical/Major.
-
-**Solution:** If there are more than ~10 Nit findings, collapse them into a single "Nits (N findings)" summary line with file:line list only, no full blocks. Keep full blocks for Critical/Major/Minor.
-
-### Problem: REVIEW.md keeps showing up as a dirty file in git
-
-**Cause:** REVIEW.md is a local review artifact, not a committed file.
-
-**Solution:** Add `REVIEW.md` to `.gitignore` (project-level) or `~/.config/git/ignore` (global). The skill always overwrites it at the repo root — it's meant to be ephemeral.
-
-### Problem: REVIEW.md written to the wrong directory
-
-**Cause:** Used `cwd` instead of the git repo root.
-
-**Solution:** Always resolve the target path with `git rev-parse --show-toplevel` before writing. If not inside a git repo, fall back to `cwd` and tell the user.
+For lane-overlap, env-var false positives, fixture vs real-secret distinction, empty scope, huge diffs, REVIEW.md location, and verifier-demoted findings see **[reference/TROUBLESHOOTING.md](./reference/TROUBLESHOOTING.md)**.
 
 ## Integration
 
@@ -463,6 +464,8 @@ A well-run code review has these properties:
 - Claude Code built-in `/review` — for reviewing an open PR by URL (this skill targets local changes)
 - `track-session` — if review surfaces work to address, a session can track the fixes
 - `ideal-react-component` — if React files are under review, findings may reference its patterns
+
+**Recommended follow-up for skill maintainers:** create an `evals/` directory with 3+ representative diff scenarios (e.g., a clean diff, a diff with a real bug, a diff with a tempting false positive). Re-run after every prompt edit — catches regressions in agent or verifier behavior before they ship.
 
 **Typical workflow:**
 ```bash
