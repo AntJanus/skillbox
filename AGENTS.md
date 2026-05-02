@@ -4,21 +4,22 @@ This file provides guidance on how to work effectively as an AI agent within the
 
 ## Skill Inventory
 
-SkillBox currently contains **11 skills**:
+SkillBox currently contains **12 skills**:
 
 | Skill | Version | Pattern | Description |
 |-------|---------|---------|-------------|
-| **track-session** | v4.2.0 | A (Methodology) | Track, stop, resume, and verify progress on long-running sessions |
+| **track-session** | v4.3.0 | A (Methodology) | Track, stop, resume, and verify progress on long-running sessions |
 | **git-worktree** | v2.0.2 | B (Technical) | Manage multiple branches simultaneously using git worktrees |
-| **generate-skill** | v1.4.0 | D (Automation) | Interactive skill builder that generates high-quality SKILL.md files |
+| **generate-skill** | v1.5.0 | D (Automation) | Interactive skill builder that generates high-quality SKILL.md files |
 | **ideal-react-component** | v1.5.0 | E (Reference) | Battle-tested React component structure pattern with hooks antipatterns |
 | **rate-skill** | v2.0.0 | C (Auditing) | Evaluate skill quality against best practices with letter grades (A-F) |
 | **setup-semantic-release** | v1.0.0 | D (Automation) | Set up automated versioning with conventional commits, husky, and semantic-release |
-| **track-roadmap** | v2.2.1 | A (Methodology) | Plan, update, audit, brainstorm, and resume work from a high-level project roadmap |
+| **track-roadmap** | v2.3.0 | A (Methodology) | Plan, update, audit, brainstorm, and resume work from a high-level project roadmap |
 | **record-tui** | v1.3.0 | B (Technical) | Record polished terminal demos using Charmbracelet VHS |
 | **screenshot-local** | v1.1.0 | B (Technical) | Capture screenshots of local dev projects using shot-scraper |
 | **reflect** | v1.0.1 | A (Methodology) | Extract learnings from conversations and save to CLAUDE.md or auto-memory |
-| **code-review** | v1.1.0 | C (Auditing) | Multi-agent local code review — basics, architecture, clarity, testing, repo-hygiene — writes REVIEW.md |
+| **code-review** | v1.2.0 | C (Auditing) | Multi-agent local code review — basics, architecture, clarity, testing, repo-hygiene — writes REVIEW.md |
+| **deep-research** | v1.0.0 | D (Automation) | Multi-source web research with structured synthesis and cited summary in conversation |
 
 ## Core Agent Principles
 
