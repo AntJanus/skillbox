@@ -5,11 +5,18 @@ All notable changes to SkillBox will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.7.0] - 2026-05-02
+
+New skill release. Adds `deep-research` for multi-source web research synthesis — generalized from the `quick-research` command in the personal `notes/` repo into a portable, vault-agnostic skill.
 
 ### Added
 
-- **deep-research** (v1.0.0): New skill for multi-source web research with structured synthesis. Adapted from the `quick-research` command in the personal `notes/` repo, generalized for portable skillbox use. Runs 5-10+ web searches with diverse angles (official docs, comparative, criticism, community), cross-references claims, prioritizes current sources, and outputs a structured summary with annotated source list. Defaults to in-conversation output (no files). Triggers on "research X", "deep dive on Y", "look into Z", "investigate this topic".
+- **deep-research** (v1.0.0): New skill for multi-source web research with structured synthesis. Runs 5-10+ web searches with diverse angles (official docs, comparative, criticism, community), cross-references claims, prioritizes current sources, and outputs a structured summary with an annotated source list. Defaults to in-conversation output — no files created unless explicitly requested. Triggers on "research X", "deep dive on Y", "look into Z", "investigate this topic", "what's the current state of X".
+
+### Documentation
+
+- README.md: added deep-research entry between code-review and Installation, bumped skill count to 12
+- AGENTS.md skill inventory updated (if applicable — see commit)
 
 ## [2.6.0] - 2026-05-02
 
