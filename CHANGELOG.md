@@ -5,6 +5,14 @@ All notable changes to SkillBox will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.10.0] - 2026-05-05
+
+New skill release. Adds `track-qa` to formalize the manual-QA layer of the cc-dash schema family — pairs with `track-roadmap` (`cc-dash/roadmap@1`) and `track-session` (`cc-dash/session@1`). The cc-dash dashboard now reads `QA.md` files across all projects, exposes a portfolio-wide `/qa` queue, an inline approve/fail/skip/decision workflow, a focus mode with keyboard shortcuts, and 8 MCP tools for agent-driven QA.
+
+### Added
+
+- **track-qa** (v1.0.0): New skill for tracking manual QA — the things tests can't verify (visual rendering, multi-step flows, race conditions, integrations, accessibility, performance feel). Five modes mirroring `track-roadmap`: `generate` (interactive bootstrap), `update` (add/remove/edit), `audit` (relevance review), `migrate` (convert ad-hoc QA notes to compliant `QA.md`), `resume` (load and pick next pending item). Format follows `cc-dash/qa@1` schema: `q_xxxxx` IDs, five status values (`pending | passed | failed | needs-decision | skipped`), `at:` timestamps on transitions, `ref:r_xxxxx` cross-link to roadmap issues filed by failures, blockquote notes on each item. Two known sections: `## Setup` (free-form runnable command) and `## Checklist` (parsed). Triggers on phrases like "create a QA list", "set up QA for this project", "audit the QA list", "before I ship I need to QA", "what's left to QA". Detailed Good/Bad examples for all five modes live in `reference/EXAMPLES.md`; edge cases for migrate, audit, and dashboard integration in `reference/TROUBLESHOOTING.md`.
+
 ## [2.9.0] - 2026-05-02
 
 `code-review` v1.3.0 — six refinements applied after a focused audit of the skill itself: transcript review across three projects, web research on Anthropic's official Code Review pipeline and skill-authoring docs, and the obra/superpowers and HAMY 9-agent precedents. The skill gains an always-on verifier pass, a Pre-existing severity bucket, a hard 5-Nit cap, evidence-bar prompts in three lanes, a model-tier note, and an evals follow-up. Personal-content audit found nothing to remove. SKILL.md stays under 500 lines via Troubleshooting extraction to `reference/TROUBLESHOOTING.md`.
