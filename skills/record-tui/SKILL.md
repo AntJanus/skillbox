@@ -395,7 +395,6 @@ vhs --version && ffmpeg -version && ttyd --version
 
 **This skill pairs with:**
 - **build-tui** — Record demos of TUIs you build
-- **git-worktree** — Test recordings across branches
 - **track-session** — Track recording iteration progress
 
 **Useful alongside:**

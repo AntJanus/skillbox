@@ -420,7 +420,6 @@ shot-scraper http://localhost:3000 --devtools
 **This skill pairs with:**
 - **record-tui** — For terminal app recordings (use VHS for CLIs, shot-scraper for web UIs)
 - **track-session** — Track screenshot iteration progress
-- **git-worktree** — Compare screenshots across branches
 
 **Useful alongside:**
 - [shot-scraper](https://github.com/simonw/shot-scraper) — The screenshot tool

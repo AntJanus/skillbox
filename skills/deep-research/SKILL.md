@@ -483,7 +483,6 @@ Sources: Wikipedia
 **This skill works with:**
 - **track-session** — For long research projects, save the topic plan and source list to SESSION_PROGRESS.md so it's resumable
 - **track-roadmap** — Use research to inform roadmap decisions; cite the research summary in the roadmap entry
-- **reflect** — After research informs a decision, capture the decision and rationale via reflect
 
 **Pairs naturally with:**
 - Pre-implementation planning — research first, then design

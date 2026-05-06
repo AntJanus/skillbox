@@ -2,7 +2,7 @@
 schema: cc-dash/roadmap@1
 project: skillbox
 description: Curated collection of reusable utility skills for Claude Code and AI agents.
-last_updated: 2026-05-02T17:00:00-06:00
+last_updated: 2026-05-06T15:00:00-06:00
 ---
 
 # Roadmap
@@ -47,3 +47,4 @@ last_updated: 2026-05-02T17:00:00-06:00
 - <!-- id:r_w8k4p status:done completed:2026-03-23 --> ~~**Batch Frontmatter Fix**~~ - Moved argument-hint to top-level across 7 skills (Claude Code autocomplete). Removed tags (7 skills) and hooks (2 skills) from frontmatter. Updated generate-skill template. *(Completed: 2026-03-23)*
 - <!-- id:r_j2v9n status:done completed:2026-03-23 --> ~~**Full Collection Audit**~~ - Audited all 11 skills against CLAUDE.md standards. Overall grade: A (89/100). Identified frontmatter spec gaps, positive framing opportunities, progressive disclosure patterns. Saved to SKILL_AUDIT_2026-03-23.md. *(Completed: 2026-03-23)*
 - <!-- id:r_f5t1r status:done completed:2026-03-21 --> ~~**reflect v1.0.0**~~ - Added reflect skill for extracting learnings from conversations into CLAUDE.md or auto-memory. *(Completed: 2026-03-21)*
+- <!-- id:r_kqp4w status:done completed:2026-05-06 --> ~~**Removed reflect and git-worktree**~~ - Skill audit (2026-04-13 → 2026-05-06) confirmed zero activations for both across the full window. `reflect` deprecated in favor of `/track-session resume` and `update` flow; `git-worktree` removed as it duplicated public git docs without skillbox-specific value. Skill count: 13 → 11. *(Completed: 2026-05-06)*

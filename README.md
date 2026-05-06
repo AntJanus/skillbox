@@ -32,22 +32,6 @@ Track, stop, resume, and save progress on long-running development sessions.
 
 ---
 
-### 🌳 git-worktree
-
-Manage multiple branches simultaneously using git worktrees for parallel Claude Code development.
-
-**Use when:**
-- Working on multiple features in parallel
-- Emergency hotfix needed during feature work
-- Reviewing PRs without switching branches
-- Running parallel Claude Code sessions
-
-**Triggers:** When asked to work on parallel branches, emergency fixes, or PR reviews
-
-[View Documentation](./skills/git-worktree/SKILL.md)
-
----
-
 ### ⚙️ generate-skill
 
 Interactive skill builder that generates high-quality SKILL.md files using proven patterns.
@@ -161,22 +145,6 @@ Capture screenshots of local development projects using shot-scraper (via pipx).
 
 ---
 
-### 🪞 reflect
-
-Extract learnings from today's Claude Code conversations and save them to CLAUDE.md or auto-memory. Identifies corrections, discoveries, architecture decisions, debugging breakthroughs, and workflow insights.
-
-**Use when:**
-- Ending a work session where you learned something new
-- After debugging sessions that revealed important insights
-- Want to capture architecture decisions with rationale
-- End of day to preserve cross-session discoveries
-
-**Triggers:** When asked to "reflect on today", "what did I learn today", "extract learnings", "save what I learned", "learn from today", "capture insights"
-
-[View Documentation](./skills/reflect/SKILL.md)
-
----
-
 ### 🔍 code-review
 
 Run a multi-agent code review over local changes. Dispatches five specialized reviewers in parallel (basics, architecture, clarity, testing, repo-hygiene) and synthesizes their findings into a severity-tagged report.
@@ -222,7 +190,7 @@ npx skills add antjanus/skillbox
 
 # Install specific skills
 npx skills add antjanus/skillbox@track-session
-npx skills add antjanus/skillbox@git-worktree
+npx skills add antjanus/skillbox@code-review
 npx skills add antjanus/skillbox@ideal-react-component
 
 # Install globally (available in all projects)
@@ -265,7 +233,7 @@ git clone https://github.com/antjanus/skillbox.git .claude/skillbox
 # Symlink desired skills
 mkdir -p .claude/skills
 ln -s ../.claude/skillbox/skills/track-session .claude/skills/track-session
-ln -s ../.claude/skillbox/skills/git-worktree .claude/skills/git-worktree
+ln -s ../.claude/skillbox/skills/code-review .claude/skills/code-review
 ```
 </details>
 
@@ -287,8 +255,8 @@ curl -o .claude/skills/track-session/SKILL.md \
 Skills activate automatically when Claude detects relevant triggers:
 
 ```
-user: I need to work on multiple features at the same time
-assistant: [Automatically activates git-worktree skill]
+user: Can you review my changes before I commit?
+assistant: [Automatically activates code-review skill]
 ```
 
 ### Explicit Invocation
@@ -296,8 +264,8 @@ assistant: [Automatically activates git-worktree skill]
 Call skills directly using slash commands:
 
 ```
-user: /git-worktree feature-auth main
 user: /track-session
+user: /code-review
 user: /generate-skill database-migration
 ```
 
@@ -369,7 +337,7 @@ See [generate-skill documentation](./skills/generate-skill/SKILL.md) for detaile
 1. **Trust the activation**: Skills activate when needed - no need to force them
 2. **Use explicit invocation for clarity**: `/skill-name` when you want specific behavior
 3. **Read the documentation**: Each skill has comprehensive usage examples
-4. **Combine skills**: Many skills work well together (e.g., git-worktree + track-session)
+4. **Combine skills**: Many skills work well together (e.g., track-roadmap + track-session)
 
 ### For Skill Creators
 
@@ -411,4 +379,4 @@ MIT License - see individual skills for specific licensing
 
 ---
 
-**Skill Count**: 12 | **Made for**: Claude Code 2025+
+**Skill Count**: 11 | **Made for**: Claude Code 2025+
