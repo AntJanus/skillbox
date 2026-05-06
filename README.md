@@ -97,6 +97,22 @@ Plan, update, and audit a high-level project roadmap with interactive feature di
 
 ---
 
+### ✅ track-qa
+
+Plan, capture, and execute manual QA — the things tests can't verify (visual rendering, multi-step flows, race conditions, integrations, accessibility, performance feel). Pairs with `track-roadmap` and `track-session` as the third member of the `cc-dash/*@1` schema family; failed items can file back to the roadmap as `r_xxxxx` issues.
+
+**Use when:**
+- Setting up a manual QA checklist before a release
+- Auditing an existing QA list for relevance
+- Migrating ad-hoc QA notes into the cc-dash schema
+- Resuming a paused QA pass and picking the next pending item
+
+**Triggers:** When asked to "create a QA list", "set up QA for this project", "audit the QA list", "what's left to QA", "before I ship I need to QA", "start manual QA"
+
+[View Documentation](./skills/track-qa/SKILL.md)
+
+---
+
 ### 📦 setup-semantic-release
 
 Set up a fully automated versioning and release pipeline using conventional commits, commitlint, husky, and semantic-release.
