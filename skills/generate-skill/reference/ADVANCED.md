@@ -266,7 +266,7 @@ Some skills naturally call others:
 - git-commit - For proper commit messages
 
 **Pairs with:**
-- git-worktree - For parallel features
+- track-roadmap - For tracking which features still need to be built
 ```
 
 ### Skill Composition

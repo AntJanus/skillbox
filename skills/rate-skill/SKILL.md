@@ -366,7 +366,7 @@ ls skills/skill-name/SKILL.md
 
 **Solution:**
 - Review the "Strong signals" for each category to understand what A-grade looks like
-- Compare your skill to high-rated skills (track-session, git-worktree)
+- Compare your skill to high-rated skills (track-session, code-review)
 - Focus on Highest Impact Improvements first
 - Remember: B grade is "Production Ready"
 

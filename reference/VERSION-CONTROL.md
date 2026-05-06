@@ -37,14 +37,14 @@ SkillBox follows a dual-versioning system:
 
 ### Scopes
 
-- Skill names: `track-session`, `git-worktree`, `generate-skill`, `ideal-react-component`, `rate-skill`, `setup-semantic-release`, `remember`
+- Skill names: `track-session`, `track-roadmap`, `track-qa`, `generate-skill`, `ideal-react-component`, `rate-skill`, `setup-semantic-release`, `record-tui`, `screenshot-local`, `code-review`, `deep-research`
 - Repository areas: `docs`, `workflow`, `meta`
 
 ### Examples
 
 ```bash
 # New skill
-feat(git-worktree): add parallel development workflow skill
+feat(deep-research): add multi-source web research skill
 
 # Bug fix
 fix(track-session): correct checkpoint recovery logic
@@ -58,7 +58,7 @@ refactor(ideal-react-component): split into progressive disclosure format
 BREAKING CHANGE: moved detailed rules to reference/STANDARDS.md
 
 # Multiple skills
-feat(track-session,git-worktree): add integration guidelines
+feat(track-session,track-roadmap): add integration guidelines
 ```
 
 ---
@@ -166,7 +166,7 @@ New Skills:
 
 Enhancements:
 - track-session (v3.3.0): Add work summary generation
-- git-worktree (v2.1.0): Add parallel session coordination
+- track-roadmap (v1.1.0): Add resume mode
 
 See CHANGELOG.md for full details."
 

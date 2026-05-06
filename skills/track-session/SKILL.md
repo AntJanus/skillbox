@@ -463,21 +463,10 @@ Quick decision guide:
 ## Integration
 
 **This skill works with:**
-- **git-worktree** - Each worktree should have its own SESSION_PROGRESS.md for parallel work tracking
+- **track-roadmap** - Pick a feature from the roadmap, then use track-session to plan and track its implementation
 - **All methodology skills** - Track phase completion for TDD, debugging, code review workflows
 - **generate-skill** - Use SESSION_PROGRESS.md to track multi-phase skill creation
 - **Long-running tasks** - Any task requiring >15 minutes or multiple context resets
-
-**Integration pattern with git-worktree:**
-```bash
-# Create worktree for feature
-git worktree add ../project-feature feature-branch
-cd ../project-feature
-
-# Create separate progress tracking
-echo "# Session Progress - Feature Branch" > SESSION_PROGRESS.md
-# Work on feature with independent progress tracking
-```
 
 **Pairs with:**
 - Commit workflows - Track progress between commits

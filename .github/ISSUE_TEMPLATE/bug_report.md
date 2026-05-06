@@ -8,7 +8,7 @@ assignees: ''
 
 ## Skill Name
 
-Which skill has the issue? (e.g., `track-session`, `git-worktree`)
+Which skill has the issue? (e.g., `track-session`, `code-review`)
 
 ## Describe the Bug
 

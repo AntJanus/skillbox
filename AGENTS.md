@@ -4,12 +4,11 @@ This file provides guidance on how to work effectively as an AI agent within the
 
 ## Skill Inventory
 
-SkillBox currently contains **13 skills**:
+SkillBox currently contains **11 skills**:
 
 | Skill | Version | Pattern | Description |
 |-------|---------|---------|-------------|
 | **track-session** | v4.3.0 | A (Methodology) | Track, stop, resume, and verify progress on long-running sessions |
-| **git-worktree** | v2.0.2 | B (Technical) | Manage multiple branches simultaneously using git worktrees |
 | **generate-skill** | v1.5.0 | D (Automation) | Interactive skill builder that generates high-quality SKILL.md files |
 | **ideal-react-component** | v1.5.0 | E (Reference) | Battle-tested React component structure pattern with hooks antipatterns |
 | **rate-skill** | v2.0.0 | C (Auditing) | Evaluate skill quality against best practices with letter grades (A-F) |
@@ -18,7 +17,6 @@ SkillBox currently contains **13 skills**:
 | **track-qa** | v1.0.0 | A (Methodology) | Plan, capture, and execute manual QA — the things tests can't verify; cc-dash dashboard reads QA.md across all projects |
 | **record-tui** | v1.3.0 | B (Technical) | Record polished terminal demos using Charmbracelet VHS |
 | **screenshot-local** | v1.1.0 | B (Technical) | Capture screenshots of local dev projects using shot-scraper |
-| **reflect** | v1.0.1 | A (Methodology) | Extract learnings from conversations and save to CLAUDE.md or auto-memory |
 | **code-review** | v1.2.0 | C (Auditing) | Multi-agent local code review — basics, architecture, clarity, testing, repo-hygiene — writes REVIEW.md |
 | **deep-research** | v1.0.0 | D (Automation) | Multi-source web research with structured synthesis and cited summary in conversation |
 
@@ -227,7 +225,6 @@ SkillBox skills follow five recognized patterns. Each pattern has specific struc
 - **track-session** - Phases: checkpoint, save, resume, verify. Rules like "Never repeat failures" and "Verify before declaring done." Verification checklists at every step.
 - **track-roadmap** - Modes: generate, update, audit, brainstorm, resume. Rules like "User drives the roadmap" and "Keep it high-level." Phase-gated discovery process before writing.
 - **track-qa** - Modes: generate, update, audit, migrate, resume. Rules like "User drives the QA list" and "One observable behavior per item." Mirror of track-roadmap for the manual-verification surface.
-- **reflect** - Scans conversations for learnings, categorizes by type (correction, discovery, decision, debugging, workflow), user chooses save destination per learning.
 
 **Structural signature from track-session:**
 ```markdown
@@ -254,23 +251,21 @@ SkillBox skills follow five recognized patterns. Each pattern has specific struc
 - DO include verification steps
 
 **Real examples in SkillBox:**
-- **git-worktree** - Step-by-step worktree creation, branch management, and cleanup commands.
 - **record-tui** - VHS tape file syntax, recording commands, CI integration for automated demos.
 - **screenshot-local** - shot-scraper setup, single/batch capture commands, YAML config templates.
 
-**Structural signature from git-worktree:**
+**Structural signature from screenshot-local:**
 ```markdown
 ## Quick Start
 
-**Create a worktree:**
+**Single screenshot:**
 ```bash
-git worktree add ../project-feature feature-branch
-cd ../project-feature
+shot-scraper http://localhost:3000 -o screenshot.png
 ```
 
-**List worktrees:**
+**Batch from YAML:**
 ```bash
-git worktree list
+shot-scraper multi screenshots.yml
 ```
 ```
 
@@ -616,6 +611,6 @@ Phase 6: Finalization (validate and present)
 - Explicit "Do Not Do" lists
 - Verification at every phase
 
-**Last Updated:** 2026-04-17
+**Last Updated:** 2026-05-06
 **Applies To:** AI agents working with SkillBox
 **Companion To:** CLAUDE.md (project-specific guidance)

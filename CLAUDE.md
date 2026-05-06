@@ -27,7 +27,7 @@ skillbox/
 ├── skills/               # All skills live here
 │   ├── track-session/
 │   │   └── SKILL.md      # Skill definition
-│   ├── git-worktree/
+│   ├── code-review/
 │   │   └── SKILL.md
 │   └── generate-skill/
 │       └── SKILL.md
@@ -269,8 +269,8 @@ Before marking skill work complete:
 user: I need to track progress on this long task
 [Should activate track-session]
 
-user: I want to work on multiple features in parallel
-[Should activate git-worktree]
+user: Review my changes before I commit
+[Should activate code-review]
 
 user: Create a skill for running database migrations
 [Should activate generate-skill]
@@ -409,13 +409,6 @@ If you catch yourself doing any of these:
 
 ## Integration with Other Skills
 
-### git-worktree + track-session
-
-When working with worktrees in parallel sessions:
-- Each worktree should have its own SESSION_PROGRESS.md
-- Use track-session to track progress in each worktree
-- Name Claude sessions after worktree branches
-
 ### generate-skill + existing skills
 
 When creating new skills:
@@ -474,7 +467,7 @@ type(scope): description
 
 # Examples:
 feat(track-session): add new checkpoint feature
-fix(git-worktree): correct branch switching logic
+fix(code-review): correct synthesis severity collapsing
 docs(readme): update installation instructions
 ```
 
@@ -497,6 +490,6 @@ Treat every issue working with SkillBox as an opportunity to update this file.
 
 ---
 
-**Last Updated:** 2026-03-21
+**Last Updated:** 2026-05-06
 **Applies To:** Claude Code 2025+
 **Source:** https://antjanus.com/ai/claude-code-best-practices

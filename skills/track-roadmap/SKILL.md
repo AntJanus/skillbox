@@ -408,8 +408,8 @@ A well-maintained roadmap has these properties:
 
 **This skill works with:**
 - **track-session** - After choosing a feature from the roadmap, use `track-session` to plan and track the implementation work
+- **track-qa** - Pair every roadmap item that ships UI/integration with a QA.md entry; failed QA items file back to the roadmap as `r_xxxxx` issues
 - **generate-skill** - Use the roadmap to identify features that could become reusable skills
-- **git-worktree** - Work on multiple roadmap features in parallel across worktrees
 
 **Workflow pattern:**
 ```
