@@ -13,31 +13,31 @@ Long-form Good/Bad comparisons for each mode of `/track-qa`. The main `SKILL.md`
 ```markdown
 ---
 schema: cc-dash/qa@1
-project: blog-2024
-last_updated: 2026-05-04T10:00:00-06:00
+project: my-notes-app
+last_updated: 2026-01-10T10:00:00-06:00
 ---
 
-# Manual QA — blog-2024
+# Manual QA — my-notes-app
 
 ## Setup
 
-Run: `cd blog-2024 && npm run dev` → open http://localhost:5173
+Run: `cd my-notes-app && npm run dev` → open http://localhost:5173
 
 ## Checklist
 
-- <!-- id:q_a1b2c status:pending --> Homepage loads, featured articles render with images, no console errors.
-- <!-- id:q_d3e4f status:pending --> Mobile menu (resize to <768px): simplified nav, hamburger toggle works smoothly.
-- <!-- id:q_g5h6i status:pending --> Dark/light theme toggle: colors flip cleanly, no FOUC on reload, preference persists across navigation.
-- <!-- id:q_j7k8l status:pending --> Reading progress bar + TOC: on a long article, progress tracks scroll, TOC sticks on xl+, collapses to accordion on mobile.
-- <!-- id:q_m9n0o status:pending --> Full-text search returns results, no stale index issues after `npm run build`.
-- <!-- id:q_p1q2r status:pending --> RSS feed validates in an RSS reader; latest 20 across collections, no broken URLs.
+- <!-- id:q_a1b2c status:pending --> Sign-in flow: enter valid credentials, land on dashboard, no console errors.
+- <!-- id:q_d3e4f status:pending --> Note CRUD: create, edit, delete a note; refresh the page; all changes persist.
+- <!-- id:q_g5h6i status:pending --> Mobile breakpoint (<768px): nav collapses to hamburger, modals don't overflow viewport.
+- <!-- id:q_j7k8l status:pending --> Dark/light theme toggle: colors flip cleanly, no FOUC on reload, preference persists across navigation.
+- <!-- id:q_m9n0o status:pending --> Search: type a query that matches notes, results filter live, clearing the query restores the full list.
+- <!-- id:q_p1q2r status:pending --> Offline mode: drop the network in DevTools, open a cached note, edits queue and replay when reconnected.
 ```
 
 **Why this is good:**
 - Setup is one line and runnable
 - Each item is one observable behavior
-- Items target what tests can't catch (visual rendering, responsive layout, theme persistence, real RSS validation)
-- Items are specific to the project's domain (this isn't generic "test the website")
+- Items target what tests can't catch (visual rendering, responsive layout, theme persistence, real network behavior)
+- Items are specific to the project's domain (not generic "test the website")
 - A QAer can knock the whole list out in 15-30 minutes
 </Good>
 
@@ -46,11 +46,11 @@ Run: `cd blog-2024 && npm run dev` → open http://localhost:5173
 ```markdown
 ---
 schema: cc-dash/qa@1
-project: blog-2024
-last_updated: 2026-05-04T10:00:00-06:00
+project: my-notes-app
+last_updated: 2026-01-10T10:00:00-06:00
 ---
 
-# Manual QA — blog-2024
+# Manual QA — my-notes-app
 
 ## Setup
 
@@ -61,7 +61,7 @@ Refer to README.
 - <!-- id:q_a1b2c status:pending --> Test the homepage.
 - <!-- id:q_d3e4f status:pending --> Make sure mobile works.
 - <!-- id:q_g5h6i status:pending --> Check dark mode.
-- <!-- id:q_j7k8l status:pending --> Articles render correctly and TOC works and reading progress and search and RSS feed and theme switching.
+- <!-- id:q_j7k8l status:pending --> Notes render correctly and search works and theme switching and offline and the mobile menu.
 ```
 
 **Why this is bad:**
@@ -80,33 +80,33 @@ Refer to README.
 ```markdown
 ---
 schema: cc-dash/qa@1
-project: fishing-game
-last_updated: 2026-05-04T10:00:00-06:00
+project: my-roguelike
+last_updated: 2026-01-10T10:00:00-06:00
 ---
 
-# Manual QA — fishing-game
+# Manual QA — my-roguelike
 
 ## Setup
 
-Run: `cd fishing-game && python3 -m http.server 8000` → open http://localhost:8000
+Run: `cd my-roguelike && cargo run --release`
 
 ## Checklist
 
-- <!-- id:q_a1b2c status:pending --> Core loop playable: sail → cast → hook → tension minigame → reel in → sell at shop.
-- <!-- id:q_d3e4f status:pending --> Save/load: play a session, earn gold, buy upgrades, catch fish — reload page → all state restored (gold, inventory, owned/equipped boats/rods/baits, fish stats).
-- <!-- id:q_g5h6i status:pending --> Save versioning: corrupt the localStorage save (manually edit in DevTools), reload — game falls back gracefully, doesn't brick.
-- <!-- id:q_j7k8l status:pending --> First major upgrade reachable in 10-15 min of play (validate the 2026-04-07 tuning pass held).
-- <!-- id:q_m9n0o status:pending --> Edge-case lockups: try to fish while shop is open, try to sail while hooked, try to open shop mid-reel — state guards prevent soft-locks.
-- <!-- id:q_p1q2r status:pending --> Pixel art renders crisply at 800x600 (no blur); 60 FPS steady on Chrome + Firefox.
-- <!-- id:q_s3t4u status:pending --> Canvas on slower machines: run for 10 min continuous, no memory leak / FPS drop (DevTools Performance tab).
-- <!-- id:q_v5w6x status:pending --> Clear localStorage entirely → first-run experience works (no null-ref errors).
+- <!-- id:q_a1b2c status:pending --> Core loop playable: explore → encounter enemy → combat → loot → descend stairs to next floor.
+- <!-- id:q_d3e4f status:pending --> Save/load: play a session, gain levels, collect items — quit and relaunch → all state restored (XP, inventory, equipped items, current floor).
+- <!-- id:q_g5h6i status:pending --> Save versioning: corrupt the save file with an unknown field, relaunch — game falls back gracefully, doesn't crash.
+- <!-- id:q_j7k8l status:pending --> First boss reachable in 15-20 min of play (calibrated against the most recent difficulty pass).
+- <!-- id:q_m9n0o status:pending --> Edge-case lockups: open inventory mid-combat, try to descend while stunned, swap weapon during animation — state guards prevent soft-locks.
+- <!-- id:q_p1q2r status:pending --> Terminal resize mid-session: layout reflows, no visual artifacts or panic.
+- <!-- id:q_s3t4u status:pending --> Long-session stability: run for 15 min continuous, no memory growth, no rendering glitches.
+- <!-- id:q_v5w6x status:pending --> Wipe save data → first-run experience works (no null-ref errors, intro plays).
 ```
 
 **Why this is good:**
-- Domain-specific (game-state persistence, save corruption recovery, upgrade pacing, FPS, soft-locks)
-- "First major upgrade reachable in 10-15 min" is calibrated against a specific past tuning decision — anchors the check to history
+- Domain-specific (game-state persistence, save corruption recovery, difficulty pacing, terminal-resize behavior, soft-locks)
+- "First boss reachable in 15-20 min" is calibrated against a specific past tuning decision — anchors the check to history
 - Edge-case lockups are exactly the kind of thing tests can't catch easily — they require human curiosity
-- Memory-leak check explicitly says "10 min continuous" so the time investment is upfront
+- The long-session check explicitly says "15 min continuous" so the time investment is upfront
 </Good>
 
 ---
@@ -115,7 +115,7 @@ Run: `cd fishing-game && python3 -m http.server 8000` → open http://localhost:
 
 ### Example: Adding new items after a feature ships
 
-**Scenario:** A new "achievement journal UI" feature shipped. The existing QA.md from above already has 8 items.
+**Scenario:** A new "achievement system" feature shipped. The existing QA.md from above already has 8 items.
 
 <Good>
 
@@ -124,11 +124,11 @@ After running `/track-qa update`:
 ```
 Read existing QA.md (8 items)
 Asked: "What changed since the last QA pass?"
-User: "I shipped the achievement journal — overlay opens/closes, lists all 17 achievements with locked/unlocked states."
+User: "I shipped achievements — there's an overlay UI that opens/closes, lists all 12 achievements with locked/unlocked states."
 
 Proposed additions:
-  - <!-- id:q_y7z8a status:pending --> Achievement journal UI: overlay opens, closes, shows locked/unlocked states, all 17 listed.
-  - <!-- id:q_b9c0d status:pending --> All 17 achievements: trigger a few concretely (first catch, first rare, gold threshold, full species set) — toast appears, achievement persists in journal across reload.
+  - <!-- id:q_y7z8a status:pending --> Achievement overlay UI: opens, closes, shows locked/unlocked states, all 12 listed.
+  - <!-- id:q_b9c0d status:pending --> All 12 achievements: trigger a few concretely (first kill, first rare drop, level threshold) — toast appears, achievement persists across reload.
 
 Confirm?
 User: yes
@@ -139,7 +139,7 @@ Wrote 2 new items to QA.md. Total: 10 items.
 **Why this is good:**
 - Asked the user before writing (rule: user drives the QA list)
 - Each new item is one observable behavior
-- Items reference the actual achievement count (17) — concrete, not generic
+- Items reference the actual achievement count (12) — concrete, not generic
 - Existing items were not touched (rule: don't reset existing status)
 </Good>
 
@@ -173,9 +173,9 @@ Read QA.md: 12 items (8 pending, 3 passed, 1 failed).
 
 Findings:
   • q_g5h6i references a "save versioning" feature — feature still exists in the code. Keep.
-  • q_p1q2r ("Pixel art crisp at 800x600") — codebase now supports 1024x768 default. PROPOSE: update item or split into 800x600 + 1024x768.
+  • q_p1q2r ("layout renders correctly at 80x24") — codebase now defaults to 120x40. PROPOSE: update item or split into 80x24 + 120x40.
   • q_v5w6x ("first-run experience") — passed 3 months ago. PROPOSE: reset to pending; new code paths added since.
-  • Two new features merged with no QA items: "weather system" and "fish marketplace". PROPOSE: add items.
+  • Two new features merged with no QA items: "weather system" and "merchant NPCs". PROPOSE: add items.
   • One feature removed: "boat customization UI" — q_old01 is obsolete. PROPOSE: remove.
 
 Apply all proposals?
@@ -195,9 +195,9 @@ Updated: 1 item edited, 1 reset to pending, 1 removed, 1 added. Total: 12 items.
 
 ## Mode: Migrate
 
-### Example: Converting a portfolio-level QA_BACKLOG.md
+### Example: Converting a portfolio-level QA backlog
 
-**Scenario:** A portfolio root has a `QA_BACKLOG.md` file with 10 repos' worth of QA notes in a single ad-hoc document. The user wants per-repo `QA.md` files.
+**Scenario:** A portfolio root has a `QA_BACKLOG.md` file with multiple repos' QA notes in a single ad-hoc document. The user wants per-repo `QA.md` files.
 
 <Good>
 
@@ -211,7 +211,7 @@ Extracted:
   Setup: "cd my-repo && bash scripts/test.sh"
   Items (7 total):
     - "CI validation workflow runs clean on a fresh PR"
-    - "AGENTS.md Last Updated date is current"
+    - "Docs file last_updated date is current"
     - ...
 
 Generating IDs (q_xxxxx) for each item.
@@ -244,17 +244,17 @@ Wrote QA.md (7 items). Recommend deleting my-repo's section from ../QA_BACKLOG.m
 After running `/track-qa resume`:
 
 ```
-QA.md status (last_updated: 2026-04-15, 19 days ago):
+QA.md status (last_updated: 2026-01-01, 19 days ago):
   • 8 items pending
   • 3 items passed (last passed 19 days ago — consider re-verifying)
   • 1 item failed (q_g5h6i, ref:r_xyz12 — has the roadmap issue been fixed?)
   • 0 items needs-decision
 
 Next pending item:
-  q_a1b2c — "Save versioning: corrupt the localStorage save (manually edit in DevTools), reload — game falls back gracefully, doesn't brick."
+  q_a1b2c — "Save versioning: corrupt the save file with an unknown field, relaunch — game falls back gracefully, doesn't crash."
 
-Want to start QA on this item? (Or open focus mode in cc-dash:
-  http://localhost:3000/project/fishing-game/qa?focus=q_a1b2c)
+Want to start QA on this item? (Or open focus mode in a compatible dashboard at
+  /project/<slug>/qa?focus=q_a1b2c.)
 ```
 
 **Why this is good:**

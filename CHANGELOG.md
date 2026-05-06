@@ -5,9 +5,9 @@ All notable changes to SkillBox will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.10.0] - 2026-05-05
+## [2.10.0] - 2026-05-06
 
-New skill release. Adds `track-qa` to formalize the manual-QA layer of the cc-dash schema family — pairs with `track-roadmap` (`cc-dash/roadmap@1`) and `track-session` (`cc-dash/session@1`). The cc-dash dashboard now reads `QA.md` files across all projects, exposes a portfolio-wide `/qa` queue, an inline approve/fail/skip/decision workflow, a focus mode with keyboard shortcuts, and 8 MCP tools for agent-driven QA.
+New skill release. Adds `track-qa` to formalize the manual-QA layer of the cc-dash schema family — pairs with `track-roadmap` (`cc-dash/roadmap@1`) and `track-session` (`cc-dash/session@1`). Tools that consume the schema can render `QA.md` files as a portfolio-wide queue, drive an inline approve/fail/skip/decision workflow, and run a focus mode with keyboard shortcuts; MCP servers built on the schema can expose tools for agent-driven QA.
 
 ### Added
 

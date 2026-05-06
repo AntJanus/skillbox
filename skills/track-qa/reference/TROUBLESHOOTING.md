@@ -41,19 +41,19 @@ Edge cases and gotchas not covered in the main `SKILL.md` Troubleshooting sectio
 
 ---
 
-## cc-dash dashboard: items don't appear after writing QA.md
+## Dashboard: items don't appear after writing QA.md
 
-**Symptom:** Wrote a new QA.md, refreshed the dashboard, items don't show.
+**Symptom:** Wrote a new QA.md, refreshed a `cc-dash/qa@1`-aware dashboard, items don't show.
 
 **Diagnosis (in order):**
-1. Discovery cache — the dashboard caches discovered projects. Restart the dev server or wait for the next refresh tick.
+1. Discovery cache — most dashboards cache discovered projects. Restart the dev server or wait for the next refresh tick.
 2. Frontmatter validity — if `schema:` isn't exactly `cc-dash/qa@1`, discovery skips the file.
 3. File location — QA.md must be in the project root, alongside ROADMAP.md / SESSION_PROGRESS.md.
 4. Item format — items that don't match the `- <!-- id:q_xxxxx status:... --> Description` shape are silently skipped by the parser.
 
 **Resolution:**
 - Open the file in VS Code; the YAML frontmatter and HTML comments should syntax-highlight cleanly.
-- Run the dashboard's MCP `get_qa_for_project` tool against the project — it returns parser errors verbatim if the file is malformed.
+- If the dashboard exposes a `get_qa_for_project` MCP tool, call it against the project — it typically returns parser errors verbatim if the file is malformed.
 
 ---
 
@@ -61,7 +61,7 @@ Edge cases and gotchas not covered in the main `SKILL.md` Troubleshooting sectio
 
 **Symptom:** A QA item was failed and a roadmap issue was filed. The roadmap issue was completed, but the QA item is still marked failed.
 
-**Diagnosis:** Failing → Reset is a one-way reset; cc-dash does not auto-flip the QA item back to pending when the linked roadmap item moves to `done`. This is by design — the QAer should re-verify after the fix lands, not trust that the fix worked.
+**Diagnosis:** Failing → Reset is a one-way reset; compatible dashboards typically do not auto-flip the QA item back to pending when the linked roadmap item moves to `done`. This is by design — the QAer should re-verify after the fix lands, not trust that the fix worked.
 
 **Resolution:**
 - After the roadmap fix is verified, run `/track-qa update` and reset the QA item to pending
@@ -90,6 +90,6 @@ Edge cases and gotchas not covered in the main `SKILL.md` Troubleshooting sectio
 **Diagnosis:** The cross-link is one-way (QA item references roadmap item, not vice versa). Deleting the roadmap item without updating the QA item leaves a dangling reference.
 
 **Resolution:**
-- The dashboard surfaces the roadmap ref as a link; clicking it 404s into the roadmap (or shows the missing item gracefully)
+- A dashboard that renders the roadmap ref as a link will 404 (or show the missing item gracefully)
 - Run `/track-qa audit`; the audit should detect dangling refs
 - Reset the QA item to pending OR clear the `roadmapRef` (manually editing the HTML comment is fine — IDs are immutable but optional fields aren't)
