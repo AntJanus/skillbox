@@ -20,7 +20,7 @@ metadata:
 
 ## Overview
 
-Use QA.md in the project root to maintain the manual QA checklist — the items a human has to exercise (visual rendering, multi-step flows, race conditions, integrations) before declaring a release ready. The cc-dash dashboard reads QA.md, surfaces pending items in a portfolio queue, and lets you approve or fail items one by one with notes.
+Use QA.md in the project root to maintain the manual QA checklist — the items a human has to exercise (visual rendering, multi-step flows, race conditions, integrations) before declaring a release ready. Tools that consume the `cc-dash/qa@1` schema can ingest the file: surface pending items in a portfolio queue, drive approve/fail/skip workflows with notes, and run focused review sessions across many items at once.
 
 **Core principle:** Tests prove correctness; QA proves shippability. Maintain a living, executable checklist of everything tests can't catch, so "ready to ship" is a verifiable state, not a vibe.
 
@@ -317,18 +317,18 @@ A well-maintained QA.md has these properties:
 **Cause:** Failing a QA item files a roadmap issue but the issue never gets worked.
 
 **Solution:**
-- The cc-dash `/qa` portfolio queue surfaces stale failures
+- A compatible dashboard's `/qa` portfolio queue surfaces stale failures
 - Audit failed items quarterly; either fix the underlying bug or remove the QA item if obsolete
 - Failures with no roadmap ref are a smell — every failure should have a tracked next-step
 
-**[Extended Troubleshooting](./reference/TROUBLESHOOTING.md)** — Edge cases for migrate, audit, and the cc-dash dashboard integration.
+**[Extended Troubleshooting](./reference/TROUBLESHOOTING.md)** — Edge cases for migrate, audit, and dashboard integration.
 
 ## Integration
 
 **This skill works with:**
-- **track-roadmap** — Failed QA items auto-file roadmap issues in a "QA Issues" category. After fixing, mark the roadmap item done and reset the QA item to pending.
+- **track-roadmap** — Failed QA items can auto-file roadmap issues (in a "QA Issues" category) when the consuming tool supports cross-linking. After fixing, mark the roadmap item done and reset the QA item to pending.
 - **track-session** — Use track-session to drive a focused QA pass when working through many items at once. Reference QA item IDs in the session plan.
-- **cc-dash dashboard** — The dashboard reads QA.md across all projects, surfaces a portfolio queue at `/qa`, lets you approve/fail items one by one, and runs a focus mode with keyboard shortcuts. The dashboard's MCP server also exposes `list_qa_pending`, `approve_qa_item`, `fail_qa_item`, etc. for agent-driven QA.
+- **`cc-dash/qa@1`-aware dashboards** — Any tool that ingests the schema can render a portfolio queue, an inline approve/fail/skip workflow, and a focus mode for keyboard-driven review. MCP servers built on the schema can expose tools like `list_qa_pending`, `approve_qa_item`, and `fail_qa_item` for agent-driven QA.
 
 **Workflow pattern:**
 
