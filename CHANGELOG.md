@@ -5,6 +5,26 @@ All notable changes to SkillBox will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [2.11.0] - 2026-05-06
+
+Skill audit follow-up to the v2.6.0 activation-tuning release. Transcript audit covering 2026-04-13 → 2026-05-06 (~448 transcripts) confirmed two skills had zero activations across the full window — `reflect` (third consecutive zero audit) and `git-worktree` (dropped from 1 to 0). Both removed entirely. The other zero-usage skills (`rate-skill`, `generate-skill`, `record-tui`, `setup-semantic-release`, `ideal-react-component`) cover narrow workflows and are kept on the watch list rather than removed. Skill count: 13 → 11. Also closes the v2.10.0 documentation gap by adding the missing `track-qa` entry to README.md.
+
+### Removed
+
+- **reflect** (v1.0.1): Removed — third consecutive zero-activation audit (v2.3.0, v2.6.0, this audit). The `/track-session resume` flow already covers cross-session learning capture; reflect's separate scan-and-categorize loop never surfaced. Use `/track-session` to capture decisions/learnings during work and `update` mode to save them to SESSION_PROGRESS.md.
+- **git-worktree** (v2.0.2): Removed — zero activations across the full window despite occasional natural-language phrases ("create a worktree") in transcripts that didn't fire the trigger. The skill duplicated public `git worktree` documentation without adding skillbox-specific value. Users wanting parallel-branch workflows can read `git help worktree` directly.
+
+### Documentation
+
+- README.md: dropped both removed skill entries; added the missing `track-qa` entry (placed alongside `track-roadmap` since they share the `cc-dash/*@1` schema family); updated install/symlink examples and the activation-example block; skill count now matches the 11 actual skills
+- AGENTS.md: dropped both rows from the skill inventory table; replaced the git-worktree Pattern B structural signature with screenshot-local; dropped reflect from the Pattern A example list; refreshed Last Updated to 2026-05-06
+- CLAUDE.md: dropped `git-worktree/` from the directory tree, dropped the `git-worktree + track-session` integration section, and replaced the example trigger and example commit message
+- reference/VERSION-CONTROL.md: refreshed the skill-name list (was missing 4 skills and still listed `remember`/`git-worktree`); replaced git-worktree from two example commit blocks
+- skills/{track-session,track-roadmap,record-tui,screenshot-local,deep-research,generate-skill,rate-skill}: dropped git-worktree and/or reflect cross-references in their Integration sections
+- .github/ISSUE_TEMPLATE/bug_report.md: replaced git-worktree example with code-review
+
 ## [2.10.0] - 2026-05-06
 
 New skill release. Adds `track-qa` to formalize the manual-QA layer of the cc-dash schema family — pairs with `track-roadmap` (`cc-dash/roadmap@1`) and `track-session` (`cc-dash/session@1`). Tools that consume the schema can render `QA.md` files as a portfolio-wide queue, drive an inline approve/fail/skip/decision workflow, and run a focus mode with keyboard shortcuts; MCP servers built on the schema can expose tools for agent-driven QA.
@@ -358,7 +378,15 @@ When creating a release:
 
 ---
 
-[Unreleased]: https://github.com/antjanus/skillbox/compare/v2.3.0...HEAD
+[Unreleased]: https://github.com/antjanus/skillbox/compare/v2.11.0...HEAD
+[2.11.0]: https://github.com/antjanus/skillbox/compare/v2.10.0...v2.11.0
+[2.10.0]: https://github.com/antjanus/skillbox/compare/v2.9.0...v2.10.0
+[2.9.0]: https://github.com/antjanus/skillbox/compare/v2.8.0...v2.9.0
+[2.8.0]: https://github.com/antjanus/skillbox/compare/v2.7.0...v2.8.0
+[2.7.0]: https://github.com/antjanus/skillbox/compare/v2.6.0...v2.7.0
+[2.6.0]: https://github.com/antjanus/skillbox/compare/v2.5.0...v2.6.0
+[2.5.0]: https://github.com/antjanus/skillbox/compare/v2.4.0...v2.5.0
+[2.4.0]: https://github.com/antjanus/skillbox/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/antjanus/skillbox/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/antjanus/skillbox/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/antjanus/skillbox/compare/v2.0.0...v2.1.0
