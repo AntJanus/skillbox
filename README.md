@@ -194,6 +194,14 @@ Run multi-source web research on a topic and synthesize a comprehensive, well-so
 
 ---
 
+## Experimental Skills
+
+A separate `experimental/` folder holds research-grade skills that are speculative enough to require human review before any change lands. Experimental skills always run on a branch, produce a report, pass through `/publish-check` for privacy, and surface decisions via `AskUserQuestion`. They never auto-merge.
+
+See [experimental/README.md](./experimental/README.md) for conventions and the graduation path from experimental to `skills/`.
+
+---
+
 ## Installation
 
 ### Using Vercel Skills CLI (Recommended)
