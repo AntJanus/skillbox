@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Enhanced Skills
+
+- **track-session** (v4.3.0 → v4.4.0): Added new `start` mode that codifies the explore → ask → plan → confirm → execute → test → commit pattern for new multi-phase work. Prevents the two most common failure modes of long sessions — starting execution before the plan is reviewed, and dumping a large synthesis when the user wants decisions one at a time. Six phases, each with a gate. Updates: `argument-hint` to include `start`, brief "Start Mode" pointer in SKILL.md with full workflow in new `reference/START.md` (progressive disclosure keeps SKILL.md at 491 lines / A-grade), new Scenario 0 in the Mode Selection examples.
+
+### Added (experimental)
+
+- **experimental/** folder: New top-level area for research-grade skills that always run on a branch, produce a report (never auto-merge), pass through `/publish-check`, and surface decisions via `AskUserQuestion`. See `experimental/README.md` for conventions and the graduation path. README.md updated with a brief reference between Available Skills and Installation.
+- **experimental/evolve-skills** (v0.1.0): First experimental skill — friction-mining + patch-proposal pipeline that scans recent transcripts, clusters by active skill, proposes patches via parallel agents, validates via headless replay, scrubs through `/publish-check`, and presents `EVOLUTION_REPORT.md` for human review on a branch. Includes `reference/friction-patterns.md` (6 detection patterns) and `reference/replay-protocol.md` (validation rubric). Pre-deployment live-test through `/publish-check` correctly caught a real `/Users/<user>/projects/...` placeholder string inside Example 3 — fixed by generalizing to `<USER>` / `<repo>` placeholders.
+
 ## [2.11.0] - 2026-05-06
 
 Skill audit follow-up to the v2.6.0 activation-tuning release. Transcript audit covering 2026-04-13 → 2026-05-06 (~448 transcripts) confirmed two skills had zero activations across the full window — `reflect` (third consecutive zero audit) and `git-worktree` (dropped from 1 to 0). Both removed entirely. The other zero-usage skills (`rate-skill`, `generate-skill`, `record-tui`, `setup-semantic-release`, `ideal-react-component`) cover narrow workflows and are kept on the watch list rather than removed. Skill count: 13 → 11. Also closes the v2.10.0 documentation gap by adding the missing `track-qa` entry to README.md.

@@ -1,0 +1,4 @@
+# Per-run artifacts. The EVOLUTION_REPORT.md commits to the branch; everything else is local only.
+*/proposed-patches/
+*/replay-logs/
+*/REPORT.md

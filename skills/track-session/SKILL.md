@@ -8,10 +8,10 @@ description: |
   "save this plan in a session", or for multi-phase implementations, complex refactoring,
   and tasks spanning multiple sessions.
 license: MIT
-argument-hint: "[save|resume|verify]"
+argument-hint: "[start|save|resume|verify]"
 metadata:
   author: Antonin Januska
-  version: "4.3.0"
+  version: "4.4.0"
 ---
 # Session Progress
 
@@ -25,14 +25,21 @@ Use SESSION_PROGRESS.md in the project root to track plans and progress. All pla
 
 ## Usage Modes
 
-This skill supports four modes via optional arguments:
+This skill supports five modes via optional arguments:
 
 | Mode | Command | What it does | Use when |
 |------|---------|-------------|----------|
+| **Start** | `/track-session start` | Explore → ask → plan → confirm → execute → test → commit | Beginning a new multi-phase task that needs structured planning |
 | **Resume** | `/track-session resume` | Load SESSION_PROGRESS.md and continue | Returning to a project, picking up where you left off |
 | **Default** | `/track-session` | Save progress, then continue working | Checkpoint during active work |
 | **Save** | `/track-session save` | Save progress and stop | Pausing work or taking a break |
 | **Verify** | `/track-session verify` | Validate completed work against requirements | Before declaring done or delivery |
+
+## Start Mode (`/track-session start`)
+
+Start mode codifies a six-phase pattern — explore → ask → plan → confirm → execute → test → commit — for new multi-phase work. It prevents two common failure modes: starting execution before the plan is reviewed, and dumping a large synthesis when the user wants decisions one at a time. Each phase is a gate; failing a gate halts the workflow until fixed.
+
+**See [reference/START.md](./reference/START.md)** for the full phase-by-phase workflow, when to use vs. skip, and an end-to-end example.
 
 ## When to Use
 
@@ -176,7 +183,17 @@ Validates completed tasks against original requirements. Checks that work is act
 
 <Good>
 ```bash
-# Scenario 1: Starting a big feature
+# Scenario 0: Starting a multi-phase feature with structured planning
+user: "I want to add real-time notifications to the app"
+assistant: "/track-session start"
+# 1. Explores notification-relevant modules
+# 2. Asks: "WebSocket vs Server-Sent Events vs polling?" (one decision)
+# 3. Asks: "Reuse Redis pub/sub or stand up a new broker?" (one decision)
+# 4. Writes SESSION_PROGRESS.md with phased plan
+# 5. Shows plan, waits for greenlight
+# 6. Executes phase-by-phase, tests after each, commits incrementally
+
+# Scenario 1: Starting a big feature (less structured, faster start)
 user: "Let's implement user authentication"
 assistant: "/track-session"
 # Creates SESSION_PROGRESS.md with plan, then starts working immediately
@@ -208,7 +225,7 @@ assistant: "/track-session verify"
 # Validates all work, generates verification report
 ```
 
-**Why this is good:** Clear separation of concerns - save for pausing, resume for continuing, no-arg for checkpointing during active work, verify for validation before delivery.
+**Why this is good:** Clear separation of concerns — `start` for structured plan-and-execute on new multi-phase work, no-arg for checkpointing during active work, `save` for pausing, `resume` for continuing, `verify` for validation before delivery.
 </Good>
 
 <Bad>
