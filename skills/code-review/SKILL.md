@@ -1,17 +1,16 @@
 ---
 name: code-review
 description: |
-  Run a multi-agent code review over local changes. Use when asked to "review my code",
-  "review these changes", "do a code review", "review this diff", "check my changes before I commit",
-  "review the work in this PR", or "give me a thorough review". Dispatches five specialized
-  reviewers in parallel (basics, architecture, clarity, testing, repo-hygiene) and synthesizes
-  their findings into a single severity-tagged report written to REVIEW.md at the repo root.
+  Multi-agent code review over local changes. Use when asked to
+  "review my code", "review these changes", "do a code review",
+  "check my changes before I commit", or "give me a thorough review".
+  Writes REVIEW.md.
 license: MIT
 argument-hint: "[path | --staged | --branch <base>]"
 allowed-tools: Read, Write, Glob, Grep, Bash, Task
 metadata:
   author: Antonin Januska
-  version: "1.3.0"
+  version: "1.4.0"
 ---
 
 # Code Review - Multi-Agent Local Review
