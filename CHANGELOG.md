@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.12.0] - 2026-05-11
+
+Three threads converge: (1) the **track-session start mode** for new multi-phase work, with phase gates and `reference/START.md`; (2) the new **`experimental/`** lane and its first inhabitant `evolve-skills`, a friction-mining + patch-proposal pipeline that always runs on a branch and surfaces decisions for human review; and (3) a **description-length pass** that brings every skill description under the 230-char target after research surfaced Claude Code 2.1.86's 250-character `/skills` display cap. Two skills (`generate-skill`, `rate-skill`) and `CLAUDE.md` now codify the rule so future authoring stays in compliance.
+
+### Description-Length Pass (description ≤230 chars)
+
+All 11 skill descriptions trimmed under the 230-character target (was 255–732). Claude Code 2.1.86 truncates the `/skills` listing at 250 characters — anything past that is invisible to auto-invocation logic ([anthropics/claude-code#40121](https://github.com/anthropics/claude-code/issues/40121), [#44780](https://github.com/anthropics/claude-code/issues/44780)). Anthropic's [authoring spec](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices) sets a hard 1024-char limit, but the 250 display cap is the practical ceiling.
+
+- **deep-research** (v2.0.0 → v2.1.0): description 732 → 226 chars. Dropped 9 redundant trigger phrasings (kept research / deep research / deep dive / investigate / compare / pros and cons / survey the landscape); removed "No files are created" implementation detail (already covered in body).
+- **generate-skill** (v1.5.0 → v1.6.0): description 619 → 201 chars. Added a new "Length self-check" sub-section under "Description field best practices" with the bash one-liner to count characters; tightened phase-3 frontmatter example to ≤230; added length to Phase 4 quality checklist.
+- **track-session** (v4.4.0 → v4.5.0): description 478 → 211 chars. Dropped 7 redundant resume-variant phrases (kept resume work / pick up where I left off / what was I doing / start a session / track this work / save progress).
+- **code-review** (v1.3.0 → v1.4.0): description 472 → 209 chars. Removed the 5-reviewer breakdown (belongs in body, not description); kept the highest-value triggers.
+- **track-qa** (v1.0.0 → v1.1.0): description 463 → 197 chars. Removed the parenthetical scope list (visual rendering, multi-step flows, etc.) — already in `## When to Use` body.
+- **ideal-react-component** (v1.5.0 → v1.6.0): description 400 → 199 chars. Kept the high-value debugging triggers ("fix infinite loop", "useEffect not working"); dropped redundant situational descriptors.
+- **record-tui** (v1.3.0 → v1.4.0): description 398 → 196 chars. Dropped niche / generic triggers ("set up VHS for CI", "show what this app looks like", "document the UI").
+- **track-roadmap** (v2.3.0 → v2.4.0): description 392 → 177 chars. Dropped "pick up where I left off" (overlaps with track-session) and one of three "generate a roadmap" variants.
+- **screenshot-local** (v1.1.0 → v1.2.0): description 351 → 220 chars. Removed the descriptor block; kept distinctive shot-scraper trigger.
+- **setup-semantic-release** (v1.0.0 → v1.1.0): description 303 → 224 chars. Light trim of redundant variants.
+- **rate-skill** (v2.0.0 → v2.1.0): description 255 → 177 chars. Also gained scoring updates for description length in the Frontmatter (15%) category.
+
+### Documentation
+
+- **CLAUDE.md**: Added the ≤230-char rule to "DO: Creating and Editing Skills" and the >250-char anti-pattern to "Forbidden Patterns", with rationale linking the spec hard limit (1024) vs the practical display cap (250).
+- **skills/rate-skill** (v2.1.0): Frontmatter category now checks description length. Letter-grade thresholds: A ≤230 / B 231–300 / C 301–500 / D 500–1024 / F >1024. "Watch for" section includes the bash one-liner for measuring length.
+- **skills/generate-skill** (v1.6.0): New "Length self-check" sub-section under "Description field best practices" with measurement command; frontmatter example trimmed; Phase 4 quality checklist now includes the ≤230 check.
+
 ### Enhanced Skills
 
 - **track-session** (v4.3.0 → v4.4.0): Added new `start` mode that codifies the explore → ask → plan → confirm → execute → test → commit pattern for new multi-phase work. Prevents the two most common failure modes of long sessions — starting execution before the plan is reviewed, and dumping a large synthesis when the user wants decisions one at a time. Six phases, each with a gate. Updates: `argument-hint` to include `start`, brief "Start Mode" pointer in SKILL.md with full workflow in new `reference/START.md` (progressive disclosure keeps SKILL.md at 491 lines / A-grade), new Scenario 0 in the Mode Selection examples.
