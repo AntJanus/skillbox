@@ -105,6 +105,7 @@ tags: [relevant, tags]
 
 - Vague descriptions like "A skill for testing" or "Helps with React"
 - Single-sentence descriptions without specific triggers
+- Descriptions over 250 characters (truncated in `/skills` listing — triggers past 250 are invisible)
 - Skills over 500 lines without progressive disclosure
 - Examples without Good/Bad comparisons
 - Missing troubleshooting sections
@@ -116,6 +117,7 @@ tags: [relevant, tags]
 
 - **DO** use the `generate-skill` skill when creating new skills
 - **DO** include 3-5 specific trigger phrases in the description field
+- **DO** keep the `description` field at **≤230 characters** (Claude Code 2.1.86 truncates the `/skills` listing at 250; 1024 is the Anthropic spec hard limit). Anything past 250 is invisible to auto-invocation — front-load triggers, move long context into the `## When to Use` body
 - **DO** provide Good/Bad code examples for clarity
 - **DO** include troubleshooting sections addressing real issues
 - **DO** keep SKILL.md under 500 lines (use reference/ for extended content)
