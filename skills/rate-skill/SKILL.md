@@ -1,15 +1,15 @@
 ---
 name: rate-skill
 description: |
-  Evaluate skill quality against best practices. Use when asked to "rate this skill",
-  "review skill quality", "check skill formatting", "is this skill good", "evaluate SKILL.md",
-  "grade this skill", or when validating skill files before publishing.
+  Evaluate skill quality against best practices. Use when asked
+  to "rate this skill", "review skill quality", "check skill
+  formatting", "evaluate SKILL.md", or "grade this skill".
 license: MIT
 argument-hint: "<path/to/SKILL.md>"
 allowed-tools: Read, Glob, Grep
 metadata:
   author: Antonin Januska
-  version: "2.0.0"
+  version: "2.1.0"
 ---
 # Rate Skill
 
@@ -88,7 +88,7 @@ Audit SKILL.md files against quality standards from generate-skill best practice
 
 ### Triggers (15%)
 
-**Strong signals:** 5+ specific phrases in description field, "when asked to X" format, covers multiple user contexts, uses natural language users actually type.
+**Strong signals:** 5+ specific phrases in description field, "when asked to X" format, covers multiple user contexts, uses natural language users actually type. Distinctive triggers **front-loaded** so they sit before the 250-char `/skills` truncation point.
 
 **Scores:** A: 5+ specific | B: 3-4 good | C: 2 phrases | D: 1 vague | F: None
 
@@ -96,7 +96,7 @@ Audit SKILL.md files against quality standards from generate-skill best practice
 
 ### Frontmatter (15%)
 
-**Strong signals:** All required fields present and valid. `name` matches directory name. Version follows semver. `argument-hint` at top level (not nested under metadata). Description is trigger-rich.
+**Strong signals:** All required fields present and valid. `name` matches directory name. Version follows semver. `argument-hint` at top level (not nested under metadata). Description is trigger-rich AND **≤230 characters** (Claude Code truncates `/skills` listing at 250; anything past is invisible to auto-invocation; Anthropic spec hard limit is 1024).
 
 **Required universal fields (agentskills.io spec):** `name`, `description`, `license`, `metadata` (with `author`, `version`)
 
@@ -104,9 +104,9 @@ Audit SKILL.md files against quality standards from generate-skill best practice
 
 **Non-functional fields (flag if present):** `tags` (no discovery system consumes it), `hooks` (belongs in `.claude/hooks.json`)
 
-**Scores:** A: All fields valid + spec-compliant | B: Minor placement issues | C: Missing optional fields | D: Missing required fields | F: Invalid or absent frontmatter
+**Scores:** A: All fields valid + spec-compliant + description ≤230 chars | B: Minor placement issues OR description 231-300 chars | C: Missing optional fields OR description 301-500 chars | D: Missing required fields OR description >500 chars | F: Invalid or absent frontmatter OR description >1024 chars (spec violation)
 
-**Watch for:** `argument-hint` nested under `metadata` (Claude Code won't parse it), `tags` field adding no value, missing `name` or `version`
+**Watch for:** description >250 chars (silent truncation in `/skills` listing — count with `python3 -c "import yaml,sys; print(len(yaml.safe_load(open(sys.argv[1]).read().split('---',2)[1])['description'].strip()))" SKILL.md`), `argument-hint` nested under `metadata` (Claude Code won't parse it), `tags` field adding no value, missing `name` or `version`
 
 ### Examples (10%)
 
@@ -319,7 +319,16 @@ Audit SKILL.md files against quality standards from generate-skill best practice
        when [situation 1], or when [situation 2].
      ```
 
-3. **Frontmatter: `argument-hint` nested under metadata**
+3. **Frontmatter: description is 412 chars (truncated at 250 in `/skills`)**
+   - Impact: Last 162 chars of triggers are invisible to Claude's auto-invocation
+   - Fix: Trim to ≤230 chars, front-load distinctive phrases, move long context into `## When to Use` body:
+     ```yaml
+     description: |
+       Short summary. Use when "trigger 1", "trigger 2",
+       or when [situation].
+     ```
+
+4. **Frontmatter: `argument-hint` nested under metadata**
    - Impact: Claude Code won't parse it for autocomplete
    - Fix: Move to top-level frontmatter field:
      ```yaml
