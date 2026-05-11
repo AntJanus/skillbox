@@ -1,14 +1,14 @@
 ---
 name: setup-semantic-release
 description: |
-  Use when setting up automated versioning, when asked to "set up semantic release",
-  "add conventional commits", "configure automated versioning", "set up commitlint",
-  "add husky hooks", "set up changelog generation", or when initializing a new project
-  that needs a commit and release workflow.
+  Set up semantic-release with conventional commits. Use when
+  asked to "set up semantic release", "add conventional commits",
+  "configure automated versioning", "set up commitlint", "add
+  husky hooks", or "generate a changelog".
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Setup Semantic Release & Conventional Commits
