@@ -1,17 +1,15 @@
 ---
 name: track-session
 description: |
-  Resume work from previous sessions, track progress on long tasks, or verify completion.
-  Use when asked to "continue where we left off", "resume work", "pick up where I left off",
-  "what was I doing", "where was I", "track this work", "save progress", "verify work",
-  "start a session", "start a session together", "save this in a session",
-  "save this plan in a session", or for multi-phase implementations, complex refactoring,
-  and tasks spanning multiple sessions.
+  Resume work, track progress, verify completion. Use when asked
+  to "resume work", "pick up where I left off", "what was I doing",
+  "start a session", "track this work", or "save progress". For
+  multi-session tasks.
 license: MIT
 argument-hint: "[start|save|resume|verify]"
 metadata:
   author: Antonin Januska
-  version: "4.4.0"
+  version: "4.5.0"
 ---
 # Session Progress
 
