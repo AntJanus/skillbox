@@ -1,17 +1,15 @@
 ---
 name: track-qa
 description: |
-  Plan, capture, and execute manual QA — the things tests can't verify.
-  Use when asked to "create a QA list", "set up QA for this project", "what should I QA",
-  "track manual QA", "add a QA check", "audit the QA list", "what's left to QA",
-  "start manual QA", "before I ship I need to QA", or when a project needs hands-on
-  verification (visual rendering, multi-step flows, race conditions, integrations,
-  accessibility, performance feel) before release.
+  Manual QA tracking — things tests can't verify. Use when asked
+  to "create a QA list", "set up QA for this project", "what
+  should I QA", "track manual QA", "audit the QA list", or
+  "start manual QA".
 license: MIT
 argument-hint: "[generate|update|audit|migrate|resume]"
 metadata:
   author: Antonin Januska
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Track QA
