@@ -1,17 +1,14 @@
 ---
 name: generate-skill
 description: |
-  Use when asked to "create a skill", "generate a SKILL.md", "make me a skill",
-  "build a custom skill", "build a new skill", "we're creating a new skill",
-  "creating a new skill", "turn this workflow into a skill",
-  "capture this as a reusable pattern", or "extract this into a skill".
-  Activates when the user wants to extend Claude Code capabilities with a new skill or
-  codify an existing workflow as reusable instructions.
+  Interactive skill builder for Claude Code. Use when asked to
+  "create a skill", "generate a SKILL.md", "build a custom skill",
+  "turn this workflow into a skill", or "capture this as a reusable pattern".
 license: MIT
 argument-hint: "[skill-topic]"
 metadata:
   author: Antonin Januska
-  version: "1.5.0"
+  version: "1.6.0"
 ---
 
 # Generate Skill - Interactive Skill Builder
@@ -136,9 +133,9 @@ For full pattern templates with complete structure skeletons, see **[Pattern Tem
 ---
 name: skill-name-kebab-case
 description: |
-  Use when [trigger phrase 1], when asked to "[user phrase]",
-  or when [situation]. Include multiple trigger variations for
-  better activation. Be specific about WHEN to activate.
+  One-line summary of what it does. Use when [trigger 1],
+  when asked to "[user phrase]", or when [situation]. Keep
+  under 230 characters — front-load distinctive triggers.
 license: MIT
 argument-hint: "<optional-args>"
 metadata:
@@ -158,11 +155,20 @@ metadata:
 - `argument-hint` - Top-level hint shown for skill arguments (e.g., `<branch-name>`)
 
 **Description field best practices:**
-- Include 3-5 specific trigger phrases
+- **Keep description ≤230 characters** (hard ceiling: Claude Code 2.1.86 truncates `/skills` listing at 250 chars; Anthropic spec hard limit is 1024). Triggers past 250 are invisible to auto-invocation.
+- Include 3-5 specific trigger phrases — **front-loaded** so they fit before truncation
 - Use "when" clauses for situations
 - Include user language ("when asked to 'do X'")
-- Be concrete, not vague
-- Avoid: "A skill for..." (too vague) or single generic descriptions
+- Be concrete, not vague — but compact
+- Write in **third person** ("Generates X" not "I generate X" or "You can use this to…")
+- Move long "When to Use" prose into the `## When to Use` section in the body — the body has no length budget; the description does
+- Avoid: "A skill for..." (too vague), single generic descriptions, or padding triggers past the 230-char budget
+
+**Length self-check:**
+```bash
+# Parse frontmatter properly so body code blocks don't pollute the count:
+python3 -c "import yaml,sys; print(len(yaml.safe_load(open(sys.argv[1]).read().split('---',2)[1])['description'].strip()))" SKILL.md
+```
 
 **Hooks field (advanced):**
 Use hooks to automate actions at specific points:
@@ -210,6 +216,7 @@ Include source links: inspiration, official docs, and community resources.
 
 1. **Run quality checklist:**
    - [ ] Description field has 3+ trigger phrases
+   - [ ] Description is ≤230 characters (count it — triggers past 250 are invisible in `/skills`)
    - [ ] Overview explains core principle clearly
    - [ ] Examples include Good/Bad comparisons
    - [ ] Troubleshooting section addresses common issues
