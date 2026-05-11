@@ -1,14 +1,14 @@
 ---
 name: ideal-react-component
 description: |
-  Use when creating React components, structuring component files, organizing component code,
-  debugging React hooks issues, or when asked to "create a React component", "structure this component",
-  "review component structure", "refactor this component", "fix infinite loop", or "useEffect not working".
-  Applies to both TypeScript and JavaScript React components. Includes hooks antipatterns.
+  React component structure and hooks antipatterns. Use when asked
+  to "create a React component", "structure this component",
+  "refactor this component", "fix infinite loop", or "useEffect
+  not working".
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.5.0"
+  version: "1.6.0"
 ---
 
 # Ideal React Component Structure
