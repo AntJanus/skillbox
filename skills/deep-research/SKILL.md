@@ -1,21 +1,15 @@
 ---
 name: deep-research
 description: |
-  Conduct multi-source web research on a topic and synthesize a comprehensive,
-  well-sourced summary directly in the conversation. Use when asked to
-  "research X", "do some research on Y", "I'd like you to do some research on Z",
-  "deep dive on Q", "deep research on R", "look into S", "investigate this topic",
-  "find out about T", "what's the current state of X", "what's new with Y",
-  "is X still relevant", "give me a thorough overview of Z",
-  "compare X and Y", "pros and cons of X", "should I use X or Y",
-  "before I build X", or "survey the landscape of Y". Use when the user needs
-  current, well-cited information before making a decision or starting a project.
-  No files are created unless explicitly requested.
+  Multi-source web research with cited synthesis in chat. Use when
+  asked to "research X", "deep research on Y", "deep dive on Z",
+  "investigate this topic", "compare X and Y", "pros and cons of X",
+  or "survey the landscape of Y".
 license: MIT
 argument-hint: "<topic>"
 metadata:
   author: Antonin Januska
-  version: "2.0.0"
+  version: "2.1.0"
 ---
 
 # Deep Research
