@@ -1,14 +1,10 @@
 ---
 name: ideal-react-component
-description: |
-  React component structure and hooks antipatterns. Use when asked
-  to "create a React component", "structure this component",
-  "refactor this component", "fix infinite loop", or "useEffect
-  not working".
+description: React component structure and hooks antipatterns. Use when asked to "create a React component", "structure this component", "refactor this component", "fix infinite loop", or "useEffect not working".
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.6.0"
+  version: "1.6.1"
 ---
 
 # Ideal React Component Structure
@@ -127,7 +123,8 @@ import { useQuery } from 'react-query';
 
 **styled-components / emotion:** Prefix with `Styled` for instant recognition:
 
-<Good>
+✅ **Good:**
+
 ```tsx
 const StyledCard = styled.div`
   border: 1px solid #ccc;
@@ -147,9 +144,9 @@ export const Card = ({ title, children }) => (
   </StyledCard>
 );
 ```
-</Good>
 
-<Bad>
+❌ **Bad:**
+
 ```tsx
 // ❌ Bad: Can't tell if CardWrapper is styled or contains logic
 const CardWrapper = styled.div`
@@ -160,7 +157,6 @@ const Title = styled.h2`
   font-size: 1.5rem;
 `;
 ```
-</Bad>
 
 **When styled components grow large:**
 - Move to co-located `ComponentName.styled.ts` file
@@ -196,7 +192,8 @@ const Card = ({ title, children }: CardProps) => (
 
 **Declare types immediately above the component for visibility:**
 
-<Good>
+✅ **Good:**
+
 ```tsx
 type ButtonProps = {
   variant?: 'primary' | 'secondary';
@@ -214,9 +211,9 @@ export const Button = ({
   // Component logic
 };
 ```
-</Good>
 
-<Bad>
+❌ **Bad:**
+
 ```tsx
 // ❌ Bad: Inline types hide the API
 export const Button = ({ variant, size, onClick, children }: {
@@ -224,7 +221,6 @@ export const Button = ({ variant, size, onClick, children }: {
   onClick: () => void; children: React.ReactNode;
 }) => { /* ... */ };
 ```
-</Bad>
 
 **Naming:** Props: `ComponentNameProps`. Return types: `JSX.Element` (or custom: `ComponentNameReturn`).
 
@@ -236,22 +232,22 @@ export const Button = ({ variant, size, onClick, children }: {
 
 **Use named exports with const arrow functions:**
 
-<Good>
+✅ **Good:**
+
 ```tsx
 export const UserProfile = ({ userId }: UserProfileProps): JSX.Element => {
   // Component logic
 };
 ```
-</Good>
 
-<Bad>
+❌ **Bad:**
+
 ```tsx
 // ❌ Bad: Default export makes refactoring harder
 export default function UserProfile({ userId }: UserProfileProps): JSX.Element {
   // Component logic
 }
 ```
-</Bad>
 
 **Why const + arrow functions:**
 - Easy to wrap with `useCallback` later if needed
@@ -298,7 +294,8 @@ export const UserProfile = ({ userId }: UserProfileProps): JSX.Element => {
 
 **Exit early for loading, error, and empty states:**
 
-<Good>
+✅ **Good:**
+
 ```tsx
 // Exit early - each conditional gets own return
 if (isLoading) return <LoadingSpinner />;
@@ -308,9 +305,9 @@ if (!data) return <EmptyState message="User not found" />;
 // Success state continues below
 return <div>{/* Main component JSX */}</div>;
 ```
-</Good>
 
-<Bad>
+❌ **Bad:**
+
 ```tsx
 // ❌ Bad: Nested ternaries are hard to read
 return (
@@ -321,7 +318,6 @@ return (
   </div>
 );
 ```
-</Bad>
 
 **Benefits of early returns:**
 - Reduces nesting depth

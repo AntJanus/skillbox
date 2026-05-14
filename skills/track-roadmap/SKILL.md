@@ -1,14 +1,11 @@
 ---
 name: track-roadmap
-description: |
-  Plan, audit, and resume project roadmaps. Use when asked to
-  "create a roadmap", "generate a roadmap", "what should we build
-  next", "brainstorm features", or "audit the roadmap".
+description: Plan, audit, and resume project roadmaps. Use when asked to "create a roadmap", "generate a roadmap", "what should we build next", "brainstorm features", or "audit the roadmap".
 license: MIT
 argument-hint: "[generate|update|audit|brainstorm|resume]"
 metadata:
   author: Antonin Januska
-  version: "2.4.0"
+  version: "2.4.1"
 ---
 
 # Track Roadmap
@@ -315,7 +312,8 @@ Each mode has a Good/Bad comparison example. For the full set of detailed exampl
 
 ### Quick Example: Generating a Roadmap
 
-<Good>
+✅ **Good:**
+
 ```markdown
 ---
 schema: cc-dash/roadmap@1
@@ -343,9 +341,9 @@ last_updated: 2026-03-16T10:00:00-07:00
 ```
 
 **Why this is good:** Includes frontmatter with schema version, every item has a unique ID and status, categories have slug comments, completed items have strikethrough and date, human-readable AND machine-parseable.
-</Good>
 
-<Bad>
+❌ **Bad:**
+
 ```markdown
 - tasks
 - lists
@@ -354,7 +352,6 @@ last_updated: 2026-03-16T10:00:00-07:00
 ```
 
 **Why this is bad:** No descriptions, no groupings, mixes features with tasks, no project purpose.
-</Bad>
 
 See **[Detailed Examples](./reference/EXAMPLES.md)** for audit, brainstorm, update, and resume mode examples with Good/Bad comparisons.
 

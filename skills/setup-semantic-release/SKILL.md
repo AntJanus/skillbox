@@ -1,14 +1,10 @@
 ---
 name: setup-semantic-release
-description: |
-  Set up semantic-release with conventional commits. Use when
-  asked to "set up semantic release", "add conventional commits",
-  "configure automated versioning", "set up commitlint", "add
-  husky hooks", or "generate a changelog".
+description: Set up semantic-release with conventional commits. Use when asked to "set up semantic release", "add conventional commits", "configure automated versioning", "set up commitlint", "add husky hooks", or "generate a changelog".
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.1.0"
+  version: "1.1.1"
 ---
 
 # Setup Semantic Release & Conventional Commits
@@ -397,7 +393,8 @@ BREAKING CHANGE: removed `page` parameter in favor of `offset`
 
 ## Examples
 
-<Good>
+✅ **Good:**
+
 Well-structured commit history:
 
 ```
@@ -409,9 +406,9 @@ chore(release): 1.0.0 [skip ci]
 ```
 
 Each commit has a clear type, optional scope, lowercase subject. Semantic-release can analyze this and produce a clean changelog grouped by type.
-</Good>
 
-<Bad>
+❌ **Bad:**
+
 Unstructured commit history:
 
 ```
@@ -423,7 +420,6 @@ updated tests and also fixed a bug and refactored
 ```
 
 No types, no scopes, mixed concerns in single commits, uppercase, vague subjects. Commitlint would reject all of these. Semantic-release cannot derive meaningful changelogs.
-</Bad>
 
 ## Integration
 

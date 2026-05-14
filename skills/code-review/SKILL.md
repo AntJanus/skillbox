@@ -1,16 +1,12 @@
 ---
 name: code-review
-description: |
-  Multi-agent code review over local changes. Use when asked to
-  "review my code", "review these changes", "do a code review",
-  "check my changes before I commit", or "give me a thorough review".
-  Writes REVIEW.md.
+description: Multi-agent code review over local changes. Use when asked to "review my code", "review these changes", "do a code review", "check my changes before I commit", or "give me a thorough review". Writes REVIEW.md.
 license: MIT
 argument-hint: "[path | --staged | --branch <base>]"
 allowed-tools: Read, Write, Glob, Grep, Bash, Task
 metadata:
   author: Antonin Januska
-  version: "1.4.0"
+  version: "1.4.1"
 ---
 
 # Code Review - Multi-Agent Local Review
@@ -336,7 +332,8 @@ REVIEW.md written — 0 Critical, 0 Major, 0 Minor, 0 Nit, 0 Pre-existing. Clean
 
 ### Example 1: A good dispatch
 
-<Good>
+✅ **Good:**
+
 ```
 User: /code-review
 
@@ -350,11 +347,11 @@ Scope: 3 files
 [Writes REVIEW.md at repo root]
 [Prints one-liner: "REVIEW.md written — 2 Critical, 1 Major, 4 Minor, 3 Nit"]
 ```
-</Good>
 
 All five agents fire in one message, scope line shown before dispatch, full report lands in REVIEW.md, chat stays terse with a one-line summary.
 
-<Bad>
+❌ **Bad:**
+
 ```
 User: /code-review
 
@@ -365,50 +362,49 @@ User: /code-review
 ...
 [Dumps entire report into the chat instead of REVIEW.md]
 ```
-</Bad>
 
 Two problems: sequential dispatch wastes time, and dumping the report into the chat bypasses the REVIEW.md artifact. The five agents are independent — send them in a single message. The report belongs in REVIEW.md.
 
 ### Example 2: A good agent finding
 
-<Good>
+✅ **Good:**
+
 ```
 [Major] src/lib/fetch-user:42
 Issue: new error path (network timeout) has no test
 Risk: timeout → silent retry loop exit; production would lose the request
 Fix: add a test case named "retries once on timeout" in the corresponding test file, simulate a timeout at the network layer, and assert the retry counter
 ```
-</Good>
 
 Specific file:line, concrete risk, actionable fix with a test name.
 
-<Bad>
+❌ **Bad:**
+
 ```
 Could use more tests. Consider adding coverage for error cases.
 ```
-</Bad>
 
 No file, no line, no specific risk, no actionable fix. Agents that produce output like this should be re-prompted with the output format.
 
 ### Example 3: Staying in lane
 
-<Good>
+✅ **Good:**
+
 ```
 [basics]        internal/auth/token:12  Unused import
 [clarity]       internal/auth/token:45  Function is 60 lines and hard to follow
 [arch]          internal/auth/token:8   Error-handling style doesn't match sibling modules — peers wrap errors with the shared error-chaining helper; this change returns raw errors
 [repo-hygiene]  internal/auth/token:22  New env var AUTH_TOKEN_TTL referenced but not added to .env.example or documented in README
 ```
-</Good>
 
 Four agents each found something distinct in the same file. No overlap, no "also this".
 
-<Bad>
+❌ **Bad:**
+
 ```
 [basics] internal/auth/token:12 Unused import and the function name is also unclear
 [clarity] internal/auth/token:45 The function is too long and has an unused import at line 12
 ```
-</Bad>
 
 Basics bleeding into clarity's lane and vice versa. Duplicates the finding and dilutes attribution.
 

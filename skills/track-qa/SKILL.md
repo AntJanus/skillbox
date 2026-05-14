@@ -1,15 +1,11 @@
 ---
 name: track-qa
-description: |
-  Manual QA tracking — things tests can't verify. Use when asked
-  to "create a QA list", "set up QA for this project", "what
-  should I QA", "track manual QA", "audit the QA list", or
-  "start manual QA".
+description: Manual QA tracking — things tests can't verify. Use when asked to "create a QA list", "set up QA for this project", "what should I QA", "track manual QA", "audit the QA list", or "start manual QA".
 license: MIT
 argument-hint: "[generate|update|audit|migrate|resume]"
 metadata:
   author: Antonin Januska
-  version: "1.1.0"
+  version: "1.1.1"
 ---
 
 # Track QA
@@ -262,21 +258,21 @@ A short Good/Bad example for a QA item. The full set of detailed examples lives 
 
 ### Quick Example: A Single QA Item
 
-<Good>
+✅ **Good:**
+
 ```markdown
 - <!-- id:q_a1b2c status:pending --> Save a session, reload the page, confirm gold/inventory/equipped items all restore.
 ```
 
 **Why this is good:** One observable behavior, runnable in under a minute, specific to the project's domain (game state persistence), verifiable as pass/fail without ambiguity.
-</Good>
 
-<Bad>
+❌ **Bad:**
+
 ```markdown
 - <!-- id:q_a1b2c status:pending --> Test save/load.
 ```
 
 **Why this is bad:** Vague — what does "test save/load" mean? Test what? In what state? With what expected outcome? Two QAers will check different things.
-</Bad>
 
 See **[Detailed Examples](./reference/EXAMPLES.md)** for full mode walk-throughs.
 

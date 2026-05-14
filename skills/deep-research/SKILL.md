@@ -1,15 +1,11 @@
 ---
 name: deep-research
-description: |
-  Multi-source web research with cited synthesis in chat. Use when
-  asked to "research X", "deep research on Y", "deep dive on Z",
-  "investigate this topic", "compare X and Y", "pros and cons of X",
-  or "survey the landscape of Y".
+description: Multi-source web research with cited synthesis in chat. Use when asked to "research X", "deep research on Y", "deep dive on Z", "investigate this topic", "compare X and Y", "pros and cons of X", or "survey the landscape of Y".
 license: MIT
 argument-hint: "<topic>"
 metadata:
   author: Antonin Januska
-  version: "2.1.0"
+  version: "2.1.1"
 ---
 
 # Deep Research
@@ -358,7 +354,8 @@ Defenses for the well-documented failure modes of LLM web research:
 
 ### Example 1: Technical Topic (default mode)
 
-<Good>
+✅ **Good:**
+
 ```
 user: research htmx for me — thinking about using it for a side project
 
@@ -400,9 +397,9 @@ Hypermedia-driven library extending HTML with AJAX/SSE/WS attributes...
 ```
 
 **Why this is good:** Local-first checked, plan posted, 5+ angles, sufficiency check posted, Tl;dr leads, confidence labels per section, gaps section honest, sources grouped + annotated + dated, every claim traces to a cited source.
-</Good>
 
-<Bad>
+❌ **Bad:**
+
 ```
 user: research htmx for me
 
@@ -415,11 +412,11 @@ Sources: htmx.org
 ```
 
 **Why this is bad:** No Phase 0, no plan, single search, no cross-referencing, no Tl;dr, no confidence, vague unsourced claims, one source.
-</Bad>
 
 ### Example 2: Comparison Mode
 
-<Good>
+✅ **Good:**
+
 ```
 user: should I use Postgres or SQLite for a small SaaS?
 
@@ -455,9 +452,9 @@ Litestream and LiteFS reset the conversation in 2024-2026...
 ```
 
 **Why this is good:** Frames around the user's actual context, mandatory matrix at the top, covers recent developments that change the answer, confidence labels, addresses migration cost (the real decision risk).
-</Good>
 
-<Bad>
+❌ **Bad:**
+
 ```
 user: should I use Postgres or SQLite
 
@@ -468,7 +465,6 @@ Sources: Wikipedia
 ```
 
 **Why this is bad:** No matrix in comparison mode, ignores user's context, oversimplified, one weak source.
-</Bad>
 
 ---
 
