@@ -1,15 +1,11 @@
 ---
 name: record-tui
-description: |
-  Record terminal demos and TUI screencasts with VHS. Use when
-  asked to "record a demo", "create a GIF of my CLI", "write a
-  VHS tape", "make a terminal recording", or "add a demo GIF to
-  the README".
+description: Records terminal demos and TUI screencasts with VHS. Use when asked to "record a demo", "create a GIF of my CLI", "write a VHS tape", "make a terminal recording", or "add a demo GIF to the README".
 license: MIT
 argument-hint: "<app-command> [output-format]"
 metadata:
   author: Antonin Januska
-  version: "1.4.0"
+  version: "1.4.2"
 ---
 
 # Record TUI - Terminal Demo Recording with VHS
@@ -207,7 +203,7 @@ See **[CI Integration Guide](./reference/CI-INTEGRATION.md)** for the GitHub Act
 
 ### Good: Well-Structured Tape File
 
-<Good>
+✅ **Good:**
 
 ```tape
 # Clear output declaration
@@ -252,11 +248,9 @@ Sleep 2s
 Sleep 3s
 ```
 
-</Good>
-
 ### Bad: Common Mistakes
 
-<Bad>
+❌ **Bad:**
 
 ```tape
 # Missing Output declaration — VHS won't know where to save
@@ -278,11 +272,9 @@ Enter
 # No Require — silently fails if app missing
 ```
 
-</Bad>
-
 ### Bad: TUI Recording Anti-Patterns
 
-<Bad>
+❌ **Bad:**
 
 ```tape
 Output demo.gif
@@ -302,8 +294,6 @@ Type "feat: add feature"
 Enter
 # No pauses between actions — looks like a blur
 ```
-
-</Bad>
 
 For a complete well-structured TUI example (lazygit, k9s), see **[Templates](./reference/TEMPLATES.md)**.
 

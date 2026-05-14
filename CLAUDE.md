@@ -41,11 +41,11 @@ Each skill MUST follow this structure:
 ```
 skill-name/
 ├── SKILL.md              # Required: Core skill documentation
-├── reference/            # Optional: Extended docs (if SKILL.md > 500 lines)
+├── references/           # Optional: Extended docs loaded on demand (plural — canonical per Anthropic spec)
 │   ├── STANDARDS.md
 │   └── EXAMPLES.md
 ├── scripts/              # Optional: Automation scripts
-└── lib/                  # Optional: Helper libraries
+└── assets/               # Optional: Templates / resources used in output
 ```
 
 ### SKILL.md Format
@@ -93,11 +93,11 @@ tags: [relevant, tags]
 **DO use these patterns:**
 
 - Phase-based workflows with verification checkboxes
-- "Iron Laws" for mandatory requirements
-- "Red Flags" sections for common mistakes
-- Good/Bad code examples in `<Good>` and `<Bad>` tags
-- Progressive disclosure (SKILL.md < 500 lines, extended docs in reference/)
-- Trigger-rich descriptions with multiple activation phrases
+- "Quality Signals" sections listing what good looks like
+- "Anti-Patterns" sections with paired ✅ alternative for every ❌ item (negation handling in LLMs is empirically weak — pair `do not X` with `do Y instead`)
+- ✅ / ❌ markdown emoji for example comparisons (community convention per Anthropic skill-creator + docx)
+- Progressive disclosure (SKILL.md < 300 lines preferred, hard cap 500; extended docs in `references/` — plural is canonical)
+- Trigger-rich descriptions in directive third-person form ("Use this skill whenever the user wants to…")
 
 ### Forbidden Patterns
 
@@ -105,10 +105,14 @@ tags: [relevant, tags]
 
 - Vague descriptions like "A skill for testing" or "Helps with React"
 - Single-sentence descriptions without specific triggers
-- Descriptions over 250 characters (truncated in `/skills` listing — triggers past 250 are invisible)
-- Skills over 500 lines without progressive disclosure
-- Examples without Good/Bad comparisons
-- Missing troubleshooting sections
+- Multiline `description: |` YAML block scalars — they silently break skill discovery (anthropics/skills #9817). Always single-line.
+- First-person POV ("I'll help you…") — empirically degrades activation reliability
+- Descriptions over 1024 chars (Anthropic spec hard cap; soft target ≤230 chars for listing-budget safety past ~15-25 installed skills)
+- Skills over 500 lines without progressive disclosure (aim under 300)
+- Examples without ✅ / ❌ comparisons
+- `<Good>` / `<Bad>` XML tag wrappers — non-canonical (zero of 8 surveyed top community skills use them); recommend ✅ / ❌ instead
+- ALL-CAPS "IRON LAW" / "NEVER" / "ALWAYS" framing without explained reasoning (Anthropic skill-creator: yellow flag)
+- Top-level `version`, `author`, `tags`, `category`, `hooks` in frontmatter — produce "unexpected key" errors (anthropics/skills #37). They live under `metadata` (except `argument-hint`, which is top-level).
 - Methodology skills without verification checklists
 
 ## Standards and Expectations
@@ -117,19 +121,22 @@ tags: [relevant, tags]
 
 - **DO** use the `generate-skill` skill when creating new skills
 - **DO** include 3-5 specific trigger phrases in the description field
-- **DO** keep the `description` field at **≤230 characters** (Claude Code 2.1.86 truncates the `/skills` listing at 250; 1024 is the Anthropic spec hard limit). Anything past 250 is invisible to auto-invocation — front-load triggers, move long context into the `## When to Use` body
-- **DO** provide Good/Bad code examples for clarity
-- **DO** include troubleshooting sections addressing real issues
-- **DO** keep SKILL.md under 500 lines (use reference/ for extended content)
+- **DO** target the `description` field at **≤230 characters** as a soft cap for listing-budget safety past ~15-25 installed skills. No penalty up to 500. Spec hard cap is 1024 (per agentskills.io). The historical 250-char display cap was a Claude Code v2.1.86 regression, removed in v2.1.105+. Always front-load the distinctive trigger noun in the first ~50 chars.
+- **DO** use single-line `description:` strings — never `description: |` block scalars (silently breaks discovery per anthropics/skills #9817)
+- **DO** write descriptions in third person ("Use this skill whenever the user wants to…", not "I help you…"). First-person POV empirically degrades activation.
+- **DO** use directive register: "Use this skill whenever the user wants to…" with a "Do NOT use this skill for…" negative scope clause for collision-prone domains
+- **DO** provide ✅ / ❌ example comparisons (community convention per Anthropic skill-creator + docx)
+- **DO** include a `## Gotchas` section — Anthropic engineers cite it as the highest-signal section in a skill body
+- **DO** keep SKILL.md under 300 lines (aim) / 500 (hard cap). Use `references/` (plural) for extended content. ETH Zurich arXiv 2602.11988 shows verbose context files reduce task success ~3% and inflate step count >20%.
 - **DO** add verification checklists for methodology enforcement skills
 - **DO** use clear, imperative language (short sentences, bullet points)
-- **DO** include "When to Use" and "When NOT to Use" sections
+- **DO** fold "When to Use" content into the description, not a body section (Anthropic skill-creator guidance: "Include all when-to-use information in the description, not the body — the body only loads after triggering.")
 - **DO** document integration points with other skills
 
 ### DO NOT: Anti-Patterns
 
 - **DO NOT** create vague or generic skills without specific use cases
-- **DO NOT** skip examples - always show Good/Bad comparisons
+- **DO NOT** skip examples - always show ✅ / ❌ comparisons (✅ first; if room, also last — recency bias)
 - **DO NOT** write skills without troubleshooting sections
 - **DO NOT** create monolithic skills over 1000 lines
 - **DO NOT** use abstract language - be concrete and specific
@@ -142,7 +149,7 @@ tags: [relevant, tags]
 **DO:**
 - Read existing SKILL.md files before modifying them
 - Preserve the YAML frontmatter exactly
-- Keep examples in `<Good>` and `<Bad>` tags for clarity
+- Keep examples in ✅ / ❌ format with desired pattern shown first
 - Update version numbers when making changes
 
 **DO NOT:**
@@ -157,7 +164,7 @@ tags: [relevant, tags]
 ```markdown
 ## Phase 1: Setup
 
-**Before proceeding, you MUST:**
+**Before proceeding:**
 - [ ] Requirement 1
 - [ ] Requirement 2
 
@@ -167,8 +174,9 @@ tags: [relevant, tags]
 command-here
 ```
 
-**Red Flags:**
-- "I'll skip this step just once..." - STOP
+**Anti-Patterns:**
+- ❌ Skipping verification "just this once" — defeats the purpose of phase gates
+  ✅ Run the verification block; if it fails, return to setup
 ```
 
 **DO NOT use this style:**
@@ -253,15 +261,19 @@ Includes:
 Before marking skill work complete:
 
 - [ ] SKILL.md has valid YAML frontmatter
-- [ ] Description includes 3-5 trigger phrases
-- [ ] "When to Use" section is specific
-- [ ] Examples show Good/Bad comparisons
-- [ ] Troubleshooting section exists
-- [ ] Integration points documented
-- [ ] SKILL.md is under 500 lines OR uses progressive disclosure
+- [ ] Description is single-line (not `description: |` block scalar)
+- [ ] Description in third-person directive form ("Use this skill whenever the user wants to…")
+- [ ] Description includes 3-5 trigger phrases front-loaded in first ~50 chars
+- [ ] Description ≤230 chars (soft target) / ≤500 chars (no penalty) / ≤1024 chars (spec hard cap)
+- [ ] Negative scoping ("Do NOT use this skill for X — see Y") for collision-prone domains
+- [ ] Examples show ✅ / ❌ comparisons (✅ first)
+- [ ] Gotchas section present (highest-signal section per Anthropic engineer)
+- [ ] Integration points documented (when concrete; drop if filler)
+- [ ] SKILL.md aim under 300 lines, hard cap 500. Use `references/` (plural) for overflow.
 - [ ] Verification checklist included (if methodology skill)
 - [ ] Markdown formatting is correct
 - [ ] Code blocks specify language
+- [ ] No top-level `version`, `author`, `tags`, `category`, `hooks` (use `metadata.*` instead)
 
 ### Testing Skills
 
@@ -322,14 +334,15 @@ user: Create a skill for running database migrations
 ### Task: Convert long skill to use progressive disclosure
 
 ```markdown
-1. Keep SKILL.md under 500 lines (essential content only)
-2. Create reference/ directory
-3. Move detailed rules to reference/STANDARDS.md
-4. Move extensive examples to reference/EXAMPLES.md
+1. Aim SKILL.md under 300 lines (essential content only); hard cap 500
+2. Create `references/` directory (plural — canonical per Anthropic spec)
+3. Move detailed rules to `references/STANDARDS.md`
+4. Move extensive examples to `references/EXAMPLES.md`
 5. Add "Deep Reference" section with links:
-   - **[📋 Complete Standards](./reference/STANDARDS.md)**
-   - **[⚡ Code Examples](./reference/EXAMPLES.md)**
-6. Note: "Only load these when specifically needed to save context"
+   - **[📋 Complete Standards](./references/STANDARDS.md)**
+   - **[⚡ Code Examples](./references/EXAMPLES.md)**
+6. Keep extracted files one level deep — Claude head -100s deeply nested files and misses content
+7. Note: "Only load these when specifically needed to save context"
 ```
 
 ### Task: Create a SkillBox release
@@ -357,24 +370,38 @@ For detailed steps, see reference/VERSION-CONTROL.md
 For versioning rules, see reference/VERSION-CONTROL.md
 ```
 
-## Red Flags - STOP
+## Anti-Patterns
 
-If you catch yourself doing any of these:
+If you catch yourself doing any of these, reconsider — each has a paired ✅ alternative:
 
-- **Creating skill without reading existing skills first** - Learn patterns first!
-- **Writing vague description** - Add specific triggers
-- **Skipping examples section** - Always include Good/Bad comparisons
-- **No troubleshooting section** - Users will encounter issues
-- **Changing skill names** - Breaks existing references
-- **Over 500 lines without progressive disclosure** - Split content
-- **No verification checklist in methodology skills** - Required for enforcement
-- **Testing by reading code instead of trigger phrases** - Test activation properly
-- **Creating git tag without updating CHANGELOG.md** - Document first!
-- **Non-conventional commit messages** - Follow the format
-- **Forgetting to increment skill version** - Update metadata.version
-- **Creating tag for individual skill update** - Tags are for SkillBox releases only
-
-**ALL of these mean: STOP. Read this CLAUDE.md again.**
+- ❌ Creating skill without reading existing skills first
+  ✅ Read 2-3 existing SKILL.md files to learn the house patterns first
+- ❌ Vague description ("A skill for testing")
+  ✅ Directive third-person form with 3-5 concrete user-language triggers and a `Do NOT use for…` scope clause
+- ❌ Multiline `description: |` block scalar
+  ✅ Single-line `description:` string (multiline silently breaks discovery, anthropics/skills #9817)
+- ❌ First-person POV in description ("I help you…")
+  ✅ Third-person ("Use this skill whenever the user wants to…")
+- ❌ Skipping examples section
+  ✅ At least one ✅ / ❌ comparison, desired pattern shown first
+- ❌ Changing skill names mid-release
+  ✅ Names are stable references — only rename in a documented major version
+- ❌ Over 500 lines without progressive disclosure
+  ✅ Move overflow to `references/` (plural), one level deep
+- ❌ No verification checklist in methodology skills
+  ✅ Methodology requires measurable checkpoints
+- ❌ Testing by reading code instead of trigger phrases
+  ✅ Test activation by saying the actual trigger phrase in a fresh Claude session
+- ❌ Creating git tag without updating CHANGELOG.md
+  ✅ Update CHANGELOG first, commit, then tag
+- ❌ Non-conventional commit messages
+  ✅ `type(scope): description` (e.g., `fix(track-session): collapse multiline description`)
+- ❌ Forgetting to increment `metadata.version`
+  ✅ Every skill edit bumps the version (PATCH for fixes, MINOR for additions, MAJOR for breaks)
+- ❌ Creating tag for individual skill update
+  ✅ Tags mark SkillBox releases that bundle multiple skill bumps
+- ❌ ALL-CAPS "IRON LAW" / "NEVER" / "ALWAYS" framing
+  ✅ "Quality Signals" and "Anti-Patterns" with explained reasoning
 
 ## Troubleshooting
 
@@ -394,10 +421,10 @@ If you catch yourself doing any of these:
 **Cause:** Too much content in SKILL.md
 
 **Solution:**
-1. Keep SKILL.md under 500 lines
-2. Move extensive content to reference/
-3. Use progressive disclosure pattern
-4. Link with clear descriptions
+1. Aim SKILL.md under 300 lines (hard cap 500)
+2. Move extensive content to `references/` (plural)
+3. Use progressive disclosure pattern; keep references one level deep
+4. Link with clear descriptions of when to load each file
 
 ### Problem: Skill activation conflicts
 
@@ -422,16 +449,16 @@ When creating new skills:
 ## Skill Development Philosophy
 
 **Activation over configuration:**
-Skills should activate automatically when relevant context appears.
+Skills should activate automatically when relevant context appears. The description field is the only signal Claude reads pre-trigger — tune it like a prompt.
 
-**Enforcement over suggestion:**
-Critical workflows use "Iron Laws" and mandatory phases.
+**Quality Signals over Red Flags:**
+Frame requirements as "what good looks like" first. LLMs follow positive directives more reliably than negations (negation handling is empirically weak — arXiv 2503.22395). Pair every `Do NOT X` with a paired `Do Y instead`.
 
 **Examples over explanation:**
-Show concrete Good/Bad code comparisons, not just abstract rules.
+Show concrete ✅ / ❌ comparisons, not just abstract rules. ✅ shown first; if room, also last (recency bias).
 
 **Progressive disclosure:**
-Start with essentials in SKILL.md, reveal complexity in reference/ when needed.
+Start with essentials in SKILL.md, reveal complexity in `references/` (plural) when needed. Aim under 300 lines (ETH Zurich arXiv 2602.11988 shows verbose context degrades task success).
 
 **Verification at every phase:**
 Methodology skills include checkboxes and completion criteria.
@@ -450,7 +477,7 @@ Read SKILL.md → Make changes → Increment version → Commit → Update CHANG
 
 ### Validating Skill
 ```
-Check: Frontmatter | Triggers | Examples | Troubleshooting | < 500 lines
+Check: Single-line desc | Triggers in first 50 chars | ✅/❌ examples | Gotchas | < 300 lines preferred
 ```
 
 ### Testing Activation
@@ -480,18 +507,21 @@ This CLAUDE.md follows its own advice:
 - Do/Don't lists clearly marked
 - Concrete examples with code
 - Verification checklists
-- Red Flags section
+- Anti-Patterns section with paired ✅ alternatives
 - Troubleshooting with solutions
 
 Treat every issue working with SkillBox as an opportunity to update this file.
 
 ## Learnings
 
-- **Progressive disclosure via reference/ for 500-line limits** — When a SKILL.md approaches 500 lines, move troubleshooting (highest line count, lowest immediate-need) to `reference/TROUBLESHOOTING.md`, keeping only 3-4 most common issues inline with a progressive disclosure link. This saved ~65 lines for track-session and ~30 lines for track-roadmap. The reference/ dir can also hold EXAMPLES.md and STANDARDS.md. _(captured 2026-03-21)_
+- **Progressive disclosure via `references/` (plural) for 300-500 line limits** — When a SKILL.md approaches 300 lines, move troubleshooting (highest line count, lowest immediate-need) to `references/TROUBLESHOOTING.md`, keeping only 3-4 most common issues inline with a progressive disclosure link. The `references/` dir can also hold EXAMPLES.md and STANDARDS.md. _(captured 2026-03-21; updated 2026-05-14 to plural)_
 - **Release commit ordering matters** — SkillBox releases follow specific ordering: (1) one commit per skill change with `type(skill-name): description`, (2) separate `docs(changelog): prepare vX.Y.Z release` commit, (3) annotated tag `git tag -a vX.Y.Z`, (4) push with `git push && git push origin vX.Y.Z`. Don't bundle skill changes and changelog into one commit. _(captured 2026-03-21)_
+- **Multiline `description: |` is the #1 silent killer** — YAML parses fine, but skill discovery never sees it (anthropics/skills #9817). Always single-line. Found across 9 SkillBox skills in 2026-05-14 audit. _(captured 2026-05-14)_
+- **Directive third-person descriptions activate ~20× more reliably** — Empirical study (Seleznov n=650, p<0.0001): "Use this skill whenever the user wants to…" form hits 94-100% activation vs passive "Use when X" at 37-87%. First-person POV ("I help you…") degrades further. _(captured 2026-05-14)_
+- **`<Good>`/`<Bad>` XML tags are SkillBox-only** — Zero of 8 surveyed top community skills (Anthropic, Vercel, Superpowers) use them. Migrate to ✅ / ❌ markdown emoji. _(captured 2026-05-14)_
 
 ---
 
-**Last Updated:** 2026-05-06
-**Applies To:** Claude Code 2025+
+**Last Updated:** 2026-05-14
+**Applies To:** Claude Code 2.1.105+
 **Source:** https://antjanus.com/ai/claude-code-best-practices

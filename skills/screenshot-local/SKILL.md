@@ -1,15 +1,11 @@
 ---
 name: screenshot-local
-description: |
-  Capture screenshots of local dev servers with shot-scraper. Use
-  when asked to "screenshot my app", "take a screenshot of
-  localhost", "generate screenshots for docs", "batch screenshot
-  my pages", or "set up shot-scraper".
+description: Capture screenshots of local dev servers with shot-scraper. Use when asked to "screenshot my app", "take a screenshot of localhost", "generate screenshots for docs", "batch screenshot my pages", or "set up shot-scraper".
 license: MIT
 argument-hint: "<url-or-file> [--output filename.png]"
 metadata:
   author: Antonin Januska
-  version: "1.2.0"
+  version: "1.2.1"
 ---
 
 # Screenshot Local - Capture Project Screenshots with shot-scraper
@@ -256,7 +252,7 @@ See **[CI Integration Guide](./reference/CI-INTEGRATION.md)** for the GitHub Act
 
 ### Good: Well-Structured Screenshot Config
 
-<Good>
+✅ **Good:**
 
 ```yaml
 # shots.yml — explicit dimensions, proper waits, organized output
@@ -285,11 +281,9 @@ See **[CI Integration Guide](./reference/CI-INTEGRATION.md)** for the GitHub Act
   height: 812
 ```
 
-</Good>
-
 ### Bad: Common Mistakes
 
-<Bad>
+❌ **Bad:**
 
 ```yaml
 # No output specified — shot-scraper auto-names from URL, messy results
@@ -308,11 +302,9 @@ See **[CI Integration Guide](./reference/CI-INTEGRATION.md)** for the GitHub Act
   output: settings.png
 ```
 
-</Bad>
-
 ### Good: Capturing Specific Components
 
-<Good>
+✅ **Good:**
 
 ```bash
 # Hero section with padding for breathing room
@@ -327,11 +319,9 @@ shot-scraper http://localhost:3000/contact \
   -s ".contact-form" -p 10 -o docs/form.png
 ```
 
-</Good>
-
 ### Bad: Component Capture Anti-Patterns
 
-<Bad>
+❌ **Bad:**
 
 ```bash
 # No selector — captures entire page when you only need one section
@@ -343,8 +333,6 @@ shot-scraper http://localhost:3000 -s ".hero" -o hero.png
 # No wait — dynamic component hasn't rendered yet
 shot-scraper http://localhost:3000 -s ".chart" -o chart.png
 ```
-
-</Bad>
 
 ## Quality Signals
 

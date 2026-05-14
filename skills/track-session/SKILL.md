@@ -1,15 +1,11 @@
 ---
 name: track-session
-description: |
-  Resume work, track progress, verify completion. Use when asked
-  to "resume work", "pick up where I left off", "what was I doing",
-  "start a session", "track this work", or "save progress". For
-  multi-session tasks.
+description: Resume work, track progress, verify completion. Use when asked to "resume work", "pick up where I left off", "what was I doing", "start a session", "track this work", or "save progress". For multi-session tasks.
 license: MIT
 argument-hint: "[start|save|resume|verify]"
 metadata:
   author: Antonin Januska
-  version: "4.5.0"
+  version: "4.5.1"
 ---
 # Session Progress
 
@@ -179,7 +175,8 @@ Validates completed tasks against original requirements. Checks that work is act
 
 ### Example: Mode Selection
 
-<Good>
+✅ **Good:**
+
 ```bash
 # Scenario 0: Starting a multi-phase feature with structured planning
 user: "I want to add real-time notifications to the app"
@@ -224,9 +221,9 @@ assistant: "/track-session verify"
 ```
 
 **Why this is good:** Clear separation of concerns — `start` for structured plan-and-execute on new multi-phase work, no-arg for checkpointing during active work, `save` for pausing, `resume` for continuing, `verify` for validation before delivery.
-</Good>
 
-<Bad>
+❌ **Bad:**
+
 ```bash
 # Always using save even when you want to continue
 user: "Let's build authentication"
@@ -244,11 +241,11 @@ assistant: "All tasks are checked off, we're done!"
 ```
 
 **Why this is bad:** Using save when you want to continue wastes time. Using resume without prior save fails. Skipping verify means potentially incomplete or incorrect work. Use no-arg mode to save+continue, and always verify before declaring completion.
-</Bad>
 
 ### Example 1: Complex Feature Implementation
 
-<Good>
+✅ **Good:**
+
 ```markdown
 ---
 schema: cc-dash/session@1
@@ -294,9 +291,9 @@ Next: Add Redis client configuration, then implement session middleware
 ```
 
 **Why this is good:** Frontmatter with schema and session metadata, specific tasks with IDs and explicit dependencies, failed attempts linked to tasks, completed work with timestamps and task references, concrete next steps.
-</Good>
 
-<Bad>
+❌ **Bad:**
+
 ```markdown
 # Session Progress
 
@@ -309,11 +306,11 @@ Working on auth. Tried some things that didn't work.
 ```
 
 **Why this is bad:** Too vague, no dependencies tracked, no details on what failed or why, impossible to resume without starting over.
-</Bad>
 
 ### Example 2: Debugging Session
 
-<Good>
+✅ **Good:**
+
 ```markdown
 ---
 schema: cc-dash/session@1
@@ -351,9 +348,9 @@ Next: Add mutex lock around shared resource access in payment processor
 ```
 
 **Why this is good:** Clear progression through debugging phases, failed attempts linked to tasks with IDs, root cause documented, frontmatter tracks session metadata.
-</Good>
 
-<Bad>
+❌ **Bad:**
+
 ```markdown
 # Session Progress
 
@@ -361,11 +358,11 @@ Debugging payment bug. Tried a few things. Need to fix it.
 ```
 
 **Why this is bad:** No systematic approach, no record of what was tried, no hypothesis tracking.
-</Bad>
 
 ### Example 3: Verification Workflow
 
-<Good>
+✅ **Good:**
+
 ```markdown
 ---
 schema: cc-dash/session@1
@@ -401,9 +398,9 @@ status: completed
 ```
 
 **Why this is good:** Verification report uses plain headings (no emojis), shows evidence (test counts, specific issues), separates critical vs. nice-to-have, frontmatter shows session is completed.
-</Good>
 
-<Bad>
+❌ **Bad:**
+
 ```markdown
 ## Plan
 - [x] Phase 1: Authentication
@@ -415,7 +412,6 @@ Everything is done! ✨
 ```
 
 **Why this is bad:** No verification performed, no evidence work meets requirements, potentially incomplete work.
-</Bad>
 
 ## Quality Signals
 

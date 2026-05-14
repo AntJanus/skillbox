@@ -19,11 +19,11 @@ Add these enhancements based on skill complexity:
 - Multiple examples (3-5)
 - Comprehensive troubleshooting
 - Integration documentation
-- Consider reference/ directory for extended docs
+- Consider references/ directory for extended docs
 
 ### For Complex Skills (> 500 lines)
 - SKILL.md (core guide, < 500 lines)
-- reference/ directory with:
+- references/ directory with:
   - STANDARDS.md (detailed rules)
   - EXAMPLES.md (extensive code samples)
   - TROUBLESHOOTING.md (advanced issues)
@@ -37,9 +37,9 @@ Add these enhancements based on skill complexity:
 
 For detailed information, load these files when needed:
 
-- **[Complete Standards](./reference/STANDARDS.md)** - Full rule set
-- **[Code Examples](./reference/EXAMPLES.md)** - 50+ examples
-- **[Advanced Troubleshooting](./reference/TROUBLESHOOTING.md)**
+- **[Complete Standards](./references/STANDARDS.md)** - Full rule set
+- **[Code Examples](./references/EXAMPLES.md)** - 50+ examples
+- **[Advanced Troubleshooting](./references/TROUBLESHOOTING.md)**
 
 *Only load these when specifically needed to save context.*
 ```
@@ -159,11 +159,11 @@ description: [triggers]
 [Main process]
 
 ## Deep Reference
-- [Standards](./reference/STANDARDS.md) - 100+ rules
-- [Examples](./reference/EXAMPLES.md) - 50+ examples
+- [Standards](./references/STANDARDS.md) - 100+ rules
+- [Examples](./references/EXAMPLES.md) - 50+ examples
 ```
 
-**reference/STANDARDS.md:**
+**references/STANDARDS.md:**
 ```markdown
 # Detailed Standards Reference
 
@@ -178,7 +178,7 @@ description: [triggers]
 [... extensive rule documentation ...]
 ```
 
-**reference/EXAMPLES.md:**
+**references/EXAMPLES.md:**
 ```markdown
 # Code Examples
 

@@ -1,455 +1,257 @@
 ---
 name: rate-skill
-description: |
-  Evaluate skill quality against best practices. Use when asked
-  to "rate this skill", "review skill quality", "check skill
-  formatting", "evaluate SKILL.md", or "grade this skill".
+description: Grades a SKILL.md A-F with prioritized, paste-ready fixes. Use whenever the user asks to "rate this skill", "grade this skill", "audit my SKILL.md", or "score this skill". Do NOT use for code review or for new skills (see generate-skill).
 license: MIT
-argument-hint: "<path/to/SKILL.md>"
+argument-hint: <path/to/SKILL.md>
 allowed-tools: Read, Glob, Grep
 metadata:
   author: Antonin Januska
-  version: "2.1.0"
+  version: "3.0.0"
 ---
+
 # Rate Skill
 
-## Overview
+Audits a single `SKILL.md` against current activation-driven authoring practice and returns a letter grade, weighted category scores, prioritized findings with concrete patches, named strengths, and a projected grade after fixes.
 
-Audit SKILL.md files against quality standards from generate-skill best practices. Provides letter grade (A-F) and actionable recommendations.
+The rubric is anchored to (a) the agentskills.io / Claude Code frontmatter spec, (b) Anthropic's `skill-creator` guidance, and (c) Seleznov's activation study (n=650, p<0.0001) showing directive third-person descriptions activate ~20× more reliably than passive prose.
 
-**Core principle:** Measure skill quality objectively to improve activation reliability and context efficiency.
+## Workflow
 
-## When to Use
+1. Resolve the input path. If the user passes a directory, look for `SKILL.md` inside it. If nothing is passed, ask once: "Which SKILL.md should I rate?"
+2. Read the whole file. Parse frontmatter and body separately. Count body lines (exclude frontmatter).
+3. Detect the skill type — **methodology** (phases + checklists), **reference** (schemas + tables), **generator** (produces an artifact), or **auditor** (reviews an artifact). State it in the report.
+4. Score each category 0–100 against the rubric below, weight, sum, map to a letter.
+5. Emit the report in the shape under **Output Format**.
+6. Estimate the post-fix grade assuming the P0 and P1 findings are applied.
 
-**Always use when:**
-- Reviewing skills before publishing
-- Validating skill structure and formatting
-- Checking if skill meets quality standards
-- User asks to "rate", "grade", or "review" a skill
+## Rubric (weights sum to 100)
 
-**Useful for:**
-- Skill authors validating their work
-- Maintainers reviewing PRs with new skills
-- Quality audits of skill repositories
-- Before submitting skills to marketplaces
+| # | Category | Weight |
+|---|---|---|
+| 1 | Description quality | 25 |
+| 2 | Frontmatter validity | 20 |
+| 3 | Length & progressive disclosure | 15 |
+| 4 | Structure fit for type | 15 |
+| 5 | Examples | 10 |
+| 6 | Conciseness / token economy | 10 |
+| 7 | Anti-pattern avoidance | 5 |
 
-**Avoid when:**
-- Evaluating non-skill documentation
-- Reviewing code (not skill definitions)
-- General code quality auditing
+Letter mapping: A 90–100, B 80–89, C 70–79, D 60–69, F <60.
 
-## How It Works
+### 1. Description quality (25)
 
-1. Read specified SKILL.md file
-2. Detect skill type (methodology / technical / auditing / reference)
-3. Evaluate against quality criteria
-4. Validate frontmatter against spec (universal vs Claude Code extensions)
-5. Calculate scores per category
-6. Generate letter grade (A-F)
-7. Output findings with positive framing and concrete fixes
+Full marks require all five:
 
-## Quality Criteria
+- Third person ("Skill X does Y…" or "Use this skill whenever…"). First-person ("I'll help you…") caps the score at 40.
+- Directive register — Anthropic's middle-ground "Use this skill whenever the user wants to…" or a stronger "ALWAYS invoke when…". Passive bare "Use when X" caps at 70.
+- Distinctive trigger token in the first ~50 chars (listing-budget truncation kicks in past ~15–25 installed skills).
+- ≥3 concrete user-language triggers, either quoted phrases or an enumerated verb list.
+- Negative scoping ("Do NOT use this skill for…") when adjacent skills exist. Required only for collision-prone domains.
 
-| Category | Weight | Strong Signals (A-grade) |
-|----------|--------|--------------------------|
-| **Length** | 20% | Under 500 lines, or progressive disclosure with well-structured reference/ |
-| **Conciseness** | 20% | High info density, scannable, short paragraphs, no redundancy, imperative language |
-| **Structure** | 15% | All required sections present and ordered, bonus for "When NOT to Use" and "Quality Signals" |
-| **Triggers** | 15% | 5+ natural-language phrases, "when asked to X" format, multiple contexts covered |
-| **Frontmatter** | 15% | All required fields valid, name matches directory, semver version, spec-compliant placement |
-| **Examples** | 10% | 3+ Good/Bad comparisons, `<Good>` shown first, explanations after each, real scenarios |
-| **Type Compliance** | 5% | Skill type correctly identified, type-specific patterns present |
+Length scoring:
 
-### Length (20%)
+- ≤230 chars: full marks (soft target — listing-budget safe).
+- 231–500 chars: no penalty, but note "above soft target" in the report.
+- 501–1024 chars: −15 (over soft target, eats listing budget at high skill counts).
+- >1024 chars: cap at 50 (spec hard cap violation per agentskills.io).
+- Multiline `description:` (YAML `|` or `>` block scalar): **automatic 0**. Silently breaks discovery (anthropics/skills #9817).
 
-**Strong signals:** Under 500 lines with all essential content. Progressive disclosure used well — SKILL.md stays focused, reference/ holds deep details with clear links.
+Other hard penalties:
 
-**Scores:** A: <500 or progressive disclosure | B: 500-600 | C: 600-800 | D: 800-1000 | F: >1000
+- Vague triggers ("helps with documents", "use for tasks"): cap at 50.
 
-**Watch for:** Monolithic files without reference/ splits, empty reference/ dirs that don't reduce SKILL.md length
+### 2. Frontmatter validity (20)
 
-### Conciseness (20%)
+Accepted top-level fields: `name`, `description`, `license`, `compatibility`, `when_to_use`, `argument-hint`, `arguments`, `disable-model-invocation`, `user-invocable`, `model`, `effort`, `agent`, `hooks`, `paths`, `shell`, `allowed-tools`, `metadata`.
 
-**Strong signals:** Short paragraphs (2-3 sentences), each sentence adds unique information, imperative direct language, bullet points over prose, scannable at a glance.
+Deduct 15 per occurrence:
 
-**Scores:** A: High info density, scannable | B: Mostly concise | C: Some wordiness | D: Verbose | F: Excessive
+- Top-level `version`, `author`, or `tags` (belong inside `metadata`).
+- `category` (not a real field).
+- `argument-hint` nested under `metadata` (must be top-level).
+- `name` with uppercase, consecutive hyphens, or reserved words (`anthropic`, `claude`).
 
-**Watch for:** Paragraphs over 5 sentences, repeated concepts across sections, flowery or hedging language
+### 3. Length & progressive disclosure (15)
 
-### Structure (15%)
+- Body ≤300 lines: full marks.
+- 301–500 lines: −20 per 50 lines over 300.
+- >500 lines without a `references/` directory: cap at 40.
+- Singular `reference/` instead of plural `references/`: −10 (canonical is plural).
+- References nested more than one level deep from `SKILL.md`: −15 (Claude head -100s files and misses content).
 
-**Strong signals:** All required sections present and logically ordered. Includes "When NOT to Use" for clarity. Methodology skills have verification checklists. "Quality Signals" section present where applicable.
+### 4. Structure fit for type (15)
 
-**Required sections:** Frontmatter, Overview, When to Use, Main content, Examples (Good/Bad), Troubleshooting, Integration
+Expected sections by detected type:
 
-**Scores:** A: All required + bonus sections | B: All required, missing 1 optional | C: Missing 2-3 optional | D: Missing required sections | F: Severely lacking
+- **Methodology**: Overview, Workflow/Phases, Quality Signals or Anti-Patterns, Examples, Verification Checklist.
+- **Reference**: Overview, Quick Reference table, Detailed sections, Gotchas.
+- **Generator**: Workflow, Inputs, Output Format, Examples.
+- **Auditor**: Workflow, Rubric, Output Format, Examples.
 
-**Watch for:** Missing "When to Use", examples without Good/Bad comparisons, no troubleshooting section
+Missing a section the detected type needs: −20 each. Penalize an `## Integration` section that contains nothing concrete (rare in surveyed top skills).
 
-### Triggers (15%)
+### 5. Examples (10)
 
-**Strong signals:** 5+ specific phrases in description field, "when asked to X" format, covers multiple user contexts, uses natural language users actually type. Distinctive triggers **front-loaded** so they sit before the 250-char `/skills` truncation point.
+- ≥1 concrete pair (desired vs. anti-pattern): baseline 70.
+- Desired shown FIRST (and ideally last too — recency bias): +15.
+- ✅/❌ emoji or prose `## Anti-Pattern:` headers: +15.
+- Non-canonical `<Good>`/`<Bad>` XML tags: −10 (zero of 8 surveyed top skills use them).
+- All examples abstract / no concrete code: cap at 40.
 
-**Scores:** A: 5+ specific | B: 3-4 good | C: 2 phrases | D: 1 vague | F: None
+### 6. Conciseness (10)
 
-**Watch for:** Generic triggers ("helps with X"), duplicate phrases, missing user-language variations
+Penalize: paragraphs restating general programming knowledge; "why this matters" prose longer than the rule it precedes; verbose intros before the workflow; inconsistent terminology (e.g., swapping "skill" / "command" for the same thing).
 
-### Frontmatter (15%)
+### 7. Anti-pattern avoidance (5)
 
-**Strong signals:** All required fields present and valid. `name` matches directory name. Version follows semver. `argument-hint` at top level (not nested under metadata). Description is trigger-rich AND **≤230 characters** (Claude Code truncates `/skills` listing at 250; anything past is invisible to auto-invocation; Anthropic spec hard limit is 1024).
+Deduct 20 per occurrence:
 
-**Required universal fields (agentskills.io spec):** `name`, `description`, `license`, `metadata` (with `author`, `version`)
-
-**Optional Claude Code extensions:** `argument-hint`, `allowed-tools`, `context`, `agent`, `model`, `effort`, `mode`, `user-invocable`
-
-**Non-functional fields (flag if present):** `tags` (no discovery system consumes it), `hooks` (belongs in `.claude/hooks.json`)
-
-**Scores:** A: All fields valid + spec-compliant + description ≤230 chars | B: Minor placement issues OR description 231-300 chars | C: Missing optional fields OR description 301-500 chars | D: Missing required fields OR description >500 chars | F: Invalid or absent frontmatter OR description >1024 chars (spec violation)
-
-**Watch for:** description >250 chars (silent truncation in `/skills` listing — count with `python3 -c "import yaml,sys; print(len(yaml.safe_load(open(sys.argv[1]).read().split('---',2)[1])['description'].strip()))" SKILL.md`), `argument-hint` nested under `metadata` (Claude Code won't parse it), `tags` field adding no value, missing `name` or `version`
-
-### Examples (10%)
-
-**Strong signals:** 3+ Good/Bad comparisons using `<Good>` and `<Bad>` tags. `<Good>` shown first (LLMs anchor on first example). Each pair has explanation. Real-world scenarios, not toy examples.
-
-**Scores:** A: 3+ with Good/Bad, Good first | B: 2 with comparisons | C: 1 comparison | D: No comparisons | F: None
-
-**Watch for:** `<Bad>` shown before `<Good>`, examples without explanation, abstract/toy scenarios
-
-### Type Compliance (5%)
-
-**Skill types and their required patterns:**
-
-| Type | Identifying signals | Required patterns |
-|------|-------------------|-------------------|
-| **Methodology** | Phases, workflows, process steps | Verification checklist, phase gates |
-| **Technical** | Commands, tools, configuration | Command examples, setup instructions |
-| **Auditing** | Evaluation, scoring, review | Output format, scoring criteria |
-| **Reference** | Lookup, standards, conventions | Organized lookup structure, cross-references |
-
-**Scores:** A: Type clear, all type patterns present | B: Type clear, minor pattern gap | C: Type ambiguous | D: Wrong patterns for type | F: No discernible type
-
-**Watch for:** Methodology skills without verification checklists, auditing skills without defined output format
+- ALL-CAPS "IRON LAW" framing without reasoning (Anthropic `skill-creator` calls this a yellow flag).
+- Mega-skill scope bundling unrelated jobs ("one skill, one job").
+- Extraneous docs in the skill dir (`README.md`, `INSTALLATION.md`, `QUICK_REFERENCE.md`, `CHANGELOG.md`).
+- Windows-style backslash paths.
+- Voodoo constants — magic numbers with no documented rationale.
+- Time-bound notes that will rot (`"if before August 2025…"`) without being scoped to an "old patterns" section.
 
 ## Output Format
 
-```markdown
-# Skill Rating: [Letter Grade]
+```
+# Skill Rating: <skill-name>
 
-## Summary
-- **File:** path/to/SKILL.md
-- **Lines:** XXX lines
-- **Detected Type:** [Methodology / Technical / Auditing / Reference]
-- **Overall Grade:** [A/B/C/D/F] ([Score]/100)
-- **Status:** [Production Ready / Needs Work / Not Ready]
-- **Spec Compliance:** [Universal (portable) / Claude Code-only fields present]
+**Detected type:** <methodology | reference | generator | auditor>
+**Overall grade:** <letter> (<weighted score>/100)
 
-## Category Scores
+## Category scores
 
-| Category | Score | Grade | Status |
-|----------|-------|-------|--------|
-| Length | XX/20 | [A-F] | [Pass/Warning/Fail] |
-| Conciseness | XX/20 | [A-F] | [Pass/Warning/Fail] |
-| Structure | XX/15 | [A-F] | [Pass/Warning/Fail] |
-| Triggers | XX/15 | [A-F] | [Pass/Warning/Fail] |
-| Frontmatter | XX/15 | [A-F] | [Pass/Warning/Fail] |
-| Examples | XX/10 | [A-F] | [Pass/Warning/Fail] |
-| Type Compliance | XX/5 | [A-F] | [Pass/Warning/Fail] |
-
-## Findings by Priority
-
-### Highest Impact Improvements
-1. **[Category: Issue description]**
-   - Impact: [Why this matters]
-   - Fix: [Specific action with code example]
-     ```yaml
-     # concrete example of the fix
-     ```
-
-### Recommended Improvements
-1. **[Issue description]**
-   - Impact: [Why this matters]
-   - Fix: [Specific action to take]
-
-### Nice to Have
-1. [Suggestion]
-   - Benefit: [Why this helps]
+| Category | Score | Weight | Weighted |
+|---|---|---|---|
+| Description quality | nn | 25 | nn.n |
+| Frontmatter validity | nn | 20 | nn.n |
+| Length & disclosure  | nn | 15 | nn.n |
+| Structure            | nn | 15 | nn.n |
+| Examples             | nn | 10 | nn.n |
+| Conciseness          | nn | 10 | nn.n |
+| Anti-pattern avoid.  | nn |  5 | nn.n |
 
 ## Strengths
-- [What this skill does well]
-- [Another strength]
+- <concrete bullet — what the skill does well>
 
-## Priority Action Items
-1. [Priority 1 action]
-2. [Priority 2 action]
-3. [Priority 3 action]
+## Findings (prioritized)
 
-## Estimated Improvements
-- Fix highest impact: +[X] points
-- Address recommended: +[X] points
-- Potential grade: [Current] -> [Target]
+### P0 — <title>
+**Why:** <one-line rationale, cite category>
+**Fix:**
+\`\`\`<lang>
+<concrete replacement text, not a description of one>
+\`\`\`
+
+### P1 — <title>
+...
+
+### P2 — <title>
+...
+
+## Estimated grade after P0+P1: <letter> (<projected score>/100)
+
+<one-line commit-ready summary>
 ```
 
-## Usage
-
-**Basic rating:**
-```bash
-/rate-skill skills/example-skill/SKILL.md
-```
-
-**Rate after changes:**
-```bash
-# Make improvements
-[edit SKILL.md]
-
-# Re-rate
-/rate-skill skills/example-skill/SKILL.md
-```
-
-**Compare before/after:**
-```bash
-# Rate original
-/rate-skill skills/track-session/SKILL.md
-
-# Make improvements
-[condense, remove redundancy]
-
-# Rate again to see improvement
-/rate-skill skills/track-session/SKILL.md
-```
-
-## Grading Scale
-
-| Grade | Score | Meaning |
-|-------|-------|---------|
-| A | 90-100 | Excellent - Production ready |
-| B | 80-89 | Good - Minor improvements recommended |
-| C | 70-79 | Acceptable - Needs work before publishing |
-| D | 60-69 | Poor - Significant issues to address |
-| F | 0-59 | Failing - Major overhaul needed |
-
-**Status mapping:**
-- A-B: Production Ready
-- C: Needs Work
-- D-F: Not Ready
+Every report includes at least one strength (even on F-tier skills — users abandon purely negative reports). Every finding ships a **concrete patch the user can paste**, not "improve the description".
 
 ## Examples
 
-### Example 1: Rating a High-Quality Skill
+### Example 1 — directive description rewrite (the most common P0 fix)
 
-**Input:** `/rate-skill skills/track-session/SKILL.md`
+✅ Anthropic middle-ground form, third person, enumerated triggers, negative scoping:
 
-**Output:**
-```markdown
-# Skill Rating: A
+```yaml
+description: Use this skill whenever the user wants to review a React component for hook misuse, infinite-loop risk, or dependency-array bugs. Triggers include "review this component", "check my hooks", or "audit this React file". Do NOT use this skill for non-React JavaScript or for general code review.
+```
 
-## Summary
-- **File:** skills/track-session/SKILL.md
-- **Lines:** 489 lines
-- **Detected Type:** Methodology
-- **Overall Grade:** A (93/100)
-- **Status:** Production Ready
-- **Spec Compliance:** Claude Code-only fields present (argument-hint, allowed-tools)
+❌ Passive single sentence — caps Category 1 at 70 and bleeds into Conciseness:
 
-## Category Scores
+```yaml
+description: Use when reviewing React components for hook issues.
+```
 
-| Category | Score | Grade | Status |
-|----------|-------|-------|--------|
-| Length | 20/20 | A | Pass |
-| Conciseness | 18/20 | A | Pass |
-| Structure | 15/15 | A | Pass |
-| Triggers | 15/15 | A | Pass |
-| Frontmatter | 14/15 | A | Pass |
-| Examples | 9/10 | A | Pass |
-| Type Compliance | 5/5 | A | Pass |
+### Example 2 — frontmatter cleanup
+
+❌ Top-level fields that belong in `metadata`, multiline description, top-level `hooks` outside the supported slot:
+
+```yaml
+---
+name: My-Skill                # uppercase
+version: "1.0.0"              # top-level — move under metadata
+tags: [react, hooks]          # top-level — move under metadata
+description: |                # multiline silently breaks discovery
+  A skill for working with React.
+  Helps with hooks.
+hooks:
+  PreToolUse: ...
+---
+```
+
+✅ Patch:
+
+```yaml
+---
+name: react-hooks-audit
+description: Use this skill whenever the user wants to review a React component for hook misuse, infinite-loop risk, or dependency-array bugs. Triggers include "review this component", "check my hooks", or "audit this React file". Do NOT use this skill for non-React JavaScript.
+license: MIT
+argument-hint: <path/to/component.tsx>
+metadata:
+  author: <author>
+  version: "1.0.0"
+  tags: [react, hooks]
+---
+```
+
+### Example 3 — desired report opener (high-quality skill)
+
+✅ What a good report looks like in practice:
+
+```
+# Skill Rating: track-session
+
+**Detected type:** methodology
+**Overall grade:** A (92/100)
 
 ## Strengths
-- Excellent progressive disclosure with reference/VERIFICATION.md
-- 10+ diverse trigger phrases in description
-- Strong Good/Bad examples with explanations
-- Verification checklist matches methodology type
-
-## Recommended Improvements
-1. **Frontmatter: `argument-hint` nested under metadata**
-   - Impact: Claude Code won't parse for autocomplete
-   - Fix: Move to top-level frontmatter field
-
-## Priority Action Items
-1. Move argument-hint to top level (optional, minor portability note)
+- Description front-loads "track-session resumes work" — distinctive trigger in first 30 chars.
+- ✅/❌ examples with desired pattern shown first.
+- Body 287 lines with `references/TROUBLESHOOTING.md` for overflow.
 ```
 
-**Note:** High-scoring skills get a short report focused on strengths and optional improvements.
+## Gotchas
 
-### Example 2: Rating a Skill That Needs Work
+- **Multiline `description:` is a silent killer.** A `|` block scalar parses fine but discovery never sees it (anthropics/skills #9817). Always flag as P0 — automatic 0 on Category 1.
+- **The 250-char display cap is gone (Claude Code v2.1.105+).** Listing-budget truncation is not. `skillListingBudgetFraction` defaults to ~1% of context — past ~15–25 installed skills, descriptions get silently dropped. Soft target ≤230; no penalty up to 500.
+- **`tags` does nothing functionally at top level.** No discovery system consumes it. If found at top level, demote to `metadata.tags` rather than deleting — preserves user intent.
+- **First-person POV breaks activation.** "I'll help you…" empirically under-activates even with identical body. Cap Category 1 at 40 on detection.
+- **`<Good>`/`<Bad>` XML tags are a SkillBox-only convention.** Zero of 8 surveyed Anthropic/Vercel/Superpowers skills use them. Recommend ✅/❌ or prose `## Anti-Pattern:` headers.
+- **Singular `reference/` vs plural `references/`.** Anthropic's spec and `skill-creator` both use plural. Singular works but is off-style — −10, not a P0.
+- **ALL-CAPS "IRON LAW" framing has no empirical support.** Anthropic `skill-creator` calls it a yellow flag: "if possible, reframe and explain the reasoning." Recommend "Quality Signals" + "Anti-Patterns".
+- **Negation is poorly handled by LLMs** (arXiv 2503.22395). When you see a bare "DO NOT X" inside the body, recommend pairing with a positive directive — "Do Y instead of X."
+- **Standards are calibrated for activation reliability, not curve-grading.** B grade is "production ready" — not a near-failure. Anchor every category to the rubric, not "most skills are worse than this one."
+- **Eval-set bonus.** Anthropic's `skill-creator` (May 2026 update) ships a 60/40 train/test description optimizer. If the rated skill ships its own eval set under `eval/` or `references/EVAL.md`, add +5 to Category 1 (cap 100). Cite: https://claude.com/blog/improving-skill-creator-test-measure-and-refine-agent-skills
 
-**Input:** `/rate-skill skills/problematic-skill/SKILL.md`
+## Anti-Patterns
 
-**Output:**
-```markdown
-# Skill Rating: C
+❌ **Vague findings.** "Description could be better" is useless. Always emit a concrete replacement string.
 
-## Summary
-- **File:** skills/problematic-skill/SKILL.md
-- **Lines:** 742 lines
-- **Detected Type:** Technical
-- **Overall Grade:** C (71/100)
-- **Status:** Needs Work
-- **Spec Compliance:** Non-functional fields present (tags)
+❌ **Skipping the strength section.** Even F-tier skills have something working. Name it.
 
-## Findings by Priority
+❌ **Recommending `<Good>`/`<Bad>` XML tags.** Non-canonical. Recommend ✅/❌ instead.
 
-### Highest Impact Improvements
-1. **Length: 742 lines without progressive disclosure**
-   - Impact: High context usage, harder to scan
-   - Fix: Create reference/ directory, move detailed content:
-     ```
-     skill-name/
-     ├── SKILL.md          # Keep under 500 lines
-     └── reference/
-         ├── EXAMPLES.md   # Move extensive examples here
-         └── STANDARDS.md  # Move detailed rules here
-     ```
+❌ **Penalizing description length up to 500 chars.** The 250-char display cap was removed in Claude Code v2.1.105. Penalize spec violations (>1024) and front-loading failures, not raw length under 500.
 
-2. **Triggers: Only 2 phrases in description**
-   - Impact: Poor activation reliability
-   - Fix: Add 5+ specific user phrases:
-     ```yaml
-     description: |
-       Use when asked to "phrase 1", "phrase 2", "phrase 3",
-       when [situation 1], or when [situation 2].
-     ```
-
-3. **Frontmatter: description is 412 chars (truncated at 250 in `/skills`)**
-   - Impact: Last 162 chars of triggers are invisible to Claude's auto-invocation
-   - Fix: Trim to ≤230 chars, front-load distinctive phrases, move long context into `## When to Use` body:
-     ```yaml
-     description: |
-       Short summary. Use when "trigger 1", "trigger 2",
-       or when [situation].
-     ```
-
-4. **Frontmatter: `argument-hint` nested under metadata**
-   - Impact: Claude Code won't parse it for autocomplete
-   - Fix: Move to top-level frontmatter field:
-     ```yaml
-     argument-hint: "<your-hint>"
-     ```
-
-### Recommended Improvements
-1. **Conciseness: Verbose mode descriptions (30+ lines each)**
-   - Fix: Condense to 2-3 lines per mode, move details to reference/
-2. **Frontmatter: Remove `tags` field**
-   - Fix: No discovery system consumes tags. Delete the field or move to `metadata.tags`
-
-## Priority Action Items
-1. Implement progressive disclosure (move 200+ lines to reference/)
-2. Add 5+ trigger phrases to description
-3. Move argument-hint to top level
-4. Condense verbose sections
-
-## Estimated Improvements
-- Fix highest impact: +15 points -> 86 (B)
-- Potential grade: C -> A
-```
-
-**Note:** Lower-scoring skills get detailed findings with concrete fixes and an improvement roadmap.
-
-## Troubleshooting
-
-### Problem: Can't find SKILL.md file
-
-**Cause:** Path incorrect or file doesn't exist.
-
-**Solution:**
-```bash
-# Verify file exists
-ls skills/skill-name/SKILL.md
-
-# Use correct path
-/rate-skill skills/skill-name/SKILL.md
-```
-
-### Problem: Rating seems too harsh
-
-**Cause:** Standards are calibrated for activation reliability. Each category has clear A-grade signals.
-
-**Solution:**
-- Review the "Strong signals" for each category to understand what A-grade looks like
-- Compare your skill to high-rated skills (track-session, code-review)
-- Focus on Highest Impact Improvements first
-- Remember: B grade is "Production Ready"
-
-### Problem: Grade improved but still low
-
-**Cause:** Multiple categories need attention.
-
-**Solution:**
-- Focus on highest-weight categories first (Length 20%, Conciseness 20%)
-- Fix Highest Impact Improvements before Recommended
-- Re-rate after each major change
-- Use "Estimated Improvements" as roadmap
-
-### Problem: Don't know how to fix an issue
-
-**Cause:** Fix recommendation unclear.
-
-**Solution:**
-- Check generate-skill examples for patterns
-- Review high-rated skills for reference
-- Ask for specific help on that issue
-- Consult CLAUDE.md for SkillBox guidelines
-
-### Problem: Unsure about spec compliance
-
-**Cause:** Two-tier spec (universal vs Claude Code) can be confusing.
-
-**Solution:**
-- **Universal fields** (portable across all agents): `name`, `description`, `license`, `metadata`, `allowed-tools`, `compatibility`
-- **Claude Code extensions** (only Claude Code reads these): `argument-hint`, `context`, `agent`, `model`, `effort`, `mode`, `user-invocable`
-- **Non-functional** (remove): `tags` at top level, `hooks` in frontmatter
-- Rate-skill flags non-portable fields so you can make informed decisions
-
-## Integration
-
-**This skill works with:**
-- **generate-skill** - Use after generating to validate quality
-- **Skill development workflow** - Rate before committing/publishing
-- **Quality control** - Gate for accepting skills into repositories
-- **Continuous improvement** - Track quality metrics over time
-
-**Workflow:**
-```bash
-# Create skill
-/generate-skill new-feature
-
-# Rate it
-/rate-skill skills/new-feature/SKILL.md
-
-# Fix issues
-[make improvements]
-
-# Re-rate
-/rate-skill skills/new-feature/SKILL.md
-
-# When A or B grade, publish
-git add skills/new-feature/
-git commit -m "Add new-feature skill"
-```
-
-**Quality gates:**
-- A-B: Merge to main
-- C: Request changes
-- D-F: Reject until improved
+✅ Concrete, prioritized, paste-ready findings — the desired pattern.
 
 ## References
 
-**Based on:**
-- generate-skill best practices
-- SkillBox CLAUDE.md guidelines
-- [agentskills.io](https://agentskills.io) universal skill spec
-- Claude Code extensions documentation
-- obra/superpowers patterns
-
-**Related:**
-- [generate-skill](../generate-skill/SKILL.md)
-- [SkillBox CLAUDE.md](../../CLAUDE.md)
+- agentskills.io spec: https://agentskills.io/specification
+- Claude Code skills docs: https://code.claude.com/docs/en/skills
+- Anthropic skill-creator: https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md
+- Description activation study (Seleznov n=650): https://medium.com/@ivan.seleznov1/why-claude-code-skills-dont-activate-and-how-to-fix-it-86f679409af1
+- Skill listing budget: https://claudefa.st/blog/guide/mechanics/skill-listing-budget
+- anthropics/skills #9817 (multiline description bug): https://github.com/anthropics/claude-code/issues/9817
