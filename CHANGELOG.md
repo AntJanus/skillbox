@@ -7,6 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-05-14
+
+### Major rewrite: directive descriptions, ✅/❌ examples, `references/` plural
+
+Multi-agent research pass (Anthropic docs, 8 top community skill repos, LLM prompt-engineering papers, Claude Code release notes, criticism/failure-mode research) surfaced that several SkillBox conventions had drifted out of line with current (May 2026) Anthropic guidance and community practice. This release re-aligns. **Breaking** for downstream consumers of `<Good>/<Bad>` XML tags and `skills/generate-skill/reference/` deep links.
+
+Key findings driving the rewrite:
+
+- **Multiline `description: |` YAML block scalars silently break skill discovery** ([anthropics/skills #9817](https://github.com/anthropics/claude-code/issues/9817)). Found in 9 of 11 SkillBox skills — all migrated to single-line.
+- **Directive third-person descriptions activate ~20× more reliably** than passive prose (Seleznov n=650, p<0.0001). New form: "Use this skill whenever the user wants to… Do NOT use this skill for…".
+- **The 250-char display cap was a v2.1.86 regression, removed in v2.1.105+** (now 1,536 chars). The ≤230 SkillBox target is now a soft cap for listing-budget hygiene past ~15-25 installed skills, not a discovery requirement.
+- **`<Good>`/`<Bad>` XML tags are SkillBox-only** — zero of 8 surveyed top community skills (Anthropic, Vercel, Superpowers) use them. Migrated to ✅/❌ markdown emoji.
+- **`references/` (plural) is canonical** per Anthropic spec and skill-creator. SkillBox used `reference/` (singular) in generate-skill.
+- **ALL-CAPS "IRON LAW" / "Red Flags - STOP" framing has no empirical support** (Anthropic skill-creator: yellow flag). Reframed as "Quality Signals" + "Anti-Patterns" with explained reasoning.
+
+### Major skill rewrites
+
+- **rate-skill** (v2.1.0 → **v3.0.0**, breaking): Complete rewrite. New rubric: Description quality (25%), Frontmatter validity (20%), Length & progressive disclosure (15%), Structure fit (15%), Examples (10%), Conciseness (10%), Anti-pattern avoidance (5%). Hard-fail rule: multiline `description: |` automatic 0. New length scoring: ≤230 full marks (soft target), 231-500 no penalty, 501-1024 −15, >1024 caps at 50. New Gotchas section (highest-signal per Anthropic engineer). Dropped `## Integration` and `## When to Use` body sections (folded into description per Anthropic guidance). Body 455 → 257 lines.
+- **generate-skill** (v1.6.0 → **v3.0.0**, breaking): Complete rewrite. New 8-phase workflow: Discovery (AskUserQuestion, one question per turn), Description drafting (target ≤230 chars, soft-directive register), Frontmatter, Body content (type-driven templates), Examples (✅/❌), Gotchas, Progressive disclosure check, **Mandatory Phase 8 eval set** (20 queries: 10 should-trigger + 10 should-not-trigger, saved as `references/EVAL.md`, mirrors Anthropic's May 2026 A/B description optimizer). Dropped letter-coded patterns (A/B/C/D/E → methodology/technical/auditing/reference/automation). Renamed `reference/` → `references/`. Body 376 → 249 lines.
+
+### Migrated skills (description fix + ✅/❌ migration, per-skill PATCH bump)
+
+All 9 had `description: |` multiline block scalars (silent discovery break) AND used `<Good>/<Bad>` XML tags. Migrated in same pass:
+
+- **code-review** (v1.4.0 → v1.4.1): single-line description (209 chars); 3 ✅/❌ pairs.
+- **deep-research** (v2.1.0 → v2.1.1): single-line description (226 chars); 2 ✅/❌ pairs.
+- **ideal-react-component** (v1.6.0 → v1.6.1): single-line description (199 chars); 4 ✅/❌ pairs.
+- **screenshot-local** (v1.2.0 → v1.2.1): single-line description (220 chars); 2 ✅/❌ pairs.
+- **setup-semantic-release** (v1.1.0 → v1.1.1): single-line description (224 chars); 1 ✅/❌ pair.
+- **track-qa** (v1.1.0 → v1.1.1): single-line description (197 chars); 1 ✅/❌ pair.
+- **track-roadmap** (v2.4.0 → v2.4.1): single-line description (177 chars); 1 ✅/❌ pair.
+- **track-session** (v4.5.0 → v4.5.1): single-line description (211 chars); 4 ✅/❌ pairs.
+- **record-tui** (v1.4.0 → v1.4.2): single-line description (197 chars); 3 ✅/❌ blocks.
+
+### Directory renames (breaking for deep links)
+
+- **skills/generate-skill/reference/** → **skills/generate-skill/references/** (plural, canonical). PATTERNS.md and ADVANCED.md preserved; internal links in ADVANCED.md updated (9 occurrences of `reference/` → `references/`).
+
+### Documentation
+
+- **CLAUDE.md**: Replaced "Iron Laws" / "Red Flags" framing with "Quality Signals" / "Anti-Patterns". Updated description-length rule from "≤230 hard ceiling" to soft target with no penalty up to 500. Replaced `<Good>/<Bad>` recommendation with ✅/❌. Added multiline-description silent-break warning. Added first-person POV anti-pattern. Updated all skill-internal `reference/` references to `references/` (plural). Repo-level `reference/VERSION-CONTROL.md` retained (repo docs dir, not a skill's references). Refreshed validation checklist with current rules. Last Updated → 2026-05-14.
+- **memory/MEMORY.md** + **memory/description_length_rule.md**: Updated description-length rule to reflect v2.1.105+ removal of the 250-char display cap. Updated `<Good>/<Bad>` entry to note deprecation. Added entries on Anthropic's A/B description optimizer, `skillOverrides` v2.1.129 fix, and `skillListingBudgetFraction` budget pressure. Removed stale `hooks` non-functional claim (now supported per code.claude.com).
+
+### Research bundle (in this session, not shipped)
+
+Five parallel research subagents (Anthropic official docs, top community skill repos, LLM prompt-engineering papers, Claude Code release notes 2026-04-30 → 2026-05-14, criticism/failure-mode research) produced a synthesized brief. Drafts went through two iteration rounds (clean-slate, then cross-pollinated with community exemplars). A comparator agent diffed final drafts vs current production. User reviewed 12 decisions via AskUserQuestion before adoption.
+
 ## [2.12.0] - 2026-05-11
 
 Three threads converge: (1) the **track-session start mode** for new multi-phase work, with phase gates and `reference/START.md`; (2) the new **`experimental/`** lane and its first inhabitant `evolve-skills`, a friction-mining + patch-proposal pipeline that always runs on a branch and surfaces decisions for human review; and (3) a **description-length pass** that brings every skill description under the 230-char target after research surfaced Claude Code 2.1.86's 250-character `/skills` display cap. Two skills (`generate-skill`, `rate-skill`) and `CLAUDE.md` now codify the rule so future authoring stays in compliance.
