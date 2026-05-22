@@ -1,20 +1,12 @@
 ---
 name: evolve-skills
-description: |
-  EXPERIMENTAL. Mine recent Claude Code transcripts for friction events,
-  cluster them by active skill, propose patches for skills with 3+ friction
-  events, validate each patch via headless replay, scrub the report through
-  /publish-check, and present an EVOLUTION_REPORT.md for human review on a
-  branch (never auto-merge). Use when asked to "evolve my skills",
-  "audit skills against recent friction", "propose skill improvements from
-  transcripts", "run the skill evolution pipeline", or as part of a weekly
-  skill-quality cadence.
+description: EXPERIMENTAL skill-evolution pipeline — mines Claude Code transcripts for friction, clusters by active skill, proposes one patch per high-friction skill, validates by headless replay, and writes a report on a branch (never auto-merges). Use when asked to "evolve my skills", "audit skills against recent friction", "propose skill improvements from transcripts", or "run the skill evolution pipeline". Do NOT use to grade one skill (see rate-skill) or scaffold a new skill (see generate-skill).
 license: MIT
 argument-hint: "[--days=N] [--min-friction=N] [--skip-replay]"
-allowed-tools: Read, Write, Bash, Grep, Glob
+allowed-tools: Read, Write, Bash, Grep, Glob, Task
 metadata:
   author: Antonin Januska
-  version: "0.1.0"
+  version: "0.2.0"
   status: experimental
 ---
 # Evolve Skills (Experimental)
@@ -73,7 +65,7 @@ If the working tree is dirty, halt — experimental skills should not be run on 
 
 Read JSONL transcripts under `~/.claude/projects/` from the last `--days` (default: 7).
 
-For each transcript, extract events that match a friction pattern (see [reference/friction-patterns.md](./reference/friction-patterns.md)):
+For each transcript, extract events that match a friction pattern (see [references/friction-patterns.md](./references/friction-patterns.md)):
 
 - **Interruption:** `request_interrupted_by_user` events.
 - **Wrong-approach rejection:** user message contains "no", "stop", "wait", "actually", "don't" near a recent assistant tool call.
@@ -124,7 +116,7 @@ For each proposed patch:
 
 Replay validation is **non-deterministic** — expect score variance run-to-run. The skill records the validation as one signal among several, not as a gate.
 
-See [reference/replay-protocol.md](./reference/replay-protocol.md) for the exact replay invocation, scoring rubric, and known caveats.
+See [references/replay-protocol.md](./references/replay-protocol.md) for the exact replay invocation, scoring rubric, and known caveats.
 
 **Gate:** Each patch has a validation result attached (or marked "skipped: --skip-replay" / "skipped: replay infrastructure unavailable").
 
@@ -152,58 +144,9 @@ DO NOT commit the proposed patches. They live in `runs/<runid>/proposed-patches/
 
 ## Output Format
 
-Single file: `EVOLUTION_REPORT.md`, committed to the experimental branch.
+A single `EVOLUTION_REPORT.md` committed to the experimental branch (never `main`): one `## Skill: <name>` block per skill over the friction threshold — each with a friction summary, redacted representative examples, the proposed patch (rationale + unified diff), the replay-validation result, and a `Decision required` checklist — followed by a pipeline-diagnostics footer.
 
-```markdown
-# Skill Evolution Report — <YYYY-MM-DD-runid>
-
-## Run Configuration
-- Days scanned: 7
-- Transcripts processed: N
-- Friction events found: M
-- Skills exceeding threshold: K (threshold: 3)
-- Replay validation: enabled / skipped
-
-## Skill: <name>
-
-### Friction summary
-- Events: N
-- Distribution: {interruption: 4, wrong-approach: 2, correction: 1}
-
-### Representative examples
-1. <session-id>, <timestamp>: <redacted summary>
-2. ...
-
-### Proposed patch
-- Rationale: <agent's rationale>
-- Expected friction reduction: <agent's claim>
-
-```diff
-<unified diff against SKILL.md>
-```
-
-### Replay validation
-- Sessions replayed: 3
-- Friction reproduction rate (before patch): 3/3
-- Friction reproduction rate (after patch): 1/3
-- Caveat: replay is non-deterministic; treat as signal, not proof.
-
-### Decision required
-- [ ] Apply patch as-is
-- [ ] Apply with modifications (note them)
-- [ ] Reject patch (note rationale)
-- [ ] Defer to next week
-
----
-
-## Skill: <next-skill>
-...
-
-## Pipeline diagnostics
-- Privacy scrub: PASS / WARN-ack / BLOCK
-- Branch: experimental/evolve-skills/<runid>
-- Run duration: 14m 22s
-```
+See [references/report-format.md](./references/report-format.md) for the full template.
 
 ## Usage
 
@@ -323,7 +266,8 @@ This skill graduates from `experimental/` to `skills/` when:
 
 ## References
 
-- [reference/friction-patterns.md](./reference/friction-patterns.md) — The patterns used to detect friction.
-- [reference/replay-protocol.md](./reference/replay-protocol.md) — Headless replay invocation and scoring rubric.
+- [references/friction-patterns.md](./references/friction-patterns.md) — The patterns used to detect friction.
+- [references/replay-protocol.md](./references/replay-protocol.md) — Headless replay invocation and scoring rubric.
+- [references/report-format.md](./references/report-format.md) — Full EVOLUTION_REPORT.md template.
 - [experimental/README.md](../README.md) — Overall conventions for experimental skills.
 - [/publish-check](~/.claude/skills/publish-check/SKILL.md) — The privacy scrub.
