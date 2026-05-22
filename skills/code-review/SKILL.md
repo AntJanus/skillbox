@@ -1,19 +1,19 @@
 ---
 name: code-review
-description: Multi-agent code review over local changes. Use when asked to "review my code", "review these changes", "do a code review", "check my changes before I commit", or "give me a thorough review". Writes REVIEW.md.
+description: Use this skill whenever the user wants a multi-agent review of local changes — triggers include "review my code", "review these changes", "do a code review", or "check my changes before I commit". Writes REVIEW.md. Do NOT use for an open PR by number (use /review) or a security-specific pass (use /security-review).
 license: MIT
 argument-hint: "[path | --staged | --branch <base>]"
 allowed-tools: Read, Write, Glob, Grep, Bash, Task
 metadata:
   author: Antonin Januska
-  version: "1.4.1"
+  version: "1.5.0"
 ---
 
 # Code Review - Multi-Agent Local Review
 
 ## Overview
 
-Runs five specialized review agents in parallel, each focused on exactly one concern, then runs a verifier pass that keeps only the evidence-backed findings, then merges them into a single report sorted by severity. Keeps each reviewer in its lane so nothing drifts into generic "looks fine" commentary.
+Runs five specialized review agents in parallel, each focused on exactly one concern, then runs a verifier pass that keeps only the evidence-backed findings, re-rates each by its real impact on the change, and distills the handful worth fixing first — then merges them into a single report sorted by severity. Keeps each reviewer in its lane so nothing drifts into generic "looks fine" commentary.
 
 **Core principle:** Narrow-scope reviewers find more real issues than one broad reviewer trying to cover everything.
 
@@ -27,7 +27,7 @@ Runs five specialized review agents in parallel, each focused on exactly one con
 4. **testing** — coverage of the change and assertion strength (membership checks, weak truthiness, missing error-path tests)
 5. **repo-hygiene** — secrets, env var documentation drift, manifest/lockfile alignment, README/CLAUDE.md/AGENTS.md drift
 
-All five run concurrently as a single `Task` dispatch. A sixth **verifier** pass then filters the merged candidates down to the evidence-backed findings before they reach `REVIEW.md` at the repo root. Full per-lane prompts in [Phase 2](#phase-2-parallel-agent-dispatch); verifier prompt in [Phase 2.5](#phase-25-verification).
+All five run concurrently as a single `Task` dispatch. A sixth **verifier** pass then filters the merged candidates down to the evidence-backed findings, re-rates each by real impact (promoting under-rated findings, demoting over-rated ones), and distills the "fix first" shortlist before they reach `REVIEW.md` at the repo root. Full per-lane prompts in [Phase 2](#phase-2-parallel-agent-dispatch); verifier prompt in [Phase 2.5](#phase-25-verification).
 
 ## When to Use
 
@@ -72,18 +72,19 @@ All five run concurrently as a single `Task` dispatch. A sixth **verifier** pass
           ▼
  ┌──────────────────────────────────────────────────────┐
  │ 2.5. Verifier pass (single Task)                     │
- │      Re-checks each candidate against actual code,   │
- │      keeps the evidence-backed findings              │
+ │      Re-reads each candidate against the real code,  │
+ │      keeps evidence-backed, re-rates by impact,      │
+ │      distills the "fix first" shortlist              │
  └────────┬─────────────────────────────────────────────┘
           │
           ▼
  ┌───────────────────────────────────┐
  │ 3. Synthesize → write REVIEW.md   │
- │    at the repo root               │
+ │    fix-first list, then buckets   │
  └───────────────────────────────────┘
 ```
 
-All five agents run concurrently. A verifier then keeps the substantiated findings before synthesis. The skill does no review reasoning itself — it only scopes, dispatches, verifies, and merges. The final report is written to `REVIEW.md` at the repo root (overwriting any previous review).
+All five agents run concurrently. A verifier then keeps the substantiated findings, re-rates them by impact, and distills the "fix first" shortlist before synthesis. The skill does no review reasoning itself — the reviewers and verifier do; the skill only scopes, dispatches, and renders. The final report is written to `REVIEW.md` at the repo root (overwriting any previous review).
 
 ## Phase 1: Scope Detection
 
@@ -197,136 +198,63 @@ For each changed non-test file, locate the corresponding test file using whateve
 
 **Out of scope:** code-level cleanups (basics owns), architectural fit (architecture owns), test coverage (testing owns), readability (clarity owns). If a docstring is misleading because it's *unclear*, that's clarity; if it's misleading because the function it documents has moved or been renamed, that's repo-hygiene.
 
-## Phase 2.5: Verification
+## Phase 2.5: Verification + Impact Re-Rating
 
-**After all five agents return, dispatch one verifier agent (single Task, `subagent_type: Explore`) with the file list, the diff, and the merged candidate findings.** The verifier:
+**After all five agents return, dispatch one verifier agent (single Task, `subagent_type: Explore`) with the file list, the diff, and the merged candidate findings.** The verifier runs two stages, then distills:
 
-1. Re-reads each cited `file:line` against the current code
-2. Keeps findings whose evidence holds up
-3. Tags unsubstantiated findings as `[Unverified]` and demotes one severity tier (Critical→Major→Minor→Nit→drop) — preserves the paper trail rather than dropping silently
-4. Returns kept findings in the agents' format plus a summary line (`Verified N of M; demoted K; dropped J`)
+**Stage 1 — Evidence.** For each finding, re-read the cited `file:line` against the current code:
+- **Holds** → carry into Stage 2
+- **Thin** → tag `[Unverified]`, demote one tier (Critical→Major→Minor→Nit→drop), add a `Verifier note:`. Skips Stage 2 — uncertainty already lowered it.
+- **Drop** → citation doesn't hold; remove (count only)
 
-Full verifier prompt: [reference/AGENTS.md](./reference/AGENTS.md#verifier). Mirrors Anthropic's official two-stage filter pattern; Datadog reports a 60%→13% false-positive reduction with this approach.
+**Stage 2 — Impact (evidence-holds findings only).** Re-rate each by its real blast radius on *this* change, independent of the severity the lane reviewer assigned (each reviewer only saw its own lane):
+- **Promote** an under-rated finding (e.g. a "Minor" missing test that guards a data-loss path)
+- **Demote** an over-rated one (e.g. a "Major" on a dev-only path)
+- The re-rated severity is **authoritative** — it replaces the lane reviewer's. A `Verifier note:` records the reasoning whenever severity moves; the original severity is not shown.
+- Pre-existing findings keep their `[Pre-existing]` tag and are **not** promoted into the blocking buckets — they stay informational.
+
+**Distillation — "what to fix first".** After re-rating, the verifier selects the findings to address before shipping (every Critical, plus the highest-impact Majors; 3-6 items) and returns them as a short ordered list. If only Minor/Nit survive: `Nothing blocking — only polish remains.`
+
+The verifier returns the distillation block, the kept findings (in the agents' format, at their re-rated severities), and a summary line: `Verifier summary: kept N of M; promoted P; demoted K; dropped J` (where `demoted` = Stage-1 thin demotions plus Stage-2 impact lowers, combined).
+
+Full verifier prompt: [reference/AGENTS.md](./reference/AGENTS.md#verifier). The evidence stage mirrors Anthropic's official two-stage filter pattern; Datadog reports a 60%→13% false-positive reduction with this approach.
 
 ## Phase 3: Synthesis
 
-**After the verifier returns, merge its kept findings and write REVIEW.md:**
+**After the verifier returns, render its output into REVIEW.md. The verifier already judged evidence, severity, and priority — synthesis only formats what it returned:**
 
-1. Parse each kept finding into a structured entry
-2. Group by severity (Critical → Major → Minor → Nit), then add a separate **Pre-existing** bucket at the bottom for findings the agents flagged outside the diff scope
-3. Within each severity, group by file path
-4. Annotate each finding with which agent surfaced it; if the verifier demoted it, mark it `[Unverified]` and apply the demoted severity
-5. Deduplicate: if multiple agents flag the same line, keep the most severe one and note all lanes
-6. **Cap nits at 5.** If more than 5 Nits remain after verification, keep the top 5 (most actionable) and collapse the rest into a single closing line: `_…plus N similar nits across <file list>._` This is a primary rule, not a fallback — it keeps reviews actionable. Anthropic's official guidance recommends the same cap.
-7. **Write the report to `REVIEW.md` at the repo root using the Write tool** — overwrite any existing REVIEW.md
-8. Tell the user the report is at `REVIEW.md` and print a one-line summary to the conversation: `REVIEW.md written — X Critical, Y Major, Z Minor, W Nit, P Pre-existing`
+1. Render the verifier's distillation as a `## What to fix first` section at the **top** of the report (above `## Critical`). Each item is the verifier's one-line `path:line — why it matters`, in the order returned. If the verifier returned `Nothing blocking — only polish remains.`, render that single line.
+2. Parse each kept finding into a structured entry
+3. Group by severity (Critical → Major → Minor → Nit) using the verifier's **re-rated** severity, then add a separate **Pre-existing** bucket at the bottom for findings flagged outside the diff scope
+4. Within each severity, group by file path
+5. Annotate each finding with which agent surfaced it. Apply the verifier's final severity as-is; if it carries `[Unverified]`, keep that tag and include the `Verifier note:`. Do not show the lane reviewer's original severity.
+6. Deduplicate: if multiple agents flag the same line, keep the most severe one and note all lanes
+7. **Group nits by file path** — render every Nit under its file as a terse one-liner; no cap. They sit in one `## Nit` block so they stay out of the way without being dropped.
+8. **Write the report to `REVIEW.md` at the repo root using the Write tool** — overwrite any existing REVIEW.md
+9. Tell the user the report is at `REVIEW.md` and print a one-line summary to the conversation: `REVIEW.md written — X Critical, Y Major, Z Minor, W Nit, P Pre-existing`
 
 **Always:**
 - Write REVIEW.md even when the report is clean (so the user sees a clean report, not missing output)
 - Put REVIEW.md at the **repo root** (use `git rev-parse --show-toplevel` to locate it)
 - Overwrite in place — there is only ever one current review
-- Keep agent findings in the agents' words — synthesis is structural, not editorial
+- Keep findings in the verifier's words at the verifier's severities — synthesis is structural, not editorial
 
-**Synthesizer scope:** parse, group, dedupe, cap nits, write the file. Anything beyond that — fresh findings, rewordings, dropping things you disagree with, dumping the full report into the chat — belongs to a different role.
+**Synthesizer scope:** render the distillation, parse, group by re-rated severity, dedupe, group nits by file, write the file. Anything beyond that — fresh findings, re-judging severity, rewordings, dropping things you disagree with, dumping the full report into the chat — belongs to the verifier, not the synthesizer.
 
 ## Output Format
 
-**Target file:** `REVIEW.md` at the repo root. Always written, even when clean.
+**Target file:** `REVIEW.md` at the repo root. Always written, even when clean. Section order:
 
-```markdown
-# Code Review
+1. **Header block** — `Generated` / `Scope` / `Agents` / `Verifier: kept N of M; promoted P; demoted K; dropped J` / `Total findings`
+2. **`## What to fix first`** — the verifier's ordered 3-6 item shortlist (`path:line — why it matters`), or the single line `Nothing blocking — only polish remains.`
+3. **`## Critical` → `## Major` → `## Minor`** — full finding blocks (`[lane]` `line` — issue, then risk/evidence + fix sub-bullets), grouped by file. Both re-rated and `[Unverified]` findings carry a `Verifier note:`; the `[Unverified]` tag rides at its already-demoted severity.
+4. **`## Nit`** — every nit grouped under its file path as a terse one-liner, no cap
+5. **`## Pre-existing`** — informational, never promoted into the blocking buckets
+6. **`Agents that found nothing:`** footer
 
-**Generated:** YYYY-MM-DD HH:MM
-**Scope:** N files (list)
-**Agents:** basics, architecture, clarity, testing, repo-hygiene
-**Verifier:** kept N of M; demoted K; dropped J
-**Total findings:** X Critical, Y Major, Z Minor, W Nit, P Pre-existing
+When clean, still write REVIEW.md with a zeroed header and `All five reviewers returned NO FINDINGS. Ship it.`, then print the Phase 3 step-9 chat one-liner.
 
----
-
-## Critical
-
-### src/services/user-service
-
-- **[architecture]** `line 42` — Layering violation
-  - Existing pattern: files under `services/*` never import from `routes/*`; see sibling `services/billing-service`
-  - This change: imports a route handler from inside a service
-  - Fix: move the shared logic into `common/` or invert the dependency
-
-- **[testing]** `line 87` — New error path has no test
-  - Risk: if the downstream API returns 429, the retry loop silently exits
-  - Fix: add a test case that simulates a 429 response and asserts the retry counter
-
-- **[repo-hygiene]** `line 12` — Hardcoded API key committed
-  - Evidence: `STRIPE_KEY = "sk_live_..."` literal in source
-  - Risk: secret enters git history; rotate immediately, then move to env
-  - Fix: read from `process.env.STRIPE_KEY`, add `STRIPE_KEY=` to `.env.example`, document in README
-
-## Major
-
-### src/api/fetch-user
-
-- **[clarity]** `line 103` — Function `handle` is 78 lines with 4-deep nesting
-  - A reader can't follow the early-exit logic; the `else` at line 145 pairs with the `if` at line 105
-  - Fix: extract the validation block (lines 110-135) into a named helper
-
-### internal/worker/queue
-
-- **[architecture]** `line 27` — Missing retry where peers have it
-  - Existing pattern: `internal/worker/http-client` wraps external calls in the shared retry/backoff helper
-  - This change: calls the downstream service once, propagates the error
-  - Fix: wrap the call with the same retry/backoff helper siblings use
-
-### package.json
-
-- **[repo-hygiene]** — Manifest changed but lockfile not updated
-  - `package.json` adds `pino@^9.0.0`; `package-lock.json` is unchanged in this diff
-  - Risk: CI install will resolve a different version than developers; reproducible builds break
-  - Fix: run the package manager's install/lock command and commit the lockfile
-
-## Minor
-...
-
-## Nit
-
-(Up to 5 most actionable shown.)
-
-- **[basics]** `src/utils/format:14` — Stale TODO from 2024
-- **[clarity]** `src/utils/format:42` — Variable `x` could be `formattedValue`
-- **[basics]** `src/utils/format:88` — Unused import `lodash/get`
-- **[clarity]** `src/api/handler:12` — Comment restates the code
-- **[basics]** `tests/format.test:5` — Leftover `console.log`
-
-_…plus 8 similar nits across `src/utils/`, `src/api/`, `tests/`._
-
-## Pre-existing
-
-Issues found outside the change scope. Listed for awareness; not blocking the current change.
-
-- **[architecture]** `src/legacy/auth:200` — Layering violation predates this diff
-- **[clarity]** `src/legacy/auth:88` — 200-line function predates this diff
-
----
-
-**Agents that found nothing:** <list or "none">
-```
-
-**When everything is clean (still write REVIEW.md):**
-```markdown
-# Code Review
-
-**Generated:** YYYY-MM-DD HH:MM
-**Scope:** N files
-**Verifier:** kept 0 of 0
-**Total findings:** 0
-
-All five reviewers returned NO FINDINGS. Ship it.
-```
-
-**Chat-side one-liner after writing the file:**
-```
-REVIEW.md written — 0 Critical, 0 Major, 0 Minor, 0 Nit, 0 Pre-existing. Clean review.
-```
+**[📄 Full worked REVIEW.md example](./reference/EXAMPLE-REVIEW.md)** — complete report with a promoted finding, the distillation, and grouped nits, plus the clean-report and chat-one-liner forms. Load when you need the exact rendering.
 
 ## Examples
 
@@ -414,13 +342,15 @@ A well-run code review has these properties:
 
 - **All five agents dispatched in a single message** — visible as five Task calls in one turn
 - **Verifier pass runs after the agents** — visible as one additional Task call before synthesis; its summary line appears in REVIEW.md
+- **`## What to fix first` sits at the top** — the verifier's 3-6 highest-impact items, or "Nothing blocking — only polish remains."
+- **Severities reflect impact, not lane** — the verifier re-rated them; a promotion or demotion carries a `Verifier note:` explaining the impact call. The original lane severity is not shown.
 - **Scope reported before dispatch** — user sees which files are under review
 - **Every finding has file:line** — no "consider reviewing the error handling"
 - **Every finding has a concrete fix** — not just the problem
 - **Findings are evidence-backed** — each cites concrete code; the verifier kept it because the citation matched
 - **Severities are used meaningfully** — not everything is Major
-- **Nits cap at 5** — anything beyond that collapses into a single "_…plus N similar nits_" line
-- **Pre-existing issues sit in their own bucket** — agents may surface them; they appear at the bottom of REVIEW.md, not mixed with change-focused findings
+- **Nits grouped by file, no cap** — every nit sits under its file path in one `## Nit` block, terse one-liners, out of the way without being dropped
+- **Pre-existing issues sit in their own bucket** — agents may surface them; they appear at the bottom of REVIEW.md, not promoted into the blocking buckets
 - **Lane discipline** — each agent stays focused on what it owns; basics covers hygiene, architecture covers fit, clarity covers readability, testing covers coverage, repo-hygiene covers project health
 - **Architecture agent actually reads siblings** — you can see the sibling references in its findings
 - **repo-hygiene actually reads `.env.example`, manifests, and lockfiles** — you can see those filenames cited in its findings, not just guesses about what's documented
@@ -448,9 +378,9 @@ The three most-common issues are inline. Full troubleshooting catalog in **[refe
 
 **Cause:** Verifier prompt was paraphrased and lost the substantiation requirement, or the agent findings were already strong enough.
 
-**Solution:** Check the verifier's summary line — if it says `kept N of N; demoted 0; dropped 0` on a large finding set, re-dispatch with the exact verifier prompt from `reference/AGENTS.md#verifier`, emphasizing "re-read the cited line and confirm the issue is present in the current code."
+**Solution:** Check the verifier's summary line — if it says `kept N of N; promoted 0; demoted 0; dropped 0` on a large finding set, re-dispatch with the exact verifier prompt from `reference/AGENTS.md#verifier`, emphasizing "re-read the cited line and confirm the issue is present in the current code."
 
-For lane-overlap, env-var false positives, fixture vs real-secret distinction, empty scope, huge diffs, REVIEW.md location, and verifier-demoted findings see **[reference/TROUBLESHOOTING.md](./reference/TROUBLESHOOTING.md)**.
+For lane-overlap, env-var false positives, fixture vs real-secret distinction, empty scope, huge diffs, REVIEW.md location, verifier-demoted/promoted findings, and an empty "what to fix first" section see **[reference/TROUBLESHOOTING.md](./reference/TROUBLESHOOTING.md)**.
 
 ## Integration
 

@@ -388,9 +388,11 @@ If you find nothing, output exactly: NO FINDINGS
 
 ```
 You are the verifier for a multi-agent code review. Five reviewer agents
-have produced candidate findings; your job is to keep the ones whose
-evidence holds up against the actual code, so the final report is
-high-signal.
+have produced candidate findings. You have two jobs: (1) keep only the
+findings whose evidence holds up against the actual code, and (2) re-rate
+the survivors by their real impact on THIS change, then distill the
+handful the user should fix first. The goal is a high-signal report where
+severity reflects blast radius, not which lane happened to flag it.
 
 Files in scope: <list>
 Diff:
@@ -399,50 +401,98 @@ Diff:
 Candidate findings (merged from all five agents):
 <merged findings list>
 
-Process each candidate finding:
+STAGE 1 — EVIDENCE (per finding):
 
 1. Read the cited file at the cited line. Confirm the issue is present
    in the current code (not just the diff snippet).
-2. Confirm the agent's claim by reading enough surrounding context to
-   judge — check sibling references for architecture findings, the
-   .env.example for repo-hygiene env-var findings, the test file for
-   testing findings, etc. Re-do the small read the agent should have
-   done; trust nothing on faith.
-3. Decide one of three outcomes for each finding:
+2. Re-do the small read the agent should have done — check sibling
+   references for architecture findings, .env.example for repo-hygiene
+   env-var findings, the test file for testing findings, etc. Trust
+   nothing on faith.
+3. Decide the evidence outcome:
 
-   KEEP — evidence holds. The cited line shows the issue; the fix is
-          actionable. Pass through unchanged.
+   HOLDS — the cited line shows the issue and the fix is actionable.
+           Carry the finding into Stage 2.
 
-   DEMOTE — evidence is partial. The cited line shows something, but
-            it's weaker than the agent claimed (e.g. a "Critical
-            layering violation" turns out to be a deliberate sibling
-            pattern; a "missing test" turns out to have a parametrized
-            test that does cover it). Demote one severity tier
-            (Critical→Major, Major→Minor, Minor→Nit, Nit→drop) and
-            tag the finding with [Unverified]. Add a one-line
-            "Verifier note:" explaining why.
+   THIN  — the cited line shows something, but weaker than claimed
+           (e.g. a "Critical layering violation" is a deliberate
+           sibling pattern; a "missing test" is actually covered by a
+           parametrized case). Tag [Unverified], demote ONE tier
+           (Critical→Major→Minor→Nit→drop), add a one-line
+           "Verifier note:" explaining why. THIN findings skip Stage 2
+           entirely — uncertainty already lowered them.
 
-   DROP — evidence does not hold. The cited file:line does not show
-          the claimed issue, or the citation points at a line that no
-          longer exists. Remove from the kept list. Record only the
-          count, not the dropped findings.
+   DROP  — the cited file:line does not show the claimed issue, or
+           points at a line that no longer exists. Remove it. Record
+           only the count, not the dropped findings.
 
-4. Pre-existing findings get verified the same way — does the issue
-   exist at the cited line? If yes, keep. If no, drop.
+STAGE 2 — IMPACT (only for findings whose evidence HOLDS):
 
-5. Return the kept and demoted findings in the same per-finding format
-   the agents used, then a single summary line at the bottom:
+Re-rate each by its real blast radius on THIS change, independent of the
+severity the lane reviewer assigned. The lane reviewer judged severity
+inside its own narrow lane; you see the whole picture, so correct it.
 
-   Verifier summary: kept N of M; demoted K; dropped J
+- PROMOTE when the true impact is worse than the lane reviewer scored
+  (e.g. a "Minor" missing test actually guards a data-loss path; a "Nit"
+  naming issue actually masks a real logic bug). Raise to the tier that
+  matches the blast radius.
+- DEMOTE when it's over-rated (e.g. a "Major" that only affects a
+  dev-only code path, or a style deviation scored as Critical).
+- LEAVE when the severity already matches the impact.
 
-EVIDENCE BAR: This pass exists to ensure every finding in REVIEW.md is
-something the user can act on with confidence. When in doubt about a
-finding, demote rather than drop — the [Unverified] tag preserves the
-signal at lower severity and gives the user a chance to assess.
+Whenever you move a severity in Stage 2, add a one-line "Verifier note:"
+stating the impact reasoning. The re-rated severity is authoritative —
+it replaces the lane reviewer's. Do not list the original severity.
+
+Judge impact by: does it break or risk breaking production behavior?
+data loss / security / silent corruption = Critical. Wrong behavior on a
+real path, or no test guarding a real regression = Major. Localized or
+low-frequency = Minor. Cosmetic = Nit.
+
+Pre-existing findings: verify evidence the same way (HOLDS/THIN/DROP).
+They keep their [Pre-existing] tag and are NOT impact-promoted into the
+blocking buckets — they stay informational. Leave their severity as-is
+unless evidence is thin.
+
+DISTILLATION — "what to fix first":
+
+After Stage 2, select the findings the user should address before
+shipping this change: every Critical, plus the Majors whose impact you
+judged highest. Aim for 3-6 items; fewer is fine. For each, give one
+line: `path:line — why it matters for this change`. Order by impact, most
+important first. If nothing qualifies (only Minor/Nit survive), output
+exactly: `Nothing blocking — only polish remains.`
+
+OUTPUT (in this order):
+
+1. A "WHAT TO FIX FIRST" block:
+
+   WHAT TO FIX FIRST
+   - path:line — one-line why it matters
+   - path:line — one-line why it matters
+   (or the single line: Nothing blocking — only polish remains.)
+
+2. The kept findings (HOLDS + THIN) in the same per-finding format the
+   agents used, each carrying its final (re-rated) severity plus any
+   [Unverified] / [Pre-existing] tag and Verifier note.
+
+3. A single summary line:
+
+   Verifier summary: kept N of M; promoted P; demoted K; dropped J
+
+   (promoted = Stage-2 raises; demoted = Stage-2 lowers plus Stage-1
+   thin demotions, combined.)
+
+EVIDENCE BAR: every finding in REVIEW.md must be something the user can
+act on with confidence. When in doubt about evidence, demote rather than
+drop — the [Unverified] tag preserves the signal at lower severity.
 
 If all findings drop, output exactly:
 
-Verifier summary: kept 0 of M; demoted 0; dropped M
+WHAT TO FIX FIRST
+Nothing blocking — only polish remains.
+
+Verifier summary: kept 0 of M; promoted 0; demoted 0; dropped M
 NO FINDINGS
 ```
 
@@ -454,4 +504,4 @@ All five reviewer prompts must be dispatched **in a single message** with five T
 
 After all five return, dispatch the verifier in a single Task call with the merged candidate list. The verifier is also `subagent_type: Explore`.
 
-After the verifier returns, the orchestrating skill parses kept and demoted findings into the synthesis report described in SKILL.md.
+After the verifier returns, the orchestrating skill renders its "what to fix first" distillation, the kept findings at their re-rated severities (promoted, demoted, or unchanged), and the summary line into the synthesis report described in SKILL.md.

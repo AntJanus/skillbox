@@ -48,9 +48,9 @@ Extended troubleshooting for the `code-review` skill. SKILL.md keeps the three m
 
 ### Problem: Report is too long to be useful
 
-**Cause:** Synthesis skipped the 5-Nit cap.
+**Cause:** Nits rendered as full finding blocks scattered through the report instead of grouped.
 
-**Solution:** Phase 3 caps Nits at 5. Keep the 5 most actionable in full-block form; collapse the rest into a single closing line: `_…plus N similar nits across <file list>._` Critical/Major/Minor are never collapsed.
+**Solution:** Phase 3 groups every Nit under its file path in a single `## Nit` block as terse one-liners (no full Risk/Fix block, no cap). Critical/Major/Minor stay in full-block form. If the actionable buckets themselves are long, that's real signal — point the user at the `## What to fix first` section, which the verifier caps at 3-6 items.
 
 ### Problem: REVIEW.md keeps showing up as a dirty file in git
 
@@ -74,4 +74,16 @@ Extended troubleshooting for the `code-review` skill. SKILL.md keeps the three m
 
 **Cause:** Verifier prompt was paraphrased and lost the substantiation requirement, or the agent findings were already strong enough.
 
-**Solution:** Check the verifier's summary line — if it says `kept N of N; demoted 0; dropped 0` on a large finding set, re-dispatch with the exact verifier prompt from `reference/AGENTS.md#verifier`, emphasizing "re-read the cited line and confirm the issue is present in the current code."
+**Solution:** Check the verifier's summary line — if it says `kept N of N; promoted 0; demoted 0; dropped 0` on a large finding set, re-dispatch with the exact verifier prompt from `reference/AGENTS.md#verifier`, emphasizing "re-read the cited line and confirm the issue is present in the current code."
+
+### Problem: Verifier promoted a finding and the user disagrees with the new severity
+
+**Cause:** Stage 2 impact re-rating is the verifier's judgment call. It can over-promote (e.g. reading a dev-only path as production) or under-demote.
+
+**Solution:** Every moved severity carries a `Verifier note:` with the impact reasoning — point the user at it so the call is transparent, not silent. The re-rated severity is authoritative by design (one severity per finding, not two). If the user wants the lane reviewer's original take, re-run `/code-review`; the per-lane agent output is regenerated each run. Persistent mis-promotion usually means the verifier prompt's impact rubric (data-loss/security = Critical, real-path = Major, localized = Minor, cosmetic = Nit) was paraphrased — re-dispatch with the exact prompt from `reference/AGENTS.md#verifier`.
+
+### Problem: `## What to fix first` is empty or missing
+
+**Cause:** Either only Minor/Nit findings survived (correct — the verifier emits `Nothing blocking — only polish remains.`), or the verifier's distillation block was dropped during synthesis.
+
+**Solution:** If Criticals or high-impact Majors exist but the section is empty, the synthesizer skipped step 1 of Phase 3 — re-render from the verifier's returned distillation block. The section always appears, even when its content is the single "Nothing blocking" line.
