@@ -19,7 +19,7 @@ Every experimental skill MUST:
 ```
 experimental/<name>/
 └── SKILL.md              # The experimental skill itself
-└── reference/            # Patterns, fixtures, prompts
+└── references/           # Patterns, fixtures, prompts
 └── runs/                 # Per-run output (gitignored or reviewed before commit)
     └── <date>-<id>/
         ├── REPORT.md
@@ -54,7 +54,7 @@ Most experimental skills assume:
 
 ## Current experimental skills
 
-_None yet. The first experimental skill is `evolve-skills`, in development._
+- **`evolve-skills`** (v0.2.0) — in development. Mines recent Claude Code transcripts for friction, clusters by active skill, proposes one patch per high-friction skill, validates via headless replay, and writes a reviewable `EVOLUTION_REPORT.md` on a branch. See [evolve-skills/SKILL.md](./evolve-skills/SKILL.md).
 
 ## Why a separate folder?
 
