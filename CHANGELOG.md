@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **code-review** (v1.4.1 → **v1.5.0**, minor): the verifier pass gains two responsibilities beyond evidence-checking. **Stage 2 impact re-rating** — for findings whose evidence holds, the verifier re-rates severity by real blast radius on the change, promoting under-rated findings and demoting over-rated ones (each lane reviewer only saw its own lane); the re-rated severity is authoritative and carries a `Verifier note:` whenever it moves. **Distillation** — the verifier emits a 3-6 item "what to fix first" shortlist (or `Nothing blocking — only polish remains.`), rendered as a `## What to fix first` section at the top of REVIEW.md. **Nits regrouped** — replaced the cap-at-5 rule with grouping all nits under their file path in one `## Nit` block (terse one-liners, no cap). Verifier summary line gains a `promoted P` count. Synthesis stays mechanical — the verifier judges, the synthesizer renders. Updated `reference/AGENTS.md` verifier prompt, `reference/TROUBLESHOOTING.md`, the flow diagram, Phase 2.5/3, Output Format, and Quality Signals. Also: rewrote the `description` to directive third-person form with negative scoping (`Do NOT use for an open PR / security pass`); added `reference/EXAMPLE-REVIEW.md` (worked report, including an `[Unverified]` demotion); and tightened verifier-note consistency, the `demoted` count definition, and the THIN→Stage-2 control flow across SKILL.md and the prompt.
+
 ## [3.0.0] - 2026-05-14
 
 ### Major rewrite: directive descriptions, ✅/❌ examples, `references/` plural
