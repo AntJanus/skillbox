@@ -5,80 +5,33 @@ license: MIT
 argument-hint: "<app-command> [output-format]"
 metadata:
   author: Antonin Januska
-  version: "1.4.2"
+  version: "1.5.0"
 ---
 
-# Record TUI - Terminal Demo Recording with VHS
+# Record TUI — VHS Terminal Recording
 
-## Overview
-
-Record polished terminal demos using [Charmbracelet VHS](https://github.com/charmbracelet/vhs). VHS turns `.tape` scripts into GIFs, MP4s, and WebMs — reproducible, version-controlled, and CI-friendly.
-
-**Core principle:** Write tape files as code, not as screen captures. Every demo should be reproducible from a single `.tape` file.
-
-## When to Use
-
-**Use this skill when:**
-- Recording a demo GIF for a README or docs
-- Creating video walkthroughs of CLI/TUI applications
-- Setting up automated demo recording in CI/CD
-- Writing `.tape` files for VHS
-- Troubleshooting VHS output quality (choppy GIFs, wrong dimensions, timing issues)
-
-**Avoid when:**
-- Recording non-terminal content (use screen capture tools instead)
-- One-off manual recordings where reproducibility doesn't matter (use `asciinema`)
-- The app has no terminal interface
+Record polished terminal demos with [Charmbracelet VHS](https://github.com/charmbracelet/vhs) — `.tape` scripts → GIF / MP4 / WebM, reproducible and CI-friendly. **Core principle:** write tape files as code, not screen captures; every demo reproducible from one `.tape`. For web UIs use `screenshot-local` instead; for throwaway recordings use `asciinema`.
 
 ## Prerequisites
-
-**VHS requires two dependencies:**
 
 ```bash
 # macOS
 brew install charmbracelet/tap/vhs ffmpeg ttyd
-
 # Debian/Ubuntu
-sudo apt install ffmpeg && sudo snap install ttyd --classic
-go install github.com/charmbracelet/vhs@latest
+sudo apt install ffmpeg && sudo snap install ttyd --classic && go install github.com/charmbracelet/vhs@latest
+
+vhs --version && ffmpeg -version && ttyd --version   # verify all three
 ```
 
-**Verify:** `vhs --version && ffmpeg -version && ttyd --version`
+## Tape file structure
 
-## Phase 1: Plan the Recording
-
-Before writing a tape file, answer these questions:
-
-1. **What are you recording?** — The exact command to launch the app
-2. **What interactions to show?** — Key presses, navigation, typing sequences
-3. **What's the target format?** — GIF (README), MP4 (docs site), WebM (web)
-4. **What dimensions?** — Match your app's ideal viewport
-
-**Recommended dimensions by use case:**
-
-| Use Case | Width | Height | FontSize |
-|----------|-------|--------|----------|
-| README GIF | 1200 | 600 | 20 |
-| Docs/tutorial | 1400 | 800 | 18 |
-| Social media | 1200 | 630 | 22 |
-| Full TUI app | 1600 | 900 | 16 |
-| Compact CLI demo | 800 | 400 | 20 |
-
-## Phase 2: Write the Tape File
-
-### Tape File Structure
-
-Every tape file follows this order:
+Settings must come before commands:
 
 ```tape
-# 1. Output declaration
-Output demo.gif
+Output demo.gif              # 1. output (gif/mp4/webm/ascii)
+Require my-app               # 2. fail fast if dependency missing
 
-# 2. Requirements (optional)
-Require my-app
-
-# 3. Settings (MUST come before commands)
-Set Shell "bash"
+Set Shell "bash"             # 3. settings, grouped before any command
 Set FontSize 20
 Set Width 1200
 Set Height 600
@@ -87,354 +40,77 @@ Set WindowBar Colorful
 Set Padding 20
 Set TypingSpeed 75ms
 
-# 4. Hidden setup (optional)
-Hide
+Hide                         # 4. hidden setup — always Ctrl+L before Show
 Type "export TERM=xterm-256color"
 Enter
 Sleep 500ms
 Ctrl+L
 Show
 
-# 5. Visible interactions
-Type "my-app --demo"
+Type "my-app --demo"         # 5. visible interactions, with deliberate pauses
 Sleep 500ms
 Enter
 Sleep 2s
-
-# 6. App interactions
-Down Down Down
+Down Down Down               # 6. app interaction
 Enter
-Sleep 1s
-Type "hello world"
-Enter
-Sleep 3s
-
-# 7. Hidden cleanup (optional)
-Hide
-Ctrl+c
-Sleep 500ms
+Sleep 3s                     # generous final frame for the loop
 ```
-
-### Essential Commands
-
-| Command | Example | Purpose |
-|---------|---------|---------|
-| `Output` | `Output demo.gif` | Set output (gif/mp4/webm/ascii) |
-| `Set` | `Set FontSize 20` | Configure settings |
-| `Type` | `Type "hello"` | Emulate typing |
-| `Type@Nms` | `Type@100ms "slow"` | Type at specific speed |
-| `Enter`/`Tab`/`Space` | `Enter` | Key presses |
-| `Up`/`Down`/`Left`/`Right` | `Down 3` | Navigation (with repeat) |
-| `Ctrl+key` | `Ctrl+c` | Modifier combos |
-| `Sleep` | `Sleep 2s` | Pause (ms or s) |
-| `Wait+Screen` | `Wait+Screen /ready/` | Wait for screen content |
-| `Hide`/`Show` | `Hide` | Control recording visibility |
-| `Screenshot` | `Screenshot step1.png` | Capture current frame |
-| `Env` | `Env TERM "xterm-256color"` | Set env variable |
-| `Source` | `Source setup.tape` | Include another tape |
-| `Require` | `Require node` | Fail if not in PATH |
-
-For complete command details, settings, and timing guidelines, see **[Command Reference](./reference/COMMAND-REFERENCE.md)**.
-
-## Phase 3: Smart Tape Generation
-
-When asked to generate a tape file for a specific app, follow this process:
-
-### Step 1: Analyze the App
-
-Read the app's code or help output to understand:
-- How it launches (command, flags, arguments)
-- Key interactions (what keys it responds to)
-- Visual states worth showing (menus, forms, results)
-
-### Step 2: Generate the Tape
-
-Build the tape file showing the app's key features:
-
-```bash
-# Generate and preview
-vhs validate demo.tape    # Check syntax
-vhs demo.tape             # Record
-```
-
-### Step 3: Iterate
-
-Run the tape, review the output, adjust timing and interactions.
-
-**Useful iteration commands:**
-```bash
-# Quick preview without saving
-vhs demo.tape --output /dev/null
-
-# Test specific section — use Source to split tapes
-vhs section-test.tape
-```
-
-### Available Templates
-
-Use these as starting points — copy and customize:
-
-- **Basic CLI Demo** — Simple command + output recording
-- **Interactive TUI Demo** — Navigation, forms, keyboard interaction
-- **Build-and-Run Demo** — Hidden compilation, visible app usage
-- **Multi-Panel TUI** — Complex apps like lazygit, k9s
-- **CI Golden File** — ASCII output for regression testing
-- **Composable Tapes** — DRY settings with `Source`
-
-For complete copy-paste templates, see **[Templates](./reference/TEMPLATES.md)**.
-
-## Phase 4: Optimize Output
-
-Tune framerate, dimensions, and pacing so GIFs stay under 5 MB for README use. Quick summary:
-
-- Lower framerate to 15 and reduce dimensions if file too large
-- `Sleep 500ms` after typing, `Sleep 2-3s` after Enter, `Sleep 3-5s` on final frame
-- Post-process with `gifsicle -O3 --lossy=80` if still over target
-
-See **[Optimization Guide](./reference/OPTIMIZATION.md)** for target sizes, timing rules, and format decision tree.
-
-## Phase 5: CI/CD Integration
-
-Automate recording with GitHub Actions so README demos stay current. ASCII output enables golden-file regression testing.
-
-See **[CI Integration Guide](./reference/CI-INTEGRATION.md)** for the GitHub Actions workflow, golden-file setup, and cost control tips.
-
-## Examples
-
-### Good: Well-Structured Tape File
-
-✅ **Good:**
-
-```tape
-# Clear output declaration
-Output demo.gif
-
-# Explicit dependency
-Require gum
-
-# All settings grouped at top
-Set Shell "bash"
-Set FontSize 20
-Set Width 1200
-Set Height 600
-Set Theme "Catppuccin Frappe"
-Set WindowBar Colorful
-Set TypingSpeed 75ms
-Set Padding 20
-
-# Hidden setup — always Ctrl+L before Show to clear the screen
-Hide
-Type "export GLAMOUR_STYLE=dark"
-Enter
-Sleep 500ms
-Ctrl+L
-Show
-
-# Deliberate pacing — viewer can follow
-Type "gum choose 'Option A' 'Option B' 'Option C'"
-Sleep 500ms
-Enter
-Sleep 1s
-
-# Navigate with visible pauses
-Down
-Sleep 300ms
-Down
-Sleep 300ms
-Enter
-Sleep 2s
-
-# Generous final pause for loop
-Sleep 3s
-```
-
-### Bad: Common Mistakes
-
-❌ **Bad:**
-
-```tape
-# Missing Output declaration — VHS won't know where to save
-
-# Settings scattered throughout (will error or be ignored)
-Type "my-app"
-Set FontSize 20
-Enter
-Set Theme "Dracula"
-
-# No Sleep after Enter — output flashes by
-Type "my-app run"
-Enter
-Type "my-app status"
-Enter
-
-# No final Sleep — GIF loops abruptly
-
-# No Require — silently fails if app missing
-```
-
-### Bad: TUI Recording Anti-Patterns
-
-❌ **Bad:**
-
-```tape
-Output demo.gif
-Set Width 600
-Set Height 300
-# Too small — TUI elements will be cramped and unreadable
-
-Type "lazygit"
-Enter
-# No Sleep — app hasn't loaded yet, next keys arrive too early
-
-Tab Tab Tab Tab Tab
-# Rapid-fire navigation — viewer can't follow what's happening
-
-Type "c"
-Type "feat: add feature"
-Enter
-# No pauses between actions — looks like a blur
-```
-
-For a complete well-structured TUI example (lazygit, k9s), see **[Templates](./reference/TEMPLATES.md)**.
-
-## Quality Signals
-
-A well-written tape file has these properties:
-
-- **Output declared first, settings grouped before commands** — structure follows the required order
-- **`Require` checks for dependencies** — fails fast instead of producing broken output
-- **Hidden setup with `Ctrl+L` before `Show`** — clean screen, no shell noise visible
-- **Deliberate pacing** — `Sleep 500ms` after typing, `Sleep 2-3s` after Enter, `Sleep 3-5s` on final frame
-- **GIF under 5MB for README use** — reduced via framerate, dimensions, or gifsicle post-processing
-- **Reproducible from the tape file alone** — no manual steps required
-
-## Troubleshooting
-
-### Problem: GIF is choppy or laggy
-
-**Cause:** Framerate too high for GIF format, or file too large for viewer.
-
-**Solution:**
-```tape
-Set Framerate 15            # Lower from default 30
-Set PlaybackSpeed 1.0       # Don't speed up
-```
-If still choppy, reduce dimensions or switch to MP4.
-
-### Problem: TUI doesn't render correctly
-
-**Cause:** Missing TERM variable, wrong shell, or app needs specific setup.
-
-**Solution:**
-```tape
-Hide
-Env TERM "xterm-256color"
-Type "stty rows 50 cols 120"
-Enter
-Sleep 500ms
-Ctrl+L
-Show
-```
-
-### Problem: Keys arrive before app is ready
-
-**Cause:** No Sleep after launching the app — VHS sends keystrokes immediately.
-
-**Solution:** Always add `Sleep 1-3s` after launching a TUI app:
-```tape
-Type "my-tui"
-Enter
-Sleep 2s          # Wait for app to initialize
-Down              # Now safe to interact
-```
-
-For apps with variable startup time, use `Wait`:
-```tape
-Type "my-tui"
-Enter
-Wait+Screen /ready/    # Wait until "ready" appears on screen
-Down
-```
-
-### Problem: VHS command not found
-
-**Cause:** Missing VHS, ffmpeg, or ttyd.
-
-**Solution:**
-```bash
-# macOS
-brew install charmbracelet/tap/vhs ffmpeg ttyd
-
-# Verify all three
-vhs --version && ffmpeg -version && ttyd --version
-```
-
-### Problem: GIF too large for GitHub
-
-**Cause:** High resolution, long recording, or high framerate.
-
-**Solution:**
-1. Reduce dimensions: `Set Width 800` / `Set Height 400`
-2. Lower framerate: `Set Framerate 15`
-3. Speed up slow sections: `Set PlaybackSpeed 1.5`
-4. Post-process: `gifsicle -O3 --lossy=80 demo.gif -o demo-small.gif`
-5. If still too large, use MP4 and embed with `<video>` tag
-
-## Integration
-
-**This skill pairs with:**
-- **build-tui** — Record demos of TUIs you build
-- **track-session** — Track recording iteration progress
-
-**Useful alongside:**
-- [Charmbracelet VHS](https://github.com/charmbracelet/vhs) — The recording tool
-- [VHS GitHub Action](https://github.com/charmbracelet/vhs-action) — CI integration
-- [gifsicle](https://www.lcdf.org/gifsicle/) — GIF optimization
-
-## Quick Reference
-
-```bash
-vhs validate demo.tape            # Check syntax
-vhs demo.tape                     # Record
-vhs demo.tape --output custom.gif # Custom output path
-vhs themes                        # List available themes
-vhs new demo.tape                 # Create tape from template
-```
-
-**Key commands cheat sheet:**
 
 | Command | Purpose |
 |---------|---------|
-| `Output file.gif` | Set output file and format |
+| `Output file.gif` | Output file + format (gif/mp4/webm/ascii) |
 | `Require app` | Fail if dependency missing |
-| `Set Key Value` | Configure terminal settings |
-| `Type "text"` | Emulate typing |
-| `Type@100ms "text"` | Type at specific speed |
+| `Set Key Value` | Terminal settings (FontSize, Width, Height, Theme, …) |
+| `Type "text"` / `Type@100ms "text"` | Emulate typing (optionally at a set speed) |
 | `Enter` / `Tab` / `Space` | Key presses |
-| `Up` / `Down` / `Left` / `Right` | Navigation |
-| `Ctrl+c` | Modifier key combos |
-| `Sleep 2s` | Pause execution |
-| `Wait+Screen /regex/` | Wait for screen content |
+| `Up`/`Down`/`Left`/`Right` (`Down 3`) | Navigation with optional repeat |
+| `Ctrl+key` | Modifier combos |
+| `Sleep 2s` | Pause (ms or s) |
+| `Wait+Screen /regex/` | Wait until screen content matches |
 | `Hide` / `Show` | Control recording visibility |
 | `Screenshot file.png` | Capture current frame |
-| `Env VAR "val"` | Set environment variable |
-| `Source other.tape` | Include another tape file |
+| `Env VAR "val"` / `Source other.tape` | Set env var / include another tape |
 
-## Deep Reference
+Full command + settings detail: **[reference/COMMAND-REFERENCE.md](./reference/COMMAND-REFERENCE.md)**.
 
-For detailed guides, load these files when needed:
+## CLI
 
-- **[Command Reference](./reference/COMMAND-REFERENCE.md)** — All VHS commands, settings, timing guidelines
-- **[Templates](./reference/TEMPLATES.md)** — Copy-paste tape file templates for common scenarios
-- **[Optimization Guide](./reference/OPTIMIZATION.md)** — File size reduction, timing rules, format decision tree
-- **[CI Integration Guide](./reference/CI-INTEGRATION.md)** — GitHub Actions workflow, golden-file testing
+```bash
+vhs validate demo.tape    # check syntax
+vhs demo.tape             # record
+vhs themes                # list themes
+vhs new demo.tape         # scaffold from template
+```
 
-*Only load these when specifically needed to save context.*
+## Recommended dimensions
 
-## References
+| Use case | Width | Height | FontSize |
+|----------|-------|--------|----------|
+| README GIF | 1200 | 600 | 20 |
+| Docs/tutorial | 1400 | 800 | 18 |
+| Social media | 1200 | 630 | 22 |
+| Full TUI app | 1600 | 900 | 16 |
+| Compact CLI | 800 | 400 | 20 |
 
-- [Charmbracelet VHS](https://github.com/charmbracelet/vhs) — Official repository
-- [VHS README](https://github.com/charmbracelet/vhs/blob/main/README.md) — Full documentation
-- [VHS GitHub Action](https://github.com/charmbracelet/vhs-action) — CI/CD integration
-- [VHS Examples](https://github.com/charmbracelet/vhs/tree/main/examples) — Official tape examples
-- [VHS Themes](https://github.com/charmbracelet/vhs/blob/main/THEMES.md) — Available color themes
+## Generating a tape for an app
+
+Read the app's code or `--help` to learn how it launches, which keys it responds to, and the states worth showing. Build a tape covering its key features, then `vhs validate demo.tape` → `vhs demo.tape` → review → adjust timing/interactions. Copy-paste starting points (Basic CLI, Interactive TUI, Build-and-Run, Multi-Panel, CI golden file, composable `Source` tapes): **[reference/TEMPLATES.md](./reference/TEMPLATES.md)**.
+
+✅ **Good** — output first, settings grouped, `Require`, hidden setup with `Ctrl+L`, deliberate pacing (`Sleep 500ms` after typing, `2-3s` after Enter, `3s` final frame).
+
+❌ **Bad** — no `Output`; `Set` scattered among commands (errors/ignored); no `Sleep` after `Enter` (output flashes by); rapid-fire `Tab Tab Tab` the viewer can't follow; dimensions too small for a TUI; no `Require` (silently fails if app missing).
+
+## Optimize & CI
+
+Keep README GIFs under ~5 MB: `Set Framerate 15`, reduce dimensions, speed slow sections with `Set PlaybackSpeed`, or post-process `gifsicle -O3 --lossy=80 demo.gif -o demo-small.gif`; if still large, use MP4 with a `<video>` tag. Details + format decision tree: **[reference/OPTIMIZATION.md](./reference/OPTIMIZATION.md)**. Automate recording in CI (ASCII output enables golden-file regression tests): **[reference/CI-INTEGRATION.md](./reference/CI-INTEGRATION.md)**.
+
+## Troubleshooting
+
+- **Choppy GIF** — `Set Framerate 15`, don't speed playback; if still choppy reduce dimensions or use MP4.
+- **TUI renders wrong** — set the terminal up in a `Hide` block: `Env TERM "xterm-256color"`, `Type "stty rows 50 cols 120"`, `Ctrl+L`, `Show`.
+- **Keys arrive before app is ready** — add `Sleep 1-3s` after launch, or `Wait+Screen /ready/` for variable startup.
+- **GIF too large for GitHub** — reduce dimensions/framerate, speed slow sections, `gifsicle` post-process, or switch to MP4.
+
+## Integration & references
+
+Pairs with **build-tui** (record TUIs you build) and **track-session** (iteration tracking). External: [VHS](https://github.com/charmbracelet/vhs) · [VHS Action](https://github.com/charmbracelet/vhs-action) · [examples](https://github.com/charmbracelet/vhs/tree/main/examples) · [themes](https://github.com/charmbracelet/vhs/blob/main/THEMES.md) · [gifsicle](https://www.lcdf.org/gifsicle/).
