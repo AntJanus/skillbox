@@ -4,467 +4,114 @@ description: React component structure and hooks antipatterns. Use when asked to
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.6.1"
+  version: "1.7.0"
 ---
 
 # Ideal React Component Structure
 
-## Overview
+A predictable seven-section order for function-component files — imports → styles → types → component → logic → conditional render → default render — so developers always know where to find things. **It's a pattern, not a law:** small/simple components and React Server Components can skip sections.
 
-A battle-tested pattern for organizing React component files that emphasizes readability, maintainability, and logical flow. This structure helps teams maintain consistency and makes components easier to understand at a glance.
-
-**Core principle:** Declare everything in a predictable order--imports to styles to types to logic to render--so developers know where to find things.
-
-## When to Use
-
-**Always use when:**
-- Creating new React components
-- Refactoring existing components
-- Reviewing component structure during code review
-- Onboarding developers to component patterns
-
-**Useful for:**
-- Establishing team conventions
-- Maintaining large component libraries
-- Teaching React best practices
-- Reducing cognitive load when reading components
-
-**Avoid when:**
-- Working with class components (this pattern is for function components)
-- Component is < 20 lines and simple (don't over-engineer)
-- Project has different established conventions (consistency > perfection)
-
-## The Ideal Structure
-
-Components should follow this seven-section pattern:
+## The seven-section structure
 
 ```tsx
-// 1. IMPORTS (organized by source)
+// 1. IMPORTS (grouped: React → third-party → internal @/ → local, blank line between)
 import React, { useState, useEffect } from 'react';
 import { useQuery } from 'react-query';
-
-import { formatDate } from '@/utils/date';
 import { api } from '@/services/api';
-
 import { Button } from './Button';
 
-// 2. STYLED COMPONENTS (prefixed with "Styled")
-const StyledContainer = styled.div`
-  padding: 1rem;
-  background: white;
-`;
+// 2. STYLED COMPONENTS (prefix "Styled" so they're instantly recognizable)
+const StyledContainer = styled.div`padding: 1rem; background: white;`;
 
-// 3. TYPE DEFINITIONS (ComponentNameProps pattern)
+// 3. TYPE DEFINITIONS (ComponentNameProps, declared right above the component)
 type UserProfileProps = {
   userId: string;
   onUpdate?: (user: User) => void;
 };
 
-// 4. COMPONENT FUNCTION
+// 4. COMPONENT FUNCTION (named export, const arrow function)
 export const UserProfile = ({ userId, onUpdate }: UserProfileProps): JSX.Element => {
-  // 5. LOGIC SECTIONS (in this order)
-  // - Local state
-  // - Custom/data hooks
-  // - useEffect/useLayoutEffect
-  // - Post-processing
-  // - Callback handlers
+  // 5. LOGIC, in order: local state → custom/data hooks → effects → post-processing → handlers
 
-  // 6. CONDITIONAL RENDERING (exit early)
+  // 6. CONDITIONAL RENDERING (exit early for each edge case)
   if (isLoading) return <Loading />;
   if (error) return <Error message={error.message} />;
   if (!data) return <Empty />;
 
-  // 7. DEFAULT RENDER (success state)
-  return (
-    <StyledContainer>
-      {/* Main component JSX */}
-    </StyledContainer>
-  );
+  // 7. DEFAULT RENDER (success/happy path stays at the bottom — most visible)
+  return <StyledContainer>{/* Main JSX */}</StyledContainer>;
 };
 ```
 
-**JavaScript:** Same pattern without type annotations (skip Section 3 or use JSDoc).
+**JavaScript:** same pattern without type annotations (skip Section 3 or use JSDoc).
 
-## Section 1: Import Organization
-
-**Order imports by source to reduce cognitive load:**
-
-```tsx
-// ✅ Good: Clear grouping with blank lines
-import React, { useState, useEffect, useMemo } from 'react';
-import { useQuery, useMutation } from 'react-query';
-import { format } from 'date-fns';
-
-import { api } from '@/services/api';
-import { formatCurrency } from '@/utils/format';
-
-import { Button } from './Button';
-import { Card } from './Card';
-```
-
-```tsx
-// ❌ Bad: Random order, no grouping
-import { Button } from './Button';
-import { format } from 'date-fns';
-import React, { useState } from 'react';
-import { api } from '@/services/api';
-import { useQuery } from 'react-query';
-```
-
-**Import priority:**
-1. React imports (first)
-2. Third-party libraries (followed by blank line)
-3. Internal/aliased imports (`@/`) (followed by blank line)
-4. Local component imports (same directory)
-
-## Section 2: Styling
-
-**The key principle is separating styling from logic.** The approach depends on your styling solution:
-
-**styled-components / emotion:** Prefix with `Styled` for instant recognition:
-
-✅ **Good:**
-
-```tsx
-const StyledCard = styled.div`
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 1rem;
-`;
-
-const StyledTitle = styled.h2`
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
-`;
-
-export const Card = ({ title, children }) => (
-  <StyledCard>
-    <StyledTitle>{title}</StyledTitle>
-    {children}
-  </StyledCard>
-);
-```
-
-❌ **Bad:**
-
-```tsx
-// ❌ Bad: Can't tell if CardWrapper is styled or contains logic
-const CardWrapper = styled.div`
-  border: 1px solid #ccc;
-`;
-
-const Title = styled.h2`
-  font-size: 1.5rem;
-`;
-```
-
-**When styled components grow large:**
-- Move to co-located `ComponentName.styled.ts` file
-- Import as `import * as S from './ComponentName.styled'`
-- Use as `<S.Container>`, `<S.Title>`, etc.
-
-**Tailwind CSS:** Extract repeated utility sets into components or use `@apply`:
-```tsx
-// Wrapper component keeps JSX clean
-const Card = ({ title, children }: CardProps) => (
-  <div className="border border-gray-300 rounded-lg p-4">
-    <h2 className="text-xl mb-2">{title}</h2>
-    {children}
-  </div>
-);
-```
-
-**CSS Modules:** Import as `styles` and use bracket notation:
-```tsx
-import styles from './Card.module.css';
-
-const Card = ({ title, children }: CardProps) => (
-  <div className={styles.container}>
-    <h2 className={styles.title}>{title}</h2>
-    {children}
-  </div>
-);
-```
-
-**JavaScript:** Same patterns work for `.js`/`.jsx` files.
-
-## Section 3: Type Definitions
-
-**Declare types immediately above the component for visibility:**
-
-✅ **Good:**
-
-```tsx
-type ButtonProps = {
-  variant?: 'primary' | 'secondary';
-  size?: 'sm' | 'md' | 'lg';
-  onClick: () => void;
-  children: React.ReactNode;
-};
-
-export const Button = ({
-  variant = 'primary',
-  size = 'md',
-  onClick,
-  children
-}: ButtonProps): JSX.Element => {
-  // Component logic
-};
-```
-
-❌ **Bad:**
-
-```tsx
-// ❌ Bad: Inline types hide the API
-export const Button = ({ variant, size, onClick, children }: {
-  variant?: 'primary' | 'secondary'; size?: 'sm' | 'md' | 'lg';
-  onClick: () => void; children: React.ReactNode;
-}) => { /* ... */ };
-```
-
-**Naming:** Props: `ComponentNameProps`. Return types: `JSX.Element` (or custom: `ComponentNameReturn`).
-
-**JavaScript:** Use JSDoc `@typedef` and `@param` annotations for equivalent documentation.
-
-**Why:** Makes component API visible at a glance, easier to modify without disturbing component code, better for documentation.
-
-## Section 4: Component Function
-
-**Use named exports with const arrow functions:**
-
-✅ **Good:**
-
-```tsx
-export const UserProfile = ({ userId }: UserProfileProps): JSX.Element => {
-  // Component logic
-};
-```
-
-❌ **Bad:**
-
-```tsx
-// ❌ Bad: Default export makes refactoring harder
-export default function UserProfile({ userId }: UserProfileProps): JSX.Element {
-  // Component logic
-}
-```
-
-**Why const + arrow functions:**
-- Easy to wrap with `useCallback` later if needed
-- Consistent with other hooks and callbacks in component
-- Named exports are easier to refactor and search for
-
-**JavaScript:** Same pattern without type annotations.
-
-## Section 5: Logic Flow
-
-**Organize component logic in this strict order:**
-
-```tsx
-export const UserProfile = ({ userId }: UserProfileProps): JSX.Element => {
-  // 5.1 - LOCAL STATE
-  const [isEditing, setIsEditing] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  // 5.2 - CUSTOM/DATA HOOKS
-  const { data: user, isLoading, error } = useQuery(['user', userId], () => api.getUser(userId));
-  const { mutate: updateUser } = useMutation(api.updateUser);
-
-  // 5.3 - useEffect/useLayoutEffect
-  useEffect(() => {
-    if (isEditing && inputRef.current) inputRef.current.focus();
-  }, [isEditing]);
-
-  // 5.4 - POST-PROCESSING
-  const displayName = user ? `${user.firstName} ${user.lastName}` : '';
-
-  // 5.5 - CALLBACK HANDLERS
-  const handleEdit = () => setIsEditing(true);
-  const handleSave = (updates: Partial<User>) => { updateUser(updates); setIsEditing(false); };
-
-  // [Next: Conditional rendering, then Default render]
-};
-```
-
-**Why this order:** Respects React's hook rules, puts dependent logic after dependencies, makes component flow easy to trace.
-
-**JavaScript:** Same ordering applies without type annotations.
-
-## Section 6: Conditional Rendering
-
-**Exit early for loading, error, and empty states:**
-
-✅ **Good:**
-
-```tsx
-// Exit early - each conditional gets own return
-if (isLoading) return <LoadingSpinner />;
-if (error) return <ErrorMessage message={error.message} />;
-if (!data) return <EmptyState message="User not found" />;
-
-// Success state continues below
-return <div>{/* Main component JSX */}</div>;
-```
-
-❌ **Bad:**
-
-```tsx
-// ❌ Bad: Nested ternaries are hard to read
-return (
-  <div>
-    {isLoading ? <LoadingSpinner /> : error ? <ErrorMessage /> : !data ? <EmptyState /> : (
-      <div>{/* Main component JSX buried deep */}</div>
-    )}
-  </div>
-);
-```
-
-**Benefits of early returns:**
-- Reduces nesting depth
-- Main success render stays at bottom (most important case)
-- Each condition is independent and easy to test
-- TypeScript can narrow types after guards
-
-**JavaScript:** Same pattern applies.
-
-## Section 7: Default Render
-
-**Keep the success/default render at the bottom, after all early returns:**
-
-```tsx
-  // Success state - the main component render
-  return (
-    <StyledContainer>
-      <StyledHeader>
-        <StyledTitle>{displayName}</StyledTitle>
-        <Button onClick={handleEdit}>Edit</Button>
-      </StyledHeader>
-      {isEditing ? (
-        <EditForm user={user} onSave={handleSave} onCancel={handleCancel} />
-      ) : (
-        <UserDetails user={user} />
-      )}
-    </StyledContainer>
-  );
-```
-
-**Why:** Most important case (happy path) is most visible. All error states eliminated, all data and handlers already declared.
-
-## Refactoring: Extract to Custom Hooks
-
-When components exceed 50 lines of logic or 200 lines total, extract stateful logic into a `use[Domain]` custom hook. The component becomes presentation-focused; the hook owns state and data flow.
-
-See **[Refactoring to Custom Hooks](./reference/REFACTORING.md)** for full examples, extraction criteria, and hook composition patterns.
-
-## Common Hooks Antipatterns (Quick Reference)
-
-These are the most frequent causes of infinite loops, stale data, and unexpected re-renders:
-
-**1. useEffect as onChange callback** - Causes double renders or infinite loops:
-```tsx
-// ❌ Bad: Effect syncs state derived from other state
-useEffect(() => { setFullName(`${first} ${last}`); }, [first, last]);
-
-// ✅ Good: Derive during render instead
-const fullName = `${first} ${last}`;
-```
-
-**2. useState initial value not updating with props:**
-```tsx
-// ❌ Bad: Initial value only runs once, won't track prop changes
-const [value, setValue] = useState(props.initialValue);
-
-// ✅ Good: Use a key to reset, or useEffect to sync
-<Component key={itemId} initialValue={data.value} />
-```
-
-**3. Non-exhaustive dependency arrays** - Causes stale closures:
-```tsx
-// ❌ Bad: Missing dependency means stale count value
-useEffect(() => { setTotal(count * price); }, [price]);
-
-// ✅ Good: Include all dependencies
-useEffect(() => { setTotal(count * price); }, [count, price]);
-```
-
-For detailed explanations and more patterns, see **[React Hooks Antipatterns](./reference/HOOKS-ANTIPATTERNS.md)**.
-
-## Deep Reference
-
-- **[Complete Component Examples](./reference/COMPLETE-EXAMPLES.md)** - Full TypeScript and JavaScript component examples
-- **[Refactoring to Custom Hooks](./reference/REFACTORING.md)** - Extraction criteria, full examples, hook composition
-- **[React Hooks Antipatterns](./reference/HOOKS-ANTIPATTERNS.md)** - Deep dive on infinite loops, stale closures, dependency arrays
-
-*Only load these when specifically needed to save context.*
-
-## Quality Signals
-
-A well-structured React component has these properties:
-
-- **Imports grouped by source** — React, third-party, internal, local — with blank lines between
-- **Types declared above the component** — component API visible at a glance
-- **Logic follows the strict order** — state, hooks, effects, post-processing, handlers
-- **Early returns for edge cases** — loading/error/empty states exit before the main render
-- **Success render at the bottom** — the happy path is the most visible code
-- **Under 200 lines** or logic extracted to custom hooks
-
-## Quick Reference
-
-| Section | What Goes Here | Why |
+| Section | What goes here | Why |
 |---------|----------------|-----|
-| 1. Imports | React, libraries, internal, local | Easy to find dependencies |
-| 2. Styling | Styled components, Tailwind, CSS Modules | Visual separation from logic |
-| 3. Type Definitions | `*Props`, `*Return` types | Component API visibility |
-| 4. Component Function | `export const Component =` | Named exports for refactoring |
-| 5. Logic Flow | State -> Hooks -> Effects -> Handlers | Respects hook rules, logical order |
-| 6. Conditional Rendering | Early returns for edge cases | Reduces nesting |
-| 7. Default Render | Success state JSX | Most important case most visible |
+| 1. Imports | React, libraries, internal `@/`, local | Easy to find dependencies |
+| 2. Styling | Styled comps (prefix `Styled`), Tailwind, CSS Modules | Visual separation from logic |
+| 3. Types | `*Props`, `*Return` above the component | API visible at a glance |
+| 4. Component | `export const Component = (...) =>` | Named exports refactor cleanly |
+| 5. Logic | state → hooks → effects → post-processing → handlers | Respects hook rules; deps before dependents |
+| 6. Conditional render | Early returns for loading/error/empty | Reduces nesting; types narrow after guards |
+| 7. Default render | Success-state JSX | Happy path is the most visible code |
 
-## Troubleshooting
+See **[reference/SECTIONS.md](./reference/SECTIONS.md)** for per-section ✅/❌ detail, styling-solution variants, and troubleshooting.
 
-### Problem: Component is getting too long (> 200 lines)
+## Logic flow order (Section 5)
 
-**Cause:** Too much logic in one file
+```tsx
+// 5.1 local state         const [isEditing, setIsEditing] = useState(false);
+// 5.2 custom/data hooks    const { data, isLoading, error } = useQuery(...);
+// 5.3 effects              useEffect(() => { ... }, [isEditing]);
+// 5.4 post-processing      const displayName = data ? `${data.first} ${data.last}` : '';
+// 5.5 callback handlers    const handleEdit = () => setIsEditing(true);
+```
 
-**Solution:**
-1. Extract data fetching to custom hook (`useUserProfile`)
-2. Move styled components to `ComponentName.styled.ts`
-3. Split into smaller sub-components
-4. Extract complex calculations to utility functions
+State first, effects after the hooks they depend on, handlers last — so the file reads top-to-bottom in dependency order.
 
-### Problem: Can't decide if something should be a styled component or a sub-component
+## Top hooks antipatterns
 
-**Solution:**
-- **Styled component** if it only adds styling (no props, no logic)
-- **Sub-component** if it has its own props, state, or logic
+The most frequent causes of infinite loops, stale data, and unexpected re-renders:
 
-### Problem: TypeScript types getting complex
+**1. useEffect as an onChange/derive callback** — causes double renders or loops:
+```tsx
+useEffect(() => { setFullName(`${first} ${last}`); }, [first, last]); // ❌
+const fullName = `${first} ${last}`;                                   // ✅ derive during render
+```
 
-**Solution:** Split component into smaller pieces, extract shared types to `types.ts`, use utility types (`Pick`, `Omit`, `Partial`).
+**2. useState initialized from props** — initializer runs once, won't track prop changes:
+```tsx
+const [value, setValue] = useState(props.initialValue);  // ❌ stale on prop change
+<Component key={itemId} initialValue={data.value} />      // ✅ key to reset, or sync in effect
+```
 
-### Problem: Hooks causing infinite re-render loop, stale data, or state not syncing
+**3. Non-exhaustive dependency arrays** — stale closures:
+```tsx
+useEffect(() => { setTotal(count * price); }, [price]);          // ❌ missing count
+useEffect(() => { setTotal(count * price); }, [count, price]);   // ✅ all deps
+```
 
-**Solution:** See the **Common Hooks Antipatterns** section above for the top 3 patterns, or load **[React Hooks Antipatterns](./reference/HOOKS-ANTIPATTERNS.md)** for the full guide.
+See **[reference/HOOKS-ANTIPATTERNS.md](./reference/HOOKS-ANTIPATTERNS.md)** for the full set with explanations.
 
-## Variations and Flexibility
+## Refactoring
 
-**This is a pattern, not a law.** Adapt as needed:
+When a component exceeds ~50 lines of logic or ~200 total, extract stateful logic into a `use[Domain]` custom hook — the component becomes presentation-focused, the hook owns state and data flow. See **[reference/REFACTORING.md](./reference/REFACTORING.md)** for extraction criteria and composition patterns.
 
-- **Small components** (< 50 lines) can skip some structure
-- **Simple components** without state can skip logic sections
-- **React Server Components** don't use hooks or client state - skip logic sections, focus on data fetching and render
+## Deep reference
+
+Load only when needed:
+- **[reference/SECTIONS.md](./reference/SECTIONS.md)** — per-section detail + troubleshooting
+- **[reference/COMPLETE-EXAMPLES.md](./reference/COMPLETE-EXAMPLES.md)** — full TS + JS component examples
+- **[reference/REFACTORING.md](./reference/REFACTORING.md)** — extracting custom hooks
+- **[reference/HOOKS-ANTIPATTERNS.md](./reference/HOOKS-ANTIPATTERNS.md)** — infinite loops, stale closures, dependency arrays
 
 ## Integration
 
-**Works with:** styled-components, emotion, Tailwind CSS, CSS Modules, React Query / TanStack Query, SWR, Zustand / Redux
+Works with styled-components, emotion, Tailwind, CSS Modules, React Query/SWR, Zustand/Redux. Pairs with ESLint, Prettier, TypeScript, Storybook, Vitest/Jest.
 
-**Pairs well with:** ESLint (`eslint-plugin-import`), Prettier, TypeScript, Storybook, Vitest / Jest
+**GSD note:** this skill won't auto-activate inside GSD execution phases — reference `/ideal-react-component` explicitly when creating React components, or add it to the project CLAUDE.md as a convention.
 
-**Note on GSD workflows:** When using GSD skills (discuss-phase, execute-phase) for React work, this skill won't auto-activate — GSD owns the execution pipeline. Reference this skill explicitly with `/ideal-react-component` during GSD phases that create React components, or add it to your project's CLAUDE.md as a convention to follow.
+## Source
 
-## References
-
-- [The Anatomy of My Ideal React Component](https://antjanus.com/digital-garden/the-anatomy-of-my-ideal-react-component) - Antonin Januska
-- [Common React Hooks Antipatterns and Gotchas](https://antjanus.com/digital-garden/common-react-hooks-antipatterns-and-gotchas) - Antonin Januska
-- [React Hooks Rules](https://react.dev/reference/rules/rules-of-hooks) | [Custom Hooks Guide](https://react.dev/learn/reusing-logic-with-custom-hooks)
-- [TypeScript React Cheatsheet](https://react-typescript-cheatsheet.netlify.app/) | [Thinking in React](https://react.dev/learn/thinking-in-react)
+- [The Anatomy of My Ideal React Component](https://antjanus.com/digital-garden/the-anatomy-of-my-ideal-react-component) and [Common React Hooks Antipatterns](https://antjanus.com/digital-garden/common-react-hooks-antipatterns-and-gotchas) — Antonin Januska
+- [Rules of Hooks](https://react.dev/reference/rules/rules-of-hooks) · [Custom Hooks](https://react.dev/learn/reusing-logic-with-custom-hooks) · [TS React Cheatsheet](https://react-typescript-cheatsheet.netlify.app/)
