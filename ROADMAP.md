@@ -2,7 +2,7 @@
 schema: cc-dash/roadmap@1
 project: skillbox
 description: Curated collection of reusable utility skills for Claude Code and AI agents.
-last_updated: 2026-05-06T15:00:00-06:00
+last_updated: 2026-05-30T11:30:00-06:00
 ---
 
 # Roadmap
@@ -13,6 +13,7 @@ last_updated: 2026-05-06T15:00:00-06:00
 
 <!-- category:core -->
 
+- <!-- id:r_sk1mp status:in-progress --> **Skill simplification campaign** - Pare every SKILL.md to its core idea + a few pointers; target ~120-150 lines each, push detail to `references/`. For each skill: identify the one non-inferable thing it teaches, cut duplicate examples to one ✅/❌ pair, fold "When to Use/Quality Signals/Rules" into terse inline lines, keep load-bearing schema/frontmatter inline (cc-dash skills). One skill per commit + version bump + changelog entry. **Done:** track-session (483→119, v5.0.0). **Remaining by size:** deep-research 486, ideal-react-component 470, screenshot-local 461, setup-semantic-release 444, record-tui 440, code-review 427, track-roadmap 421, track-qa 340, rate-skill 257, generate-skill 249. Total 4114→target ~1600.
 - <!-- id:r_si6j5 status:done completed:2026-04-15 --> ~~**AGENTS.md Refresh**~~ - AGENTS.md refreshed with rate-skill v2.0.0 rubric; workflow sections aligned to current skill set. *(Completed: 2026-04-15)*
 - <!-- id:r_oulw2 status:done completed:2026-04-15 --> ~~**Progressive Disclosure Fixes**~~ - track-roadmap trimmed from 512 → 426 lines via inline-example extraction; TROUBLESHOOTING expanded in reference/. Similar patterns applied to record-tui, ideal-react-component, screenshot-local. *(Completed: 2026-04-15)*
 
