@@ -5,156 +5,62 @@ license: MIT
 argument-hint: "<url-or-file> [--output filename.png]"
 metadata:
   author: Antonin Januska
-  version: "1.2.1"
+  version: "1.3.0"
 ---
 
-# Screenshot Local - Capture Project Screenshots with shot-scraper
+# Screenshot Local — shot-scraper
 
-## Overview
-
-Capture screenshots of local development projects using [shot-scraper](https://github.com/simonw/shot-scraper) installed globally via pipx. Turn localhost URLs and local HTML files into PNGs, JPEGs, and PDFs for documentation, READMEs, and design reviews.
-
-**Core principle:** Screenshots should be reproducible from a single command or YAML config, not manual screen captures. Version-control your screenshot configs alongside your code.
-
-## When to Use
-
-**Use this skill when:**
-- Capturing screenshots of a local dev server for docs or README
-- Generating screenshots of multiple pages/states in batch
-- Documenting UI changes or new features visually
-- Creating before/after comparisons during refactoring
-- Automating screenshot generation in CI/CD
-
-**Avoid when:**
-- Recording terminal/CLI output (use `record-tui` with VHS instead)
-- Capturing non-web content (use native screenshot tools)
-- Scraping third-party websites (shot-scraper can do it, but this skill focuses on local projects)
+Capture screenshots of local dev servers and HTML files with [shot-scraper](https://github.com/simonw/shot-scraper) (installed via pipx). **Core principle:** screenshots should be reproducible from a command or committed YAML config, not manual captures. For terminal/CLI recordings use `record-tui` (VHS) instead.
 
 ## Prerequisites
 
-**Install shot-scraper globally via pipx:**
-
 ```bash
-# Install pipx if needed
-brew install pipx  # macOS
-# or: apt install pipx / pip install pipx
-
-# Install shot-scraper globally
+brew install pipx            # or: apt install pipx / pip install pipx
 pipx install shot-scraper
-
-# Install the browser engine (Chromium by default)
-shot-scraper install
+shot-scraper install         # installs Chromium; add -b firefox / -b webkit for others
+shot-scraper --version       # verify
 ```
 
-**Verify:** `shot-scraper --version`
+If the command isn't found after install, run `pipx ensurepath` and reopen the shell.
 
-**Alternative browsers:**
+## Capture
+
 ```bash
-shot-scraper install -b firefox
-shot-scraper install -b webkit
-```
-
-## Phase 1: Plan the Screenshots
-
-Before capturing, answer these questions:
-
-1. **What are you capturing?** — localhost URL, local HTML file, or built static site
-2. **Which pages/states?** — Single page, multiple routes, or specific UI states
-3. **What dimensions?** — Match your target display context
-4. **Any interaction needed?** — Click buttons, fill forms, dismiss modals before capture
-
-**Recommended dimensions by use case:**
-
-| Use Case | Width | Height | Format |
-|----------|-------|--------|--------|
-| README hero image | 1280 | 800 | PNG |
-| Docs screenshot | 1200 | auto | PNG |
-| Social/OG image | 1200 | 630 | PNG |
-| Mobile viewport | 375 | 812 | PNG |
-| Tablet viewport | 768 | 1024 | PNG |
-| Full page capture | 1280 | (omit) | PNG |
-
-## Phase 2: Capture Screenshots
-
-### Single Screenshot
-
-**Capture a localhost page:**
-```bash
-shot-scraper http://localhost:3000 -o homepage.png
-```
-
-**Capture a local HTML file:**
-```bash
-shot-scraper index.html -o preview.png
-```
-
-**With custom dimensions:**
-```bash
-shot-scraper http://localhost:3000 -w 1200 -h 800 -o homepage.png
-```
-
-**Retina (2x resolution):**
-```bash
-shot-scraper http://localhost:3000 --retina -o homepage-retina.png
-```
-
-**Capture a specific element:**
-```bash
-shot-scraper http://localhost:3000 -s ".hero-section" -o hero.png
-shot-scraper http://localhost:3000 -s "#main-nav" --padding 10 -o nav.png
-```
-
-**Wait for dynamic content:**
-```bash
-# Wait fixed time (ms)
-shot-scraper http://localhost:3000 --wait 2000 -o page.png
-
-# Wait for JS condition
+shot-scraper http://localhost:3000 -o homepage.png              # localhost page
+shot-scraper index.html -o preview.png                          # local HTML file
+shot-scraper http://localhost:3000 -w 1200 -h 800 -o home.png   # fixed viewport
+shot-scraper http://localhost:3000 --retina -o home@2x.png      # 2x for high-DPI
+shot-scraper http://localhost:3000 -s ".hero" -p 20 -o hero.png # element + padding
 shot-scraper http://localhost:3000 --wait-for "document.querySelector('.loaded')" -o page.png
+shot-scraper http://localhost:3000 -j "document.querySelector('.cookie-banner')?.remove()" -o clean.png
+shot-scraper pdf http://localhost:3000 -o page.pdf              # PDF export
+shot-scraper http://localhost:3000 -i                           # interactive debug
 ```
 
-**Execute JS before capture (dismiss modals, set state):**
-```bash
-shot-scraper http://localhost:3000 \
-  -j "document.querySelector('.cookie-banner')?.remove()" \
-  -o clean-homepage.png
-```
+| Flag | Purpose |
+|------|---------|
+| `-o` | Output filename |
+| `-w` / `-h` | Viewport width / height (omit `-h` for full page) |
+| `-s` / `--selector-all` | Capture one / all matching elements |
+| `-p` | Padding around selector (px) |
+| `--retina` | 2x device pixel ratio |
+| `--quality N` | Save as JPEG at quality N |
+| `--wait N` / `--wait-for "expr"` | Wait ms / until JS returns true |
+| `-j "js"` | Run JS before capture (dismiss modals, set state) |
+| `--omit-background` | Transparent background (PNG) |
+| `-b` | Browser: chromium / firefox / webkit |
 
-### Essential Options
+Full flag list: **[reference/COMMAND-REFERENCE.md](./reference/COMMAND-REFERENCE.md)**.
 
-| Flag | Example | Purpose |
-|------|---------|---------|
-| `-o` | `-o hero.png` | Output filename |
-| `-w` | `-w 1280` | Viewport width (default: 1280) |
-| `-h` | `-h 800` | Viewport height (omit for full page) |
-| `-s` | `-s ".card"` | CSS selector to capture |
-| `--selector-all` | `--selector-all ".card"` | All matching elements |
-| `-p` | `-p 10` | Padding around selector (px) |
-| `--retina` | `--retina` | 2x device pixel ratio |
-| `--quality` | `--quality 80` | Save as JPEG with quality |
-| `--wait` | `--wait 2000` | Wait ms after page load |
-| `--wait-for` | `--wait-for "expr"` | Wait until JS returns true |
-| `-j` | `-j "js code"` | Execute JS before screenshot |
-| `-b` | `-b firefox` | Browser (chromium/firefox/webkit) |
-| `--omit-background` | `--omit-background` | Transparent background (PNG) |
-| `--timeout` | `--timeout 10000` | Failure timeout (ms) |
+## Batch with YAML
 
-For the complete flag reference, see **[Command Reference](./reference/COMMAND-REFERENCE.md)**.
-
-### Batch Screenshots with YAML
-
-Create a `shots.yml` for capturing multiple pages:
+Commit a `shots.yml` and run `shot-scraper multi shots.yml`:
 
 ```yaml
-# shots.yml
 - url: http://localhost:3000
   output: screenshots/homepage.png
   width: 1280
   height: 800
-
-- url: http://localhost:3000/about
-  output: screenshots/about.png
-  width: 1280
 
 - url: http://localhost:3000/dashboard
   output: screenshots/dashboard.png
@@ -170,97 +76,25 @@ Create a `shots.yml` for capturing multiple pages:
   height: 812
 ```
 
-**Run the batch:**
-```bash
-shot-scraper multi shots.yml
-```
+**Supported keys:** `url`, `output`, `width`, `height`, `quality`, `wait`, `wait_for`, `selector`, `selectors`, `selector_all`, `padding`, `javascript`, `js_selector`, `retina`, `omit_background`. Copy-paste configs per project type: **[reference/TEMPLATES.md](./reference/TEMPLATES.md)**.
 
-### Advanced YAML Keys
+## Recommended dimensions
 
-```yaml
-- url: http://localhost:3000/form
-  output: screenshots/form-filled.png
-  width: 1200
-  javascript: |
-    document.querySelector('#name').value = 'Jane Doe';
-    document.querySelector('#email').value = 'jane@example.com';
-  wait: 500
-  selector: ".form-container"
-  padding: 20
-  retina: true
-```
+| Use case | Width | Height | Format |
+|----------|-------|--------|--------|
+| README hero | 1280 | 800 | PNG |
+| Docs screenshot | 1200 | auto | PNG |
+| Social/OG image | 1200 | 630 | PNG |
+| Mobile / Tablet | 375 / 768 | 812 / 1024 | PNG |
+| Full page | 1280 | (omit) | PNG |
 
-**Supported YAML keys:** `url`, `output`, `width`, `height`, `quality`, `wait`, `wait_for`, `selector`, `selectors`, `selector_all`, `padding`, `javascript`, `js_selector`, `retina`, `omit_background`
+## Generating a config for a project
 
-## Phase 3: Smart Config Generation
+When asked to set up screenshots for a project: read its routes (router config, page files, nav), identify key UI states (loading, empty, populated, error) and the dev-server port, then write a `shots.yml` covering the key screens. Validate with `shot-scraper multi shots.yml` and iterate on timing/selectors.
 
-When asked to generate a screenshot config for a project, follow this process:
-
-### Step 1: Analyze the Project
-
-Read the project to understand:
-- **Routes/pages** — Check router config, page files, or navigation
-- **Key UI states** — Loading, empty, populated, error states
-- **Important components** — Hero sections, dashboards, forms
-- **Port** — What port does the dev server run on
-
-### Step 2: Generate shots.yml
-
-Build a YAML config covering the project's key screens:
-
-```bash
-# Validate by running
-shot-scraper multi shots.yml
-```
-
-### Step 3: Iterate
-
-Review screenshots, adjust timing and selectors, re-run.
-
-## Phase 4: Optimize Output
-
-### File Size Reduction
-
-**Use JPEG for photos/complex UIs:**
-```bash
-shot-scraper http://localhost:3000 --quality 85 -o page.jpg
-```
-
-**Use PNG for UI with text/sharp edges (default).**
-
-**Transparent backgrounds (for overlaying on docs):**
-```bash
-shot-scraper http://localhost:3000 -s ".component" --omit-background -o widget.png
-```
-
-### Consistency Tips
-
-- Always set explicit `width` — default 1280 is fine but be intentional
-- Omit `height` for full-page captures, set it for fixed viewport
-- Use `--retina` for README images viewed on high-DPI screens
-- Add `--wait` for SPAs that hydrate client-side
-- Use `javascript` to dismiss cookie banners, tooltips, or modals
-- Use `selector` + `padding` to capture specific components cleanly
-
-## Phase 5: CI/CD Integration
-
-Automate screenshot regeneration with GitHub Actions so docs stay current. Use the YAML `server` key to auto-start a dev server during capture.
-
-See **[CI Integration Guide](./reference/CI-INTEGRATION.md)** for the GitHub Actions workflow, `server` key usage, and cost-control tips.
-
-## Examples
-
-### Good: Well-Structured Screenshot Config
-
-✅ **Good:**
+✅ **Good** — explicit dimensions, SPA waits, organized output, JS cleanup:
 
 ```yaml
-# shots.yml — explicit dimensions, proper waits, organized output
-- url: http://localhost:3000
-  output: screenshots/homepage.png
-  width: 1280
-  height: 800
-
 - url: http://localhost:3000/dashboard
   output: screenshots/dashboard.png
   width: 1280
@@ -268,194 +102,21 @@ See **[CI Integration Guide](./reference/CI-INTEGRATION.md)** for the GitHub Act
   wait: 2000
   javascript: |
     document.querySelector('.toast-notification')?.remove()
-
-- url: http://localhost:3000/settings
-  output: screenshots/settings.png
-  width: 1280
-  selector: ".settings-panel"
-  padding: 20
-
-- url: http://localhost:3000
-  output: screenshots/mobile-home.png
-  width: 375
-  height: 812
 ```
 
-### Bad: Common Mistakes
-
-❌ **Bad:**
-
-```yaml
-# No output specified — shot-scraper auto-names from URL, messy results
-- url: http://localhost:3000
-
-# No width — relies on default, inconsistent across machines
-- url: http://localhost:3000/about
-  output: about.png
-
-# No wait for SPA — captures loading spinner instead of content
-- url: http://localhost:3000/dashboard
-  output: dashboard.png
-
-# Screenshot directory not organized
-- url: http://localhost:3000/settings
-  output: settings.png
-```
-
-### Good: Capturing Specific Components
-
-✅ **Good:**
-
-```bash
-# Hero section with padding for breathing room
-shot-scraper http://localhost:3000 -s ".hero" -p 20 -o docs/hero.png
-
-# Navigation in retina for crisp text
-shot-scraper http://localhost:3000 -s "nav" --retina -o docs/nav.png
-
-# Form with pre-filled data via JS
-shot-scraper http://localhost:3000/contact \
-  -j "document.querySelector('#name').value = 'Jane Doe'" \
-  -s ".contact-form" -p 10 -o docs/form.png
-```
-
-### Bad: Component Capture Anti-Patterns
-
-❌ **Bad:**
-
-```bash
-# No selector — captures entire page when you only need one section
-shot-scraper http://localhost:3000 -o hero.png
-
-# No padding — element cropped tight, looks cramped in docs
-shot-scraper http://localhost:3000 -s ".hero" -o hero.png
-
-# No wait — dynamic component hasn't rendered yet
-shot-scraper http://localhost:3000 -s ".chart" -o chart.png
-```
-
-## Quality Signals
-
-A well-configured screenshot setup has these properties:
-
-- **Explicit `width` on every capture** — default is fine but intentional beats accidental
-- **`wait` or `wait-for` on SPA routes** — captures content, not loading spinners
-- **Organized output paths** — `screenshots/homepage.png`, not `homepage.png` at project root
-- **YAML config committed to the repo** — reproducible across machines and CI, not one-off `shot-scraper` commands
-- **`--retina` for README hero images** — crisp on high-DPI displays where it matters
-- **JS cleanup for modals/banners** — `-j "document.querySelector('.banner')?.remove()"` before capture
-- **Selector + padding for component shots** — `-s ".hero" -p 20` beats full-page crops
+❌ **Bad** — no `output` (messy auto-names), no `width` (inconsistent across machines), no `wait` on an SPA route (captures the loading spinner), output dumped at project root.
 
 ## Troubleshooting
 
-### Problem: Screenshot shows blank page or loading spinner
+- **Blank page / loading spinner** — SPA hasn't hydrated. Add `--wait 3000` or `--wait-for "document.querySelector('.content')"`.
+- **"Connection refused"** — dev server not running or wrong port. Start it first (`npm run dev &`), verify with `curl -I http://localhost:3000`, or use the YAML `server` key to auto-start.
+- **Wrong dimensions** — `--retina` doubles pixels (1280w → 2560px); set `-h` for a fixed viewport, omit it for full page.
+- **Elements missing** — wrong selector or lazy-loaded content. Debug visually with `-i` or `--devtools`.
 
-**Cause:** SPA hasn't hydrated or async data hasn't loaded.
+## CI/CD
 
-**Solution:**
-```bash
-# Fixed wait
-shot-scraper http://localhost:3000 --wait 3000 -o page.png
+Automate regeneration with GitHub Actions so docs stay current; the YAML `server` key auto-starts a dev server during capture. See **[reference/CI-INTEGRATION.md](./reference/CI-INTEGRATION.md)**.
 
-# Wait for specific element
-shot-scraper http://localhost:3000 --wait-for "document.querySelector('.content')" -o page.png
-```
+## Integration & references
 
-### Problem: "Connection refused" on localhost
-
-**Cause:** Dev server isn't running or is on a different port.
-
-**Solution:**
-1. Start your dev server first: `npm run dev &`
-2. Verify the port: `curl -I http://localhost:3000`
-3. Or use the `server` key in YAML to auto-start it
-
-### Problem: Screenshot dimensions don't match expectations
-
-**Cause:** Height omitted (captures full page) or retina not accounted for.
-
-**Solution:**
-- Set explicit `-h` for fixed viewport
-- Omit `-h` intentionally for full-page capture
-- `--retina` doubles pixel dimensions (1280w becomes 2560px image)
-
-### Problem: shot-scraper command not found
-
-**Cause:** Not installed or pipx PATH not configured.
-
-**Solution:**
-```bash
-pipx install shot-scraper
-pipx ensurepath      # Add pipx bin to PATH
-shot-scraper install # Install browser engine
-```
-
-### Problem: Elements missing from screenshot
-
-**Cause:** CSS selector wrong, element behind a modal, or lazy-loaded content.
-
-**Solution:**
-```bash
-# Use --interactive to debug visually
-shot-scraper http://localhost:3000 -i
-
-# Use --devtools for inspector
-shot-scraper http://localhost:3000 --devtools
-```
-
-## Integration
-
-**This skill pairs with:**
-- **record-tui** — For terminal app recordings (use VHS for CLIs, shot-scraper for web UIs)
-- **track-session** — Track screenshot iteration progress
-
-**Useful alongside:**
-- [shot-scraper](https://github.com/simonw/shot-scraper) — The screenshot tool
-- [shot-scraper-template](https://github.com/simonw/shot-scraper-template) — GitHub Actions template
-- [pipx](https://pipx.pypa.io/) — Global Python app installer
-
-## Quick Reference
-
-```bash
-# Single screenshot
-shot-scraper http://localhost:3000 -o page.png
-
-# With dimensions
-shot-scraper http://localhost:3000 -w 1280 -h 800 -o page.png
-
-# Specific element
-shot-scraper http://localhost:3000 -s ".hero" -p 10 -o hero.png
-
-# Retina
-shot-scraper http://localhost:3000 --retina -o page@2x.png
-
-# Local HTML file
-shot-scraper index.html -o preview.png
-
-# Batch from YAML
-shot-scraper multi shots.yml
-
-# Interactive debugging
-shot-scraper http://localhost:3000 -i
-
-# PDF export
-shot-scraper pdf http://localhost:3000 -o page.pdf
-```
-
-## Deep Reference
-
-For detailed guides, load these files when needed:
-
-- **[Command Reference](./reference/COMMAND-REFERENCE.md)** — All shot-scraper commands, flags, and subcommands
-- **[Templates](./reference/TEMPLATES.md)** — Copy-paste YAML configs for common project types
-- **[CI Integration Guide](./reference/CI-INTEGRATION.md)** — GitHub Actions workflow, server management, cost control
-
-*Only load these when specifically needed to save context.*
-
-## References
-
-- [shot-scraper](https://github.com/simonw/shot-scraper) — Official repository
-- [shot-scraper documentation](https://shot-scraper.datasette.io/) — Full docs
-- [shot-scraper-template](https://github.com/simonw/shot-scraper-template) — GitHub Actions template
-- [pipx](https://pipx.pypa.io/) — Global Python app installer
-- [Simon Willison's blog](https://simonwillison.net/tags/shot-scraper/) — Author's posts on shot-scraper
+Pairs with **record-tui** (terminal recordings) and **track-session** (iteration tracking). External: [shot-scraper](https://github.com/simonw/shot-scraper) · [docs](https://shot-scraper.datasette.io/) · [GH Actions template](https://github.com/simonw/shot-scraper-template) · [pipx](https://pipx.pypa.io/).
