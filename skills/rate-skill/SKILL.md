@@ -6,7 +6,7 @@ argument-hint: <path/to/SKILL.md>
 allowed-tools: Read, Glob, Grep
 metadata:
   author: Antonin Januska
-  version: "3.0.0"
+  version: "3.1.0"
 ---
 
 # Rate Skill
@@ -160,67 +160,7 @@ Every report includes at least one strength (even on F-tier skills — users aba
 
 ## Examples
 
-### Example 1 — directive description rewrite (the most common P0 fix)
-
-✅ Anthropic middle-ground form, third person, enumerated triggers, negative scoping:
-
-```yaml
-description: Use this skill whenever the user wants to review a React component for hook misuse, infinite-loop risk, or dependency-array bugs. Triggers include "review this component", "check my hooks", or "audit this React file". Do NOT use this skill for non-React JavaScript or for general code review.
-```
-
-❌ Passive single sentence — caps Category 1 at 70 and bleeds into Conciseness:
-
-```yaml
-description: Use when reviewing React components for hook issues.
-```
-
-### Example 2 — frontmatter cleanup
-
-❌ Top-level fields that belong in `metadata`, multiline description, top-level `hooks` outside the supported slot:
-
-```yaml
----
-name: My-Skill                # uppercase
-version: "1.0.0"              # top-level — move under metadata
-tags: [react, hooks]          # top-level — move under metadata
-description: |                # multiline silently breaks discovery
-  A skill for working with React.
-  Helps with hooks.
-hooks:
-  PreToolUse: ...
----
-```
-
-✅ Patch:
-
-```yaml
----
-name: react-hooks-audit
-description: Use this skill whenever the user wants to review a React component for hook misuse, infinite-loop risk, or dependency-array bugs. Triggers include "review this component", "check my hooks", or "audit this React file". Do NOT use this skill for non-React JavaScript.
-license: MIT
-argument-hint: <path/to/component.tsx>
-metadata:
-  author: <author>
-  version: "1.0.0"
-  tags: [react, hooks]
----
-```
-
-### Example 3 — desired report opener (high-quality skill)
-
-✅ What a good report looks like in practice:
-
-```
-# Skill Rating: track-session
-
-**Detected type:** methodology
-**Overall grade:** A (92/100)
-
-## Strengths
-- Description front-loads "track-session resumes work" — distinctive trigger in first 30 chars.
-- ✅/❌ examples with desired pattern shown first.
-- Body 287 lines with `references/TROUBLESHOOTING.md` for overflow.
-```
+Worked examples — directive-description rewrite, frontmatter cleanup, and a desired report opener: **[references/EXAMPLES.md](./references/EXAMPLES.md)**.
 
 ## Gotchas
 
@@ -234,18 +174,6 @@ metadata:
 - **Negation is poorly handled by LLMs** (arXiv 2503.22395). When you see a bare "DO NOT X" inside the body, recommend pairing with a positive directive — "Do Y instead of X."
 - **Standards are calibrated for activation reliability, not curve-grading.** B grade is "production ready" — not a near-failure. Anchor every category to the rubric, not "most skills are worse than this one."
 - **Eval-set bonus.** Anthropic's `skill-creator` (May 2026 update) ships a 60/40 train/test description optimizer. If the rated skill ships its own eval set under `eval/` or `references/EVAL.md`, add +5 to Category 1 (cap 100). Cite: https://claude.com/blog/improving-skill-creator-test-measure-and-refine-agent-skills
-
-## Anti-Patterns
-
-❌ **Vague findings.** "Description could be better" is useless. Always emit a concrete replacement string.
-
-❌ **Skipping the strength section.** Even F-tier skills have something working. Name it.
-
-❌ **Recommending `<Good>`/`<Bad>` XML tags.** Non-canonical. Recommend ✅/❌ instead.
-
-❌ **Penalizing description length up to 500 chars.** The 250-char display cap was removed in Claude Code v2.1.105. Penalize spec violations (>1024) and front-loading failures, not raw length under 500.
-
-✅ Concrete, prioritized, paste-ready findings — the desired pattern.
 
 ## References
 
