@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.0] - 2026-06-01
+
+### Skill simplification pass — every SKILL.md pared to its core
+
+A portfolio-wide simplification campaign cut **all 11 skills** down to their non-inferable core, moving worked examples, per-mode procedures, and troubleshooting into `references/` while keeping load-bearing schema/frontmatter/contracts inline. **Total SKILL.md weight: 4,478 → 1,458 lines (−67%)**; every skill now sits under the 300-line soft cap. The recipe, established skill-by-skill: identify the one thing the skill teaches that Claude can't infer, collapse sections that restate each other, cut duplicate examples to one ✅/❌ pair, and push depth to one-level-deep references. Research basis: the best community session/methodology skills (Anthropic skill-creator, obra/superpowers) run 70–152 lines.
+
+Per-skill cuts: track-session 483→119, deep-research 486→120, ideal-react-component 470→117, screenshot-local 461→122, setup-semantic-release 444→156, record-tui 440→116, code-review 427→104, track-roadmap 421→105, track-qa 340→95, rate-skill 257→185, generate-skill 219. The cc-dash skills (track-session/roadmap/qa) keep their schema markers inline because the dashboard parses them on every run; setup-semantic-release keeps its config blocks inline as the deliverable; code-review keeps the v1.5.0 verifier contract verbatim (its `reference/AGENTS.md` prompts are byte-for-byte unchanged).
+
+**Breaking:** `track-session` dropped its `start` mode (v5.0.0) and the `experimental/` lane + `evolve-skills` were removed — hence the major version bump. `code-review` net moves v1.4.1 → v1.6.0 (the v1.5.0 verifier rewrite never shipped a tag; both entries below land here).
+
 ### Changed
 
 - **rate-skill** (v3.0.0 → **v3.1.0**, minor): light trim, **257 → 185 lines**. Moved the three worked examples (directive-description rewrite, frontmatter cleanup, report opener) to a new `references/EXAMPLES.md`, and dropped the `## Anti-Patterns` section — its four points were already covered by the Output Format notes ("every finding ships a concrete patch", "every report includes a strength") and Gotchas (XML-tag and length guidance). The 7-category rubric, length/frontmatter scoring rules, Output Format, and Gotchas stay inline (load-bearing audit logic).
