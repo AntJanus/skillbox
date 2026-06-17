@@ -1,11 +1,11 @@
 ---
 name: track-session
-description: Resume work, track progress across sessions, verify completion. Use when asked to "resume work", "pick up where I left off", "what was I doing", "save progress", or "are we done". For multi-session tasks.
+description: Resume work, track progress across sessions, verify completion, recover a lost session file. Use when asked to "resume work", "pick up where I left off", "what was I doing", "save progress", "are we done", "I lost my SESSION_PROGRESS", or "reconstruct my session". For multi-session tasks.
 license: MIT
-argument-hint: "[save|resume|verify]"
+argument-hint: "[save|resume|verify|recover]"
 metadata:
   author: Antonin Januska
-  version: "5.0.0"
+  version: "5.1.0"
 ---
 
 # Session Progress
@@ -20,6 +20,7 @@ Track multi-session work in `SESSION_PROGRESS.md` at the project root so work ca
 | **Save** | `/track-session save` | Checkpoint progress and stop |
 | **Resume** | `/track-session resume` | Read `SESSION_PROGRESS.md`, continue from "Next" |
 | **Verify** | `/track-session verify` | Validate completed work against requirements before declaring done |
+| **Recover** | `/track-session recover` | Rebuild a lost/deleted `SESSION_PROGRESS.md` from the session transcript |
 
 ## File format
 
@@ -81,6 +82,18 @@ Next: <specific next action — name files and functions, not "fix the bug">
 ```
 
 See [reference/VERIFICATION.md](./reference/VERIFICATION.md) for the full methodology.
+
+## Recover mode
+
+`/track-session recover` rebuilds a missing `SESSION_PROGRESS.md`. Its content survives in the session transcript — but as incremental `Edit`s, not one clean blob.
+
+1. Ask the user for **branch**, **rough date**, and **topic** to narrow the search.
+2. Find the transcript under `~/.claude/projects/<cwd-slug>/` (grep `cc-dash/session@1`, confirm `gitBranch`).
+3. Reconstruct: take the latest full snapshot (a `Write`, else a `Read` result with line-number prefixes stripped), then replay later `Edit`s. Re-stamp `last_updated`.
+4. If no transcript content exists, rebuild from `git reflog`/`git log` and say plainly it's partial — never fabricate a confident plan.
+5. Hand off to `resume`.
+
+See [reference/RECOVERY.md](./reference/RECOVERY.md) for the slug derivation and the tested Python reconstructor (jq is unreliable here).
 
 ## Example
 
