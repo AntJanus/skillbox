@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **track-session** (v5.0.0 → **v5.1.0**, minor): new **`recover` mode** (`/track-session recover`) that rebuilds a lost or deleted `SESSION_PROGRESS.md` from the Claude Code session transcript at `~/.claude/projects/<cwd-slug>/*.jsonl`. The mode interviews the user for branch/date/topic to narrow the transcript set, reconstructs the file, re-stamps `last_updated`, and hands off to `resume`; when no transcript content exists it falls back to `git reflog`/`git log` and labels the result partial rather than fabricating a plan. The reconstruction mechanics were verified against real transcripts, which corrected two wrong initial assumptions: (1) the file is updated almost entirely via incremental `Edit`s, **not** a single full `Write` — so recovery takes the latest full snapshot (a `Write`, else a `Read` tool-result with `cat -n` line-number prefixes stripped) and replays later `Edit`s; (2) `jq 1.7.1-apple` mis-parses the multi-step filter and dumps help text, so the reference ships a tested **Python** reconstructor instead. SKILL.md grows +13 lines (119 → 132, still well under cap); slug derivation, the Python script, and fallbacks live in the new `reference/RECOVERY.md`. Description + `argument-hint` extended with `recover` / "I lost my SESSION_PROGRESS" / "reconstruct my session" triggers.
+
 ## [4.0.0] - 2026-06-01
 
 ### Skill simplification pass — every SKILL.md pared to its core
