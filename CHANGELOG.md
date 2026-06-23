@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.1.0] - 2026-06-23
+
 ### Added
 
 - **color-system** (new skill, **v1.0.0**): a curated color-palette library plus palette-building and contrast methodology. Ships ready-to-use, role-mapped palettes (light + dark) across four domains — **web-app UI** (Graphite, Evergreen, Terracotta, Bloom), **marketing/landing** (Sunbloom, Tidewater, Obsidian & Gold, Paper & Ink), **data viz** (categorical Hearthstead/Vintage Warm/Glass Wall/Lunar Valley, sequential Viridis-family/Blues/YlOrRd, diverging Alien Sun/Orchard Dusk/Coffee & Coolant/Console & Window), and **terminal/TUI** (Solarized Dark, Nord, Catppuccin Mocha/Latte, Dracula, Tokyo Night). Core principle: choose by **semantic role**, not raw hue. Palettes were developed through an iterative visual-review loop (live HTML mockups: dashboards, landing heroes, charts, terminal windows) plus a multi-agent research+design pipeline; the two signature data-viz palettes (Lunar Valley, Console & Window) and several names are originals tuned to a warm-cozy-with-cool-edge aesthetic. SKILL.md is 145 lines (role contract + library index + methodology essentials + ✅/❌ examples + Gotchas); depth lives in four one-level-deep references — `palettes.md` (full hex tables, all four domains), `theory.md` (wheel, harmony, OKLCH, scales), `contrast.md` (WCAG/APCA thresholds, formulas, Okabe-Ito CVD set), and `build-your-own.md` (step-by-step). Single-line directive description with a `Do NOT use for UI layout — see frontend-design` scope clause.
