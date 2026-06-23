@@ -194,6 +194,22 @@ Run multi-source web research on a topic and synthesize a comprehensive, well-so
 
 ---
 
+### 🎨 color-system
+
+A curated library of ready-to-use color palettes (light + dark) across four domains — web-app UI, marketing/landing, data visualization, and terminal/TUI — plus the methodology to build new palettes and verify their accessibility. Every palette maps hexes to **semantic roles** so themes stay swappable and accessible by construction.
+
+**Use when:**
+- Picking a ready-made palette for an app, brand, chart, or terminal
+- Building a new palette from scratch (OKLCH scales, harmony schemes)
+- Setting up light & dark mode (dark mode ≠ inversion; elevation = lighter)
+- Checking WCAG/APCA contrast or colorblind-safety
+
+**Triggers:** When asked to "pick a color palette", "create a color scheme", "choose colors for my app", "set up dark mode", "what colors should I use", "data viz colors", or "check color contrast"
+
+[View Documentation](./skills/color-system/SKILL.md)
+
+---
+
 ## Installation
 
 ### Using Vercel Skills CLI (Recommended)
