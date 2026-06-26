@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- **QA.md and ROADMAP.md deleted** — removed the internal cc-dash tracking artifacts from the published skills repo; skillbox no longer surfaces in the cc-dash roadmap/QA dashboard views. No `SESSION_PROGRESS.md` existed. Verified no live references remain (README, CLAUDE.md, CI, PR/issue templates, and the VERSION-CONTROL reference are all clean; the `skills/track-qa` and `skills/track-roadmap` skill bodies still describe these file *types* generically, which is correct and untouched).
 - **AGENTS.md deleted** — the root agent-workflow doc was retired; its content (imperative-language guidance, skill inventory, pattern taxonomy, rating rubric) duplicated CLAUDE.md, the README skill Index, and the `rate-skill` rubric. Cleaned up all references: README Resources link, CLAUDE.md file-structure map, the obsolete `q_sk003` QA item, the PR + feature-request templates, and the VERSION-CONTROL release step. (The unrelated `skills/code-review/reference/AGENTS.md` — the reviewer prompts — is untouched.)
 
 ### Changed
