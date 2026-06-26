@@ -65,7 +65,7 @@ Phase 1 -> Phase 2 -> Phase 3
 ```
 skill-name/
 ├── SKILL.md
-├── reference/
+├── references/
 │   └── STANDARDS.md
 └── scripts/
     └── setup.sh
@@ -101,7 +101,7 @@ List forbidden actions explicitly with literal language.
 - [ ] Overview with core principle
 - [ ] "When to Use" section
 - [ ] Main content matching selected pattern
-- [ ] Examples with Good/Bad comparisons
+- [ ] Examples with ✅/❌ comparisons
 - [ ] Troubleshooting section
 - [ ] Integration section
 
@@ -213,8 +213,7 @@ SkillBox skills follow five recognized patterns. Each pattern has specific struc
 **You will recognize this pattern by:**
 - Phase-based workflow with strict completion gates
 - Verification checklists with `[ ]`
-- "Rules" or "Iron Laws" section
-- "Red Flags - STOP" section (in some)
+- "Quality Signals" or "Anti-Patterns" section (the current framing; older skills used "Rules" / "Iron Laws" / "Red Flags - STOP" before the v3.0.0 reframe)
 - Mode-based operation (e.g., generate/update/audit)
 
 **When you see this pattern:**
@@ -294,12 +293,12 @@ shot-scraper multi screenshots.yml
 
 | Category | Weight | Strong Signals (A-grade) |
 |----------|--------|--------------------------|
-| Length | 20% | Under 500 lines, or progressive disclosure with well-structured reference/ |
+| Length | 20% | Under 300 lines (hard cap 500), or progressive disclosure with well-structured references/ |
 | Conciseness | 20% | High info density, scannable, short paragraphs, no redundancy |
 | Structure | 15% | All required sections present and ordered |
 | Triggers | 15% | 5+ natural-language phrases, "when asked to X" format |
 | Frontmatter | 15% | All required fields valid, name matches directory, spec-compliant |
-| Examples | 10% | 3+ Good/Bad comparisons, Good shown first, real scenarios |
+| Examples | 10% | 3+ ✅/❌ comparisons, desired (✅) shown first, real scenarios |
 | Type Compliance | 5% | Skill type correctly identified, type-specific patterns present |
 
 ## Grading Scale
@@ -367,7 +366,7 @@ Create `commitlint.config.js` in the project root:
 - DO reference official docs
 
 **Real example in SkillBox:**
-- **ideal-react-component** - Defines a predictable ordering pattern for React component files (imports, styles, types, sub-components, hooks, render). Includes hooks antipatterns (infinite loops, stale closures) with Good/Bad comparisons.
+- **ideal-react-component** - Defines a predictable ordering pattern for React component files (imports, styles, types, sub-components, hooks, render). Includes hooks antipatterns (infinite loops, stale closures) with ✅/❌ comparisons.
 
 **Structural signature from ideal-react-component:**
 ```markdown
@@ -479,7 +478,7 @@ If you catch yourself:
 - **Skipping validation checklists** - Complete all phases
 - **Making changes without reading full file** - Understand first
 - **Using casual language instead of imperative** - Be direct
-- **Creating vague examples** - Show Good/Bad clearly
+- **Creating vague examples** - Show ✅/❌ clearly
 - **Skipping troubleshooting sections** - Users will have issues
 - **Not testing trigger phrases** - Activation is critical
 
@@ -504,7 +503,7 @@ Copy this checklist when working on skills:
 - [ ] Overview with core principle
 - [ ] "When to Use" section complete
 - [ ] Main content matches pattern
-- [ ] Examples with Good/Bad comparisons
+- [ ] Examples with ✅/❌ comparisons
 - [ ] Troubleshooting section present
 - [ ] Integration section documented
 

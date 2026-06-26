@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **README restructured** — moved Installation above the skill list; added a 13-row **skill Index** (table of contents with in-page anchor links); collapsed every skill's use-cases/triggers into `<details>` blocks so the section is a short scannable table instead of ~210 lines; removed the Acknowledgments section.
+- **Doc consistency audit (README + AGENTS.md + CLAUDE.md)** — fixed stale skill count (11 → 13), singular `reference/` → plural `references/`, `Good/Bad` → `✅/❌`, the "under 500 lines" target → "under 300 (hard cap 500)", and reframed the "use Iron Laws" creator advice to verification-checklist / "Quality Signals" framing (ALL-CAPS "Iron Law" is a skill-creator yellow flag). AGENTS.md pattern-recognition list updated to current "Quality Signals"/"Anti-Patterns" section names.
+
 ## [4.2.0] - 2026-06-26
 
 ### Added
