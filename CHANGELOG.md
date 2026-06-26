@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.2.0] - 2026-06-26
+
+### Added
+
+- **typography** (new skill, **v1.0.0**): ready-to-use **type systems** plus type-scale, vertical-rhythm, and font methodology — built to stop the recurring failure of AI-generated UI shipping text that's tiny, thin, or low-contrast. Ships four role-mapped systems (paralleling color-system's four domains) — **Product UI** (system sans, 16px base, 1.2 ratio, tabular numerals, +14px compact variant), **Editorial/Long-form** (serif body 18px/1.6, 1.25 ratio, 66ch measure, space-before > space-after), **Marketing/Landing** (fluid `clamp()` display, 1.333 ratio, tight tracking, scrim guidance), and **Docs/Technical** (Product UI scale + first-class mono: ligatures-off, slashed-zero). Core principle: size text by **role on a scale** (base × ratio), never eyeballed pixels. The skill's headline contract is the **readability floor** — size ≥16px · weight ≥400 · contrast ≥4.5:1 · line-height ≥1.5 — framed as strong guidance with rationale (not ALL-CAPS mandates), since most unreadable output breaks at least one. Developed the same way as color-system: a four-stream multi-agent research pass (11 design systems' shipped tokens — Tailwind/Bootstrap/Material 3/Apple HIG/shadcn/Radix/Chakra/Primer/Atlassian/Carbon/Ant — plus type-scale/vertical-rhythm theory, WCAG/APCA readability, and font-stack/pairing research) feeding an **iterative visual-review loop** (live HTML mockup: type-scale ladder, long-form article, dense dashboard, marketing hero, and a before/after readability panel) to lock the cadence before writing. SKILL.md is 115 lines (readability-floor table + system index + methodology essentials + ✅/❌ examples + 8-item Gotchas); depth lives in four one-level-deep references — `systems.md` (full token tables, all four systems), `scale.md` (ratios, vertical rhythm, measure, tracking), `readability.md` (minimum sizes, WCAG 2 + APCA, fluid `clamp()`, AI-failure→fix table), and `fonts.md` (system stacks, curated webfonts, pairing, font-level CSS, loading). Single-line directive description with `Do NOT use for color palettes — see color-system; layout — see frontend-design` scope clause.
+
 ## [4.1.0] - 2026-06-23
 
 ### Added
