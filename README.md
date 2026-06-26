@@ -441,7 +441,6 @@ SkillBox skills follow these principles:
 - **Skill Specification**: https://agentskills.io/specification
 - **Best Practices Article**: https://antjanus.com/ai/claude-code-best-practices
 - **CLAUDE.md Guide**: See [CLAUDE.md](./CLAUDE.md) in this repository
-- **Agent Patterns**: See [AGENTS.md](./AGENTS.md) in this repository
 
 ## License
 

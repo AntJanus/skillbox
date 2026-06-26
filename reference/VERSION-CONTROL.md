@@ -150,7 +150,6 @@ git commit -m "fix(track-session): correct checkpoint file path"
 **3. Update version references:**
 - Update README.md footer if needed
 - Update CLAUDE.md "Last Updated" date
-- Update AGENTS.md if workflow changed
 
 #### Phase 3: Create Git Tag
 

@@ -6,18 +6,17 @@ Brief description of what this PR does.
 
 - [ ] New skill
 - [ ] Skill update (bug fix, improvement, new content)
-- [ ] Documentation (CLAUDE.md, AGENTS.md, README, etc.)
+- [ ] Documentation (CLAUDE.md, README, etc.)
 - [ ] Infrastructure (CI, templates, tooling)
 
 ## Skill Checklist (for new or updated skills)
 
-- [ ] SKILL.md has valid YAML frontmatter
-- [ ] Description includes 3-5 specific trigger phrases
-- [ ] "When to Use" and "When NOT to Use" sections present
-- [ ] Examples use `<Good>` and `<Bad>` comparison tags
-- [ ] Troubleshooting section addresses real issues
+- [ ] SKILL.md has valid YAML frontmatter (single-line `description:`)
+- [ ] Description includes 3-5 specific trigger phrases + negative scoping (when-to-use lives in the description, not a body section)
+- [ ] Examples use ✅/❌ comparisons (desired pattern first)
+- [ ] Troubleshooting / Gotchas section addresses real issues
 - [ ] Integration section documents how it works with other skills
-- [ ] SKILL.md is under 500 lines (or uses `reference/` for extended content)
+- [ ] SKILL.md is under 300 lines (hard cap 500; use `references/` for extended content)
 - [ ] Version number incremented in frontmatter metadata
 
 ## Testing

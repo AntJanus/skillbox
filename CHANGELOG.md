@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- **AGENTS.md deleted** — the root agent-workflow doc was retired; its content (imperative-language guidance, skill inventory, pattern taxonomy, rating rubric) duplicated CLAUDE.md, the README skill Index, and the `rate-skill` rubric. Cleaned up all references: README Resources link, CLAUDE.md file-structure map, the obsolete `q_sk003` QA item, the PR + feature-request templates, and the VERSION-CONTROL release step. (The unrelated `skills/code-review/reference/AGENTS.md` — the reviewer prompts — is untouched.)
+
 ### Changed
 
 - **README restructured** — moved Installation above the skill list; added a 13-row **skill Index** (table of contents with in-page anchor links); collapsed every skill's use-cases/triggers into `<details>` blocks so the section is a short scannable table instead of ~210 lines; removed the Acknowledgments section.
