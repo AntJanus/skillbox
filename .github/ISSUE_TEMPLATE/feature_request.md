@@ -34,9 +34,9 @@ When would someone need this? Describe 1-2 concrete scenarios.
 
 ## Skill Pattern
 
-Which pattern best fits? (See AGENTS.md for pattern descriptions)
+Which pattern best fits?
 
-- [ ] Pattern A: Methodology Enforcement (phases, iron laws, verification)
+- [ ] Pattern A: Methodology Enforcement (phases, verification checklists, quality signals)
 - [ ] Pattern B: Technical Implementation (step-by-step commands)
 - [ ] Pattern C: Rule-Based Auditing (severity levels, grading)
 - [ ] Pattern D: Automation/Integration (config templates, scripts)

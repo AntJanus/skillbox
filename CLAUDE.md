@@ -20,7 +20,6 @@ SkillBox is a collection of utility skills for Claude Code and AI agents. Each s
 skillbox/
 ├── README.md              # User-facing documentation
 ├── CLAUDE.md             # This file - AI onboarding doc
-├── AGENTS.md             # Agent workflow documentation
 ├── CHANGELOG.md          # Version history and release notes
 ├── reference/            # Extended documentation
 │   └── VERSION-CONTROL.md # Complete versioning workflow
