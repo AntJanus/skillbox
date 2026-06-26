@@ -4,21 +4,23 @@ This file provides guidance on how to work effectively as an AI agent within the
 
 ## Skill Inventory
 
-SkillBox currently contains **11 skills**:
+SkillBox currently contains **13 skills**:
 
 | Skill | Version | Pattern | Description |
 |-------|---------|---------|-------------|
-| **track-session** | v4.3.0 | A (Methodology) | Track, stop, resume, and verify progress on long-running sessions |
-| **generate-skill** | v1.5.0 | D (Automation) | Interactive skill builder that generates high-quality SKILL.md files |
-| **ideal-react-component** | v1.5.0 | E (Reference) | Battle-tested React component structure pattern with hooks antipatterns |
-| **rate-skill** | v2.0.0 | C (Auditing) | Evaluate skill quality against best practices with letter grades (A-F) |
-| **setup-semantic-release** | v1.0.0 | D (Automation) | Set up automated versioning with conventional commits, husky, and semantic-release |
-| **track-roadmap** | v2.3.0 | A (Methodology) | Plan, update, audit, brainstorm, and resume work from a high-level project roadmap |
-| **track-qa** | v1.0.0 | A (Methodology) | Plan, capture, and execute manual QA — the things tests can't verify; cc-dash dashboard reads QA.md across all projects |
-| **record-tui** | v1.3.0 | B (Technical) | Record polished terminal demos using Charmbracelet VHS |
-| **screenshot-local** | v1.1.0 | B (Technical) | Capture screenshots of local dev projects using shot-scraper |
-| **code-review** | v1.2.0 | C (Auditing) | Multi-agent local code review — basics, architecture, clarity, testing, repo-hygiene — writes REVIEW.md |
-| **deep-research** | v1.0.0 | D (Automation) | Multi-source web research with structured synthesis and cited summary in conversation |
+| **track-session** | v5.1.0 | A (Methodology) | Track, stop, resume, recover, and verify progress on long-running sessions |
+| **generate-skill** | v3.1.0 | D (Automation) | Interactive skill builder that generates high-quality SKILL.md files |
+| **ideal-react-component** | v1.7.0 | E (Reference) | Battle-tested React component structure pattern with hooks antipatterns |
+| **rate-skill** | v3.1.0 | C (Auditing) | Evaluate skill quality against best practices with letter grades (A-F) |
+| **setup-semantic-release** | v1.2.0 | D (Automation) | Set up automated versioning with conventional commits, husky, and semantic-release |
+| **track-roadmap** | v2.5.0 | A (Methodology) | Plan, update, audit, brainstorm, and resume work from a high-level project roadmap |
+| **track-qa** | v1.2.0 | A (Methodology) | Plan, capture, and execute manual QA — the things tests can't verify; cc-dash dashboard reads QA.md across all projects |
+| **record-tui** | v1.5.0 | B (Technical) | Record polished terminal demos using Charmbracelet VHS |
+| **screenshot-local** | v1.3.0 | B (Technical) | Capture screenshots of local dev projects using shot-scraper |
+| **code-review** | v1.6.0 | C (Auditing) | Multi-agent local code review — basics, architecture, clarity, testing, repo-hygiene — writes REVIEW.md |
+| **deep-research** | v2.2.0 | D (Automation) | Multi-source web research with structured synthesis and cited summary in conversation |
+| **color-system** | v1.0.0 | E (Reference) | Curated color palettes (light + dark) across four domains, plus build-your-own and WCAG/APCA contrast guidance |
+| **typography** | v1.0.0 | E (Reference) | Ready-to-use type systems plus type-scale, vertical-rhythm, font, and readability-floor guidance |
 
 ## Core Agent Principles
 
