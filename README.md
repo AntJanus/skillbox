@@ -210,6 +210,22 @@ A curated library of ready-to-use color palettes (light + dark) across four doma
 
 ---
 
+### 🔠 typography
+
+Ready-to-use **type systems** (Product UI, Editorial, Marketing, Docs/Technical) plus the methodology to size text, build scales, set vertical rhythm, and pick fonts — so generated UI is readable instead of tiny, thin, and low-contrast. Size by **role on a scale**, never eyeballed pixels, and keep text above the four-number **readability floor** (size ≥16px · weight ≥400 · contrast ≥4.5:1 · line-height ≥1.5).
+
+**Use when:**
+- Choosing a ready-made type system for an app, article, landing page, or docs
+- Building a custom type scale (base × ratio) and vertical rhythm on an 8px grid
+- Fixing unreadable text — too small, too thin, too low-contrast, too cramped
+- Picking or pairing fonts (system stacks, curated webfonts, superfamilies)
+
+**Triggers:** When asked to "what font size should I use", "set up a type scale", "this text is too small to read", "what line-height for body", "set up vertical rhythm", "pick a font for my dashboard", "pair a heading and body font", or "make typography fluid with clamp()"
+
+[View Documentation](./skills/typography/SKILL.md)
+
+---
+
 ## Installation
 
 ### Using Vercel Skills CLI (Recommended)
