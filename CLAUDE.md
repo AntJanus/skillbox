@@ -77,7 +77,7 @@ tags: [relevant, tags]
 [Main Content - Pattern Specific]
 
 ## Examples
-[Good/Bad code comparisons]
+[✅/❌ code comparisons]
 
 ## Troubleshooting
 [Common issues and solutions]
