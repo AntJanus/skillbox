@@ -86,7 +86,7 @@ curl -o .claude/skills/track-session/SKILL.md \
 
 ## Available Skills
 
-13 skills. Click any name to jump to its use-cases and triggers; expand for details.
+14 skills. Click any name to jump to its use-cases and triggers; expand for details.
 
 | Skill | What it does |
 |-------|-------------|
@@ -103,6 +103,7 @@ curl -o .claude/skills/track-session/SKILL.md \
 | [🔬 deep-research](#deep-research) | Multi-source web research with cited synthesis |
 | [🎨 color-system](#color-system) | Curated color palettes + WCAG/APCA contrast guidance |
 | [🔠 typography](#typography) | Type systems, scale, rhythm + a readability floor |
+| [🧱 local-first-app](#local-first-app) | Local-first single-user web-app blueprint (Next.js + node:sqlite) |
 
 ### track-session
 
@@ -322,6 +323,27 @@ Four systems (Product UI, Editorial, Marketing, Docs/Technical). Size by **role 
 **Triggers:** When asked to "what font size should I use", "set up a type scale", "this text is too small to read", "what line-height for body", "set up vertical rhythm", "pick a font for my dashboard", "pair a heading and body font", or "make typography fluid with clamp()"
 
 [View Documentation](./skills/typography/SKILL.md)
+</details>
+
+### local-first-app
+
+<details>
+<summary><b>A blueprint for building local-first, single-user web apps — calculators, trackers, dashboards — that run in the browser, persist to a local SQLite file, and can ship as a desktop binary.</b></summary>
+
+The stack: **Next.js (App Router) + React + TypeScript**, **Mantine** UI, **`node:sqlite`** persistence (no native addon → single-binary packaging), a **pure framework-free calculation core**, **zod** at the server boundary, and a themed **colorblind-safe chart palette**. Core principle: keep all computation in a pure core the browser imports directly; persistence is a thin `server-only` layer.
+
+**Use when:**
+- Scaffolding a tracker / calculator / dashboard / personal-tool web app
+- Adding a persisted entity + a zod-validated server action over `node:sqlite`
+- Wiring the chart color *module* (semantic roles, theme hook) — pair with **color-system** for the actual palette
+- Packaging a Next.js app as a self-contained desktop binary (`deno compile` / `deno desktop`)
+- Deciding where computation, persistence, and view-model logic belong
+
+**Triggers:** When asked to "scaffold a tracker app", "build a local-first app", "add a persisted entity + server action", "wire a node:sqlite store", "package this as a desktop app", or "where should this calculation live?"
+
+Not for palette/contrast choices (see [color-system](#color-system)) or pure visual layout (see frontend-design).
+
+[View Documentation](./skills/local-first-app/SKILL.md)
 </details>
 
 ## Usage
