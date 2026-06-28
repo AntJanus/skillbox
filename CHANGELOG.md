@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **local-first-app** (v1.0.0 → **v1.1.0**, minor): added route-topology and entity-relationship architecture. New SKILL.md sections **CRUD as screens — never modals** (every list/view/create/edit is an addressable `app/<entity>/` route — `page.tsx` / `new` / `[id]` / `[id]/edit` — with the URL as state; edit is the create screen prefilled via one `<EntityForm mode>`; post/redirect/get; unified `<ListScreen>`/`<DetailScreen>`/`<FormScreen>` shells reused across every entity so projects and tasks share identical chrome) and **Relationships — FKs, assembled in loaders, cross-linked** (real foreign keys with declared delete intent; joins assembled in `lib/` loaders via a two-loader pattern — list+counts vs detail aggregate; the pure core stays relationship-agnostic; a reusable `<RelatedList>` cross-links parent↔child detail routes and prefills the FK on "+ New"). Flat top-level routes per entity (cross-link by FK, not nested paths). **Delete** is the one allowed modal carve-out — a Mantine `openConfirmModal` that shows the CASCADE blast radius (`also deletes 4 tasks`) from the detail loader before posting to `deleteEntity` → no delete *screen*. **Forms** use one zod schema in `lib/schemas/<entity>.ts` shared by both sides — `zodResolver` on the client for inline errors, the same schema `.parse()`d in the server action as the authority. Added a `PRAGMA foreign_keys = ON` gotcha (node:sqlite defaults FKs OFF per connection) and a ✅/❌ example pair (loader-assembled aggregate vs core-follows-relation/N+1). `references/ARCHITECTURE.md` gains a full worked **Project→Tasks** pattern (schema FK + index, scoped/batched store queries, the two loaders, server-action PRG with shared-schema validation, `openConfirmModal` delete, `<RelatedList>` cross-linking), a **many-to-many variant** (join table with composite PK, attach/detach actions, two-step batched loader), and the screen shells folded into component consolidation.
+
 ## [4.3.0] - 2026-06-28
 
 ### Added

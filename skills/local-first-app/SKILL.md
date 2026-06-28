@@ -4,7 +4,7 @@ description: Local-first single-user web-app blueprint for a single-purpose CRUD
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.0.0"
+  version: "1.1.0"
   tags: [nextjs, react, typescript, sqlite, local-first, desktop, architecture, charts]
 ---
 
@@ -49,6 +49,34 @@ components/     UI                — 'use client'; import the pure core directl
 Keep a **plain row type** + a `toX(row, derived)` mapper as the single shape every screen renders, and put **pure view-model logic** (aggregations, summaries, derived metrics) in `lib/<domain>.ts` — not in components.
 
 → Full data-layer, migrations, and shared-state detail: **[references/ARCHITECTURE.md](./references/ARCHITECTURE.md)**
+
+## CRUD as screens — never modals
+
+Every list/view/create/edit is an **addressable route**, not modal state. One screen per operation, identical layout across every entity:
+
+```
+app/<entity>/
+  page.tsx             list      → loadEntities()         → <ListScreen>
+  new/page.tsx         create    → <FormScreen>           → createEntity action
+  [id]/page.tsx        detail    → loadEntityDetail(id)   → <DetailScreen>
+  [id]/edit/page.tsx   edit      → <FormScreen mode=edit> → updateEntity action
+```
+
+- **The URL is the state:** deep-linkable, refresh-safe, back/forward works, nothing to lose mid-flow. Don't reach for App Router's intercepting-route modal pattern for data entry — for one user on one machine, plain screens are simpler and the clarity is the point. **The one modal exception is a destructive-delete confirm** (Mantine `openConfirmModal`) — it shows the cascade blast radius (`also deletes 4 tasks`) from the detail loader's counts, then posts to the `deleteEntity` action → `revalidatePath` → `redirect` to the list. Don't build a delete *screen*; don't delete without the count.
+- **Edit is the new screen, prefilled.** One `<EntityForm>` (a `mode` prop) is the single source of truth for the fields; new mounts it empty, edit mounts it with the loaded row. Both validate against **one zod schema** (`lib/schemas/<entity>.ts`) — `zodResolver` on the client for inline errors, the *same* schema `.parse()`d in the `'use server'` action as the authority (no duplicated rules, no client/server drift). The action then writes → `redirect('/<entity>/[id]')` (post/redirect/get) and `revalidatePath`s the list + detail.
+- **Unified shells, one per screen type.** Every entity reuses the *same* `<ListScreen>` / `<DetailScreen>` / `<FormScreen>` container (header, breadcrumbs, action bar, related-list slots). Projects and tasks get the same edit-page chrome for free; only the inner fields differ.
+
+## Relationships — FKs, assembled in loaders, cross-linked
+
+Entities reference each other with real foreign keys; joins are assembled in `lib/` loaders, never followed by the pure core.
+
+- **Schema:** turn FKs on (`PRAGMA foreign_keys = ON` — node:sqlite defaults them OFF), declare delete intent (`ON DELETE CASCADE` for ownership, `RESTRICT`/`SET NULL` otherwise). Let the DB constraint reject orphans; surface the violation, never swallow it.
+- **Store:** per-relation queries (`listTasksByProject(id)`) + a *batched* count (`countTasksByProject()` — one `GROUP BY`, no N+1).
+- **Loaders, two per parent:** `loadProjects()` → list rows + cheap counts; `loadProjectDetail(id)` → a `{ project, tasks }` aggregate.
+- **Pure core stays relationship-agnostic** — hand it the assembled aggregate (`summarizeProject(project, tasks)`); it never reads the DB to follow a relation.
+- **Cross-link both ways:** parent detail renders a reusable `<RelatedList>` (child rows link to `/<child>/[id]`; a `+ New` link prefills the FK via `/<child>/new?projectId=<id>`); child detail links back to its parent. Relationship navigation is just links between detail routes.
+
+→ Full route topology + worked Project→Tasks relationship pattern: **[references/ARCHITECTURE.md](./references/ARCHITECTURE.md)**
 
 ## Conventions (carry these verbatim)
 
@@ -127,8 +155,28 @@ const dollars = row.price_cents / 100;                       // read, then hand 
 createPurchase({ price: 19.99 });   // float drift; never store money as a float in SQLite
 ```
 
+✅ **Relationship assembled in the loader, core stays pure**
+```ts
+// lib/projects.ts — loader composes the aggregate; one batched count, no N+1
+export async function loadProjectDetail(id: number): Promise<ProjectDetail> {
+  const db = getDb();
+  const project = requireProject(db, id);
+  const tasks = listTasksByProject(db, id);     // single scoped query
+  return { project, tasks, summary: summarizeProject(project, tasks) }; // pure core gets the assembled shape
+}
+```
+
+❌ **Core follows the relation into the DB (and N+1s)**
+```ts
+// src/project/summary.ts — pure core must not import the db or query per-row
+function summarize(project: Project) {
+  const tasks = getDb().prepare("SELECT * FROM tasks WHERE project_id = ?").all(project.id); // wrong layer + N+1
+}
+```
+
 ## Gotchas
 
+- **Foreign keys default OFF in node:sqlite** — they're a *per-connection* PRAGMA, not a schema property. Run `PRAGMA foreign_keys = ON` in `openDatabase()` before any query, or `ON DELETE CASCADE` and orphan-rejection silently do nothing.
 - **`node:sqlite` breaks vitest/Vite** — it's a runtime builtin but NOT in `module.builtinModules`, so Vite mangles the specifier. Redirect `node:sqlite` to a tiny `createRequire` shim via a `pre` resolve plugin in `vitest.config.ts` (test-only; prod imports it directly). Also alias `@/*` → repo root there.
 - **Schema must be an inlined TS string**, not a `.sql` file — `readFileSync(process.cwd()/...)` ENOENTs next to a packaged binary.
 - **No `db.transaction()` in node:sqlite** — write a `runInTransaction(db, fn)` wrapper (`BEGIN`/`COMMIT`/`ROLLBACK`); better-sqlite3's helper doesn't exist here.
