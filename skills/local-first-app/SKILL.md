@@ -1,6 +1,6 @@
 ---
 name: local-first-app
-description: Local-first single-user web-app blueprint — Next.js App Router + React + TypeScript, Mantine, node:sqlite, a pure calculation core, zod boundaries, themed colorblind-safe charts. Use this skill whenever the user wants to scaffold a tracker/calculator/dashboard app, add a persisted entity + server action, wire a node:sqlite store, or package a web app as a desktop binary. Do NOT use for palette/contrast choices (see color-system) or pure visual layout (see frontend-design).
+description: Local-first single-user web-app blueprint for a single-purpose CRUD app — Next.js App Router + React + TypeScript, Mantine, node:sqlite, a pure domain core, zod boundaries, colorblind-safe charts. Use this skill whenever the user wants to scaffold a tracker/calculator/dashboard app, add a persisted entity + server action, wire a node:sqlite store, or package a web app as a desktop binary. Do NOT use for palette/contrast choices (see color-system) or pure visual layout (see frontend-design).
 license: MIT
 metadata:
   author: Antonin Januska
@@ -12,9 +12,9 @@ metadata:
 
 ## Overview
 
-A blueprint for building **local-first, single-user web apps** — calculators, trackers, dashboards, and personal tools that run entirely in the browser, persist to a local SQLite file, and can ship as a single self-contained desktop binary. **No backend service, no auth, no network dependency for core function.** The "server" is just Next.js server components and server actions talking to a local file.
+A blueprint for building a **local-first, single-user web app for one specific function** — a game-backlog tracker, an expense log, a book/collection catalog, a habit tracker, a mortgage calculator, a personal dashboard. One purpose, one user, one machine: it runs entirely in the browser, persists to a local SQLite file, and can ship as a single self-contained desktop binary. **No backend service, no auth, no network dependency for core function.** The "server" is just Next.js server components and server actions talking to a local file. This skill is the *architecture*; the specific function is yours.
 
-**Core principle:** keep all real computation in a **pure, framework-free core** (`src/<domain>/`) that imports nothing from React, Next, or the DB. Client components import it directly and compute in the browser. Persistence is a thin `server-only` SQLite layer. This separation makes the math testable, reusable (a future CLI), and packageable.
+**Core principle:** keep all real domain logic — CRUD-derived state (rollups, filters, status counts) *and* any computation — in a **pure, framework-free core** (`src/<domain>/`) that imports nothing from React, Next, or the DB. Client components import it directly and run it in the browser. Persistence is a thin `server-only` SQLite layer. This separation makes the logic testable, reusable (a future CLI), and packageable.
 
 *Scope: one-user, one-machine, local-data apps. Not for apps needing real multi-user auth, server-side secrets, a hosted API, or horizontal scale — that's a different architecture.*
 
@@ -27,8 +27,8 @@ A blueprint for building **local-first, single-user web apps** — calculators, 
 | Component lib | **Mantine** (`@mantine/core`, `/hooks`, `/dates`, `/charts`) | Mature, batteries-included: AppShell, tables, inputs, dark mode, charts. Don't roll your own or use an immature/personal component lib. |
 | Persistence | **`node:sqlite`** (built-in `DatabaseSync`) | **No native addon** — `better-sqlite3` needs per-platform native rebuilds, which kills the single-binary goal. `node:sqlite` is the same driver on Node 24 and Deno. Load-bearing; don't swap it. |
 | Validation | **zod** at every server boundary | One schema per write path; parse before touching the DB |
-| Data fetching | **none** — no TanStack Query / SWR / Redux | Reads are server components; compute happens in the browser. No client cache layer to add. |
-| Math/diagrams | **KaTeX** (formulas), **Mermaid** (lazy client render) | The app shows its work |
+| Data fetching | **none** — no TanStack Query / SWR / Redux | Reads are server components; derive/compute in the browser. No client cache layer to add. |
+| Math/diagrams | **KaTeX** (formulas), **Mermaid** (lazy client render) | *Only if the app computes non-obvious numbers.* A pure CRUD tracker can skip these. |
 | Test | **vitest** | Pure-core unit tests, test-first |
 
 ## Architecture — three hard layers
@@ -44,7 +44,7 @@ components/     UI                — 'use client'; import the pure core directl
 **Data flow:**
 - **Reads:** server component (`export const dynamic = "force-dynamic"`) calls a `'server-only'` loader → maps DB rows to a plain client-row type → passes to a `'use client'` child. Mantine compound components (`Table.*`, `Accordion.*`) are client references — never render them from a server component.
 - **Writes:** `'use server'` action → zod `.parse()` the input → typed DB call → `revalidatePath()`.
-- **Compute:** lives in the pure core, called from client components and `lib/` view-models.
+- **Derive/compute:** roll-ups, filters, summaries, and any math live in the pure core, called from client components and `lib/` view-models.
 
 Keep a **plain row type** + a `toX(row, derived)` mapper as the single shape every screen renders, and put **pure view-model logic** (aggregations, summaries, derived metrics) in `lib/<domain>.ts` — not in components.
 
@@ -52,8 +52,8 @@ Keep a **plain row type** + a `toX(row, derived)` mapper as the single shape eve
 
 ## Conventions (carry these verbatim)
 
-- **Money:** integer **cents** at the DB/zod boundary; the pure core works in **major units (dollars) as floats**. Convert at the boundary, nowhere else. Never store money as a float.
-- **Rates:** decimals in code — 7% is `0.07`. The UI takes percents and `/100` before calling the core.
+- **Money** *(only finance domains)*: integer **cents** at the DB/zod boundary; the pure core works in **major units (dollars) as floats**. Convert at the boundary, nowhere else. Never store money as a float.
+- **Rates** *(only finance domains)*: decimals in code — 7% is `0.07`. The UI takes percents and `/100` before calling the core.
 - **Imports:** extensionless relative imports (`./amortization`). Bundler resolves TS directly.
 - **No silent fallbacks:** the pure core *throws* on invalid input; the UI guards inputs before calling it. A fallback that masks a missing row is a bug.
 - **Types:** explicit interfaces for every input/result. `noUncheckedIndexedAccess` is on — handle `undefined` from index access.
@@ -66,12 +66,24 @@ These are the corrections that recur most — treat them as defaults:
 - **Tables:** one grouped table with parent-owned filter pills that drive columns AND chart series together — not many split tables. Always include the diff/delta column for paired figures.
 - **Color:** centralize all chart color in one module; color by **semantic role**, not hue; provide light + dark variants; ride meaning on **blue-vs-orange (warm/cool), never red-vs-green**, and add a `+/−` glyph so color is never the only signal.
 - **Legibility (recurring failure):** set the floor at the theme/globals level — body ≥16px, weight ≥400, contrast ≥4.5:1, line-height ≥1.5. Cards/tables need a surface background distinct from the canvas; flat same-color containers read as illegible.
-- **Explainability:** show each formula once (KaTeX) with values plugged in + a JavaScript-form toggle; collapsible "underlying math" under dashboard stats; an in-app `/docs` area with Mermaid diagrams.
+- **Explainability** *(when the app computes non-obvious numbers)*: show each formula once (KaTeX) with values plugged in + a JavaScript-form toggle; collapsible "underlying math" under dashboard stats; an in-app `/docs` area with Mermaid diagrams. A pure CRUD tracker skips formulas but still ships the `/docs` concept area.
 
 → Full color/theme system, data-viz rules, explainability, and legibility detail: **[references/UI.md](./references/UI.md)**
 → Packaging to a desktop binary (`deno compile` / `deno desktop`): **[references/PACKAGING.md](./references/PACKAGING.md)**
 
 ## Examples
+
+✅ **Derived state in the pure core — a tracker with no math**
+```ts
+// src/backlog/summary.ts — pure: rollups/counts, throws on bad input. No arithmetic, same pattern.
+export function summarize(games: Game[]): BacklogSummary {
+  const byStatus = { backlog: 0, playing: 0, beaten: 0 };
+  for (const game of games) byStatus[game.status]++;
+  return { total: games.length, byStatus, pctBeaten: games.length ? byStatus.beaten / games.length : 0 };
+}
+```
+
+The identical core pattern carries real computation when the domain has it:
 
 ✅ **Calculation in the pure core, called from the client**
 ```ts
