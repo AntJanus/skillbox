@@ -4,7 +4,7 @@ description: Curated color palettes (light + dark) plus build-your-own and contr
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.0.0"
+  version: "1.1.0"
   tags: [color, palette, design, accessibility, dark-mode, data-viz, theme]
 ---
 
@@ -27,7 +27,8 @@ Load a reference file only when the task needs it — keep context lean.
 ## Palette Library (quick index)
 
 ### Web App UI — light + dark, 13 semantic roles each
-- **Graphite** — cool slate + blue. Dense B2B dashboards, dev tools; the recede-and-let-data-lead default.
+- **Carbon** ⭐ *(top pick)* — deep slate-blue, dark-first. Analytics dashboards, perf reports & dev tooling; the recommended default. Ships a full dashboard kit (A–F grade pills, ordered stage sequence, inline-code tone, success highlight). Reach for **Graphite** instead when light mode must be hand-tuned-equal.
+- **Graphite** — cool slate + blue. Dense B2B dashboards, dev tools; the light+dark parity default.
 - **Evergreen** — emerald brand on true-neutral zinc. Fresh, confident, non-blue identity.
 - **Terracotta** — warm clay/espresso neutrals + rust. Editorial, content platforms, writing tools.
 - **Bloom** — pastel periwinkle/violet, deep dark mode. Friendly dev tools, playful-but-clean apps.
@@ -85,7 +86,8 @@ Data-viz palettes instead provide ordered color **lists** (categorical = distinc
 
 ```
 User: "I need colors for an admin dashboard, light and dark."
-→ Recommend Graphite (cool slate + blue, made for dense UI).
+→ Recommend Carbon (deep slate-blue, dark-first, made for dense data UI) — the top pick;
+  offer Graphite if hand-tuned light-mode parity matters more than the dashboard kit.
 → Copy its role→hex table from palettes.md (both modes).
 → Apply by role: background→surface→border→text, primary for the main CTA,
   success/warning/error for status badges. Confirm text-primary on background ≥ 4.5:1.
