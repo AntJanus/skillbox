@@ -23,9 +23,9 @@ Centralize ALL data-viz color in one module (e.g. `lib/colors.ts`); restyle ther
 - **One table with column-toggle pills, not many split tables.** When tempted to split (monthly vs totals, nominal vs real), build a single grouped-columns table whose pills (owned by the parent) drive which column groups AND which chart series show together. Always include the diff/delta column for paired figures.
 - **No-cents axis ticks; high-contrast chart labels.** Tabular numerals for figure columns.
 
-## Explainability (first-class, not an afterthought)
+## Explainability (first-class when the app computes)
 
-The product is trusted only if the user can audit it:
+Applies when the app derives non-obvious numbers (calculators, financial/projection tools). A pure CRUD tracker with no computed figures skips the formula surfaces below — but still ships the in-app `/docs` concept area. When there *are* computed numbers, the product is trusted only if the user can audit them:
 
 - **Show the math.** Render each formula **once** at the top of its section in **KaTeX**, with values plugged in AND the pure symbolic form, plus a toggle to its **JavaScript form** for programmers. Below it, a collapsible per-step breakdown.
 - Put a **collapsible "underlying math" section under dashboard stats** so any headline number can be traced to its inputs.

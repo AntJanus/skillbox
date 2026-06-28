@@ -330,7 +330,7 @@ Four systems (Product UI, Editorial, Marketing, Docs/Technical). Size by **role 
 <details>
 <summary><b>A blueprint for building local-first, single-user web apps — calculators, trackers, dashboards — that run in the browser, persist to a local SQLite file, and can ship as a desktop binary.</b></summary>
 
-The stack: **Next.js (App Router) + React + TypeScript**, **Mantine** UI, **`node:sqlite`** persistence (no native addon → single-binary packaging), a **pure framework-free calculation core**, **zod** at the server boundary, and a themed **colorblind-safe chart palette**. Core principle: keep all computation in a pure core the browser imports directly; persistence is a thin `server-only` layer.
+A blueprint for a single-purpose local CRUD app — a game-backlog tracker, expense log, collection catalog, habit tracker, or calculator. The stack: **Next.js (App Router) + React + TypeScript**, **Mantine** UI, **`node:sqlite`** persistence (no native addon → single-binary packaging), a **pure framework-free domain core**, **zod** at the server boundary, and a themed **colorblind-safe chart palette**. Core principle: keep all domain logic (CRUD-derived state *and* any computation) in a pure core the browser imports directly; persistence is a thin `server-only` layer.
 
 **Use when:**
 - Scaffolding a tracker / calculator / dashboard / personal-tool web app

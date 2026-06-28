@@ -4,11 +4,11 @@ Load when wiring up the data layer, migrations, or shared state. The three layer
 
 ## The pure core (`src/<domain>/`)
 
-The product's brain. Imports nothing from React, Next, or the DB. Works in plain numbers (major units), returns explicit typed result objects, and **throws on invalid input** rather than guessing.
+The product's brain. Imports nothing from React, Next, or the DB. Works in plain data — domain entities, and plain numbers in major units where there's money — returns explicit typed result objects, and **throws on invalid input** rather than guessing. The logic is whatever the function needs: derived state and rollups for a tracker (status counts, filters, streaks), real math for a calculator. Same rules either way.
 
-- Keep one file per concept (e.g. `amortization.ts`, `inflation.ts`, `analysis.ts`) plus an `index.ts` barrel.
-- Higher-level helpers (`analyzeX`) compose the primitives and return the per-row shapes the UI renders.
-- A shared period-discount/loop helper avoids duplicating the same iteration across calculators.
+- Keep one file per concept — `summary.ts` / `filters.ts` for a tracker, `amortization.ts` / `inflation.ts` for a calculator — plus an `index.ts` barrel.
+- Higher-level helpers (`analyzeX`, `summarizeX`) compose the primitives and return the per-row shapes the UI renders.
+- Shared helpers (a status-grouping reducer, a period/loop iterator) avoid duplicating the same traversal across features.
 - Because it's pure, it's trivially unit-tested and reusable by a future CLI.
 
 ## The store (`src/db/`, `server-only`)
