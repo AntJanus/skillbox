@@ -8,12 +8,12 @@ Spot-check 3–5 of these in a fresh Claude session to confirm the description t
 2. "single-user book/movie catalog that saves to my machine"
 3. "a habit tracker that runs offline and persists locally"
 4. "personal workout log, no account, data stays on disk"
-5. "scaffold an expense tracker I can run as a desktop app"
+5. "scaffold a recipe manager I can run as a desktop app"
 6. "where should the rollup/summary logic live in my Next tracker app?"
 7. "add a persisted entity with a zod-validated server action over node:sqlite"
 8. "package this Next.js app as a downloadable desktop binary"
 9. "small inventory manager that stores everything in a local SQLite file"
-10. "build a mortgage calculator that saves my scenarios locally"
+10. "a plant-care app that computes next-watering dates and saves my plants locally"
 
 ## Should NOT trigger (adjacent skills / out of scope)
 
