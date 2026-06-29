@@ -4,16 +4,18 @@ Load when wiring up the data layer, migrations, or shared state. The three layer
 
 ## The pure core (`src/<domain>/`)
 
-The product's brain. Imports nothing from React, Next, or the DB. Works in plain data — domain entities, and plain numbers in major units where there's money — returns explicit typed result objects, and **throws on invalid input** rather than guessing. The logic is whatever the function needs: derived state and rollups for a tracker (status counts, filters, streaks), real math for a calculator. Same rules either way.
+The product's brain, and the **single home for every derived value**. Imports nothing from React, Next, or the DB. Works in plain data — domain entities, and plain numbers in major units where a quantity is exact — returns explicit typed result objects, and **throws on invalid input** rather than guessing. *All* derivation lives here: status counts, filters, streaks, summaries — plus any real computation a domain carries (a unit conversion, a projection from history). One rule, no exceptions: **a derived value? → the core, always.** `lib/` never aggregates; it maps rows and calls the core (see The glue).
 
-- Keep one file per concept — `summary.ts` / `filters.ts` for a tracker, `amortization.ts` / `inflation.ts` for a calculator — plus an `index.ts` barrel.
+- Keep one file per concept — `summary.ts` / `filters.ts`, plus `rules.ts` for business-rule predicates (below) — and an `index.ts` barrel.
 - Higher-level helpers (`analyzeX`, `summarizeX`) compose the primitives and return the per-row shapes the UI renders.
 - Shared helpers (a status-grouping reducer, a period/loop iterator) avoid duplicating the same traversal across features.
 - Because it's pure, it's trivially unit-tested and reusable by a future CLI.
 
+**Business rules live in the action's guard step.** A rule that needs DB context ("can't mark a project done while it has open tasks," "can't delete a tag that's in use") runs in the server action: load the needed rows, check, throw a typed domain error before writing (see Routes) — inline is fine, the way the reference implementation does it. When rules grow or you want them unit-tested, **extract them to pure predicates** in `rules.ts` (`canMarkDone(project, tasks): Result`) and have the action call those — a derived boolean is just more core logic. Optional structure, not a mandate.
+
 ## The store (`src/db/`, `server-only`)
 
-`node:sqlite`'s `DatabaseSync` — no native addon, so the app compiles into one file.
+`node:sqlite`'s `DatabaseSync` — no native addon, so the app compiles into one file. Requires **Node ≥ 22.5** (`--experimental-sqlite` on 22.x; unflagged on Node ≥ 23 / Node 24). Pin the floor in CI.
 
 ```
 src/db/
@@ -22,33 +24,69 @@ src/db/
   index.ts        openDatabase() → typed query API; runs migrations on boot
 ```
 
-- **Schema as a TS string export.** `readFileSync(join(process.cwd(), ...))` ENOENTs next to a shipped binary — inline it.
-- **Versioned migrations** tracked by `PRAGMA user_version`: each has a monotonic `version` + idempotent `up()` (`CREATE IF NOT EXISTS`, guarded `ALTER TABLE ... ADD COLUMN`). A DB seeded at any earlier version upgrades cleanly. Run on boot.
-- **`runInTransaction(db, fn)`** — node:sqlite has no `db.transaction()`:
+**Open the connection once, hardened.** Set the pragmas every local-SQLite app needs, and guard the singleton against Next's dev HMR (which re-evaluates modules and would reopen the file → "database is locked"):
+
+```ts
+// src/db/index.ts
+declare global { var __db: DatabaseSync | undefined }
+export const getDb = () => (globalThis.__db ??= open());   // survives HMR; server-only
+
+function open(): DatabaseSync {
+  const db = new DatabaseSync(resolveDbPath());
+  db.exec(`
+    PRAGMA journal_mode = WAL;     -- concurrent readers during a write (server components render in parallel)
+    PRAGMA synchronous = NORMAL;   -- safe with WAL, far faster than FULL
+    PRAGMA busy_timeout = 5000;    -- retry on lock contention instead of failing instantly
+    PRAGMA foreign_keys = ON;      -- per-connection; OFF by default
+  `);
+  db.exec("PRAGMA optimize");      // keep the query planner's stats current
+  migrate(db);
+  return db;
+}
+```
+
+Without WAL + `busy_timeout`, a server action writing while a server component reads throws `SQLITE_BUSY` — not a tuning nicety, a reliability fix.
+
+- **Schema as a TS string export.** `readFileSync(join(process.cwd(), ...))` ENOENTs next to a shipped binary — inline it. Define tables **parent-before-child** in `BASE_SCHEMA` — a `REFERENCES` to a not-yet-defined table errors with FKs on.
+- **Versioned migrations** tracked by `PRAGMA user_version`, run on boot. On a **fresh DB** (no tables): run `BASE_SCHEMA`, then set `user_version` to the *current max migration version* — skipping all migrations. On an **existing DB**: run each migration with `version > user_version`, in order. Each migration is idempotent (`CREATE IF NOT EXISTS`, guarded `ALTER TABLE ... ADD COLUMN`) and runs **inside one transaction together with its `user_version` bump**, so a multi-statement migration can't half-apply and desync the counter:
+
+```ts
+function applyMigration(db: DatabaseSync, m: Migration) {
+  runInTransaction(db, () => {
+    m.up(db);
+    db.exec(`PRAGMA user_version = ${m.version}`);   // atomic with the DDL above
+  });
+}
+```
+
+- **`runInTransaction(db, fn)`** — node:sqlite has no `db.transaction()`. Use `BEGIN IMMEDIATE` on write paths so lock contention surfaces up front (predictable with `busy_timeout`) instead of mid-transaction:
 
 ```ts
 export function runInTransaction<T>(db: DatabaseSync, fn: () => T): T {
-  db.exec("BEGIN");
+  db.exec("BEGIN IMMEDIATE");
   try { const result = fn(); db.exec("COMMIT"); return result; }
   catch (error) { db.exec("ROLLBACK"); throw error; }
 }
 ```
 
-- Expose a **small typed query API** (`createX`, `addY`, `requireX`, batched aggregates to avoid N+1), not raw SQL at call sites.
-- `getDb()` is cached and `server-only`. Resolve the data dir via one helper: an env override (e.g. `<APP>_DATA_DIR`, set by the desktop entrypoint) else `./data`; `mkdirSync(..., { recursive: true })`.
-- Gitignore `data/`, `*.sqlite`, `.next/`.
+- Expose a **small typed query API** (`createX`, `addY`, `requireX`, batched aggregates to avoid N+1), not raw SQL at call sites. `.all()` returns `Record<string, unknown>[]` — assert each query fn's return type at that seam (an `as Row[]` cast or a zod parse on reads) so call sites stay typed. Compile hot statements once (module-level `db.prepare(...)`), not per call.
+- **`requireX` calls Next's `notFound()`** (`next/navigation`) on a missing row — a thrown plain `Error` is a 500; `notFound()` renders the route's `not-found.tsx` as a 404.
+- `getDb()` is `server-only`. Resolve the data dir via one helper: an env override (`<APP>_DATA_DIR`, set by the desktop entrypoint) else `./data`; `mkdirSync(..., { recursive: true })`. **In a packaged binary the env var is mandatory** — `./data` is CWD-relative, so it follows wherever the user launched the binary from. `./data` is dev-only.
+- Gitignore `data/`, `*.sqlite`, `*.sqlite-wal`, `*.sqlite-shm`, `.next/`.
 
 ## The glue (`lib/`)
 
-- `'server-only'` loaders that the server pages call (e.g. `loadX()` = `getDb()` + query + map).
-- **Pure view-models** over the plain row type — aggregations, summary stats, derived metrics. This is where roll-ups live, NOT in components.
-- zod schemas, one per write boundary; formatters; the color module; config defaults.
-- A **plain client-row type** + `toX(row, derived)` mapper: the single shape the overview, list, and detail screens all render.
+`lib/` is **plumbing, not logic** — it assembles data and shapes it for screens, and calls the core for every derived value. It never aggregates on its own (that rule lives in The pure core).
+
+- `'server-only'` loaders the server pages call (`loadX()` = `getDb()` + query + map). A loader may *call* core helpers (`summarizeProject(project, tasks)`) but holds no rollup logic itself.
+- zod schemas, one per write boundary (`lib/schemas/<entity>.ts`); formatters; the color module; config defaults.
+- **Two row shapes, not one** — a lightweight **list row** (scalar columns + cheap counts) and a **detail aggregate** (the row + its children + a core summary; a superset of the list row). A `toX(row, derived)` mapper builds each. Don't claim one shape serves every screen — the two loaders return different shapes by design.
 
 ## Routes & server actions (`app/`)
 
 - Each data page is a server component with `export const dynamic = "force-dynamic"`; it loads via a `lib/` loader and passes plain rows to a `'use client'` child.
-- Writes are `'use server'` actions: zod `.parse()` → typed DB call → `revalidatePath()` the affected routes. Validate at this boundary; never trust raw input.
+- Writes are `'use server'` actions: zod `.parse()` → **rule guard** (load needed rows, check the rule — inline, or an optional `rules.ts` predicate — throw a typed domain error if violated) → typed DB call → `revalidatePath()`. Validate at this boundary; never trust raw input.
+- **`force-dynamic` and `revalidatePath` are not redundant.** `force-dynamic` keeps the *server* render fresh (no full-route cache); `revalidatePath` busts the *client* Router Cache after a write, so an already-visited route (the list you navigate back to) refreshes instead of showing a stale snapshot. You need both.
 
 ## CRUD as screens (no modals)
 
@@ -56,41 +94,82 @@ Every operation on an entity is its own addressable route — never modal state.
 
 ```
 app/<entity>/
-  page.tsx             list      server page → loadEntities()       → <ListScreen>
-  new/page.tsx         create    server page → defaults             → <FormScreen>
-  [id]/page.tsx        detail    server page → loadEntityDetail(id) → <DetailScreen>
+  page.tsx             list      server page → loadEntities()       → <EntityList>   (per-entity)
+  new/page.tsx         create    server page → defaults             → <FormScreen>   (shared shell)
+  [id]/page.tsx        detail    server page → loadEntityDetail(id) → <EntityDetail> (per-entity)
   [id]/edit/page.tsx   edit      server page → loadEntityDetail(id) → <FormScreen mode="edit">
   actions.ts           'use server' createEntity / updateEntity / deleteEntity
+  not-found.tsx        rendered when requireX → notFound()  (bad [id] → 404, not 500)
+  error.tsx            catches unexpected throws (incl. the core's deliberate throws)
+  loading.tsx          optional — shown while a slow server page resolves
 ```
 
-**Edit is the create screen, prefilled.** One `<EntityForm>` component owns the field set; `new` mounts it empty, `edit` mounts it with the loaded row via a `mode` prop. Both submit to the same shape; the action branches on presence of an id. This guarantees the two screens never drift.
+**Next 15: `params` and `searchParams` are async.** Page components must `await` them (`const { projectId } = await searchParams`) — synchronous access type-errors and silently misbehaves. The FK-prefill pattern (below) depends on this.
 
-**Post / redirect / get.** A write action `.parse()`s, calls the typed store method, `revalidatePath()`s the list + detail, then `redirect('/<entity>/[id]')`. The user lands on the canonical detail URL — no resubmit-on-refresh, no modal to dismiss.
+**Edit is the create screen, prefilled.** One `<EntityForm>` component owns the field set; `new` mounts it empty, `edit` mounts it with the loaded row via a `mode` prop. The action branches on presence of an id. This guarantees the two screens never drift.
+
+**One schema, two consumers — bridged by `z.coerce`.** The entity's zod schema lives once in `lib/schemas/<entity>.ts` and is the authority on both sides. Use `z.coerce.*` for every non-string field so the *same* schema validates native types in the browser AND survives a server round-trip:
 
 ```ts
-// app/projects/actions.ts
+// lib/schemas/project.ts — the one schema
+export const ProjectInput = z.object({
+  id: z.coerce.number().int().optional(),                  // present on edit, absent on create
+  name: z.string().min(1),
+  targetCount: z.coerce.number().int().nonnegative(),
+  archived: z.coerce.boolean().optional().default(false),  // unchecked box = absent → default
+});
+export type ProjectInput = z.infer<typeof ProjectInput>;
+```
+
+**Submit via Mantine `useForm`, not a raw `<form action>`.** The controlled form gives inline client validation through `zodResolver`; `onSubmit` calls the action inside `startTransition`; on a server-side failure the action *returns* field errors and the client maps them with `form.setErrors()`:
+
+```tsx
+// components/ProjectForm.tsx — 'use client'
+const form = useForm({ initialValues, validate: zodResolver(ProjectInput) });
+const [pending, start] = useTransition();
+<form onSubmit={form.onSubmit(values => start(async () => {
+  const result = await saveProject(values);        // typed values object, NOT FormData
+  if (result?.errors) form.setErrors(result.errors);
+}))}>
+```
+```ts
+// app/projects/actions.ts — 'use server'; receives the typed values object
 "use server";
-import { ProjectInput } from "@/lib/schemas/project";           // the one schema, shared with the client form
-export async function saveProject(form: FormData) {
-  const input = ProjectInput.parse(Object.fromEntries(form));   // zod at the boundary (authority)
-  const id = input.id ? (updateProject(getDb(), input), input.id) : createProject(getDb(), input);
+import { ProjectInput } from "@/lib/schemas/project";
+export async function saveProject(values: unknown) {
+  const parsed = ProjectInput.safeParse(values);           // authority; z.coerce handles any stray strings
+  if (!parsed.success) return { errors: parsed.error.flatten().fieldErrors };
+  const input = parsed.data;
+  const db = getDb();
+  let id: number;
+  if (input.id) { updateProject(db, input); id = input.id; }
+  else { id = Number(createProject(db, input)); }          // lastInsertRowid is bigint → Number()
   revalidatePath("/projects");
   revalidatePath(`/projects/${id}`);
-  redirect(`/projects/${id}`);                                   // PRG
+  redirect(`/projects/${id}`);                             // PRG: land on the canonical detail URL
 }
 ```
 
-**Validation — one schema, two consumers.** The entity's zod schema lives once in `lib/schemas/<entity>.ts`. The client `<EntityForm>` validates with `zodResolver(EntityInput)` (Mantine `useForm`) for inline field errors; the server action `.parse()`s the *same* schema as the authority. No duplicated rules, no client/server drift. Surface a failed `.parse()` back to the form (`useActionState` for the errors, `useFormStatus` for pending) — never swallow it.
+`redirect()` throws internally, so the lines after it never run and `runInTransaction` re-throws it cleanly. (Prefer `useFormStatus` over `useTransition` for pending? It only works in a component nested *inside* the `<form>`, not the one rendering it.)
 
-**Delete — the one modal exception.** Data entry is always a screen, but a destructive yes/no is the single allowed dialog: Mantine `openConfirmModal`, with children showing the **cascade blast radius** from the detail loader's counts (`also deletes 4 tasks`). On confirm it calls the `deleteEntity` action → `revalidatePath` → `redirect` to the list. Don't build a delete *screen*; don't delete without the count.
+**Delete — the one modal exception.** Data entry is always a screen, but a destructive yes/no is the single allowed dialog: Mantine `openConfirmModal`, with children showing the **cascade blast radius** from the detail loader's counts (`also deletes 4 tasks`). It needs `<ModalsProvider>` in the root provider stack (see UI.md), and the async action must run inside `startTransition` or its pending state breaks:
 
-**Unified page shells — one container per screen type.** Don't hand-build each entity's pages. Build three shells once and reuse them across every entity, so projects and tasks share identical chrome:
+```tsx
+openConfirmModal({
+  title: "Delete project?",
+  children: <Text>Also deletes {project.tasks.length} tasks.</Text>,
+  labels: { confirm: "Delete", cancel: "Cancel" },
+  confirmProps: { color: "red" },
+  onConfirm: () => startTransition(() => deleteProject(project.id)),   // → revalidatePath → redirect to list
+});
+```
 
-- `<ListScreen>` — page header, "+ New" action, the grouped table / `<RelatedList>` of rows.
-- `<DetailScreen>` — title, edit/delete action bar, a slot for the entity's fields, and a slot for its `<RelatedList>` sections.
-- `<FormScreen>` — title ("New X" / "Edit X"), the `<EntityForm>`, cancel/save bar; identical for create and edit.
+Don't build a delete *screen*; don't delete without the count.
 
-Only the inner field set and the loader differ per entity. The shells own layout, breadcrumbs, and action placement — that's what makes every entity feel like the same app.
+**The form shell is the high-value reuse.** The one shell worth sharing from day one is the **form/editor** — a `<FormScreen>` (a.k.a. an `EditorShell`) that every entity's new+edit screens mount, so create and edit share identical chrome and only the inner `<EntityForm>` fields differ:
+
+- `<FormScreen>` — title ("New X" / "Edit X"), the `<EntityForm>`, cancel/save bar; identical for create and edit. **Always share this one.**
+- **List & detail are usually per-entity components** (`CardList`, `CardDetail`) — they diverge more (each entity's table columns, detail layout, and `<RelatedList>` sections differ), so a generic `<ListScreen>`/`<DetailScreen>` shell often costs more than it saves. Promote them to shared shells only once the duplication is real. Don't mandate a three-shell triad up front.
 
 ## Relationships between entities
 
@@ -116,7 +195,7 @@ CREATE INDEX IF NOT EXISTS idx_tasks_project ON tasks(project_id);        -- ind
 `;
 ```
 
-Pick the delete rule per relationship: `CASCADE` for true ownership (a task can't exist without its project), `RESTRICT` to block deleting a parent that still has children, `SET NULL` for optional references. Let the DB reject orphans and surface the error — don't add a fallback that masks it.
+Pick the delete rule per relationship: `CASCADE` for true ownership (a task can't exist without its project), `RESTRICT` to block deleting a parent that still has children, `SET NULL` for optional references (**the FK column must be nullable — no `NOT NULL`, or `SET NULL` errors when the parent is deleted**). Let the DB reject orphans and surface the error — don't add a fallback that masks it.
 
 **Store — scoped queries + batched aggregates (no N+1).**
 
@@ -150,7 +229,7 @@ export async function loadProjectDetail(id: number): Promise<ProjectDetail> {
 
 **Pure core stays relationship-agnostic.** `summarizeProject(project, tasks)` takes both plain shapes as arguments and returns derived metrics — it never imports the db, never follows `project.id` into another table. That's what keeps it unit-testable and CLI-reusable.
 
-**Display — cross-link via `<RelatedList>`.** The parent's `<DetailScreen>` renders one `<RelatedList>` per relationship; the child's detail links back. Navigation between related entities is just links between their detail routes.
+**Display — cross-link via `<RelatedList>`.** The parent's detail screen renders one `<RelatedList>` per relationship; the child's detail links back. Navigation between related entities is just links between their detail routes.
 
 ```tsx
 // components/RelatedList.tsx — reused for every parent→child section
@@ -163,7 +242,9 @@ export async function loadProjectDetail(id: number): Promise<ProjectDetail> {
 // the task detail screen renders: <Link href={`/projects/${task.projectId}`}>← {project.name}</Link>
 ```
 
-The `new/page.tsx` for the child reads `searchParams.projectId` and passes it as the form's default FK, so creating a task from a project lands back on that project. Keep the FK select in the form too (for the standalone `/tasks/new` entry point), defaulted from the query param.
+The `new/page.tsx` for the child reads the FK from `searchParams` (`const { projectId } = await searchParams` — async in Next 15) and passes it as the form's default FK, so creating a task from a project lands back on that project. Keep the FK select in the form too (for the standalone `/tasks/new` entry point), defaulted from the query param.
+
+**Edit overfetches by default, and that's fine.** The edit page reuses `loadEntityDetail` (full aggregate) just to prefill the parent's own scalar fields — harmless at this scale. If a detail aggregate ever gets heavy, give edit a lighter parent-only loader; until then, one loader is simpler.
 
 ### Many-to-many variant (join table)
 
@@ -175,14 +256,29 @@ When the relationship is N:N (e.g. `tasks` ↔ `tags`), only three things change
 CREATE TABLE IF NOT EXISTS task_tags (
   task_id INTEGER NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
   tag_id  INTEGER NOT NULL REFERENCES tags(id)  ON DELETE CASCADE,
-  PRIMARY KEY (task_id, tag_id)        -- composite PK = dedupe + the lookup index
+  PRIMARY KEY (task_id, tag_id)        -- composite PK: dedupe + the task_id→tags lookup index
 );
+CREATE INDEX IF NOT EXISTS idx_task_tags_tag ON task_tags(tag_id);   -- reverse tag→tasks (the PK doesn't cover it)
 ```
 
 - **Actions — attach/detach, not create-with-FK.** The link is edited by `attachTag(taskId, tagId)` / `detachTag(taskId, tagId)` (INSERT / DELETE on the join row), not by setting a column when the child is created. The `<RelatedList>` for an N:N gets add/remove controls instead of a `+ New` that prefills an FK.
-- **Loader — two-step batched assembly.** Fetch the join rows for the parent(s), collect the far-side ids, then batch-fetch those rows in one `WHERE id IN (...)` — never per-row. For a list, one `GROUP BY` over the join table gives per-parent counts (same N+1 rule as 1:N).
+- **Loader — two-step batched assembly.** Fetch the join rows for the parent(s), collect the far-side ids, then batch-fetch those rows in one `WHERE id IN (...)` — never per-row. (SQLite caps bound variables at ~999 on older builds / 32766 on 3.32+; chunk the `IN` list if a parent could exceed it.) For a list, one `GROUP BY` over the join table gives per-parent counts (same N+1 rule as 1:N).
 
 The pure core still receives the assembled aggregate (`{ task, tags }`); the join table never leaks past the loader.
+
+## Adding an entity (touch these, in order)
+
+The per-entity cost is real and the shape repeats. To add entity `X`:
+
+1. **`src/<x>/`** — types, `summary.ts` (derivations), `rules.ts` (predicates), `index.ts` barrel.
+2. **`src/db/`** — add the table to `BASE_SCHEMA` (parent-before-child), a migration if the DB already ships, and the typed query fns (`listX`, `requireX`, `createX`, `updateX`, `deleteX`, batched `countYByX`).
+3. **`lib/schemas/<x>.ts`** — the one zod schema (`z.coerce.*` on non-strings).
+4. **`lib/<x>.ts`** — list loader (+counts), detail loader (+aggregate), the row types, the `toX` mapper.
+5. **`app/<x>/`** — `page` / `new` / `[id]` / `[id]/edit` / `actions.ts` / `not-found` / `error`.
+6. **`components/<X>Form.tsx`** + per-entity `<X>List` / `<X>Detail` — the form reuses the shared `<FormScreen>` shell (`zodResolver` inside); list/detail stay per-entity until duplication justifies shared shells.
+7. **Wire relationships** — a `<RelatedList>` on each parent's detail screen, a back-link on the child, FK-prefill on `+ New`.
+
+This is deliberately *not* hidden behind a factory — the duplication is mechanical but explicit, and each entity stays independently editable. If steps 2 + 4 (the data plumbing) start to chafe across many entities, that's the first place a typed-store helper would earn its keep.
 
 ## Shared derived state for multi-step / tabbed flows
 
@@ -194,11 +290,19 @@ The hard requirement: **the user's selections and computed results must survive 
 
 The UI converges on a few shared presentational primitives — reuse them instead of bespoke variants:
 
-- the three **screen shells** (`<ListScreen>` / `<DetailScreen>` / `<FormScreen>`) every entity reuses,
-- a `<RelatedList>` for every parent→child section (rows link out, `+ New` prefills the FK),
+- the shared **form shell** (`<FormScreen>` / `EditorShell`) every entity's new+edit screens reuse (list/detail stay per-entity until duplication justifies shared shells),
+- a `<RelatedList>` for every parent→child section, with a **1:N mode** (rows link out, `+ New` prefills the FK) and an **N:N mode** (attach/detach controls) — one component, one mode prop,
 - a controlled grouped-columns table (parent owns which column groups show),
 - a chart renderer with a built-in bar/line toggle,
 - multi-select filter pills,
 - a filtered-section render-prop that hands selected groups to its children.
 
 Parent owns filter state; children are dumb. One pill selection filters a table and its chart together.
+
+## Your data is one file
+
+Local-first's payoff: the entire dataset is a single SQLite file at the data-dir path.
+
+- **Backup** = copy that file (plus its `-wal`/`-shm` siblings, or run `PRAGMA wal_checkpoint(TRUNCATE)` first to fold the WAL back in). No service, no export pipeline required.
+- **Export/import** for portability: a "download my data" that streams the file, or a per-table JSON dump, is a few lines — name it as a feature, it's a core selling point of going local-first.
+- **Reads load everything, filter in the browser** — fine for a personal tracker into the low tens of thousands of rows. Past that, push filtering/pagination into the query (`LIMIT`/`OFFSET`, or keyset) rather than shipping every row to the client.
