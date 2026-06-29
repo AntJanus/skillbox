@@ -36,14 +36,14 @@ A blueprint for building a **local-first, single-user CRUD app for one specific 
 ```
 src/<domain>/   PURE logic core   — no I/O, no React, no next, no db. The product's brain.
 src/db/         server-only store — node:sqlite, typed query API, versioned migrations
-lib/            server/client glue — 'server-only' loaders, pure view-models, zod schemas, formatters, colors, config
+lib/            server/client glue — 'server-only' loaders + row mappers (call the core; no aggregation here), zod schemas, formatters, colors, config
 app/            routes            — server pages load data → pass plain rows to 'use client' children
 components/     UI                — 'use client'; import the pure core directly and compute in the browser
 ```
 
 **Data flow:**
 - **Reads:** server component (`export const dynamic = "force-dynamic"`) calls a `'server-only'` loader → maps DB rows to a plain client-row type → passes to a `'use client'` child. Mantine compound components (`Table.*`, `Accordion.*`) are client references — never render them from a server component.
-- **Writes:** `'use server'` action → zod `.parse()` the input → typed DB call → `revalidatePath()`.
+- **Writes:** `'use server'` action → zod parse → rule guard (load → check → throw) → typed DB call → `revalidatePath()`.
 - **Derive/compute:** roll-ups, filters, summaries, and math all live in the pure core (`a derived value? → the core, always`), called from client components and `lib/` loaders. `lib/` maps rows and *calls* the core; it holds no aggregation logic of its own.
 
 Two row shapes, not one: a lightweight **list row** (scalars + cheap counts) and a **detail aggregate** (row + children + a core summary, a superset). A `toX(row, derived)` mapper builds each — the two loaders return different shapes by design.
