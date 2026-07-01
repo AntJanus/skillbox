@@ -24,6 +24,8 @@ CREATE INDEX IF NOT EXISTS idx_tasks_project ON tasks(project_id);        -- ind
 
 Pick the delete rule per relationship: `CASCADE` for true ownership (a task can't exist without its project), `RESTRICT` to block deleting a parent that still has children, `SET NULL` for optional references (**the FK column must be nullable — no `NOT NULL`, or `SET NULL` errors when the parent is deleted**). Let the DB reject orphans and surface the error — don't add a fallback that masks it.
 
+Writing an explicit application-level cascade delete inside the same transaction, even where `ON DELETE CASCADE` already covers it, is a defensible belt-and-suspenders — not redundant dead code to remove. It keeps the delete correct if a future code path opens a second connection without `foreign_keys = ON`.
+
 **Store — scoped queries + batched aggregates (no N+1).**
 
 ```ts

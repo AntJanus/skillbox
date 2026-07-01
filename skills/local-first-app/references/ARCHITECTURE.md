@@ -83,6 +83,8 @@ export function runInTransaction<T>(db: DatabaseSync, fn: () => T): T {
 - `'server-only'` loaders the server pages call (`loadX()` = `getDb()` + query + map). A loader may *call* core helpers (`summarizeProject(project, tasks)`) but holds no rollup logic itself.
 - zod schemas, one per write boundary (`lib/schemas/<entity>.ts`); formatters; the color module; config defaults.
 - **Two row shapes, not one** — a lightweight **list row** (scalar columns + cheap counts) and a **detail aggregate** (the row + its children + a core summary; a superset of the list row). A `toX(row, derived)` mapper builds each. Don't claim one shape serves every screen — the two loaders return different shapes by design.
+- **Sibling-props is a valid alternative for shallow relationships.** When the detail view doesn't need a merged summary type — just the row plus a child list rendered as-is — a single unified `toX(row)` mapper reused for both list and detail, with children fetched by a separate loader call and passed to the component as a sibling prop (not folded into the mapper's output), is simpler and equally correct. Reach for the two-shape split when detail needs a core-computed aggregate over the children; skip it when the children are just displayed.
+- **A third shape: metadata + opaque computed-data blob**, for a bespoke calculator/report bolted onto an otherwise-CRUD app. Model it as a row (`slug, name, note, data` where `data` is a JSON blob with no fixed schema) auto-seeded the first time its screen is visited, produced by a code-registered `build(...)` function keyed on `slug`, and re-run on demand via a "refresh" action that overwrites `data`. This isn't a list row or a detail aggregate — closer to a cache with a rebuild button — and it's the shape to reach for instead of forcing a one-off computation into the list-row/detail-aggregate pair.
 
 ## Routes & server actions (`app/`)
 
@@ -172,6 +174,17 @@ Don't build a delete *screen*; don't delete without the count.
 
 - `<FormScreen>` — title ("New X" / "Edit X"), the `<EntityForm>`, cancel/save bar; identical for create and edit. **Always share this one.**
 - **List & detail are usually per-entity components** (`CardList`, `CardDetail`) — they diverge more (each entity's table columns, detail layout, and `<RelatedList>` sections differ), so a generic `<ListScreen>`/`<DetailScreen>` shell often costs more than it saves. Promote them to shared shells only once the duplication is real. Don't mandate a three-shell triad up front.
+
+## Review-deck triage (periodic re-verification)
+
+Some entity sets need recurring re-checking, not one-off CRUD — items due for a follow-up, records that have gone stale, anything where the question is "which of these N need attention right now." A list screen with row actions works but forces the user to scan and decide; a **review deck** turns it into one decision at a time:
+
+- **Selection is a pure core function.** `itemsDueForReview(items, now): Item[]` (or several named selectors — due-for-payment, stale, needs-replacement) live in `src/<domain>/`, same as any other derived value. They take the current time as an argument rather than reading it, so they stay pure and testable.
+- **One card at a time**, not a table: the current item, 1-2 actions (e.g. confirm / skip / dismiss), advanced by swipe or keyboard shortcut.
+- **A progress indicator** (`3 of 12`) so the user knows how much triage is left.
+- **Explicit empty and done states** — "nothing needs review right now" on an empty selection, and a distinct "you cleared the queue" state after the last card, not just an empty screen.
+
+This is a screen shape alongside list/detail/form, not a replacement for them — the deck reads from the same entities and the same store, it just applies a different selector and a different UI for the triage moment.
 
 ## Relationships between entities
 
