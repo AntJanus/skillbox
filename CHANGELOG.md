@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.5.0] - 2026-07-01
+
+### Changed
+
+- **local-first-app** (v1.2.0 → **v1.3.0**, minor): realigned against two real downstream builds (the skill's origin app and a from-scratch consumer app), audited via three parallel agents over both repos' code and chat history plus a rubric self-audit. **Description** trimmed 494 → 263 chars (was 2× the soft cap). **DB hardening** claim softened — the full pragma set (`WAL`+`synchronous`+`busy_timeout`+`optimize`+`globalThis` caching) is now framed as the recommended baseline rather than an already-verified pattern, since neither real app fully implements it yet. **New: `references/RELATIONSHIPS.md`** — the 1:N/N:N relationships section was extracted out of `ARCHITECTURE.md` (which had crept to 308 lines, over the 300-line aim) into its own reference, and the N:N example gained an "at scale" subsection (`json_group_array` read pre-aggregation + a shared `syncTags` attach/detach write path) reflecting a real production N:N migration. **`ARCHITECTURE.md`** gained two new sections: **Background jobs** (job-status table, detached-promise-in-a-module-`Set` pattern, client polling, boot-time stale-job reconciliation, auto-run gating — previously zero coverage despite being a common real subsystem) and **External APIs, caching, and dedup** (per-source throttling, cache-first with negative-result caching, per-item failure isolation, natural-key dedup on import, plus a carve-out to the "no server-side secrets" rule for locally-stored third-party API keys). Also added shared **detail-page chrome** (`PageShell`/`PageActions`) as the natural next promotion after the form shell, once an app has several entities. **`SKILL.md`** gained a short **empty-state / first-run UX** convention (a fresh local-first DB always starts empty — design the empty state before the first entity exists).
+- **Removed** the `local-first-app-builder` Claude Code subagent (`~/.claude/agents/`) — it had drifted from the skill (missing the CRUD-as-screens and relationships sections added in v1.1.0/v1.2.0) and leaked two identifiers the skill's own history shows were deliberately scrubbed. The skill is now the single source of truth; no replacement subagent was created.
+
 ## [4.4.0] - 2026-06-29
 
 ### Changed
