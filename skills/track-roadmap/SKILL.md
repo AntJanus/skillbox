@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "[generate|update|audit|brainstorm|resume]"
 metadata:
   author: Antonin Januska
-  version: "2.5.0"
+  version: "2.5.1"
 ---
 
 # Track Roadmap
@@ -102,4 +102,10 @@ resume      → check session   → pick feature   → /track-session → build
 audit       → review progress → update         → adjust plan
 ```
 
-Troubleshooting (too many features, over-granular features, decision paralysis, resume edge cases): **[reference/TROUBLESHOOTING.md](./reference/TROUBLESHOOTING.md)**.
+## Troubleshooting
+
+- **Roadmap doesn't match what's actually being built** — run `/track-roadmap audit` to reconcile plan vs. reality; make auditing a habit after every major feature completion.
+- **Roadmap has ballooned to 30+ features** — audit and move speculative items to "Future Ideas"; delete items that no longer fit (git preserves history, don't archive in-file).
+- **Resume can't find ROADMAP.md** — run `/track-roadmap generate` first, then resume.
+
+Extended edge cases (codebase-scan noise, brainstorm dead ends, audit ambiguity, renaming/merging features, priority paralysis): **[reference/TROUBLESHOOTING.md](./reference/TROUBLESHOOTING.md)**.
