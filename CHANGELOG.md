@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **CI: `validate-skills.sh`** — the "Validate Skills" GitHub Actions workflow had failed on every release since v4.2.0 (2026-06-23) because the validator still checked for pre-2026-05-14 conventions: a mandatory `## When to Use` heading (now folded into the description), a rigid enumerated list of "workflow/steps" heading names, a plural-only `## Examples` heading with no ✅/❌ fallback, `reference/` (singular) only for the progressive-disclosure line-budget exception and internal-link checks, and a `## Troubleshooting` heading with no `## Gotchas` equivalent or reference-file-content fallback. Rewrote all four checks against the actual current skill bodies (verified across all 14 skills, not assumed): Overview now accepts intro prose under the title; When to Use and workflow/steps are soft warnings, not hard fails (both are legitimately pattern-specific or now live in the description); Examples accepts ✅/❌ pairs inline or in a `references/`/`reference/` file; Troubleshooting accepts `## Gotchas` and reference-file content by grep, not filename guessing; `reference/` and `references/` are both recognized everywhere. All 14 skills now pass with zero fails (7 informational warnings on the soft workflow/steps check).
+- **track-qa** (v1.2.0 → **v1.2.1**, patch): added the `## Troubleshooting` section that `reference/TROUBLESHOOTING.md` referred to ("beyond the common issues covered in SKILL.md") but that had never actually existed in SKILL.md — only a bare unheaded pointer paragraph.
+- **track-roadmap** (v2.5.0 → **v2.5.1**, patch): same fix — added the missing `## Troubleshooting` section that `reference/TROUBLESHOOTING.md` assumed existed.
+
 ## [4.5.0] - 2026-07-01
 
 ### Changed
