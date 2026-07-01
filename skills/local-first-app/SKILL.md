@@ -4,7 +4,7 @@ description: Local-first CRUD blueprint — Next.js + node:sqlite, single-user. 
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.3.0"
+  version: "1.4.0"
   tags: [nextjs, react, typescript, sqlite, local-first, desktop, architecture, charts]
 ---
 
@@ -46,7 +46,7 @@ components/     UI                — 'use client'; import the pure core directl
 - **Writes:** `'use server'` action → zod parse → rule guard (load → check → throw) → typed DB call → `revalidatePath()`.
 - **Derive/compute:** roll-ups, filters, summaries, and math all live in the pure core (`a derived value? → the core, always`), called from client components and `lib/` loaders. `lib/` maps rows and *calls* the core; it holds no aggregation logic of its own.
 
-Two row shapes, not one: a lightweight **list row** (scalars + cheap counts) and a **detail aggregate** (row + children + a core summary, a superset). A `toX(row, derived)` mapper builds each — the two loaders return different shapes by design.
+Two row shapes, not one: a lightweight **list row** (scalars + cheap counts) and a **detail aggregate** (row + children + a core summary, a superset). A `toX(row, derived)` mapper builds each — the two loaders return different shapes by design. A third shape exists for bolt-on computation (a calculator/report mixed into an otherwise-CRUD app) — see references/ARCHITECTURE.md.
 
 → Full data-layer, migrations, and shared-state detail: **[references/ARCHITECTURE.md](./references/ARCHITECTURE.md)**
 
@@ -64,9 +64,10 @@ app/<entity>/
   error.tsx            catches throws   ·   loading.tsx (optional)
 ```
 
-- **The URL is the state:** deep-linkable, refresh-safe, back/forward works, nothing to lose mid-flow. Don't reach for App Router's intercepting-route modal pattern for data entry — for one user on one machine, plain screens are simpler and the clarity is the point. **The one modal exception is a destructive-delete confirm** (Mantine `openConfirmModal`, which needs `<ModalsProvider>` in the root stack) — it shows the cascade blast radius (`also deletes 4 tasks`) from the detail loader's counts, then runs the `deleteEntity` action inside `startTransition` → `revalidatePath` → `redirect` to the list. Don't build a delete *screen*; don't delete without the count.
+- **The URL is the state:** deep-linkable, refresh-safe, back/forward works, nothing to lose mid-flow. Don't reach for App Router's intercepting-route modal pattern for data entry — for one user on one machine, plain screens are simpler and the clarity is the point. **When the entity set needs periodic re-checking rather than one-off CRUD** (staleness checks, due-for-follow-up items), a plain list is the wrong shape — see the review-deck pattern below. **The one modal exception is a destructive-delete confirm** (Mantine `openConfirmModal`, which needs `<ModalsProvider>` in the root stack) — it shows the cascade blast radius (`also deletes 4 tasks`) from the detail loader's counts, then runs the `deleteEntity` action inside `startTransition` → `revalidatePath` → `redirect` to the list. Don't build a delete *screen*; don't delete without the count.
 - **Edit is the new screen, prefilled.** One `<EntityForm>` (a `mode` prop) is the single source of truth for the fields; new mounts it empty, edit mounts it with the loaded row. It validates against **one zod schema** (`lib/schemas/<entity>.ts`, `z.coerce.*` on non-strings) — `zodResolver` on the client for inline errors, the *same* schema `safeParse`d in the `'use server'` action as the authority. Submit via Mantine `useForm.onSubmit` calling the action (with the **typed values object, not FormData**) inside `startTransition`; the action returns `fieldErrors` on failure → `form.setErrors`, else writes → `redirect('/<entity>/[id]')` (post/redirect/get) and `revalidatePath`s list + detail.
 - **Shared form shell; per-entity list/detail.** The high-value reuse is the **form/editor shell** (`<FormScreen>` / an `EditorShell`) that every entity's new+edit screens share — same chrome, only the inner fields differ. List and detail screens are usually **per-entity components** (a `CardList`, a `CardDetail`); promote them to shared `<ListScreen>`/`<DetailScreen>` shells only if the duplication actually bites. Don't force a three-shell triad up front.
+- **Review-deck triage — a fourth screen shape for periodic re-checking.** When an existing entity set needs recurring re-verification rather than one-off CRUD (items due for follow-up, records gone stale), don't bolt it onto the list screen as row actions. Model it as a deck: a pure core selector (`itemsDueForReview(items, now): Item[]`) picks the working set, and a dedicated screen shows one item at a time — top card + 1-2 actions, a progress bar, and explicit empty/done states — advanced by swipe or keyboard. One decision at a time beats a table the user has to scan and triage manually.
 
 ## Relationships — FKs, assembled in loaders, cross-linked
 
@@ -186,6 +187,7 @@ function summarize(project: Project) {
 ## Gotchas
 
 - **Foreign keys default OFF in node:sqlite** — they're a *per-connection* PRAGMA, not a schema property. Run `PRAGMA foreign_keys = ON` in `openDatabase()` before any query, or `ON DELETE CASCADE` and orphan-rejection silently do nothing.
+- **A manual cascade delete alongside `ON DELETE CASCADE` isn't dead code** — even with the pragma on, an explicit child-delete inside the same transaction is a defensible belt-and-suspenders: it protects against a future code path that opens a second raw connection without setting `foreign_keys = ON`. Rely on the FK cascade as the primary mechanism, but don't flag the redundant explicit delete as a smell to remove.
 - **Open the DB hardened, once** — in `openDatabase()` set `journal_mode = WAL`, `busy_timeout = 5000`, `synchronous = NORMAL`, `foreign_keys = ON`, and cache the connection on `globalThis` (`globalThis.__db ??= …`). Without WAL + busy_timeout a read racing a write throws `SQLITE_BUSY`; without the globalThis guard Next's dev HMR reopens the file → "database is locked". See references/ARCHITECTURE.md.
 - **`node:sqlite` breaks vitest/Vite** — it's a runtime builtin but NOT in `module.builtinModules`, so Vite mangles the specifier. Redirect `node:sqlite` to a tiny `createRequire` shim via a `pre` resolve plugin in `vitest.config.ts` (test-only; prod imports it directly). Also alias `@/*` → repo root there.
 - **Schema must be an inlined TS string**, not a `.sql` file — `readFileSync(process.cwd()/...)` ENOENTs next to a packaged binary.
