@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "[generate|update|audit|migrate|resume]"
 metadata:
   author: Antonin Januska
-  version: "1.2.0"
+  version: "1.2.1"
 ---
 
 # Track QA
@@ -92,4 +92,10 @@ generate → write QA.md   ·   migrate → convert ad-hoc notes
 resume   → next item     ·   audit   → relevance review   ·   update → add as features ship
 ```
 
-Troubleshooting (test-like items, vague items, failures piling up, migrate/audit edge cases): **[reference/TROUBLESHOOTING.md](./reference/TROUBLESHOOTING.md)**.
+## Troubleshooting
+
+- **Items don't appear on a dashboard after writing QA.md** — verify `schema: cc-dash/qa@1` is exact, the file lives in the project root, and each item matches the `- <!-- id:q_xxxxx status:... --> Description` shape (malformed items are silently skipped by the parser).
+- **A failed item stays failed after the linked roadmap fix ships** — the failed→pending reset is intentionally one-way; re-verify manually with `/track-qa update`, don't assume the fix worked.
+- **Migrate mode chokes on an unfamiliar file layout** — it expects ad-hoc per-repo notes or `### project-name` headings; other layouts need manual splitting first.
+
+Extended edge cases (ID collisions, audit staleness tuning, needs-decision items piling up, dangling roadmap refs): **[reference/TROUBLESHOOTING.md](./reference/TROUBLESHOOTING.md)**.
