@@ -1,10 +1,10 @@
 ---
 name: local-first-app
-description: Local-first single-user web-app blueprint for a single-purpose CRUD app — Next.js App Router + React + TypeScript, Mantine, node:sqlite, a pure domain core, zod boundaries, colorblind-safe charts. Use this skill whenever the user wants to scaffold a tracker/dashboard/catalog app, add a persisted entity + server action, wire a node:sqlite store, or package a web app as a desktop binary. Do NOT use for palette/contrast choices (see color-system) or pure visual layout (see frontend-design).
+description: Local-first CRUD blueprint — Next.js + node:sqlite, single-user. Use this skill whenever the user wants to scaffold a tracker/dashboard app, add a persisted entity, or package as a desktop binary. Do NOT use for palette (color-system) or layout (frontend-design).
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.2.0"
+  version: "1.3.0"
   tags: [nextjs, react, typescript, sqlite, local-first, desktop, architecture, charts]
 ---
 
@@ -78,7 +78,7 @@ Entities reference each other with real foreign keys; joins are assembled in `li
 - **Pure core stays relationship-agnostic** — hand it the assembled aggregate (`summarizeProject(project, tasks)`); it never reads the DB to follow a relation.
 - **Cross-link both ways:** parent detail renders a reusable `<RelatedList>` (child rows link to `/<child>/[id]`; a `+ New` link prefills the FK via `/<child>/new?projectId=<id>`); child detail links back to its parent. Relationship navigation is just links between detail routes.
 
-→ Full route topology + worked Project→Tasks relationship pattern: **[references/ARCHITECTURE.md](./references/ARCHITECTURE.md)**
+→ Full route topology: **[references/ARCHITECTURE.md](./references/ARCHITECTURE.md)** · worked 1:N + N:N relationship patterns: **[references/RELATIONSHIPS.md](./references/RELATIONSHIPS.md)**
 
 ## Conventions (carry these verbatim)
 
@@ -87,6 +87,7 @@ Entities reference each other with real foreign keys; joins are assembled in `li
 - **Imports:** extensionless relative imports (`./summary`). Bundler resolves TS directly.
 - **No silent fallbacks:** the pure core *throws* on invalid input; the UI guards inputs before calling it. A fallback that masks a missing row is a bug.
 - **Types:** explicit interfaces for every input/result. `noUncheckedIndexedAccess` is on — handle `undefined` from index access.
+- **Empty state is the default state:** a fresh local-first DB has zero rows on day one — there's no seed data. Every list screen needs a real empty state (a short message + the primary "add" CTA) designed *before* the first entity exists, not a bare table header.
 
 ## UI & data-viz quality signals
 
