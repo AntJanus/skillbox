@@ -4,9 +4,12 @@
 #
 # Checks:
 #   1. YAML frontmatter has required fields (name, version, description)
-#   2. Required sections exist (Overview, When to Use, Examples, Troubleshooting, Integration)
-#   3. SKILL.md is under 500 lines (unless reference/ subdir exists for progressive disclosure)
-#   4. No broken internal links (referenced files in reference/ must exist)
+#   2. Overview + Examples + Troubleshooting present (heading or progressive-disclosure
+#      equivalent); When to Use / workflow-steps are soft warnings, not hard fails —
+#      current house style folds triggers into the description and treats main content
+#      as pattern-specific per skill type
+#   3. SKILL.md is under 500 lines (unless reference/ or references/ subdir exists)
+#   4. No broken internal links (referenced files in reference/ or references/ must exist)
 #
 # Usage:
 #   .github/scripts/validate-skills.sh [skills-dir]
@@ -105,54 +108,74 @@ check_sections() {
   local file="$1"
   local has_error=0
 
-  # Required section headings (## level)
-  # "Overview" or "Description" heading
+  # Overview — an explicit heading, OR non-empty prose directly under the H1 title.
+  # Current house style often skips the heading and leads straight into a summary
+  # paragraph (title + core-principle sentence), which serves the same purpose.
   if grep -qE '^##\s+(Overview|Description)' "$file"; then
     pass "Has 'Overview' section"
+  elif awk '/^# /{seen=1; next} seen && /^## /{exit} seen && NF>0{found=1} END{exit !found}' "$file"; then
+    pass "Has intro content under the title (no separate Overview heading needed)"
   else
-    fail "Missing 'Overview' (or 'Description') section"
+    fail "Missing an Overview — no heading and no prose before the first '##' section"
     has_error=1
   fi
 
-  # "When to Use" or activation section
-  if grep -qE '^##\s+When to Use' "$file"; then
-    pass "Has 'When to Use' section"
-  else
-    fail "Missing 'When to Use' section"
-    has_error=1
+  # "When to Use" now lives in the frontmatter description, not a body section
+  # (house style: fold triggers into the description; the body only loads post-activation).
+  # Soft-check only: warn if the description looks too short to carry real triggers.
+  local desc_len
+  desc_len=$(sed -n '2,/^---$/p' "$file" | sed '$d' | grep '^description:' | head -1 | wc -c | tr -d ' ')
+  if [ -n "$desc_len" ] && [ "$desc_len" -lt 60 ]; then
+    warn "description is short (${desc_len} chars) — when-to-use triggers belong in the description now, not a body section"
+    WARN_COUNT=$((WARN_COUNT + 1))
   fi
 
-  # Workflow/Steps — flexible naming across skill patterns:
-  # Pattern A (Methodology): "Usage Modes", "Mode:", "Phase N"
-  # Pattern B (Technical): "The Workflow", "Quick Start", "The Process", "Recording Workflow"
-  # Pattern C (Auditing): "How It Works", "Quality Criteria"
-  # Pattern D (Automation): "The Skill Generation Process", "Phase N", "Setup"
-  # Pattern E (Reference): "The Ideal Structure", "Section N:", "Component Structure"
-  if grep -qE '^##\s+(Workflow|Steps|The Process|Usage Modes|The Skill Generation Process|Quick Start|The Workflow|Phase|Phases|Setup|Recording Workflow|How It Works|Quality Criteria|The Ideal Structure|Component Structure)' "$file" || \
+  # Workflow/steps — deliberately pattern-specific per house style ("[Main Content -
+  # Pattern Specific]"), so heading names vary too much to hard-enumerate reliably.
+  # Soft-check: known headings pass silently; anything else just gets a warn to review.
+  if grep -qE '^##\s+(Workflow|Steps|The Process|Usage Modes|The Skill Generation Process|Quick Start|The Workflow|Phase|Phases|Setup|Recording Workflow|How It Works|Quality Criteria|The Ideal Structure|Component Structure|Pipeline|Prerequisites)' "$file" || \
      grep -qE '^## Mode:' "$file" || \
      grep -qE '^##\s+Section [0-9]' "$file" || \
      grep -qE '^###\s+Phase [0-9]' "$file"; then
     pass "Has workflow/steps content"
   else
-    fail "Missing workflow/steps section (e.g., 'Workflow', 'Steps', 'The Process', 'Usage Modes', 'How It Works')"
-    has_error=1
+    warn "No recognized workflow/steps heading — main content is pattern-specific per house style; verify manually"
+    WARN_COUNT=$((WARN_COUNT + 1))
   fi
 
-  # Examples — either a dedicated ## Examples section or <Good>/<Bad> tags in the file
-  if grep -qE '^##\s+Examples' "$file"; then
+  # Examples — a dedicated section (singular or plural heading), ✅/❌ comparison pairs
+  # (current convention, inline or in a references/reference file), or the deprecated
+  # <Good>/<Bad> tags (still accepted, with a warn).
+  local ref_dir
+  ref_dir=$(dirname "$file")
+  if grep -qE '^##\s+Examples?' "$file"; then
     pass "Has 'Examples' section"
+  elif grep -qF '✅' "$file" && grep -qF '❌' "$file"; then
+    pass "Has examples (✅/❌ comparison pairs found)"
+  elif { [ -d "${ref_dir}/references" ] && grep -qF '✅' "${ref_dir}/references/"*.md 2>/dev/null && grep -qF '❌' "${ref_dir}/references/"*.md 2>/dev/null; } || \
+       { [ -d "${ref_dir}/reference" ] && grep -qF '✅' "${ref_dir}/reference/"*.md 2>/dev/null && grep -qF '❌' "${ref_dir}/reference/"*.md 2>/dev/null; }; then
+    pass "Has examples (✅/❌ comparison pairs in a reference(s)/ file)"
   elif grep -qE '<Good>' "$file" && grep -qE '<Bad>' "$file"; then
-    pass "Has examples (Good/Bad comparison tags found)"
+    warn "Has examples via deprecated <Good>/<Bad> tags — migrate to ✅/❌"
+    WARN_COUNT=$((WARN_COUNT + 1))
   else
-    fail "Missing 'Examples' section (or <Good>/<Bad> comparison tags)"
+    fail "Missing 'Examples' section (or ✅/❌ comparison pairs)"
     has_error=1
   fi
 
-  # Troubleshooting section
-  if grep -qE '^##\s+Troubleshooting' "$file"; then
-    pass "Has 'Troubleshooting' section"
+  # Troubleshooting — inline heading, OR 'Gotchas' (the current house-style equivalent —
+  # per SkillBox's own checklist, Gotchas is now the highest-signal section), inline or
+  # in any references/reference file under progressive disclosure. Checked by content,
+  # not by filename — troubleshooting/gotchas content can live in any reference doc.
+  local skill_dir
+  skill_dir=$(dirname "$file")
+  if grep -qE '^##\s+(Troubleshooting|Gotchas)' "$file"; then
+    pass "Has 'Troubleshooting'/'Gotchas' section"
+  elif { [ -d "${skill_dir}/references" ] && grep -qE '^##\s+(Troubleshooting|Gotchas)' "${skill_dir}/references/"*.md 2>/dev/null; } || \
+       { [ -d "${skill_dir}/reference" ] && grep -qE '^##\s+(Troubleshooting|Gotchas)' "${skill_dir}/reference/"*.md 2>/dev/null; }; then
+    pass "Has 'Troubleshooting'/'Gotchas' in a reference(s)/ file (progressive disclosure)"
   else
-    fail "Missing 'Troubleshooting' section"
+    fail "Missing 'Troubleshooting'/'Gotchas' section (inline or in a reference(s)/ file)"
     has_error=1
   fi
 
@@ -174,13 +197,14 @@ check_line_count() {
     return 0
   fi
 
-  # Check if progressive disclosure is used (reference/ directory exists)
-  if [ -d "${skill_dir}/reference" ]; then
-    warn "Line count: ${line_count}/500 (reference/ dir exists — progressive disclosure)"
+  # Progressive disclosure: either references/ (canonical) or reference/ (legacy,
+  # still used by a few not-yet-migrated skills) satisfies the exception.
+  if [ -d "${skill_dir}/references" ] || [ -d "${skill_dir}/reference" ]; then
+    warn "Line count: ${line_count}/500 (reference(s)/ dir exists — progressive disclosure)"
     WARN_COUNT=$((WARN_COUNT + 1))
     return 0
   else
-    fail "Line count: ${line_count}/500 (exceeds limit, no reference/ dir for progressive disclosure)"
+    fail "Line count: ${line_count}/500 (exceeds limit, no reference(s)/ dir for progressive disclosure)"
     return 1
   fi
 }
@@ -194,11 +218,12 @@ check_internal_links() {
   skill_dir=$(dirname "$file")
   local has_error=0
 
-  # Find markdown links to reference/ files: [text](./reference/path) or [text](reference/path)
-  # Scoped to reference/ paths only — these are the internal project files that must exist.
+  # Find markdown links to reference(s)/ files: [text](./reference/path), [text](reference/path),
+  # and the plural references/ form (canonical per current house style).
+  # Scoped to reference(s)/ paths only — these are the internal project files that must exist.
   # Bare ./file.md links in example text or code blocks are excluded.
   local links
-  links=$(grep -oE '\]\(\./reference/[^)]+\)|\]\(reference/[^)]+\)' "$file" | sed 's/\](\.\///' | sed 's/\](reference\//reference\//' | sed 's/)//' || true)
+  links=$(grep -oE '\]\(\.?/?references?/[^)]+\)' "$file" | sed -E 's/^\]\(\.?\/?//; s/\)$//' || true)
 
   if [ -z "$links" ]; then
     pass "No internal links to check"
