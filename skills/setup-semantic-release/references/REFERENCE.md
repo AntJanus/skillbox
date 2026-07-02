@@ -57,9 +57,9 @@ Adjust `.releaserc.json` `branches` for pre-releases:
 | 1. Install | All packages in `devDependencies`, no install errors |
 | 2. Commitlint | `commitlint.config.js` at root; module syntax matches project type (ESM vs CJS) |
 | 3. Release config | `.releaserc.json` at root; `branches` matches default branch; plugin order analyzer→…→github |
-| 4. Husky | `.husky/commit-msg` has the commitlint command; `.husky/pre-commit` set or removed per user choice |
-| 5. Prepare | `"prepare": "husky"` in package.json scripts |
-| 7. CI | `.github/workflows/release.yml` exists; branch matches; `NPM_TOKEN` set if publishing to npm |
+| 4. Husky | `.husky/commit-msg` has the commitlint command; `.husky/pre-commit` set or removed per user choice; `"prepare": "husky"` in package.json scripts |
+| 5. Changelog | Starter `CHANGELOG.md` exists at root |
+| 6. CI | `.github/workflows/release.yml` exists; branch matches; `NPM_TOKEN` set if publishing to npm |
 
 Final smoke test:
 
