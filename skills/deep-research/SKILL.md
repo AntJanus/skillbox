@@ -1,11 +1,11 @@
 ---
 name: deep-research
-description: Multi-source web research with cited synthesis in chat. Use when asked to "research X", "deep research on Y", "deep dive on Z", "investigate this topic", "compare X and Y", "pros and cons of X", or "survey the landscape of Y".
+description: Multi-source web research with cited synthesis in chat. Use this skill whenever the user wants to "research X", "deep research on Y", "deep dive on Z", "investigate this topic", "compare X and Y", "pros and cons of X", or "survey the landscape of Y".
 license: MIT
 argument-hint: "<topic>"
 metadata:
   author: Antonin Januska
-  version: "2.2.0"
+  version: "2.2.1"
 ---
 
 # Deep Research
