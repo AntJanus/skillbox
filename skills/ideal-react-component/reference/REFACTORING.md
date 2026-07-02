@@ -4,13 +4,14 @@ When components grow complex, extract logic into custom hooks. The component bec
 
 ## Full Example
 
-<Good>
+✅ **Good:**
+
 ```tsx
 // usePost.ts - All logic extracted into a custom hook
 export const usePost = (postId: string) => {
   const [isEditing, setIsEditing] = useState(false);
-  const { data: post, isLoading, error } = useQuery(['post', postId], () => api.getPost(postId));
-  const { mutate: updatePost } = useMutation(api.updatePost);
+  const { data: post, isLoading, error } = useQuery({ queryKey: ['post', postId], queryFn: () => api.getPost(postId) });
+  const { mutate: updatePost } = useMutation({ mutationFn: api.updatePost });
 
   const handleEdit = () => setIsEditing(true);
   const handleSave = (updates: Partial<Post>) => {
@@ -22,7 +23,7 @@ export const usePost = (postId: string) => {
 };
 
 // PostView.tsx - Clean component focused on presentation
-export const PostView = ({ postId }: PostViewProps): JSX.Element => {
+export const PostView = ({ postId }: PostViewProps): React.JSX.Element => {
   const { post, isLoading, error, isEditing, handleEdit, handleSave } = usePost(postId);
 
   if (isLoading) return <Loading />;
@@ -32,7 +33,6 @@ export const PostView = ({ postId }: PostViewProps): JSX.Element => {
   return <StyledContainer>{/* Presentation-focused JSX */}</StyledContainer>;
 };
 ```
-</Good>
 
 ## When to Extract
 

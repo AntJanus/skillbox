@@ -4,7 +4,7 @@ description: React component structure and hooks antipatterns. Use when asked to
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.7.0"
+  version: "1.7.1"
 ---
 
 # Ideal React Component Structure
@@ -16,7 +16,7 @@ A predictable seven-section order for function-component files — imports → s
 ```tsx
 // 1. IMPORTS (grouped: React → third-party → internal @/ → local, blank line between)
 import React, { useState, useEffect } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { api } from '@/services/api';
 import { Button } from './Button';
 
@@ -30,7 +30,7 @@ type UserProfileProps = {
 };
 
 // 4. COMPONENT FUNCTION (named export, const arrow function)
-export const UserProfile = ({ userId, onUpdate }: UserProfileProps): JSX.Element => {
+export const UserProfile = ({ userId, onUpdate }: UserProfileProps): React.JSX.Element => {
   // 5. LOGIC, in order: local state → custom/data hooks → effects → post-processing → handlers
 
   // 6. CONDITIONAL RENDERING (exit early for each edge case)

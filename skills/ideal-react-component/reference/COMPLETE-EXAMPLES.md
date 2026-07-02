@@ -11,7 +11,7 @@ Full TypeScript and JavaScript examples showing all seven sections of the ideal 
 ```tsx
 // UserProfile.tsx
 import React, { useState, useEffect, useRef } from 'react';
-import { useQuery, useMutation } from 'react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { format } from 'date-fns';
 
 import { api } from '@/services/api';
@@ -53,17 +53,17 @@ type UserProfileProps = {
 export const UserProfile = ({
   userId,
   onUpdate
-}: UserProfileProps): JSX.Element => {
+}: UserProfileProps): React.JSX.Element => {
   // Local state
   const [isEditing, setIsEditing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Data hooks
-  const { data: user, isLoading, error } = useQuery(
-    ['user', userId],
-    () => api.getUser(userId)
-  );
-  const { mutate: updateUser } = useMutation(api.updateUser);
+  const { data: user, isLoading, error } = useQuery({
+    queryKey: ['user', userId],
+    queryFn: () => api.getUser(userId),
+  });
+  const { mutate: updateUser } = useMutation({ mutationFn: api.updateUser });
 
   // Effects
   useEffect(() => {
@@ -133,7 +133,7 @@ export const UserProfile = ({
 ```jsx
 // UserProfile.jsx
 import React, { useState, useEffect, useRef } from 'react';
-import { useQuery, useMutation } from 'react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { format } from 'date-fns';
 
 import { api } from '@/services/api';
@@ -173,11 +173,11 @@ export const UserProfile = ({ userId, onUpdate }) => {
   const inputRef = useRef(null);
 
   // Data hooks
-  const { data: user, isLoading, error } = useQuery(
-    ['user', userId],
-    () => api.getUser(userId)
-  );
-  const { mutate: updateUser } = useMutation(api.updateUser);
+  const { data: user, isLoading, error } = useQuery({
+    queryKey: ['user', userId],
+    queryFn: () => api.getUser(userId),
+  });
+  const { mutate: updateUser } = useMutation({ mutationFn: api.updateUser });
 
   // Effects
   useEffect(() => {
