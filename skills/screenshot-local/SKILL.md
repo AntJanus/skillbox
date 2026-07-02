@@ -1,11 +1,11 @@
 ---
 name: screenshot-local
-description: Capture screenshots of local dev servers with shot-scraper. Use when asked to "screenshot my app", "take a screenshot of localhost", "generate screenshots for docs", "batch screenshot my pages", or "set up shot-scraper".
+description: Capture screenshots of local dev servers with shot-scraper. Use this skill whenever the user wants to "screenshot my app", "take a screenshot of localhost", "generate screenshots for docs", "batch screenshot my pages", or "set up shot-scraper".
 license: MIT
 argument-hint: "<url-or-file> [--output filename.png]"
 metadata:
   author: Antonin Januska
-  version: "1.3.0"
+  version: "1.3.1"
 ---
 
 # Screenshot Local — shot-scraper
