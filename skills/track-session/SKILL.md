@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "[save|resume|verify|recover]"
 metadata:
   author: Antonin Januska
-  version: "5.1.0"
+  version: "5.1.1"
 ---
 
 # Session Progress
