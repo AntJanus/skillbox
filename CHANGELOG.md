@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **generate-skill** (v3.1.0 → **v3.1.1**, patch): `references/PATTERNS.md` — the file SKILL.md's Phase 4 links to as the body-template source — had never been migrated in the v3.0.0 rewrite and still taught everything v3 banned: letter-coded patterns A–E (in an order contradicting SKILL.md's five named types), an "Iron Law"/"Red Flags - STOP" methodology template, `<Good>`/`<Bad>` XML example tags (directly contradicting SKILL.md's own Phase 5 prohibition), and a "You MUST select a pattern" ALL-CAPS gate. Rewrote it to the five named types (methodology/technical/auditing/reference/automation) in SKILL.md's order, with ✅/❌ example blocks (✅ first), a `## Gotchas` section in every template, paired ❌→✅ anti-patterns, and a plain selection sentence. Also deleted `references/ADVANCED.md` — a 297-line orphan linked from nowhere, still using the obsolete pre-v3 phase numbering ("Phase 4: Enhancement", "Phase 5: Scripts"); its salvageable content already lives in Phase 7's progressive-disclosure rules.
+
 ## [4.6.0] - 2026-07-01
 
 ### Changed
