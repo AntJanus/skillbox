@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "[generate|update|audit|migrate|resume]"
 metadata:
   author: Antonin Januska
-  version: "1.2.1"
+  version: "1.2.2"
 ---
 
 # Track QA
