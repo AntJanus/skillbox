@@ -53,7 +53,7 @@ The dimension WCAG2 can't see. **Body weight ≥ 400** always; never 100–300 o
 
 1. MIN and MAX in **`rem`** (both bounds honor zoom).
 2. PREFERRED mixes a `rem` term + a `vw` term: `calc(rem + vw)`.
-3. MAX ≤ ~2.5× MIN (and ≥ 2× MIN) so text can still double.
+3. MAX ≈ 1.25–2.5× MIN — a design choice, not a compliance requirement; `rem` bounds already scale with zoom and text-size preferences.
 4. Body MIN ≥ 1rem.
 
 ```css
