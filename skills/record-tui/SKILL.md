@@ -1,11 +1,11 @@
 ---
 name: record-tui
-description: Records terminal demos and TUI screencasts with VHS. Use when asked to "record a demo", "create a GIF of my CLI", "write a VHS tape", "make a terminal recording", or "add a demo GIF to the README".
+description: Records terminal demos and TUI screencasts with VHS. Use this skill whenever the user wants to "record a demo", "create a GIF of my CLI", "write a VHS tape", "make a terminal recording", or "add a demo GIF to the README".
 license: MIT
 argument-hint: "<app-command> [output-format]"
 metadata:
   author: Antonin Januska
-  version: "1.5.0"
+  version: "1.5.1"
 ---
 
 # Record TUI — VHS Terminal Recording
