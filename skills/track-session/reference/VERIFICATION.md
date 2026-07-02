@@ -52,9 +52,9 @@ For each task marked with `[x]`:
 
 **Validation:**
 ```markdown
-- [x] Phase 1: Setup [dependency: none] ✅
-- [x] Phase 2: Implementation [dependency: Phase 1] ✅
-- [ ] Phase 3: Testing [dependency: Phase 2] ⚠️ Phase 2 done but Phase 3 pending
+- [x] <!-- id:t_a1b2c dep:none --> Phase 1: Setup ✅
+- [x] <!-- id:t_d3e4f dep:t_a1b2c --> Phase 2: Implementation ✅
+- [ ] <!-- id:t_g5h6i dep:t_d3e4f --> Phase 3: Testing ⚠️ Phase 2 done but Phase 3 pending
 ```
 
 ### Step 5: Check for Scope Gaps
@@ -70,6 +70,7 @@ For each task marked with `[x]`:
 - Code committed but not deployed
 - Documentation updated but not reviewed
 - Error handling added but not tested
+- Ambiguous "done" — when a task can't be verified because completion was never defined, add acceptance criteria to the task description before re-verifying
 
 ### Step 6: Generate Report
 
@@ -219,8 +220,8 @@ npm test
 
 **Verification:**
 ```markdown
-- [x] Phase 2: API integration [missing API key]
-- [x] Phase 3: Frontend using API [fails due to Phase 2 issue]
+- [x] <!-- id:t_d3e4f dep:t_a1b2c --> Phase 2: API integration (missing API key)
+- [x] <!-- id:t_g5h6i dep:t_d3e4f --> Phase 3: Frontend using API (fails due to Phase 2 issue)
 ```
 
 **Report:**
@@ -229,92 +230,12 @@ npm test
 📋 Complete Phase 2 configuration before Phase 3 can be verified
 ```
 
-## Troubleshooting Verification
-
-### Problem: Too Many Tasks to Verify
-
-**Solution:**
-- Verify incrementally after each major phase
-- Don't wait until end to verify everything
-- Archive verified phases to reduce scope
-- Focus on critical path first
-
-### Problem: Unclear What "Done" Means
-
-**Solution:**
-- Define acceptance criteria in task description
-- Include "Definition of Done" in Plan section
-- Specify test requirements
-- Document expected behavior
-
-### Problem: Verification Takes Too Long
-
-**Solution:**
-- Automate verification where possible (test suites, linters)
-- Create verification scripts
-- Use CI/CD for continuous verification
-- Sample test critical paths, not everything
-
-### Problem: Work Verified But User Unhappy
-
-**Solution:**
-- Verify against user requirements, not assumptions
-- Confirm acceptance criteria with user before starting
-- Include user testing in verification
-- Document any deviations from original plan
-
-## Best Practices
-
-1. **Verify early and often** - Don't wait until the end
-2. **Collect evidence** - Document what you checked and how
-3. **Be specific** - "Tests pass (23/23)" vs. "tests work"
-4. **Separate critical from nice-to-have** - Use ⚠️ vs. ❌ appropriately
-5. **Provide actionable next steps** - Tell what to do, not just what's wrong
-6. **Test edge cases** - Don't just verify happy path
-7. **Check dependencies** - Ensure prerequisite work is solid
-8. **Run actual tests** - Don't assume code works without running it
-9. **Validate against requirements** - Check original plan, not current state
-10. **Document deviations** - Note any changes from original plan
-
 ## Integration with Development Workflow
 
-**After each phase:**
-```bash
-# Complete phase work
-[make changes]
+Verify incrementally, not only at the end: run `/track-session verify` after each major phase, again before final delivery (fix blocking issues and re-verify until the report is clean), and during code review to confirm the report's evidence holds up.
 
-# Update session
-/track-session
-
-# Verify phase before moving on
-/track-session verify
-```
-
-**Before final delivery:**
-```bash
-# All tasks appear complete
-/track-session verify
-
-# Fix any blocking issues
-[make fixes]
-
-# Re-verify
-/track-session verify
-
-# When clean, deliver
-```
-
-**During code review:**
-```bash
-# Reviewer runs verification
-/track-session verify
-
-# Checks verification report
-# Confirms evidence provided
-# Validates requirements met
-```
+For verify-mode problems — verify reports incomplete work with all tasks checked, verify takes too long, verify passes but bugs remain — see [TROUBLESHOOTING.md](./TROUBLESHOOTING.md).
 
 ## References
 
 - Main skill: [track-session SKILL.md](../SKILL.md)
-- Related: Systematic debugging, TDD, code review workflows
