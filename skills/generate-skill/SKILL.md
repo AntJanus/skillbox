@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "[skill-topic]"
 metadata:
   author: Antonin Januska
-  version: "3.1.0"
+  version: "3.1.1"
 ---
 
 # Generate Skill
