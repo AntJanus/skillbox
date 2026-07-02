@@ -6,14 +6,14 @@ argument-hint: <path/to/SKILL.md>
 allowed-tools: Read, Glob, Grep
 metadata:
   author: Antonin Januska
-  version: "3.1.0"
+  version: "3.1.1"
 ---
 
 # Rate Skill
 
 Audits a single `SKILL.md` against current activation-driven authoring practice and returns a letter grade, weighted category scores, prioritized findings with concrete patches, named strengths, and a projected grade after fixes.
 
-The rubric is anchored to (a) the agentskills.io / Claude Code frontmatter spec, (b) Anthropic's `skill-creator` guidance, and (c) Seleznov's activation study (n=650, p<0.0001) showing directive third-person descriptions activate ~20× more reliably than passive prose.
+The rubric is anchored to (a) the agentskills.io / Claude Code frontmatter spec, (b) Anthropic's `skill-creator` guidance, and (c) Seleznov's activation study (n=650, p<0.0001) showing directive third-person descriptions carry ~20× higher activation odds (CMH OR 20.6) than passive prose.
 
 ## Workflow
 
@@ -76,7 +76,7 @@ Deduct 15 per occurrence:
 - Body ≤300 lines: full marks.
 - 301–500 lines: −20 per 50 lines over 300.
 - >500 lines without a `references/` directory: cap at 40.
-- Singular `reference/` instead of plural `references/`: −10 (canonical is plural).
+- Singular `reference/` instead of plural `references/`: style note only, no deduction (plural is the spec-documented name, but nothing validates directory names — prefer plural for new dirs, don't force renames).
 - References nested more than one level deep from `SKILL.md`: −15 (Claude head -100s files and misses content).
 
 ### 4. Structure fit for type (15)
@@ -169,7 +169,8 @@ Worked examples — directive-description rewrite, frontmatter cleanup, and a de
 - **`tags` does nothing functionally at top level.** No discovery system consumes it. If found at top level, demote to `metadata.tags` rather than deleting — preserves user intent.
 - **First-person POV breaks activation.** "I'll help you…" empirically under-activates even with identical body. Cap Category 1 at 40 on detection.
 - **`<Good>`/`<Bad>` XML tags are a SkillBox-only convention.** Zero of 8 surveyed Anthropic/Vercel/Superpowers skills use them. Recommend ✅/❌ or prose `## Anti-Pattern:` headers.
-- **Singular `reference/` vs plural `references/`.** Anthropic's spec and `skill-creator` both use plural. Singular works but is off-style — −10, not a P0.
+- **Singular `reference/` vs plural `references/`.** The spec and `skill-creator` document plural, but no validator checks directory names and Anthropic's own examples are inconsistent. Style note only — recommend plural for new dirs, never a rename finding.
+- **Claude Code extension keys vs the packaging validator.** `argument-hint`, `hooks`, `paths`, `when_to_use` are valid Claude Code runtime keys but are rejected by Anthropic's repo packaging validator (`quick_validate.py`) and absent from the universal spec. Don't penalize them — note the portability caveat only if the skill targets submission to anthropics/skills.
 - **ALL-CAPS "IRON LAW" framing has no empirical support.** Anthropic `skill-creator` calls it a yellow flag: "if possible, reframe and explain the reasoning." Recommend "Quality Signals" + "Anti-Patterns".
 - **Negation is poorly handled by LLMs** (arXiv 2503.22395). When you see a bare "DO NOT X" inside the body, recommend pairing with a positive directive — "Do Y instead of X."
 - **Standards are calibrated for activation reliability, not curve-grading.** B grade is "production ready" — not a near-failure. Anchor every category to the rubric, not "most skills are worse than this one."
