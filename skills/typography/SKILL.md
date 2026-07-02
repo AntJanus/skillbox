@@ -4,7 +4,7 @@ description: Typography & type systems — font sizing, type scale, line-height,
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.0.0"
+  version: "1.0.1"
   tags: [typography, type-scale, font-size, line-height, vertical-rhythm, readability, accessibility, fonts]
 ---
 
@@ -84,7 +84,7 @@ Why it fails: 13px is below the floor, 300 thins the stroke, `#9ca3af` on white 
 ✅ Desired
 
 ```css
-h1 { font-size: clamp(2rem, 1.1rem + 3.2vw, 3rem); line-height: 1.1; letter-spacing: -0.02em; } /* scales, caps, still zooms */
+h1 { font-size: clamp(1.75rem, 1.1rem + 3.2vw, 3rem); line-height: 1.1; letter-spacing: -0.02em; } /* scales, caps, still zooms */
 ```
 
 Why it works: `rem` bounds + a `rem`-anchored preferred keep it readable at 200% zoom; the cap stops a runaway hero size.
