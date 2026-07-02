@@ -1,10 +1,10 @@
 ---
 name: color-system
-description: Curated color palettes (light + dark) plus build-your-own and contrast guidance. Use whenever the user wants to pick or build a palette, choose app/brand/chart/terminal colors, set up dark mode, or check contrast. Do NOT use for UI layout — see frontend-design.
+description: Curated color palettes (light + dark) plus build-your-own and contrast guidance. Use this skill whenever the user wants to pick or build a palette, choose app/brand/chart/terminal colors, set up dark mode, or check contrast. Do NOT use for UI layout — see frontend-design.
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.1.0"
+  version: "1.1.1"
   tags: [color, palette, design, accessibility, dark-mode, data-viz, theme]
 ---
 
