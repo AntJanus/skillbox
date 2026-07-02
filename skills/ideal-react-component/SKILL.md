@@ -1,10 +1,10 @@
 ---
 name: ideal-react-component
-description: React component structure and hooks antipatterns. Use when asked to "create a React component", "structure this component", "refactor this component", "fix infinite loop", or "useEffect not working".
+description: React component structure and hooks antipatterns. Use this skill whenever the user wants to "create a React component", "structure this component", "refactor this component", "fix infinite loop", or "useEffect not working".
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.7.1"
+  version: "1.7.2"
 ---
 
 # Ideal React Component Structure
