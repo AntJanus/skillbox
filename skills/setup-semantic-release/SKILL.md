@@ -4,14 +4,14 @@ description: Set up semantic-release with conventional commits. Use when asked t
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.2.0"
+  version: "1.2.1"
 ---
 
 # Setup Semantic Release & Conventional Commits
 
 Wire up automated versioning: conventional commits → commitlint → husky hooks → semantic-release. Version bumps, changelogs, and GitHub releases are derived from commit messages. **Core principle:** commits drive releases — enforce format at author time, automate the rest.
 
-**Skip if** the project already has `.releaserc*`, uses another release tool (changesets, release-it, standard-version), or has no `package.json`. **Prerequisites:** `package.json`, git remote on GitHub, Node ≥18, and a CI environment (GitHub Actions).
+**Skip if** the project already has `.releaserc*`, uses another release tool (changesets, release-it, standard-version), or has no `package.json`. **Prerequisites:** `package.json`, git remote on GitHub, Node ≥20.8.1 (the engines floor of the pinned `semantic-release@^24` — install fails on 18), and a CI environment (GitHub Actions).
 
 ## Phase 1: Install
 
@@ -50,6 +50,9 @@ export default {
 ```
 
 **Type → bump:** `feat` = minor · `fix` = patch · `feat!` or `BREAKING CHANGE:` footer = major · all others (`docs`, `test`, `chore`, …) = no release.
+
+✅ `feat(auth): add OAuth login` — valid type + scope, triggers a minor release
+❌ `updated auth stuff` — no type prefix; commitlint rejects it and no release happens
 
 ## Phase 3: Semantic-release
 
