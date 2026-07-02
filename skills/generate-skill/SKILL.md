@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "[skill-topic]"
 metadata:
   author: Antonin Januska
-  version: "3.1.1"
+  version: "3.2.0"
 ---
 
 # Generate Skill
@@ -96,11 +96,14 @@ Add these optional fields only when the skill genuinely needs them:
 | `user-invocable: false` | Skill is only callable by subagents or other skills |
 | `model` / `effort` | Skill needs a specific model tier or thinking budget |
 | `paths` | Skill should only auto-trigger inside specific repo paths |
+| `when_to_use` | Extra listing-time routing text beyond the description (Claude Code; shares a combined 1,536-char listing cap with `description`) |
 
 Anti-patterns:
 
-- ❌ Top-level `version`, `author`, `tags`, `category`, `hooks` — produce "unexpected key" errors (anthropics/skills #37). They live under `metadata`.
+- ❌ Top-level `version`, `author`, `tags`, `category` — produce "unexpected key" errors (anthropics/skills #37). They live under `metadata`.
 - ❌ Nested `argument-hint` under `metadata` — Claude Code reads it at top level.
+
+Portability note (three-tier reality): the universal spec allows only `name`, `description`, `license`, `compatibility`, `allowed-tools`, `metadata`; Claude Code additionally accepts its extension keys (`argument-hint`, `when_to_use`, `hooks`, `paths`, `arguments`, `disable-model-invocation`, `user-invocable`, `model`, `effort`, `context`, `agent`, `shell`, `disallowed-tools`); Anthropic's repo packaging validator (`quick_validate.py`) rejects everything outside the spec set. The Vercel `npx skills add` channel tolerates the extensions (verified 2026-07-02) — keep them unless the skill targets submission to anthropics/skills.
 - ❌ Reserved-word names containing `anthropic` or `claude`.
 - ❌ Consecutive hyphens or uppercase in `name`.
 
@@ -116,9 +119,9 @@ Compact summary:
 - **reference** — Overview + navigation, then one `references/<domain>.md` per domain. SKILL.md stays a router; don't inline the data.
 - **automation** — Overview, Command surface table, Sample invocation, Failure modes, Gotchas. Put the actual script in `scripts/`.
 
-Always include a `## Gotchas` section — Anthropic engineers cite it as the highest-signal section in a skill body.
+Always include a `## Gotchas` section — concrete edge cases and failure modes are the body content agents can't infer (house convention; the spec's nearest equivalent is its recommended "common edge cases").
 
-Length budget: aim <300 lines in SKILL.md, hard cap 500. The ETH Zurich AGENTS.md study (arXiv 2602.11988) found verbose context files reduce task success ~3% and inflate step count >20%.
+Length budget: aim <300 lines in SKILL.md (house aim), hard cap 500 (canonical — Claude Code docs, spec, and skill-creator all state it). The ETH Zurich AGENTS.md study (arXiv 2602.11988) found context files generally don't improve task success while adding >20% inference cost.
 
 ### Phase 5 — Examples
 
@@ -159,7 +162,7 @@ Pair every "do not X" with a positive directive — negation handling in LLMs is
 Count lines in the body. If SKILL.md exceeds 300 lines:
 
 1. List candidate sections to extract, largest first.
-2. Propose `references/<TOPIC>.md` files (plural directory — `reference/` singular is a non-canonical anti-pattern).
+2. Propose `references/<TOPIC>.md` files (plural — the spec-documented name; nothing validates directory names, so never rename an existing singular `reference/` dir just for style).
 3. Keep extracted files exactly one level deep from SKILL.md. Deeply nested references silently get truncated by Claude's preview reads.
 4. Add a one-line pointer in SKILL.md for each extracted file: when to load it, what's in it.
 
