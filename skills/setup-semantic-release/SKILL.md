@@ -4,21 +4,21 @@ description: Set up semantic-release with conventional commits. Use when asked t
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.2.1"
+  version: "1.3.0"
 ---
 
 # Setup Semantic Release & Conventional Commits
 
 Wire up automated versioning: conventional commits → commitlint → husky hooks → semantic-release. Version bumps, changelogs, and GitHub releases are derived from commit messages. **Core principle:** commits drive releases — enforce format at author time, automate the rest.
 
-**Skip if** the project already has `.releaserc*`, uses another release tool (changesets, release-it, standard-version), or has no `package.json`. **Prerequisites:** `package.json`, git remote on GitHub, Node ≥20.8.1 (the engines floor of the pinned `semantic-release@^24` — install fails on 18), and a CI environment (GitHub Actions).
+**Skip if** the project already has `.releaserc*`, uses another release tool (changesets, release-it, standard-version), or has no `package.json`. **Prerequisites:** `package.json`, git remote on GitHub, Node ≥22.14 — or ≥24.10 on the 24.x line (the engines floor of the pinned `semantic-release@^25`, which dropped Node 20/21/23; `@commitlint/*@^21` needs ≥22.12), and a CI environment (GitHub Actions).
 
 ## Phase 1: Install
 
 ```bash
 npm install --save-dev \
-  @commitlint/cli@^19.0.0 @commitlint/config-conventional@^19.0.0 \
-  semantic-release@^24.0.0 @semantic-release/changelog@^6.0.0 \
+  @commitlint/cli@^21.0.0 @commitlint/config-conventional@^21.0.0 \
+  semantic-release@^25.0.0 @semantic-release/changelog@^6.0.0 \
   @semantic-release/git@^10.0.0 husky@^9.0.0
 ```
 
