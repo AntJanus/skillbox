@@ -108,15 +108,16 @@ curl -o .claude/skills/track-session/SKILL.md \
 ### track-session
 
 <details>
-<summary><b>Track, stop, resume, and save progress on long-running development sessions.</b></summary>
+<summary><b>Track, save, resume, verify, and recover progress on long-running development sessions.</b></summary>
 
 **Use when:**
 - Working on multi-step implementations
 - Planning complex features
 - Need to pause and resume work
-- Want checkpoint-based recovery
+- Verifying completed tasks actually meet requirements before declaring done
+- Recovering a lost or corrupted SESSION_PROGRESS.md
 
-**Triggers:** Automatically activates on long-running collaborative work
+**Triggers:** When asked to "resume work", "pick up where I left off", "what was I doing", "save progress", "are we done", or "I lost my SESSION_PROGRESS"
 
 [View Documentation](./skills/track-session/SKILL.md)
 </details>
@@ -284,7 +285,7 @@ Cross-references claims across 5-10+ searches, prioritizes current and authorita
 - Catching up on recent developments in a fast-moving space
 - Sanity-checking assumptions against authoritative sources
 
-**Triggers:** When asked to "research X", "do a deep dive on Y", "look into Z", "investigate this topic", "what's the current state of X", "give me a thorough overview of Y"
+**Triggers:** When asked to "research X", "deep research on Y", "deep dive on Z", "investigate this topic", "compare X and Y", "pros and cons of X", or "survey the landscape of Y"
 
 [View Documentation](./skills/deep-research/SKILL.md)
 </details>
@@ -328,12 +329,12 @@ Four systems (Product UI, Editorial, Marketing, Docs/Technical). Size by **role 
 ### local-first-app
 
 <details>
-<summary><b>A blueprint for building local-first, single-user web apps — calculators, trackers, dashboards — that run in the browser, persist to a local SQLite file, and can ship as a desktop binary.</b></summary>
+<summary><b>A blueprint for building local-first, single-user web apps — trackers, dashboards, personal tools — that run in the browser, persist to a local SQLite file, and can ship as a desktop binary.</b></summary>
 
-A blueprint for a single-purpose local CRUD app — a game-backlog tracker, expense log, collection catalog, habit tracker, or calculator. The stack: **Next.js (App Router) + React + TypeScript**, **Mantine** UI, **`node:sqlite`** persistence (no native addon → single-binary packaging), a **pure framework-free domain core**, **zod** at the server boundary, and a themed **colorblind-safe chart palette**. Core principle: keep all domain logic (CRUD-derived state *and* any computation) in a pure core the browser imports directly; persistence is a thin `server-only` layer.
+A blueprint for a single-purpose local CRUD app — a game-backlog tracker, expense log, collection catalog, or habit tracker. The stack: **Next.js (App Router) + React + TypeScript**, **Mantine** UI, **`node:sqlite`** persistence (no native addon → single-binary packaging), a **pure framework-free domain core**, **zod** at the server boundary, and a themed **colorblind-safe chart palette**. Core principle: keep all domain logic (CRUD-derived state *and* any computation) in a pure core the browser imports directly; persistence is a thin `server-only` layer.
 
 **Use when:**
-- Scaffolding a tracker / calculator / dashboard / personal-tool web app
+- Scaffolding a tracker / dashboard / personal-tool web app (a pure computation-only calculator with no persisted entities doesn't need this machinery)
 - Adding a persisted entity + a zod-validated server action over `node:sqlite`
 - Wiring the chart color *module* (semantic roles, theme hook) — pair with **color-system** for the actual palette
 - Packaging a Next.js app as a self-contained desktop binary (`deno compile` / `deno desktop`)
@@ -470,4 +471,4 @@ MIT License - see individual skills for specific licensing
 
 ---
 
-**Skill Count**: 13 | **Made for**: Claude Code 2025+
+**Skill Count**: 14 | **Made for**: Claude Code 2025+
