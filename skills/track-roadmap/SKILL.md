@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "[generate|update|audit|brainstorm|resume]"
 metadata:
   author: Antonin Januska
-  version: "2.5.1"
+  version: "2.5.2"
 ---
 
 # Track Roadmap

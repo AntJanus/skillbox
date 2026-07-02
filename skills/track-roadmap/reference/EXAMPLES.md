@@ -6,7 +6,8 @@ Extended examples for the track-roadmap skill. See the main [SKILL.md](../SKILL.
 
 ## Example: Generating a Roadmap
 
-<Good>
+✅ **Good:**
+
 ```markdown
 ---
 schema: cc-dash/roadmap@1
@@ -57,9 +58,8 @@ last_updated: 2026-03-16T10:00:00-07:00
 ```
 
 **Why this is good:** Includes frontmatter with schema version, every item has a unique ID and status, categories have slug comments, completed items have strikethrough and date, Future Ideas uses `idea` status, human-readable AND machine-parseable.
-</Good>
+❌ **Bad:**
 
-<Bad>
 ```markdown
 # Roadmap
 
@@ -75,13 +75,12 @@ last_updated: 2026-03-16T10:00:00-07:00
 ```
 
 **Why this is bad:** No descriptions, no groupings, mixes features with tasks ("fix bugs", "add tests"), vague items ("make it look good"), no project purpose, no structure.
-</Bad>
-
 ---
 
 ## Example: Auditing a Roadmap
 
-<Good>
+✅ **Good:**
+
 ```markdown
 ## Audit Results
 
@@ -102,24 +101,22 @@ last_updated: 2026-03-16T10:00:00-07:00
 ```
 
 **Why this is good:** Every feature checked, evidence cited with file paths, actionable recommendations, surfaced a new feature from codebase discovery.
-</Good>
+❌ **Bad:**
 
-<Bad>
 ```markdown
 ## Audit
 Looks like some stuff is done. Maybe we should build more things.
 ```
 
 **Why this is bad:** No specifics, no evidence, no per-feature assessment, no actionable recommendations.
-</Bad>
-
 ---
 
 ## Example: Updating a Roadmap
 
 User says: *"We decided not to do offline support, and I want to add calendar integration."*
 
-<Good>
+✅ **Good:**
+
 ```markdown
 # Before:
 ## Technical Infrastructure
@@ -139,9 +136,8 @@ User says: *"We decided not to do offline support, and I want to add calendar in
 ```
 
 **Why this is good:** Confirms removal before acting, places new feature in appropriate category with description, only changes what the user asked for.
-</Good>
+❌ **Bad:**
 
-<Bad>
 ```markdown
 # User asked to remove offline support.
 # Agent removes offline support AND cloud sync AND dark mode
@@ -149,13 +145,12 @@ User says: *"We decided not to do offline support, and I want to add calendar in
 ```
 
 **Why this is bad:** Removed features the user didn't ask about. Never make unilateral roadmap decisions.
-</Bad>
-
 ---
 
 ## Example: Resuming from Roadmap
 
-<Good>
+✅ **Good:**
+
 ```bash
 # User returns to project after a break
 user: "/track-roadmap resume"
@@ -190,9 +185,8 @@ user: "In-app only, 1 hour and 1 day before"
 ```
 
 **Why this is good:** Checks session state first, presents roadmap features for user to choose, asks clarifying questions before starting, creates a session plan that references the roadmap feature, then starts working.
-</Good>
+❌ **Bad:**
 
-<Bad>
 ```bash
 # Agent skips session check, auto-picks feature
 user: "/track-roadmap resume"
@@ -203,13 +197,12 @@ assistant: "I'll start working on Cloud sync since it's the most important featu
 ```
 
 **Why this is bad:** Skipped session check (might have overwritten active work), auto-selected a feature without asking the user, violated the "user drives the roadmap" rule.
-</Bad>
-
 ---
 
 ## Example: Brainstorming Ideas
 
-<Good>
+✅ **Good:**
+
 ```bash
 user: "/track-roadmap brainstorm"
 # Agent reads ROADMAP.md -> summarizes 3 planned features, 0 future ideas
@@ -249,9 +242,8 @@ a personal task manager. The focus mode idea — yes, keep that."
 ```
 
 **Why this is good:** Starts with user pain points (not a feature list), explores the "why" before the "what", deepens each idea with journey/inspirations/requirements/questions, presents multiple angles, user decides what stays, rejected ideas are noted with reasons, captured ideas use `status:idea` with cc-dash IDs and include open questions.
-</Good>
+❌ **Bad:**
 
-<Bad>
 ```bash
 user: "/track-roadmap brainstorm"
 assistant: "Based on similar task managers, here are 15 features you should add:
@@ -270,4 +262,3 @@ assistant: "Based on similar task managers, here are 15 features you should add:
 ```
 
 **Why this is bad:** Dumped a generic feature list without asking about user's pain points or vision, no exploration of ideas, no user filtering, added items to roadmap without confirmation, features are generic (could apply to any app), no inspirations or open questions captured.
-</Bad>
