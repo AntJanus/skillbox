@@ -1,11 +1,11 @@
 ---
 name: track-session
-description: Resume work, track progress across sessions, verify completion, recover a lost session file. Use when asked to "resume work", "pick up where I left off", "what was I doing", "save progress", "are we done", "I lost my SESSION_PROGRESS", or "reconstruct my session". For multi-session tasks.
+description: Resume work, track progress across sessions, verify completion, recover a lost session file. Use this skill whenever the user wants to "resume work", "pick up where I left off", "what was I doing", "save progress", "are we done", "I lost my SESSION_PROGRESS", or "reconstruct my session". For multi-session tasks.
 license: MIT
 argument-hint: "[save|resume|verify|recover]"
 metadata:
   author: Antonin Januska
-  version: "5.1.1"
+  version: "5.1.2"
 ---
 
 # Session Progress
