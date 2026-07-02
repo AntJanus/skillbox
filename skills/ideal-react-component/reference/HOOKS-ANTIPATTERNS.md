@@ -10,7 +10,8 @@ Common mistakes that cause bugs, performance issues, and infinite loops in React
 
 **Problem:** Using `useEffect` to notify parent components whenever state changes.
 
-<Bad>
+❌ **Bad:**
+
 ```tsx
 type FormProps = {
   initialValue: string;
@@ -33,14 +34,14 @@ export const Form = ({ initialValue, onChange }: FormProps) => {
   );
 };
 ```
-</Bad>
 
 **Why it's problematic:**
 - Causes double render: state update -> component re-render -> `useEffect` queued -> `useEffect` runs -> parent updates -> child re-renders again
 - If parent's `onChange` modifies `formValue`, creates infinite loop
 - ESLint exhaustive-deps forces including `onChange`, worsening the issue
 
-<Good>
+✅ **Good:**
+
 ```tsx
 // ✅ Good: Call onChange directly when setting state
 export const Form = ({ initialValue, onChange }: FormProps) => {
@@ -77,7 +78,6 @@ export const Form = ({ initialValue, onChange }: FormProps) => {
   );
 };
 ```
-</Good>
 
 **JavaScript:** Same pattern without type annotations.
 
@@ -87,7 +87,8 @@ export const Form = ({ initialValue, onChange }: FormProps) => {
 
 **Problem:** Expecting `useState` to update when props change after initial render.
 
-<Bad>
+❌ **Bad:**
+
 ```tsx
 type UserProfileProps = {
   initialName: string;
@@ -108,14 +109,14 @@ export const UserProfile = ({ initialName }: UserProfileProps) => {
   );
 };
 ```
-</Bad>
 
 **Why it's problematic:**
 - `useState` initializer runs only once (first render)
 - Prop changes don't update state automatically
 - Function initializers (`useState(() => expensive())`) also run every render but discard results after first render
 
-<Good>
+✅ **Good:**
+
 ```tsx
 // ✅ Good: Use useEffect to sync when prop changes
 export const UserProfile = ({ initialName }: UserProfileProps) => {
@@ -154,7 +155,6 @@ export const UserProfile = ({ name }: UserProfileProps) => {
   );
 };
 ```
-</Good>
 
 **When to use expensive function initializer:**
 ```tsx
@@ -175,7 +175,8 @@ const [state, setState] = useState(expensiveComputation(props.value));
 
 **Problem:** Omitting dependencies from `useEffect` to avoid triggering effects.
 
-<Bad>
+❌ **Bad:**
+
 ```tsx
 type ModalProps = {
   onOpen: () => void;
@@ -197,7 +198,6 @@ export const Modal = ({ onOpen, onClose }: ModalProps) => {
   // ...
 };
 ```
-</Bad>
 
 **Why it's problematic:**
 - **Stale closures:** Effect captures old versions of callbacks with outdated data
@@ -205,7 +205,8 @@ export const Modal = ({ onOpen, onClose }: ModalProps) => {
 - **Data inconsistency:** Cascading issues when unmemoized callbacks throughout component tree
 - **Silent failures:** Logic appears to work but operates on stale data
 
-<Good>
+✅ **Good:**
+
 ```tsx
 // ✅ Good: Include all dependencies
 export const Modal = ({ onOpen, onClose }: ModalProps) => {
@@ -256,7 +257,6 @@ export const Modal = ({ onOpen, onClose }: ModalProps) => {
   );
 };
 ```
-</Good>
 
 **Key principle:** Missing dependencies reveal design issues. Fix the design, don't silence the warning.
 

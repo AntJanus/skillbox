@@ -9,7 +9,7 @@ Order imports by source to reduce cognitive load:
 ```tsx
 // ✅ Good: Clear grouping with blank lines
 import React, { useState, useEffect, useMemo } from 'react';
-import { useQuery, useMutation } from 'react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { format } from 'date-fns';
 
 import { api } from '@/services/api';
@@ -66,18 +66,18 @@ type ButtonProps = {
   children: React.ReactNode;
 };
 
-export const Button = ({ variant = 'primary', size = 'md', onClick, children }: ButtonProps): JSX.Element => { /* ... */ };
+export const Button = ({ variant = 'primary', size = 'md', onClick, children }: ButtonProps): React.JSX.Element => { /* ... */ };
 ```
 
 ❌ **Bad:** inline types in the parameter destructure — hide the component API.
 
-**Naming:** props `ComponentNameProps`; return `JSX.Element` (or custom `ComponentNameReturn`). **JavaScript:** use JSDoc `@typedef` / `@param`.
+**Naming:** props `ComponentNameProps`; return `React.JSX.Element` (or custom `ComponentNameReturn`). **JavaScript:** use JSDoc `@typedef` / `@param`.
 
 ## Section 4: Component Function
 
 Use named exports with const arrow functions.
 
-✅ **Good:** `export const UserProfile = ({ userId }: UserProfileProps): JSX.Element => { ... }`
+✅ **Good:** `export const UserProfile = ({ userId }: UserProfileProps): React.JSX.Element => { ... }`
 
 ❌ **Bad:** `export default function UserProfile(...)` — default exports make refactoring and search harder.
 
@@ -88,14 +88,14 @@ Use named exports with const arrow functions.
 Organize component logic in this strict order:
 
 ```tsx
-export const UserProfile = ({ userId }: UserProfileProps): JSX.Element => {
+export const UserProfile = ({ userId }: UserProfileProps): React.JSX.Element => {
   // 5.1 - LOCAL STATE
   const [isEditing, setIsEditing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // 5.2 - CUSTOM/DATA HOOKS
-  const { data: user, isLoading, error } = useQuery(['user', userId], () => api.getUser(userId));
-  const { mutate: updateUser } = useMutation(api.updateUser);
+  const { data: user, isLoading, error } = useQuery({ queryKey: ['user', userId], queryFn: () => api.getUser(userId) });
+  const { mutate: updateUser } = useMutation({ mutationFn: api.updateUser });
 
   // 5.3 - useEffect/useLayoutEffect
   useEffect(() => { if (isEditing && inputRef.current) inputRef.current.focus(); }, [isEditing]);
