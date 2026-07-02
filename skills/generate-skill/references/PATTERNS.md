@@ -1,97 +1,96 @@
-# Skill Pattern Templates
+# Skill Body Templates
 
-This reference contains the full structure templates for all five skill patterns used in the generate-skill workflow. Use this when you need the detailed skeleton for a specific pattern.
+Full body templates for the five skill types used in the generate-skill workflow (Phase 4). Use the type chosen in Phase 1; each template below expands the compact summary in SKILL.md into a complete skeleton.
 
-## Pattern Selection Guide
+## Template Selection Guide
 
-| Pattern | Use When | Enforcement | Key Sections |
-|---------|----------|-------------|--------------|
-| A: Methodology | TDD, debugging, code review, quality gates | Strict phases + Iron Laws | Phases, Red Flags, Verification |
-| B: Technical | Project setup, build automation, deployment | Step-by-step guidance | Quick Start, Configuration, Troubleshooting |
-| C: Auditing | Code quality, performance, accessibility | Rule-based checking | Rule Categories, Output Format, Quick Reference |
-| D: Automation | Browser testing, API integration, CI/CD | Workflow automation | Auto-Detection, Configuration, Helper Functions |
-| E: Reference | Library patterns, architecture, best practices | Information on demand | Core Concepts, Patterns Library, Best Practices |
-
-**You MUST select a pattern before generating:**
-- [ ] Pattern matches skill type
-- [ ] Pattern supports enforcement level
-- [ ] Pattern includes necessary sections
+| Type | Use When | Enforcement | Key Sections |
+|------|----------|-------------|--------------|
+| methodology | Enforces a multi-step workflow (code review, TDD, session tracking) | Phased workflow + verification checklist | Phased Workflow, Examples, Gotchas, Verification |
+| technical | Wraps an API, format, or tool (docx, semantic-release, build setup) | Step-by-step guidance | Quick Start, How It Works, Quick Reference, Gotchas |
+| auditing | Grades or inspects an artifact (rate-skill, security review) | Rule-based checking | Scoring Rubric, Output Format, Examples, Gotchas |
+| reference | Domain schemas, conventions, lookup tables (bigquery, style guides) | Information on demand | Overview + navigation, per-domain references/ files |
+| automation | Wraps a script or external command (screenshots, recordings) | Workflow automation | Command Surface, Sample Invocation, Failure Modes, Gotchas |
 
 ---
 
-## Pattern A: Methodology Enforcement
+## methodology — Workflow Enforcement
 
-**Use when:** TDD, debugging, code review, quality gates
+**Use when:** the skill enforces a multi-step process — code review, debugging protocol, quality gates, session tracking.
 
 **Structure:**
-```markdown
+
+````markdown
 # Skill Title
 
 ## Overview
-[Core principle statement]
+[Core principle statement — one or two sentences.]
 
-## The Iron Law (if strict enforcement)
-```
-NON-NEGOTIABLE RULE
-```
+## Core principles
+- [Principle 1 with the reasoning behind it]
+- [Principle 2]
 
-## When to Use
-[Specific triggers]
-
-## The Process (Phase-Based)
+## Workflow
 
 ### Phase 1: [Step Name]
-**Before proceeding, you MUST:**
+**Before proceeding:**
 - [ ] Requirement 1
 - [ ] Requirement 2
+
+[Instructions for this phase.]
 
 ### Phase 2: [Step Name]
 [...]
 
-## Red Flags - STOP
-- Warning sign 1
-- Warning sign 2
+## Examples
 
-**If you see these: STOP and return to Phase 1**
+### Example: [one-line task]
+
+✅ Desired
+
+[short code or transcript]
+
+Why it works: [one sentence].
+
+### Counter-example
+
+❌ Anti-pattern
+
+[short code or transcript]
+
+Why it fails: [one sentence].
+
+## Anti-patterns
+- ❌ [Shortcut authors are tempted by] — [why it backfires]
+  ✅ [What to do instead]
+
+## Gotchas
+- **Symptom:** [observable failure]. **Cause:** [root cause]. **Fix:** [action].
 
 ## Verification Checklist
 - [ ] Requirement 1
 - [ ] Requirement 2
-
-## Common Rationalizations
-| Excuse | Reality |
-|--------|---------|
-| "Just this once..." | Always leads to problems |
-
-## Examples
-<Good>
-[Code example]
-</Good>
-
-<Bad>
-[Code example]
-</Bad>
-```
+````
 
 **Key characteristics:**
-- Phase-based workflow with mandatory checkboxes
-- "Iron Laws" for non-negotiable rules
-- Red Flags section to catch violations
-- Common Rationalizations table
-- Verification checklist at end
+- Phase-based workflow with checkboxes at phase boundaries
+- Every ❌ anti-pattern paired with a ✅ alternative (negation handling in LLMs is empirically weak)
+- Explained reasoning instead of all-caps mandates — state *why* a rule exists
+- Verification checklist at the end so completion is measurable
 
 ---
 
-## Pattern B: Technical Implementation
+## technical — Tool/API Implementation
 
-**Use when:** Project setup, build automation, deployment
+**Use when:** project setup, build automation, deployment, wrapping a file format or API.
 
 **Structure:**
-```markdown
+
+````markdown
 # Skill Title
 
 ## Overview
-[What it does and tech stack]
+[What it does and the tech stack — one or two sentences.]
 
 ## Quick Start
 
@@ -108,58 +107,61 @@ command-here
 command-here
 ```
 
-## Configuration Options
-[Customization details]
+## How It Works
+[The non-obvious mechanics an agent can't infer.]
 
-## Common Patterns
-[Code examples]
+## Quick Reference
+| Option | Effect | Default |
+|--------|--------|---------|
+
+## Examples
+
+✅ Desired
+
+[minimal working invocation]
+
+❌ Anti-pattern
+
+[common misconfiguration]
+
+## Gotchas
+- **Symptom:** [failure]. **Cause:** [cause]. **Fix:** [action].
 
 ## Troubleshooting
 **Problem:** [Issue]
 **Solution:** [Fix]
-
-## Integration
-**Pairs with:**
-- Other skills
-```
+````
 
 **Key characteristics:**
-- Quick Start for fast adoption
-- Step-by-step numbered instructions
-- Configuration reference section
-- Practical code examples
-- Integration points with other tools
+- Quick Start with one minimal, runnable path before any options
+- Quick-reference tables for configuration surface
+- Long API surface moves to `references/API.md` — SKILL.md keeps only the common 80%
+- Gotchas capture version floors, environment traps, and silent failure modes
 
 ---
 
-## Pattern C: Rule-Based Auditing
+## auditing — Rule-Based Grading
 
-**Use when:** Code quality, performance, accessibility checks
+**Use when:** code quality, performance, accessibility, or artifact grading.
 
 **Structure:**
-```markdown
+
+````markdown
 # Skill Title
+
+## Overview
+[What gets audited and what the output is.]
+
+## Scoring Rubric
+
+| Signal | Weight | Check |
+|--------|--------|-------|
+| [Signal 1] | 25 | [How to measure it] |
 
 ## How It Works
 1. Read specified files
-2. Check against rules
+2. Check against the rubric
 3. Output findings in priority order
-
-## Rule Categories
-
-| Priority | Category | Impact |
-|----------|----------|--------|
-| CRITICAL | Category A | Must fix |
-| HIGH | Category B | Should fix |
-
-## Quick Reference
-
-### Category A (CRITICAL)
-- `rule-id-1` - Description
-- `rule-id-2` - Description
-
-## Usage
-[How to invoke]
 
 ## Output Format
 ```
@@ -167,115 +169,137 @@ CRITICAL: Issue description (file.js:123)
 - Impact: [explanation]
 - Fix: [solution]
 ```
-```
+
+## Examples
+
+✅ High-quality artifact
+
+[what a passing artifact looks like, briefly]
+
+❌ Low-quality artifact
+
+[what a failing artifact looks like, briefly]
+
+## Gotchas
+- **Symptom:** [scoring edge case]. **Cause:** [cause]. **Fix:** [action].
+````
 
 **Key characteristics:**
-- Priority-based rule categories (CRITICAL/HIGH/MEDIUM/LOW)
-- Quick reference table for all rules
-- Standardized output format
-- Clear severity levels and impact descriptions
-- Structured fix recommendations
+- Explicit rubric with weights — grades are reproducible, not vibes
+- Standardized output format with severity, impact, and fix per finding
+- Paired examples of high- and low-quality artifacts anchor the rubric
+- Severity levels (CRITICAL/HIGH/MEDIUM/LOW) ordered most-severe first
 
 ---
 
-## Pattern D: Automation/Integration
+## reference — Domain Knowledge Router
 
-**Use when:** Browser testing, API integration, external tools
+**Use when:** library usage, architecture patterns, schemas, conventions, lookup tables.
 
 **Structure:**
-```markdown
+
+````markdown
 # Skill Title
 
-## How It Works
-[High-level workflow]
+## Overview
+[When to reach for this knowledge — one or two sentences.]
 
-## Critical Workflow
+## Navigation
+
+| Topic | Load When | File |
+|-------|-----------|------|
+| [Domain 1] | [trigger situation] | [references/domain-1.md](references/domain-1.md) |
+| [Domain 2] | [trigger situation] | [references/domain-2.md](references/domain-2.md) |
+
+## Core Concepts
+[Only the ideas needed to pick the right reference file — keep short.]
+
+## Examples
+
+✅ Desired
+
+[correct application of the domain knowledge]
+
+❌ Anti-pattern
+
+[common misapplication]
+
+## Gotchas
+- **Symptom:** [misuse]. **Cause:** [cause]. **Fix:** [action].
+````
+
+**Key characteristics:**
+- SKILL.md stays a router — the data lives in one `references/<domain>.md` per domain
+- Every reference file gets a "load when…" pointer so the agent knows what's inside without opening it
+- Reference files exactly one level deep — deeper nesting gets truncated by preview reads
+- Core Concepts covers only what's needed to navigate, not a tutorial
+
+---
+
+## automation — Script/Command Wrapper
+
+**Use when:** browser testing, screenshots, recordings, API integration, CI/CD helpers.
+
+**Structure:**
+
+````markdown
+# Skill Title
+
+## Overview
+[What the automation does, end to end.]
+
+## Command Surface
+
+| Command | Purpose |
+|---------|---------|
+| `command --flag` | [what it does] |
+
+## Sample Invocation
+```bash
+# The one command that covers the common case
+command --input file --output result
+```
+
+## Workflow
 1. Auto-detect environment
 2. Generate configuration
 3. Execute with parameters
 4. Present results
 
-## Auto-Detection
-```bash
-# Detection script
-```
+## Failure Modes
 
-## Configuration
-[Parameterization details]
+✅ Desired
 
-## Helper Functions
-[Utility library if needed]
+[healthy run — what success output looks like]
 
-## Common Tasks
-[Pre-built examples]
+❌ Anti-pattern
+
+[running blind: no detection step, hardcoded paths]
+
+## Gotchas
+- **Symptom:** [failure]. **Cause:** [cause]. **Fix:** [action].
 
 ## Troubleshooting
-[Common issues]
-```
+[Common issues and recovery steps]
+````
 
 **Key characteristics:**
-- Auto-detection of environment and tools
-- Parameterized configuration
-- Helper functions/libraries
-- Pre-built common task examples
-- Error handling and recovery
+- Auto-detection of environment and tools before execution
+- The actual script lives in `scripts/` — SKILL.md documents the surface, not the implementation
+- Failure modes documented with recovery steps, not just the happy path
+- Pre-built invocations for the common tasks
 
 ---
 
-## Pattern E: Reference/Knowledge
+## Combining Types
 
-**Use when:** Library usage, architecture patterns, domain knowledge
-
-**Structure:**
-```markdown
-# Skill Title
-
-## Overview
-[When to use this knowledge]
-
-## Core Concepts
-[Key ideas explained]
-
-## Patterns Library
-
-### Pattern A: [Use Case]
-```javascript
-// Code example with annotations
-```
-
-### Pattern B: [Use Case]
-```javascript
-// Code example
-```
-
-## Best Practices
-[Guidelines]
-
-## Common Mistakes
-[Anti-patterns to avoid]
-
-## When NOT to Use
-[Situations to avoid]
-```
-
-**Key characteristics:**
-- Knowledge organized by concept
-- Annotated code examples
-- Best practices and anti-patterns
-- Clear guidance on when NOT to use
-- Patterns library for common scenarios
-
----
-
-## Combining Patterns
-
-Some skills benefit from combining elements of multiple patterns:
+Some skills benefit from combining elements of multiple templates:
 
 | Combination | Example Use Case |
-|-------------|-----------------|
-| A + D | Methodology enforcement with automation scripts |
-| B + E | Technical setup with reference knowledge |
-| C + D | Automated auditing with tool integration |
-| A + C | Process enforcement with rule-based checks |
+|-------------|------------------|
+| methodology + automation | Enforced workflow with helper scripts |
+| technical + reference | Tool setup plus domain knowledge files |
+| auditing + automation | Automated grading with tool integration |
+| methodology + auditing | Process enforcement with rule-based checks |
 
-When combining, choose a **primary pattern** for overall structure and incorporate specific sections from the secondary pattern.
+When combining, choose a **primary type** for the overall structure and incorporate specific sections from the secondary type.
