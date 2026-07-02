@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.7.0] - 2026-07-02
+
 ### Changed
 
 - **setup-semantic-release** (v1.2.1 → **v1.3.0**, minor): modernized the taught package set to current majors — `semantic-release@^25.0.0` (v25.0.0's only breaking change is the Node floor: `^22.14.0 || ≥24.10.0`, dropping Node 20/21/23; no config or plugin API changes, so the `.releaserc.json` as taught remains valid) and `@commitlint/cli` + `@commitlint/config-conventional` `@^21.0.0` (v21 requires Node ≥22 and changes CLI output formatting only; v20's sole break — `body-max-line-length` ignoring URL lines — is moot since the skill disables that rule). Prerequisite line updated to the new Node floor. Live-verified on Node 24.11.1: clean install of the exact pinned set, the skill's `commitlint.config.js` accepted verbatim (`feat: test message` → exit 0, `bad message` → exit 1 with subject/type errors), semantic-release 25.0.5 resolved with all bundled default plugins.
