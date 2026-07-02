@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Directive-register description sweep** (all patch bumps): converted the last eight skill descriptions still using the passive "Use when asked to…" / "Use whenever…" register to the directive third-person form "Use this skill whenever the user wants to…" — deep-research (v2.2.1), track-session (v5.1.2), track-roadmap (v2.5.3), track-qa (v1.2.3), record-tui (v1.5.1), color-system (v1.1.1), screenshot-local (v1.3.1), ideal-react-component (v1.7.2). Trigger phrases unchanged. Basis: the Seleznov activation study (n=650, CMH odds ratio 20.6, p<0.0001 — directive register raised absolute activation from 77% to 100%); a 2026-07-02 convention re-validation confirmed the directive/trigger-rich/third-person principle is canonical in current Anthropic guidance, while the exact phrasing remains a house choice.
+
 ### Fixed
 
 - **typography** (v1.0.0 → **v1.0.1**, patch): `references/readability.md`'s fluid-clamp() rule 3 claimed "MAX ≤ ~2.5× MIN (and ≥ 2× MIN) so text can still double" — a floor every authored example in the skill violates (ratios run 1.14–1.71×) and whose justification was wrong: with both bounds in `rem`, zoom and text-size preferences scale the whole range, so 200%-zoom compliance doesn't depend on the MAX/MIN ratio. Softened to "MAX ≈ 1.25–2.5× MIN — a design choice, not a compliance requirement." Also canonicalized the fluid-h1 snippet: SKILL.md's example (`clamp(2rem, …)`) diverged from readability.md's (`clamp(1.75rem, …)`) with an identical preferred term; standardized both on the 1.75rem MIN, whose crossover starts scaling at ~325px viewport instead of leaving small phones stuck at the floor until ~450px.
