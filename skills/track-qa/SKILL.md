@@ -1,11 +1,11 @@
 ---
 name: track-qa
-description: Manual QA tracking — things tests can't verify. Use when asked to "create a QA list", "set up QA for this project", "what should I QA", "track manual QA", "audit the QA list", or "start manual QA".
+description: Manual QA tracking — things tests can't verify. Use this skill whenever the user wants to "create a QA list", "set up QA for this project", "what should I QA", "track manual QA", "audit the QA list", or "start manual QA".
 license: MIT
 argument-hint: "[generate|update|audit|migrate|resume]"
 metadata:
   author: Antonin Januska
-  version: "1.2.2"
+  version: "1.2.3"
 ---
 
 # Track QA
