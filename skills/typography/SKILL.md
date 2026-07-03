@@ -4,7 +4,7 @@ description: Typography & type systems — font sizing, type scale, line-height,
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.0.1"
+  version: "1.1.0"
   tags: [typography, type-scale, font-size, line-height, vertical-rhythm, readability, accessibility, fonts]
 ---
 
@@ -28,6 +28,8 @@ These are the recede-defaults. Most unreadable AI typography breaks one of them;
 | **Line-height** | body **≥ 1.5** | Cramped leading hurts reading and fails the WCAG 1.4.12 spacing override. |
 
 The single worst combination is **small + thin + low-contrast** — any two is risky, all three is the canonical unreadable panel. → [references/readability.md](references/readability.md)
+
+**Verify computed, not authored.** Reading the class/prop/token in source only tells you intent — check the actual rendered value (devtools Computed panel, or `getComputedStyle(el).fontSize`) before calling a size fixed. A "should be 16px" edit that's still 13px on screen is a common failure mode, not a rare one.
 
 ## How to use this skill
 
@@ -99,6 +101,8 @@ Why it works: `rem` bounds + a `rem`-anchored preferred keep it readable at 200%
 - **Symptom:** Fluid type stops scaling at 200% zoom. **Cause:** `vw`-only `font-size`. **Fix:** `clamp(rem, calc(rem + vw), rem)`; browsers don't zoom `vw`.
 - **Symptom:** Text over a hero image is unreadable in spots. **Cause:** no scrim; contrast varies per pixel. **Fix:** add a semi-opaque overlay / `text-shadow`; verify the worst-case region.
 - **Symptom:** Bold looks smeared, italics weak. **Cause:** faux-synthesized weight/style the font file lacks. **Fix:** load real weights or use a variable font; `font-synthesis: none` to expose gaps.
+- **Symptom:** Theme/CSS says text should be ≥16px, but it renders small anyway. **Cause:** size-token names lie — Mantine `size="sm"`/`"xs"` compute to 14px/12px, Tailwind `text-sm`/`text-xs` to 14px/12px, both under the floor; nested `em` units also compound multiplicatively per level, shrinking silently as components nest. **Fix:** read the *computed* font-size in devtools, not the source class/token; prefer `rem` for font-size so it can't compound.
+- **Symptom:** Body text passes the floor but chart/graph text is still tiny and washed out. **Cause:** charting libraries (Recharts, Mantine charts) render text as SVG with their own inline `font-size`/`fill` — it doesn't inherit your CSS type scale or color tokens. **Fix:** target the library's text elements directly (e.g. `.recharts-wrapper text { font-size: …; fill: var(--text) }`) and re-verify the computed size/color — your stylesheet's cascade never reaches it.
 
 ## Integration
 
