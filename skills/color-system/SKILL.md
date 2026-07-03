@@ -4,7 +4,7 @@ description: Curated color palettes (light + dark) plus build-your-own and contr
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.1.1"
+  version: "1.2.0"
   tags: [color, palette, design, accessibility, dark-mode, data-viz, theme]
 ---
 
@@ -128,9 +128,11 @@ Why it works: matches the data's structure to the right palette family and respe
 ## Gotchas
 
 - **Symptom:** Brand color is unreadable as body text. **Cause:** Saturated mid-tones (amber, coral, teal) often fail 4.5:1 on their own background. **Fix:** use the brand color as a *fill* (white/dark text on top) or step to a darker shade for text; verify in contrast.md.
+- **Symptom:** Secondary/muted text ("dimmed", `text-secondary`) looks fine in the design tool but fails contrast in the app. **Cause:** component libraries ship a default muted-text color (e.g. Mantine's `dimmed`) tuned for visual hierarchy, not contrast — commonly landing around ~3.4:1, well under the 4.5:1 AA floor. **Fix:** don't trust the library default for this role; pick/verify your own `text-secondary` hex against contrast.md, and re-check per theme — the same override can pass in one theme and fail in another.
 - **Symptom:** Dark mode "passes WCAG" but is hard to read. **Cause:** WCAG 2 math overstates contrast near black. **Fix:** re-check dark pairs with APCA (Lc), not the 4.5:1 ratio alone.
 - **Symptom:** Dark theme looks flat, elevation unreadable. **Cause:** pure `#000` background + same-lightness surfaces. **Fix:** raise the base to ~`#0d1117`–`#1e1e2e` and make each elevation tier *lighter*.
 - **Symptom:** A chart is unreadable for colorblind viewers. **Cause:** red↔green encoding or hue-only meaning. **Fix:** switch to a warm↔cool diverging palette and add labels/icons; for categorical use the Okabe-Ito safe set (in palettes.md).
+- **Symptom:** Chart text stays low-contrast even though your palette defines the right text color. **Cause:** charting libraries (Recharts, Mantine charts) render axis/legend/value text as SVG with their own inline `fill`, bypassing your color tokens entirely. **Fix:** target the library's text elements directly (e.g. `.recharts-wrapper text { fill: var(--text) }`) — the CSS cascade never reaches it.
 - **Symptom:** TUI colors vanish on some terminals. **Cause:** hardcoded hex or relying on bright-black (slot 8) for important text. **Fix:** bind meaning to ANSI slots 1–6 so the user's theme renders it; never put load-bearing text in slot 8.
 - **Symptom:** Palette steps look lumpy/uneven. **Cause:** stepping lightness in HSL/RGB. **Fix:** rebuild the scale in OKLCH; see build-your-own.md.
 
