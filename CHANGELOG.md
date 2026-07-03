@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **typography** (v1.0.1 → **v1.1.0**, minor): added a "Verify computed, not authored" callout after the readability-floor table, plus two new Gotchas, from a cross-repo audit of typography complaints across three Mantine-based apps (all three independently hit "everything's too small" despite source-level fixes). New Gotcha 1: size-token names lie (Mantine `size="sm"`/`"xs"` compute to 14px/12px, Tailwind `text-sm`/`text-xs` likewise, both under the 16px floor) and nested `em` units compound multiplicatively per level — fix by reading the *computed* font-size in devtools rather than the source class/token, and preferring `rem` for font-size. New Gotcha 2: chart/graph text (Recharts, Mantine charts) renders as SVG with its own inline `font-size`/`fill` that bypasses the CSS type scale and color tokens entirely — fix by targeting the library's text elements directly and re-verifying the computed size/color.
+
 ## [4.7.0] - 2026-07-02
 
 ### Changed
