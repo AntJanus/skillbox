@@ -4,7 +4,7 @@ description: Local-first CRUD blueprint — Next.js + node:sqlite, single-user. 
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.4.0"
+  version: "1.6.0"
   tags: [nextjs, react, typescript, sqlite, local-first, desktop, architecture, charts]
 ---
 
@@ -24,7 +24,7 @@ A blueprint for building a **local-first, single-user CRUD app for one specific 
 |---|---|---|
 | Framework | **Next.js (App Router)**, `output: "standalone"` | Server components for the data boundary; standalone build compiles to a binary. Start in React from day one. |
 | UI | **React + TypeScript (strict)** | `noUncheckedIndexedAccess: true`, `moduleResolution: "Bundler"` |
-| Component lib | **Mantine** (`@mantine/core`, `/hooks`, `/dates`, `/charts`, `/form`, `/modals`) | Mature, batteries-included: AppShell, tables, inputs, dark mode, charts, `useForm`+zodResolver, confirm modals. Don't roll your own or use an immature/personal component lib. |
+| Component lib | **Mantine** (`@mantine/core`, `/hooks`, `/dates`, `/charts`, `/form`, `/modals`) | Mature, batteries-included: AppShell, tables, inputs, dark mode, charts, `useForm`+zodResolver, confirm modals. Don't roll your own or use an immature/personal component lib. **Known weakness, not a reason to switch:** several components (Table, NavLink, Tooltip, Menu, Badge, Input label) default to sub-16px sizes even when unstyled. A headless stack (shadcn/Radix/Base UI) avoids that class of bug but costs a real rebuild of AppShell/Table/dates/charts this blueprint leans on — net loss for this use case. Neutralize it instead: override the **entire** `fontSizes` scale explicitly in the shared theme (don't leave Mantine's 12px/14px defaults live), and treat bare `size="xs"`/`"sm"`/`c="dimmed"` on Text/NavLink/Anchor/Badge as needing a justification, not a default reach. |
 | Persistence | **`node:sqlite`** (built-in `DatabaseSync`) | **No native addon** — `better-sqlite3` needs per-platform native rebuilds, which kills the single-binary goal. Same driver on Node 24 and Deno; needs **Node ≥ 22.5** (flagged on 22.x, unflagged on ≥ 23). Load-bearing; don't swap it. |
 | Validation | **zod** at every server boundary | One schema per write path; parse before touching the DB |
 | Data fetching | **none** — no TanStack Query / SWR / Redux | Reads are server components; derive/compute in the browser. No client cache layer to add. |
@@ -89,6 +89,7 @@ Entities reference each other with real foreign keys; joins are assembled in `li
 - **No silent fallbacks:** the pure core *throws* on invalid input; the UI guards inputs before calling it. A fallback that masks a missing row is a bug.
 - **Types:** explicit interfaces for every input/result. `noUncheckedIndexedAccess` is on — handle `undefined` from index access.
 - **Empty state is the default state:** a fresh local-first DB has zero rows on day one — there's no seed data. Every list screen needs a real empty state (a short message + the primary "add" CTA) designed *before* the first entity exists, not a bare table header.
+- **Wire `next/font` variables to `<html>`, not `<body>`.** Mantine's `fontFamily`/`headings.fontFamily` get injected into a `:root`-scoped block (`:root, :host { --mantine-font-family: var(--font-body) } `). A `next/font` `.variable` class name applied only to `<body>` (an easy default to reach for) leaves `--font-body` invisible at `:root` — CSS custom properties don't inherit upward — so the reference is guaranteed-invalid and the whole app silently renders in the browser's fallback serif, with nothing wrong visible in source. Confirmed as a real, previously-undocumented trap across a five-app blueprint family. Apply the `.variable` class to `<html>` instead, or follow Mantine's own pattern and inject the resolved string (`fontFamily: font.style.fontFamily`) rather than a CSS variable. See the **typography** skill's gotcha and `references/UI.md` for the full mechanism.
 
 ## UI & data-viz quality signals
 
