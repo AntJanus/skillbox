@@ -43,8 +43,11 @@ font-family: Charter, "Bitstream Charter", "Sitka Text", Cambria, Georgia, serif
 - **Match x-height** for harmony; **share a mood/era** (contrast in form, agreement in feeling).
 - **Superfamily = guaranteed harmony** — IBM Plex (Sans/Serif/Mono), Source Sans + Source Serif, DM Sans + DM Serif Display. Removes all guesswork.
 - **Limit to 2 families (3 max);** assign by role (display/heading · body · mono).
+- **Scope a serif accent to the single largest page-level heading — nowhere else.** A serif reads as intentional and elegant at hero/h1 display size; the same serif on h2-h6, nav labels, buttons, badges, or (especially) tracked ALL-CAPS chrome reads as broken, not editorial — small serif strokes lose definition, and letter-spaced uppercase serif is close to illegible. If a design calls for "a touch of editorial warmth," apply the second family to `h1`/page-title only and keep every other role — including `h2`-`h6` — on the sans/body family. This is a common regression path: a heading font gets set once at the theme level (`headings.fontFamily`) and silently inherited by every heading size instead of being scoped to just the top one.
 
 **Proven pairings (heading → body):** Playfair Display → Source Sans 3 · Fraunces → Inter · **Inter → Inter** (single family, lowest risk) · IBM Plex Serif → IBM Plex Sans · Space Grotesk → Inter · DM Serif Display → DM Sans · Lora → Source Sans 3 · Newsreader → Inter.
+
+**For the "serif accent on h1 only" pattern specifically**, favor pairings with an existing superfamily or an already-proven combo so the accent never feels bolted-on: **IBM Plex Serif → IBM Plex Sans** (same superfamily — zero new brand risk if the body is already on Plex Sans) · **Newsreader → Inter** or **Fraunces → Inter** (both explicitly designed/proven to sit next to Inter body text) · **DM Serif Display → DM Sans**. Set the accent family *only* in the `h1`/page-title component's own style, not in a shared `headings.fontFamily` theme key that every heading level inherits.
 
 **The one-family default:** pick Inter / Source Sans 3 / IBM Plex Sans / DM Sans and build hierarchy from weight + size (700 h1, 600 h2, 500 labels, 400 body). Add a second family only when you can name the role it fills.
 
