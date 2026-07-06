@@ -4,7 +4,7 @@ description: Curated color palettes (light + dark) plus build-your-own and contr
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.2.0"
+  version: "1.2.1"
   tags: [color, palette, design, accessibility, dark-mode, data-viz, theme]
 ---
 
@@ -128,7 +128,7 @@ Why it works: matches the data's structure to the right palette family and respe
 ## Gotchas
 
 - **Symptom:** Brand color is unreadable as body text. **Cause:** Saturated mid-tones (amber, coral, teal) often fail 4.5:1 on their own background. **Fix:** use the brand color as a *fill* (white/dark text on top) or step to a darker shade for text; verify in contrast.md.
-- **Symptom:** Secondary/muted text ("dimmed", `text-secondary`) looks fine in the design tool but fails contrast in the app. **Cause:** component libraries ship a default muted-text color (e.g. Mantine's `dimmed`) tuned for visual hierarchy, not contrast — commonly landing around ~3.4:1, well under the 4.5:1 AA floor. **Fix:** don't trust the library default for this role; pick/verify your own `text-secondary` hex against contrast.md, and re-check per theme — the same override can pass in one theme and fail in another.
+- **Symptom:** Secondary/muted text ("dimmed", `text-secondary`) looks fine in the design tool but fails contrast in the app. **Cause:** component libraries ship a default muted-text color (e.g. Mantine's `dimmed`) tuned for visual hierarchy, not contrast — commonly landing around ~3.4:1, well under the 4.5:1 AA floor. **Fix:** don't trust the library default for this role; pick/verify your own `text-secondary` hex against contrast.md, and re-check per theme — the same override can pass in one theme and fail in another. Also re-verify on **tinted/elevated surfaces** (cards, striped table rows), not just the flat canvas — a ratio authored and verified against the base background can still fail once the same text sits on a lighter/darker surface color.
 - **Symptom:** Dark mode "passes WCAG" but is hard to read. **Cause:** WCAG 2 math overstates contrast near black. **Fix:** re-check dark pairs with APCA (Lc), not the 4.5:1 ratio alone.
 - **Symptom:** Dark theme looks flat, elevation unreadable. **Cause:** pure `#000` background + same-lightness surfaces. **Fix:** raise the base to ~`#0d1117`–`#1e1e2e` and make each elevation tier *lighter*.
 - **Symptom:** A chart is unreadable for colorblind viewers. **Cause:** red↔green encoding or hue-only meaning. **Fix:** switch to a warm↔cool diverging palette and add labels/icons; for categorical use the Okabe-Ito safe set (in palettes.md).
