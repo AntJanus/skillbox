@@ -42,6 +42,22 @@ Applies when the app derives non-obvious numbers (projection or estimate tools).
 - **Generative fallback avatars** (hash the id/name → deterministic identicon) for entities with no image; make the entity name editable.
 - Image uploads: client-side canvas downscale → WebP data URI. Any product/image fetch route must be SSRF/size/type-guarded.
 
+## Bulk selection & the batch-edit overlay
+
+The pattern for editing many rows at once (see SKILL.md for the rules; this is the anatomy). It is a **mode**, not a route — nothing about it goes in the URL.
+
+**Chrome takeover.** A non-empty selection replaces the sidebar nav with a batch bar in the same slot: `N selected` + ✕ on top, one control per batchable field below. Reusing the nav slot (rather than floating a bar over the content) keeps the list fully visible while you refine the selection, which is the whole point of the mode. Two things fall out of it that are easy to miss:
+- **A collapsed icon-rail sidebar can't hold the controls** — force the shell back to full width for as long as a selection lasts.
+- **On mobile the sidebar is a closed drawer**, so the bar is invisible after selecting a row. Put an "N selected" button in the header (mobile-only) that opens the drawer, or the mode is unreachable on small screens.
+
+**Where the state lives.** The bar renders into the chrome; the checkboxes render inside the page. They are siblings, so selection state hoists into a context provider **above the app shell**. The page registers its currently-visible rows with the provider (the bar has no other way to see them, and it needs them to compute each control's value). Key both the registration and the selection by pathname, and derive liveness from the current path — do **not** clear on navigation in an effect (child effects run first; you'd wipe the registration the page just made).
+
+**Control state is three-valued, not two.** Each field across the selection is `uniform` (every row agrees — show the value) or `mixed` (show a "Mixed" placeholder and no value). A *shared absent* value — two unrated items — is `uniform: null`, not `mixed`: they agree that they're unrated, and rendering "Mixed" would imply there's something to preserve. Summarize per field independently; one mixed field must not drag the others into "mixed".
+
+**Anatomy of the write.** One action taking `(ids, sparsePatch)`. Absent key = untouched, explicit `null` = cleared. Reuse the *single-item* setters inside the transaction rather than writing bespoke bulk SQL, so batch and per-item edits can't drift apart (a status setter that stamps `completed_at` keeps doing so in a batch). Return a count and toast it (`Updated 7 items.`); keep the selection alive after a successful write — setting a status and then a rating over the same rows is the common case.
+
+**Table extras.** A header checkbox that selects/clears **all visible rows** (indeterminate when partial). "All" always means post-filter — never the unfiltered set.
+
 ## Importing external design mocks
 
 When given design mocks or screenshots (e.g. from a design tool), **port the visual design while preserving the existing data, intent, and calculations** — the math/derivations are sacred, the skin is not. Adopt spacing, color, type, and layout; keep every computed figure and its meaning.
