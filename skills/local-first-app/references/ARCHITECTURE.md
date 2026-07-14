@@ -47,6 +47,8 @@ function open(): DatabaseSync {
 
 Without WAL + `busy_timeout`, a server action writing while a server component reads throws `SQLITE_BUSY` — not a tuning nicety, a reliability fix.
 
+**Cache the handle, not the query API.** `globalThis.__db` holds the bare `DatabaseSync`; the query functions stay free functions taking `db` as their first argument (`listTasksByProject(db, projectId)`). That injection seam is what lets a unit test pass an in-memory DB instead of stubbing a global — and it keeps HMR honest, since a re-evaluated module re-exports the new functions. Cache an *object of methods* on `globalThis` instead and dev HMR pins the object built by the old code — see the HMR gotcha in SKILL.md.
+
 This is the recommended baseline, not a guarantee every real app already has it — it's easy to ship with only `WAL` + `foreign_keys` and not notice the gap until a write races a read under real load. Add the full pragma set from day one rather than retrofitting it later.
 
 - **Schema as a TS string export.** `readFileSync(join(process.cwd(), ...))` ENOENTs next to a shipped binary — inline it. Define tables **parent-before-child** in `BASE_SCHEMA` — a `REFERENCES` to a not-yet-defined table errors with FKs on.
