@@ -1,5 +1,13 @@
 # SkillBox - Claude Code Agent Guide
 
+## Repository Visibility: PUBLIC
+
+**This repo is PUBLIC on GitHub (`AntJanus/skillbox`).** Everything committed here is world-readable and permanent.
+
+- Before every commit, scrub PII and secrets: no API keys, tokens, `.env` values, real emails (beyond intended author attribution), internal/employer identifiers, or absolute paths containing a username (`/Users/<user>/...`).
+- When in doubt, run the `/publish-check` privacy scan over the diff before pushing.
+
+
 This file helps Claude Code understand how to work with the SkillBox project effectively.
 
 ## Project Description
