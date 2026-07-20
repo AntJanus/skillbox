@@ -4,6 +4,8 @@
 
 # SkillBox
 
+> 🌐 **PUBLIC repository** — hosted publicly on GitHub. Scrub PII and secrets before every commit.
+
 A curated collection of utility skills for Claude Code and AI agents. SkillBox provides reusable, battle-tested skills that enhance agent capabilities for common development workflows.
 
 **Compatible with:** Claude Code, Cursor, Cline, GitHub Copilot, and 40+ other AI agents via [Vercel Skills](https://skills.sh)
