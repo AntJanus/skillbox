@@ -26,6 +26,41 @@ Every palette below maps to semantic roles (UI) or ordered color lists (data viz
 | error | `#dc2626` | `#f85149` |
 | info | `#0284c7` | `#388bfd` |
 
+### Teal Slate — deep teal on cool slate · technical reports, SRE / rate-limit dashboards
+
+Single-accent system: teal carries structure/data; amber is the one warm signal (doubles as `accent` and `warning`); green = headroom, red = risk. Light values are the "keeper" set; dark mirrors them (not a naive invert).
+
+| Role | Light | Dark |
+|---|---|---|
+| background | `#f5f8f9` | `#0b1015` |
+| surface | `#ffffff` | `#121a21` |
+| surface-elevated | `#eef3f5` | `#1a232b` |
+| border | `#d8e0e4` | `#25313a` |
+| text-primary | `#121a20` | `#e7eef2` |
+| text-secondary | `#48565f` | `#9aa8b1` |
+| primary | `#0c6d78` | `#3fb6c4` |
+| primary-hover | `#095a63` | `#62cad6` |
+| accent | `#a96811` | `#dca23f` |
+| success | `#2f7d52` | `#4cbe80` |
+| warning | `#a96811` | `#dca23f` |
+| error | `#bd3831` | `#ef6b62` |
+| info | `#0c6d78` | `#3fb6c4` |
+
+Extended tokens as shipped (the tints + extra neutrals that make it work — soft = 10–15% wash of its hue for callout/chip/fill backgrounds):
+
+```css
+/* light */
+--ink-faint:#7b8a92; --line-strong:#c2ccd1;
+--accent-soft:#dceff1; --good-soft:#dcefe3; --warn-soft:#f6ecd7; --crit-soft:#f7e0de;
+--shadow:0 1px 2px rgba(18,26,32,.06),0 8px 24px -12px rgba(18,26,32,.16);
+/* dark */
+--ink-faint:#6c7b84; --line-strong:#34424c;
+--accent-soft:#10323a; --good-soft:#122c20; --warn-soft:#322611; --crit-soft:#331715;
+--shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+```
+
+Pairs with a mono face (`ui-monospace`) for labels/figures + a system sans for prose.
+
 ### Evergreen — emerald on neutral zinc · fresh, confident, non-blue
 
 | Role | Light | Dark |

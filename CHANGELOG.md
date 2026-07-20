@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **color-system** (v1.2.1 → **v1.3.0**, minor): added the **Teal Slate** web-app UI palette — deep teal on cool slate with a single warm amber accent (doubling as `accent`/`warning`), full 13-role light+dark tables plus the shipped extended tokens (hue-wash soft fills, faint ink, strong lines, shadow recipe). Pairs with a mono face for labels/figures. Contrast-verified: text 7–17:1, primary-as-text 6.0/7.2, faint ink clears the 3:1 UI floor by design. Listed in the SKILL.md quick index under Web App UI.
+
 ## [4.10.0] - 2026-07-14
 
 ### Changed

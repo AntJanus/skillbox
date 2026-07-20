@@ -4,7 +4,7 @@ description: Curated color palettes (light + dark) plus build-your-own and contr
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.2.1"
+  version: "1.3.0"
   tags: [color, palette, design, accessibility, dark-mode, data-viz, theme]
 ---
 
@@ -32,6 +32,7 @@ Load a reference file only when the task needs it — keep context lean.
 - **Evergreen** — emerald brand on true-neutral zinc. Fresh, confident, non-blue identity.
 - **Terracotta** — warm clay/espresso neutrals + rust. Editorial, content platforms, writing tools.
 - **Bloom** — pastel periwinkle/violet, deep dark mode. Friendly dev tools, playful-but-clean apps.
+- **Teal Slate** — deep teal on cool slate, single warm accent. Technical reports, SRE / rate-limit dashboards; pairs with a mono face for figures.
 
 ### Marketing / Landing — light + dark, hero gradients
 - **Sunbloom** — refined coral/amber warmth. Approachable consumer/creator brands.
