@@ -4,7 +4,7 @@ description: Curated color palettes (light + dark) plus build-your-own and contr
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.3.0"
+  version: "1.3.1"
   tags: [color, palette, design, accessibility, dark-mode, data-viz, theme]
 ---
 
