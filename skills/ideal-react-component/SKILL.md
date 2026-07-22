@@ -4,7 +4,7 @@ description: React component structure and hooks antipatterns. Use this skill wh
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.7.2"
+  version: "1.7.3"
 ---
 
 # Ideal React Component Structure
