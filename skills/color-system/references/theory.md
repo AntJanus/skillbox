@@ -59,7 +59,7 @@ Conventional state hues (Western, document as starting points, not universal): s
 
 - "Warm advances, cool recedes" is **unreliable** — depends on contrast and context more than temperature. Treat as a hint, not a rule.
 - High saturation drives attention/arousal → reserve for CTAs, alerts, focal points. Desaturated colors reduce eye strain over large areas and long sessions.
-- Red text reports the highest visual fatigue; yellow the lowest.
+- Claims that specific *hues* cause more eye fatigue than others (e.g. "red text is the most tiring") circulate widely but resolve to saturation and contrast, not hue — don't design around them. Fix legibility with the contrast and saturation levers above.
 
 ## Sources
 

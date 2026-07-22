@@ -152,7 +152,7 @@ A dark-led sibling of Graphite, pulled from a working pipeline-performance dashb
 - **Success highlight ("big win")** — gradient `#10261a` → `#161b22`, border `#1f5132`, emphasis text `#7ee787`. A call-out card that reads as a win without a full success-green flood.
 - **Text on colored fills** (stage segments, critical-path blocks): `#ffffff`.
 
-**Contrast watch-outs:** Terracotta `primary #c2410c` ≈ 3.4:1 on white — use as a fill or step to `#9a3412` for text. Bloom light `accent #a855f7` is large-text/fill only. Verify pairs in contrast.md before shipping.
+**Contrast watch-outs:** Terracotta `primary #c2410c` is **5.18:1** on white — it clears AA for body text; step to `#9a3412` (7.31:1) only if you want AAA. The shade to avoid as text is the lighter `#ea580c` at **3.56:1**. Bloom light `accent #a855f7` is **3.96:1** — large-text/fill only. Verify pairs in contrast.md before shipping.
 
 ---
 
@@ -205,7 +205,7 @@ Each ships a hero gradient plus roles. Use gradient as a hero background with li
 | error | `#f87171` | `#b91c1c` |
 | gradient | `#e8c56a` → `#c69b3c` → `#8a6a1f` | `#c69b3c` → `#9a7726` |
 
-Gold `#c69b3c` ≈ 7.9:1 on near-black — readable as text (the rare metallic that is).
+Gold `#c69b3c` is 7.69:1 on near-black — readable as text (the rare metallic that is).
 
 ### Paper & Ink — warm paper + ink + terracotta accent · blogs, long-form, portfolios
 
