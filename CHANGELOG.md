@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.1.0] - 2026-07-22
+
 Evidence-driven pass on the three heaviest-used skills, from 20 days of real activation data across 1,912 transcripts rather than a fresh read of the prose.
 
 ### Changed
