@@ -4,7 +4,7 @@ description: Typography & type systems — font sizing, type scale, line-height,
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.3.0"
+  version: "1.3.1"
   tags: [typography, type-scale, font-size, line-height, vertical-rhythm, readability, accessibility, fonts]
 ---
 
