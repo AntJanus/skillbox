@@ -4,16 +4,12 @@ Additional troubleshooting beyond the common issues covered in SKILL.md.
 
 ## Problem: SESSION_PROGRESS.md getting too large (>1000 lines)
 
-**Cause:** Not archiving completed work periodically.
+**Cause:** Usually one of two things — the plan is too granular (task-level, not phase-level), or multiple finished sessions have been stacked into one file. A session file should track **one** active session; the dashboard parses only the top frontmatter block, so anything below a second `---` is invisible to it.
 
 **Solution:**
-```bash
-# Archive completed phases to separate file
-cat SESSION_PROGRESS.md >> SESSION_ARCHIVE_2025-01.md
-# Keep only active phases in SESSION_PROGRESS.md
-```
-
-Move completed work to archive file monthly or after major milestones.
+- Collapse finished phases to one-line entries under `## Completed Work` — the detail already lives in git history and commit messages, so it doesn't need to sit in the file.
+- When a session is genuinely done, start the next one by **replacing** the file (see the Start-mode collision policy in SKILL.md), not by appending to it. Don't accrete `# (Previous session)` blocks.
+- Only if you truly need the old context readable, move it to a topic-named `SESSION_ARCHIVE_<topic>.md` and keep `SESSION_PROGRESS.md` to the active session. In practice, replace-and-trust-git is simpler and is the default.
 
 ## Problem: Repeated failed attempts with same approach
 
@@ -54,7 +50,7 @@ Before trying new approach:
 - Run verify incrementally after each major phase
 - Don't wait until the end to verify everything
 - Use `/track-session verify` after completing each group of related tasks
-- Archive verified phases to SESSION_ARCHIVE.md to reduce scope
+- Collapse already-verified phases to one-line `## Completed Work` entries to reduce scope (git holds the detail)
 
 ## Problem: Verify passes but work still has bugs
 
