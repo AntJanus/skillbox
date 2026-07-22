@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0] - 2026-07-22
+
+Major cut: **local-first-app v2.0.0 reverses two rules the blueprint previously stated**, so anyone who built against v1.7.0 gets different instructions on re-read. The release also carries a full 72-file manual audit of the repo (every tracked file read end to end) and the 22 fixes it produced — including several regressions introduced by the local-first-app rewrite itself and caught before they shipped.
+
+### Breaking Changes
+
+- **local-first-app**: the sanctioned delete-confirm changes from `@mantine/modals`' `openConfirmModal` to a hand-rolled controlled `<Modal>` (`ConfirmDeleteButton`). `@mantine/modals` and `<ModalsProvider>` leave the stack entirely.
+- **local-first-app**: tests move from colocated `*.test.ts` to a top-level `tests/` directory with a shared `tests/shims/` set (`next-cache`, `next-navigation`, `node-sqlite`, `server-only`).
+- **rate-skill**: the type taxonomy changes from `methodology`/`reference`/`generator`/`auditor` to `generate-skill`'s five (`methodology`/`technical`/`auditing`/`reference`/`automation`). Reports emit different type names, and the §3 length rubric produces different scores for skills over 300 lines.
+
 ### Fixed
 
 From a full manual read-through of all 72 tracked files (13,150 lines) — every file read end to end rather than grepped, with each numeric and behavioral claim re-verified by execution. Privacy scan came back clean across the whole repo.
@@ -613,7 +623,8 @@ When creating a release:
 
 ---
 
-[Unreleased]: https://github.com/antjanus/skillbox/compare/v4.10.0...HEAD
+[Unreleased]: https://github.com/antjanus/skillbox/compare/v5.0.0...HEAD
+[5.0.0]: https://github.com/antjanus/skillbox/compare/v4.10.0...v5.0.0
 [4.10.0]: https://github.com/antjanus/skillbox/compare/v4.9.0...v4.10.0
 [4.9.0]: https://github.com/antjanus/skillbox/compare/v4.8.0...v4.9.0
 [4.8.0]: https://github.com/antjanus/skillbox/compare/v4.7.0...v4.8.0
