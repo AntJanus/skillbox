@@ -1,11 +1,11 @@
 ---
 name: track-roadmap
-description: Plan, audit, and resume project roadmaps. Use this skill whenever the user wants to "create a roadmap", "generate a roadmap", "what should we build next", "brainstorm features", or "audit the roadmap".
+description: Plan, update, audit, and resume project roadmaps. Use this skill whenever the user wants to "create a roadmap", "add an item to the roadmap", "mark a feature done", "log the work I shipped", "what should we build next", "brainstorm features", or "audit the roadmap".
 license: MIT
 argument-hint: "[generate|update|audit|brainstorm|resume]"
 metadata:
   author: Antonin Januska
-  version: "2.5.3"
+  version: "2.5.4"
 ---
 
 # Track Roadmap
@@ -21,6 +21,8 @@ Maintain `ROADMAP.md` in the project root as a living, high-level feature plan, 
 | **Audit** | `/track-roadmap audit` | Scan code to mark each feature Done/In-Progress/Not-Started/Unclear, review relevance with the user, update |
 | **Brainstorm** | `/track-roadmap brainstorm` | Divergent ideation — explore directions before committing; viable ideas land in "Future Ideas" as `status:idea` |
 | **Resume** | `/track-roadmap resume` | Check session state, present remaining features, user picks one, hand off to `/track-session` |
+
+There is no `save` mode — a `/track-roadmap save` request means **Update** (record what changed). Adding an item, marking one done, or logging shipped work is the most common use; it lands in **Update**, not a separate verb. `roadmap_ref` in a SESSION_PROGRESS.md may list multiple ids comma-separated (`roadmap_ref: r_abc12,r_def34`) when one session advances several features.
 
 Full per-mode procedures (discovery questions, brainstorm question banks, audit steps): **[reference/MODES.md](./reference/MODES.md)**.
 
