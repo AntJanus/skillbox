@@ -339,6 +339,7 @@ A blueprint for a single-purpose local CRUD app — a game-backlog tracker, expe
 - Scaffolding a tracker / dashboard / personal-tool web app (a pure computation-only calculator with no persisted entities doesn't need this machinery)
 - Adding a persisted entity + a zod-validated server action over `node:sqlite`
 - Wiring the chart color *module* (semantic roles, theme hook) — pair with **color-system** for the actual palette
+- Building the app shell, logo, theming, and the shared page/editor/stat/empty-state shells
 - Packaging a Next.js app as a self-contained desktop binary (`deno compile` / `deno desktop`)
 - Deciding where computation, persistence, and view-model logic belong
 
