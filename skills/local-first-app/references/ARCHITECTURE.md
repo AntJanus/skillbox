@@ -15,7 +15,7 @@ The product's brain, and the **single home for every derived value**. Imports no
 
 ## The store (`src/db/`, `server-only`)
 
-`node:sqlite`'s `DatabaseSync` — no native addon, so the app compiles into one file. Requires **Node ≥ 22.5** (`--experimental-sqlite` on 22.x; unflagged on Node ≥ 23 / Node 24). Pin the floor in CI.
+`node:sqlite`'s `DatabaseSync` — no native addon, so the app compiles into one file. Added in **v22.5.0** behind `--experimental-sqlite` and **unflagged from v22.13.0 / v23.4.0** ([nodejs.org/api/sqlite.html](https://nodejs.org/api/sqlite.html)) — pin the floor at **22.13** in CI and no flag is needed. Import still emits an `ExperimentalWarning` (verified on v24.11.1); expected, not a misconfiguration.
 
 ```
 src/db/
@@ -29,7 +29,17 @@ src/db/
 ```ts
 // src/db/index.ts
 declare global { var __db: DatabaseSync | undefined }
-export const getDb = () => (globalThis.__db ??= open());   // survives HMR; server-only
+
+let migratedThisModule = false;
+
+export function getDb(): DatabaseSync {                    // server-only
+  const db = (globalThis.__db ??= open());                 // connection survives HMR
+  if (!migratedThisModule) {                               // module state does NOT — that's the hook
+    migrate(db);                                           // cheap: user_version gate, see below
+    migratedThisModule = true;
+  }
+  return db;
+}
 
 function open(): DatabaseSync {
   const db = new DatabaseSync(resolveDbPath());
@@ -39,11 +49,52 @@ function open(): DatabaseSync {
     PRAGMA busy_timeout = 5000;    -- retry on lock contention instead of failing instantly
     PRAGMA foreign_keys = ON;      -- per-connection; OFF by default
   `);
-  db.exec("PRAGMA optimize");      // keep the query planner's stats current
+  backupBeforeMigrate(db);         // VACUUM INTO snapshot — only if migrations are pending
   migrate(db);
+  db.exec("PRAGMA optimize");      // AFTER migrate: refresh planner stats against the new schema
+  resolveStuckJobs(db);            // only if the app has a background-job table
   return db;
 }
 ```
+
+**`PRAGMA optimize` goes after `migrate()`, not before.** Running it first analyzes the *old* schema and then throws that away — a migration that adds an index or rewrites a table leaves the planner with stats for a shape that no longer exists.
+
+**Back up before migrating.** Local-first means there is no server-side copy: a bad migration is unrecoverable user data. `VACUUM INTO` writes a consistent snapshot without stopping the world, and it's cheap enough to do on every migrating boot.
+
+```ts
+function backupBeforeMigrate(db: DatabaseSync) {
+  const current = db.prepare("PRAGMA user_version").get() as { user_version: number };
+  if (current.user_version >= LATEST_VERSION) return;   // nothing pending, nothing to protect
+
+  const dir = join(resolveDataDir(), "backups");
+  mkdirSync(dir, { recursive: true });
+
+  const target = join(dir, `v${String(current.user_version).padStart(4, "0")}-${stamp()}.sqlite`);
+  if (target.includes("'")) throw new Error(`backup path contains a quote: ${target}`);
+  db.exec(`VACUUM INTO '${target}'`);                       // no bound params in VACUUM INTO
+
+  const snapshots = readdirSync(dir)
+    .filter((file) => file.endsWith(".sqlite"))
+    .map((file) => ({ file, modified: statSync(join(dir, file)).mtimeMs }))
+    .sort((left, right) => left.modified - right.modified);  // oldest first
+  for (const stale of snapshots.slice(0, -20)) rmSync(join(dir, stale.file));   // keep newest 20
+}
+```
+
+Gate it on pending migrations, or every dev-server restart writes a snapshot. Recovery is a file copy — document that in the app's README, because a backup nobody knows how to restore isn't one.
+
+**Two details the obvious version gets wrong.** Sort the rotation by **mtime, not filename**: `v10-…` sorts before `v9-…` lexicographically, so a naive `.sort()` prunes the *newest* snapshots once you pass nine migrations — in the one routine whose whole job is protecting unrecoverable data. (The zero-padded version prefix keeps the names sortable for humans; the mtime sort is what the code relies on.) And `VACUUM INTO` takes no bound parameters, so the path is string-interpolated — reject a path containing a quote rather than letting it break the statement.
+
+**Resolve stuck jobs on boot** *(only if the app has a background-job table)*. A process killed mid-flight leaves rows in `running` forever, and nothing else will ever clear them — the worker that owned them is gone.
+
+```ts
+function resolveStuckJobs(db: DatabaseSync) {
+  db.exec(`UPDATE jobs SET status = 'failed', error = 'interrupted by restart'
+            WHERE status = 'running'`);
+}
+```
+
+Safe because a single-user local app has exactly one process: if a job is `running` at boot, its owner is by definition dead.
 
 Without WAL + `busy_timeout`, a server action writing while a server component reads throws `SQLITE_BUSY` — not a tuning nicety, a reliability fix.
 
@@ -62,6 +113,8 @@ function applyMigration(db: DatabaseSync, m: Migration) {
   });
 }
 ```
+
+- **Re-run migrations once per module load, or dev never sees a new one.** The `globalThis.__db` cache exists to survive HMR — but migrations run inside `open()`, which the cache skips. Ship a migration while `next dev` is running and it never applies: queries on the new columns 500 while vitest and any fresh boot pass, so it reads as broken code rather than a stale schema. Module state *does* reset on HMR reload while the `globalThis` cache doesn't, and that asymmetry is the hook — which is why the canonical `getDb()` above carries the `migratedThisModule` recheck rather than calling `migrate()` only inside `open()`. The `user_version` gate makes the re-entry a couple of PRAGMA reads when nothing is pending; in production the module loads once, so it's a no-op.
 
 - **`runInTransaction(db, fn)`** — node:sqlite has no `db.transaction()`. Use `BEGIN IMMEDIATE` on write paths so lock contention surfaces up front (predictable with `busy_timeout`) instead of mid-transaction:
 
@@ -158,17 +211,17 @@ export async function saveProject(values: unknown) {
 
 `redirect()` throws internally, so the lines after it never run and `runInTransaction` re-throws it cleanly. (Prefer `useFormStatus` over `useTransition` for pending? It only works in a component nested *inside* the `<form>`, not the one rendering it.)
 
-**Delete — the one modal exception.** Data entry is always a screen, but a destructive yes/no is the single allowed dialog: Mantine `openConfirmModal`, with children showing the **cascade blast radius** from the detail loader's counts (`also deletes 4 tasks`). It needs `<ModalsProvider>` in the root provider stack (see UI.md), and the async action must run inside `startTransition` or its pending state breaks:
+**Delete — the one modal exception.** Data entry is always a screen, but a destructive confirm is the single allowed dialog: a hand-rolled controlled `<Modal>` (`<ConfirmDeleteButton>`), **not** `@mantine/modals`' `openConfirmModal` — so there's no `<ModalsProvider>` in the stack. It shows the **cascade blast radius** from the detail loader's counts (`also deletes 4 tasks`), and the async action runs inside `startTransition` or its pending state breaks:
 
 ```tsx
-openConfirmModal({
-  title: "Delete project?",
-  children: <Text>Also deletes {project.tasks.length} tasks.</Text>,
-  labels: { confirm: "Delete", cancel: "Cancel" },
-  confirmProps: { color: "red" },
-  onConfirm: () => startTransition(() => deleteProject(project.id)),   // → revalidatePath → redirect to list
-});
+<ConfirmDeleteButton
+  entityLabel="project"
+  cascade={`${project.tasks.length} tasks`}          // from the detail loader's counts
+  onConfirm={() => deleteProject(project.id)}        // → revalidatePath → redirect to list
+/>
 ```
+
+The same component carries option-bearing confirms (an "also delete the source file" checkbox), so there's no second pattern to reach for. Full implementation: **[CHROME.md](./CHROME.md)**.
 
 Don't build a delete *screen*; don't delete without the count.
 
@@ -276,10 +329,38 @@ export function findExistingMatch(db: DatabaseSync, title: string) {
 
 - **Secrets exception.** SKILL.md's "no server-side secrets" line assumes a hosted multi-user service; a local single-user app legitimately stores third-party API keys. Keep them in a `settings` table (or `.env` in dev), never echo them back to the client once saved, and never log them.
 
+## Testing layout
+
+Tests live in a **top-level `tests/` directory**, mirroring the source tree — not colocated beside sources.
+
+```
+tests/
+  shims/
+    next-cache.ts        revalidatePath / revalidateTag → no-ops
+    next-navigation.ts   notFound / redirect → throwing sentinels the tests assert on
+    node-sqlite.ts       createRequire redirect (Vite mangles the builtin specifier)
+    server-only.ts       empty module — the real one throws outside a server context
+  <domain>/summary.test.ts
+  db/migrations.test.ts
+  lib/loaders.test.ts
+```
+
+The **shims are the point**. Anything importing `src/db/` or a `'server-only'` module is unimportable under vitest without them, and each one fails in its own confusing way — `server-only` throws at import time, `node:sqlite` resolves to nothing, `next/navigation`'s `notFound()` has no route context. Wire them as aliases in `vitest.config.ts` alongside the `@/*` → repo-root alias.
+
+Colocating tests is defensible in the abstract, but a shared shim set has to live *somewhere* central regardless — and once it does, a parallel `tests/` tree is the layout that keeps the shims next to their only consumers.
+
+## Agent access (MCP)
+
+Expose the app's read surface to an agent client over MCP via `mcp-handler` at `app/api/mcp/route.ts`. For a local-first app this is close to free — the loaders already exist and already return plain serializable rows.
+
+- **Read tools first** (`list_<entity>`, `get_<entity>`, a summary/rollup tool). They wrap the same `lib/` loaders the UI uses, so there's no second data path to keep in sync.
+- **Writes are opt-in and explicit** — reuse the server actions' zod schemas as the tool input schemas rather than accepting free-form arguments. A tool that writes should be as guarded as the form that writes.
+- **No auth layer needed** — it's the same trust boundary as the app itself: one user, one machine, a local port.
+
 ## Your data is one file
 
 Local-first's payoff: the entire dataset is a single SQLite file at the data-dir path.
 
-- **Backup** = copy that file (plus its `-wal`/`-shm` siblings, or run `PRAGMA wal_checkpoint(TRUNCATE)` first to fold the WAL back in). No service, no export pipeline required.
+- **Backup** = copy that file (plus its `-wal`/`-shm` siblings, or run `PRAGMA wal_checkpoint(TRUNCATE)` first to fold the WAL back in). No service, no export pipeline required. The pre-migration `VACUUM INTO` snapshots (above) give you a rotating set of these for free — restoring one is a file copy, which is worth documenting in the app's README.
 - **Export/import** for portability: a "download my data" that streams the file, or a per-table JSON dump, is a few lines — name it as a feature, it's a core selling point of going local-first.
 - **Reads load everything, filter in the browser** — fine for a personal tracker into the low tens of thousands of rows. Past that, push filtering/pagination into the query (`LIMIT`/`OFFSET`, or keyset) rather than shipping every row to the client.
