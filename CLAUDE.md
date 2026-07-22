@@ -112,7 +112,7 @@ tags: [relevant, tags]
 
 - Vague descriptions like "A skill for testing" or "Helps with React"
 - Single-sentence descriptions without specific triggers
-- Multiline `description: |` YAML block scalars — they silently break skill discovery (anthropics/skills #9817). Always single-line.
+- Multiline `description: |` YAML block scalars — they silently break skill discovery (anthropics/claude-code #9817). Always single-line.
 - First-person POV ("I'll help you…") — empirically degrades activation reliability
 - Descriptions over 1024 chars (Anthropic spec hard cap; soft target ≤230 chars for listing-budget safety past ~15-25 installed skills)
 - Skills over 500 lines without progressive disclosure (aim under 300)
@@ -129,7 +129,7 @@ tags: [relevant, tags]
 - **DO** use the `generate-skill` skill when creating new skills
 - **DO** include 3-5 specific trigger phrases in the description field
 - **DO** target the `description` field at **≤230 characters** as a soft cap for listing-budget safety past ~15-25 installed skills. No penalty up to 500. Spec hard cap is 1024 (per agentskills.io). The historical 250-char display cap was a Claude Code v2.1.86 regression, removed in v2.1.105+. Always front-load the distinctive trigger noun in the first ~50 chars.
-- **DO** use single-line `description:` strings — never `description: |` block scalars (silently breaks discovery per anthropics/skills #9817)
+- **DO** use single-line `description:` strings — never `description: |` block scalars (silently breaks discovery per anthropics/claude-code #9817)
 - **DO** write descriptions in third person ("Use this skill whenever the user wants to…", not "I help you…"). First-person POV empirically degrades activation.
 - **DO** use directive register: "Use this skill whenever the user wants to…" with a "Do NOT use this skill for…" negative scope clause for collision-prone domains
 - **DO** provide ✅ / ❌ example comparisons (community convention per Anthropic skill-creator + docx)
@@ -386,7 +386,7 @@ If you catch yourself doing any of these, reconsider — each has a paired ✅ a
 - ❌ Vague description ("A skill for testing")
   ✅ Directive third-person form with 3-5 concrete user-language triggers and a `Do NOT use for…` scope clause
 - ❌ Multiline `description: |` block scalar
-  ✅ Single-line `description:` string (multiline silently breaks discovery, anthropics/skills #9817)
+  ✅ Single-line `description:` string (multiline silently breaks discovery, anthropics/claude-code #9817)
 - ❌ First-person POV in description ("I help you…")
   ✅ Third-person ("Use this skill whenever the user wants to…")
 - ❌ Skipping examples section
@@ -523,7 +523,7 @@ Treat every issue working with SkillBox as an opportunity to update this file.
 
 - **Progressive disclosure via `references/` (plural) for 300-500 line limits** — When a SKILL.md approaches 300 lines, move troubleshooting (highest line count, lowest immediate-need) to `references/TROUBLESHOOTING.md`, keeping only 3-4 most common issues inline with a progressive disclosure link. The `references/` dir can also hold EXAMPLES.md and STANDARDS.md. _(captured 2026-03-21; updated 2026-05-14 to plural)_
 - **Release commit ordering matters** — SkillBox releases follow specific ordering: (1) one commit per skill change with `type(skill-name): description`, (2) separate `docs(changelog): prepare vX.Y.Z release` commit, (3) annotated tag `git tag -a vX.Y.Z`, (4) push with `git push && git push origin vX.Y.Z`. Don't bundle skill changes and changelog into one commit. _(captured 2026-03-21)_
-- **Multiline `description: |` is the #1 silent killer** — YAML parses fine, but skill discovery never sees it (anthropics/skills #9817). Always single-line. Found across 9 SkillBox skills in 2026-05-14 audit. _(captured 2026-05-14)_
+- **Multiline `description: |` is the #1 silent killer** — YAML parses fine, but skill discovery never sees it (anthropics/claude-code #9817). Always single-line. Found across 9 SkillBox skills in 2026-05-14 audit. _(captured 2026-05-14)_
 - **Directive third-person descriptions carry ~20× higher activation odds** — Empirical study (Seleznov n=650, CMH odds ratio 20.6, p<0.0001): "Use this skill whenever the user wants to…" form hits 94-100% activation vs passive "Use when X" at 37-87%. Note it's an odds ratio — "20× more reliably" overstates the absolute delta. First-person POV ("I help you…") degrades further. _(captured 2026-05-14; wording corrected 2026-07-02)_
 - **`<Good>`/`<Bad>` XML tags are SkillBox-only** — Zero of 8 surveyed top community skills (Anthropic, Vercel, Superpowers) use them. Migrate to ✅ / ❌ markdown emoji. _(captured 2026-05-14; repo fully migrated 2026-07-02)_
 - **Frontmatter is three-tier — know which validator you're serving** — (1) Universal spec (agentskills.io): `name`, `description`, `license`, `compatibility`, `allowed-tools`, `metadata` only. (2) Claude Code runtime: adds `argument-hint`, `when_to_use`, `hooks`, `paths`, `arguments`, `disable-model-invocation`, `user-invocable`, `model`, `effort`, `context`, `agent`, `shell`, `disallowed-tools`. (3) Anthropic's repo packaging validator (`quick_validate.py`) rejects everything outside tier 1. Verified 2026-07-02: the Vercel `npx skills add` channel (SkillBox's actual distribution) tolerates the CC extension keys — keep `argument-hint` etc. unless submitting to anthropics/skills. _(captured 2026-07-02)_
