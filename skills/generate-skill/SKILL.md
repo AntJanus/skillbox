@@ -5,14 +5,14 @@ license: MIT
 argument-hint: "[skill-topic]"
 metadata:
   author: Antonin Januska
-  version: "3.2.0"
+  version: "3.2.1"
 ---
 
 # Generate Skill
 
 ## Overview
 
-Produces a single, ready-to-ship `SKILL.md` (plus optional `references/`, `scripts/`, `assets/`) following 2026-05 conventions distilled from Anthropic's skill-creator, the agentskills.io spec, and empirical activation research.
+Produces a single, ready-to-ship `SKILL.md` (plus optional `references/`, `scripts/`, `assets/`) following the current conventions distilled from Anthropic's skill-creator, the agentskills.io spec, and empirical activation research.
 
 One skill, one job. This skill's job is the SKILL.md and its frontmatter — not docs, releases, or auxiliary files.
 
@@ -79,7 +79,7 @@ Emit only these fields, in this order:
 name: <kebab-case, ≤64 chars, no "anthropic" or "claude" reserved words>
 description: <single-line string from Phase 2>
 license: MIT
-argument-hint: [<short-token>]      # top-level, not nested
+argument-hint: "[<short-token>]"    # top-level, not nested — and QUOTED: bare [x] is a YAML list, not a string
 metadata:
   author: <user-supplied>
   version: "1.0.0"
@@ -102,10 +102,11 @@ Anti-patterns:
 
 - ❌ Top-level `version`, `author`, `tags`, `category` — produce "unexpected key" errors (anthropics/skills #37). They live under `metadata`.
 - ❌ Nested `argument-hint` under `metadata` — Claude Code reads it at top level.
-
-Portability note (three-tier reality): the universal spec allows only `name`, `description`, `license`, `compatibility`, `allowed-tools`, `metadata`; Claude Code additionally accepts its extension keys (`argument-hint`, `when_to_use`, `hooks`, `paths`, `arguments`, `disable-model-invocation`, `user-invocable`, `model`, `effort`, `context`, `agent`, `shell`, `disallowed-tools`); Anthropic's repo packaging validator (`quick_validate.py`) rejects everything outside the spec set. The Vercel `npx skills add` channel tolerates the extensions (verified 2026-07-02) — keep them unless the skill targets submission to anthropics/skills.
+- ❌ An unquoted `argument-hint: [a|b]` — bare brackets are a YAML **sequence**, not a string. Always quote it.
 - ❌ Reserved-word names containing `anthropic` or `claude`.
 - ❌ Consecutive hyphens or uppercase in `name`.
+
+Portability note (three-tier reality): the universal spec allows only `name`, `description`, `license`, `compatibility`, `allowed-tools`, `metadata`; Claude Code additionally accepts its extension keys (`argument-hint`, `when_to_use`, `hooks`, `paths`, `arguments`, `disable-model-invocation`, `user-invocable`, `model`, `effort`, `context`, `agent`, `shell`, `disallowed-tools`); Anthropic's repo packaging validator (`quick_validate.py`) rejects everything outside the spec set. The Vercel `npx skills add` channel tolerates the extensions (verified 2026-07-02) — keep them unless the skill targets submission to anthropics/skills.
 
 ### Phase 4 — Body content
 
@@ -198,7 +199,7 @@ Worked description examples (methodology ✅, technical ✅, multi-line counter-
 - **Symptom:** New skill never auto-invokes. **Cause:** Description used vague prose without specific triggers. **Fix:** Rewrite with the "Use whenever the user wants to…" form plus 3+ quoted trigger phrases.
 - **Symptom:** Skill works in isolation, breaks once user has >20 skills installed. **Cause:** Distinctive trigger is past char 50; listing budget truncated it. **Fix:** Move the distinctive noun to the start of `description`.
 - **Symptom:** YAML parses but skill never appears in `/skills`. **Cause:** Multi-line `description: |`. **Fix:** Collapse to a single line; move long context into the body's first paragraph.
-- **Symptom:** "Unexpected key" warning on load. **Cause:** Top-level `version`, `author`, `tags`, or `hooks`. **Fix:** Move them under `metadata` (except `argument-hint`, which stays top-level).
+- **Symptom:** "Unexpected key" warning on load. **Cause:** Top-level `version`, `author`, or `tags`. **Fix:** Move them under `metadata`. Note `argument-hint` and `hooks` are **valid** Claude Code top-level keys and stay put — only Anthropic's repo packaging validator rejects them (see the three-tier note above).
 - **Symptom:** Two skills both fire on the same prompt. **Cause:** Overlapping triggers, no negative scope. **Fix:** Add `Do NOT use this skill for X — see Y` to whichever skill is the wrong fit.
 - **Symptom:** SKILL.md is 700 lines, agent quotes the wrong section. **Cause:** Single-file overflow; Claude reads the head, misses the tail. **Fix:** Extract to `references/` (plural), one level deep, with explicit "load when…" pointers.
 
