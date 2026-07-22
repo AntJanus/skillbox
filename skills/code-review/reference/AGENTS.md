@@ -1,6 +1,6 @@
 # Agent Prompt Skeletons
 
-Full prompts for the five reviewer agents dispatched by `/code-review`. Each is self-contained because Task agents start with no conversation context.
+Full prompts for the five reviewer agents dispatched by `/code-review`. Each is self-contained because Agent-dispatched subagents start with no conversation context.
 
 Substitute `<list>` with the file paths and `<diff content>` with the actual diff text before dispatching.
 
@@ -500,8 +500,8 @@ NO FINDINGS
 
 ## Dispatch Pattern
 
-All five reviewer prompts must be dispatched **in a single message** with five Task tool calls. Use `subagent_type: Explore` for all five — they are read-only review tasks.
+All five reviewer prompts must be dispatched **in a single message** with five Agent tool calls. Use `subagent_type: Explore` for all five — they are read-only review tasks.
 
-After all five return, dispatch the verifier in a single Task call with the merged candidate list. The verifier is also `subagent_type: Explore`.
+After all five return, dispatch the verifier in a single Agent call with the merged candidate list. The verifier is also `subagent_type: Explore`.
 
 After the verifier returns, the orchestrating skill renders its "what to fix first" distillation, the kept findings at their re-rated severities (promoted, demoted, or unchanged), and the summary line into the synthesis report described in SKILL.md.
