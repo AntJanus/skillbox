@@ -5,20 +5,23 @@ license: MIT
 argument-hint: "[save|resume|verify|recover]"
 metadata:
   author: Antonin Januska
-  version: "5.1.2"
+  version: "5.2.0"
 ---
 
 # Session Progress
 
-Track multi-session work in `SESSION_PROGRESS.md` at the project root so work can pause and resume without losing context. Keep the file current — it should always reflect actual state. At the start of any session, check for an existing `SESSION_PROGRESS.md` and resume from it.
+Track multi-session work in `SESSION_PROGRESS.md` at the project root so work can pause and resume without losing context. Keep the file current — it should always reflect actual state.
+
+**On a bare `/track-session` (no argument):** look for `SESSION_PROGRESS.md` first. **No file → Start** (create one). **File exists and is yours to continue → Resume**. **File exists mid-work → checkpoint** (Default). Never sit idle waiting for an argument.
 
 ## Modes
 
 | Mode | Command | Behavior |
 |------|---------|----------|
-| **Default** | `/track-session` | Checkpoint progress, then keep working |
+| **Start** | `/track-session` (no file yet) or `start` | Create a fresh `SESSION_PROGRESS.md` — see [Start mode](#start-mode) for the collision policy when one already exists |
+| **Default** | `/track-session` (file exists) | Checkpoint progress, then keep working. Re-checkpoint after every completed task, plan change, or failure — don't wait to be asked |
 | **Save** | `/track-session save` | Checkpoint progress and stop |
-| **Resume** | `/track-session resume` | Read `SESSION_PROGRESS.md`, continue from "Next" |
+| **Resume** | `/track-session resume` | Read `SESSION_PROGRESS.md`, re-orient, continue from "Next" — see [Resume mode](#resume-mode) |
 | **Verify** | `/track-session verify` | Validate completed work against requirements before declaring done |
 | **Recover** | `/track-session recover` | Rebuild a lost/deleted `SESSION_PROGRESS.md` from the session transcript |
 
@@ -49,6 +52,10 @@ status: in-progress           # in-progress | paused | completed | blocked
 Working on: <current task>
 Next: <specific next action — name files and functions, not "fix the bug">
 
+## Decisions
+
+- <!-- at:YYYY-MM-DDTHH:MM:SS-TZ --> Durable choice + why, so it isn't relitigated on resume
+
 ## Failed Attempts
 
 - <!-- id:f_x1y2z task:t_d3e4f --> Tried X: failed because Y, trying Z instead
@@ -58,11 +65,34 @@ Next: <specific next action — name files and functions, not "fix the bug">
 - <!-- ref:t_d3e4f at:YYYY-MM-DDTHH:MM:SS-TZ --> What was done
 ```
 
-**IDs:** 5 random `[a-z0-9]` chars — `t_` task, `f_` failed attempt; `session_id` uses date + slug. Every plan item gets an `id` and a `dep` (`dep:none` or `dep:t_XXXXX`). These markers are what the dashboard ingests — don't omit them.
+**IDs:** `t_` (task) or `f_` (failed attempt) + a short, unique, stable token — 5 random `[a-z0-9]` chars is the default, but a mnemonic slug (`t_redis-mw`, `t_authfix`) is fine; the dashboard parser accepts `[a-z0-9-]+` and reads them either way. Keep an id **stable** once written — `dep:` references point at it. `session_id` uses date + slug. Every plan item gets an `id` and a `dep` (`dep:none` or `dep:t_XXXXX`). These markers are what the dashboard ingests — don't omit them.
 
-**Log every failed approach with its reason**, so it's never retried.
+**`## Decisions` and `## Completed Work` are optional** — add them when there's something to record; `## Plan` and `## Current Status` are the load-bearing ones.
 
-**Update** after completing a task, changing the plan, hitting a failure, or before asking the user questions.
+**Log every failed approach with its reason**, so it's not blindly retried. **Exception:** if a failure was environment-scoped (an MCP server not connected, missing credentials, a service down) rather than a wrong approach, note that in the entry — a later session may have a different environment, so re-checking is correct, not a violation.
+
+**Update** after completing a task, changing the plan, hitting a failure, or before asking the user questions. This is the single most-skipped rule — checkpoint proactively, don't wait for the user to say "save".
+
+## Start mode
+
+Creating a fresh `SESSION_PROGRESS.md`. Derive `project:` from the repo (folder name / `package.json` / `pyproject.toml`) — **don't inherit it from an unrelated file you're overwriting**. Stamp `started` and `last_updated`, set `status: in-progress`, write at least `## Plan` and `## Current Status`.
+
+**If a `SESSION_PROGRESS.md` already exists, do not blindly overwrite or stack onto it.** Read it first, then:
+
+- **It's yours to continue** (same work, unfinished) → this isn't Start, it's **Resume**.
+- **Prior work is `completed`/`paused` and unrelated** → confirm with the user, then **replace** the file with the new session. History lives in git — don't accrete multiple sessions in one file (the dashboard parses only the top frontmatter block; everything below a second `---` is invisible to it).
+- **You genuinely need the old context visible** → archive it to a separate `SESSION_ARCHIVE_<topic>.md`, then write a clean new file. (Only if actually needed — in practice, replace-and-trust-git is simpler.)
+
+## Resume mode
+
+Read the file, then **lead your first response with the state** — don't bury it under fresh analysis. Required opening, 2-3 lines:
+
+```
+State: <status>, <N of M plan tasks done>, working tree <clean/dirty>, last commit <hash/subject>.
+Next: <the "Next" line, verbatim or sharpened>.
+```
+
+Then continue the work. Also re-check that frontmatter still matches reality (`project:` correct, `status:` accurate) and fix it in place if it drifted — Resume is the natural reconciliation point.
 
 ## Verify mode
 
