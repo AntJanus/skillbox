@@ -16,7 +16,7 @@ description: Use when reviewing React components for hook issues.
 
 ## Example 2 — frontmatter cleanup
 
-❌ Top-level fields that belong in `metadata`, multiline description, top-level `hooks` outside the supported slot:
+❌ Top-level fields that belong in `metadata`, plus a multiline description:
 
 ```yaml
 ---
@@ -26,10 +26,10 @@ tags: [react, hooks]          # top-level — move under metadata
 description: |                # multiline silently breaks discovery
   A skill for working with React.
   Helps with hooks.
-hooks:
-  PreToolUse: ...
 ---
 ```
+
+*(`hooks` is **not** a finding — it's a valid Claude Code top-level key. Don't deduct for it; see the extension-key gotcha in SKILL.md.)*
 
 ✅ Patch:
 
@@ -38,7 +38,7 @@ hooks:
 name: react-hooks-audit
 description: Use this skill whenever the user wants to review a React component for hook misuse, infinite-loop risk, or dependency-array bugs. Triggers include "review this component", "check my hooks", or "audit this React file". Do NOT use this skill for non-React JavaScript.
 license: MIT
-argument-hint: <path/to/component.tsx>
+argument-hint: "<path/to/component.tsx>"
 metadata:
   author: <author>
   version: "1.0.0"

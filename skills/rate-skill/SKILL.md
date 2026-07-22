@@ -2,11 +2,11 @@
 name: rate-skill
 description: Grades a SKILL.md A-F with prioritized, paste-ready fixes. Use whenever the user asks to "rate this skill", "grade this skill", "audit my SKILL.md", or "score this skill". Do NOT use for code review or for new skills (see generate-skill).
 license: MIT
-argument-hint: <path/to/SKILL.md>
+argument-hint: "<path/to/SKILL.md>"
 allowed-tools: Read, Glob, Grep
 metadata:
   author: Antonin Januska
-  version: "3.1.1"
+  version: "3.2.0"
 ---
 
 # Rate Skill
@@ -19,7 +19,7 @@ The rubric is anchored to (a) the agentskills.io / Claude Code frontmatter spec,
 
 1. Resolve the input path. If the user passes a directory, look for `SKILL.md` inside it. If nothing is passed, ask once: "Which SKILL.md should I rate?"
 2. Read the whole file. Parse frontmatter and body separately. Count body lines (exclude frontmatter).
-3. Detect the skill type — **methodology** (phases + checklists), **reference** (schemas + tables), **generator** (produces an artifact), or **auditor** (reviews an artifact). State it in the report.
+3. Detect the skill type — the same five `generate-skill` uses, so a generated skill can be graded against the profile it was built from: **methodology** (enforces a multi-step workflow), **technical** (wraps an API, format, or tool), **auditing** (grades or inspects an artifact), **reference** (schemas, conventions, lookup tables), or **automation** (wraps a script or external command). State it in the report.
 4. Score each category 0–100 against the rubric below, weight, sum, map to a letter.
 5. Emit the report in the shape under **Output Format**.
 6. Estimate the post-fix grade assuming the P0 and P1 findings are applied.
@@ -43,7 +43,7 @@ Letter mapping: A 90–100, B 80–89, C 70–79, D 60–69, F <60.
 Full marks require all five:
 
 - Third person ("Skill X does Y…" or "Use this skill whenever…"). First-person ("I'll help you…") caps the score at 40.
-- Directive register — Anthropic's middle-ground "Use this skill whenever the user wants to…" or a stronger "ALWAYS invoke when…". Passive bare "Use when X" caps at 70.
+- Directive register — "Use this skill whenever the user wants to…". Passive bare "Use when X" caps at 70. Don't reward an ALL-CAPS escalation ("ALWAYS invoke when…") as stronger; §7 deducts for that framing, and the directive form already carries the activation benefit.
 - Distinctive trigger token in the first ~50 chars (listing-budget truncation kicks in past ~15–25 installed skills).
 - ≥3 concrete user-language triggers, either quoted phrases or an enumerated verb list.
 - Negative scoping ("Do NOT use this skill for…") when adjacent skills exist. Required only for collision-prone domains.
@@ -74,8 +74,8 @@ Deduct 15 per occurrence:
 ### 3. Length & progressive disclosure (15)
 
 - Body ≤300 lines: full marks.
-- 301–500 lines: −20 per 50 lines over 300.
-- >500 lines without a `references/` directory: cap at 40.
+- 301–500 lines: −10 per 50 lines over 300 (so 500 lines floors at 60, not 20).
+- \>500 lines: −30 on top of the above, and an **additional** −20 if there's no `references/` directory (crossing the hard cap with no progressive disclosure is the worst case, so it must score *below* every case under it — never a cap that rescues it).
 - Singular `reference/` instead of plural `references/`: style note only, no deduction (plural is the spec-documented name, but nothing validates directory names — prefer plural for new dirs, don't force renames).
 - References nested more than one level deep from `SKILL.md`: −15 (Claude head -100s files and misses content).
 
@@ -83,12 +83,15 @@ Deduct 15 per occurrence:
 
 Expected sections by detected type:
 
-- **Methodology**: Overview, Workflow/Phases, Quality Signals or Anti-Patterns, Examples, Verification Checklist.
-- **Reference**: Overview, Quick Reference table, Detailed sections, Gotchas.
-- **Generator**: Workflow, Inputs, Output Format, Examples.
-- **Auditor**: Workflow, Rubric, Output Format, Examples.
+- **methodology**: Overview, Workflow/Phases, Quality Signals or Anti-Patterns, Examples, Gotchas.
+- **technical**: Overview, Prerequisites/Setup, the command or API surface, Examples, Gotchas.
+- **auditing**: Overview, Workflow, Rubric, Output Format, Examples.
+- **reference**: Overview, Quick Reference table, Detailed sections, Gotchas.
+- **automation**: Overview, Prerequisites, Commands, Output/Artifacts, Troubleshooting.
 
 Missing a section the detected type needs: −20 each. Penalize an `## Integration` section that contains nothing concrete (rare in surveyed top skills).
+
+A **Verification Checklist** is recommended for *enforcement*-style methodology skills but is **not** required — note its absence, don't deduct. Only 3 of this repo's 5 methodology skills carry one, and `generate-skill` marks it optional in the same template; a hard deduction would dock skills its sibling generated correctly.
 
 ### 5. Examples (10)
 
@@ -118,7 +121,7 @@ Deduct 20 per occurrence:
 ```
 # Skill Rating: <skill-name>
 
-**Detected type:** <methodology | reference | generator | auditor>
+**Detected type:** <methodology | technical | auditing | reference | automation>
 **Overall grade:** <letter> (<weighted score>/100)
 
 ## Category scores
