@@ -3,10 +3,10 @@ name: code-review
 description: Use this skill whenever the user wants a multi-agent review of local changes — triggers include "review my code", "review these changes", "do a code review", or "check my changes before I commit". Writes REVIEW.md. Do NOT use for an open PR by number (use /review) or a security-specific pass (use /security-review).
 license: MIT
 argument-hint: "[path | --staged | --branch <base>]"
-allowed-tools: Read, Write, Glob, Grep, Bash, Task
+allowed-tools: Read, Write, Glob, Grep, Bash, Agent
 metadata:
   author: Antonin Januska
-  version: "1.6.0"
+  version: "1.6.1"
 ---
 
 # Code Review — Multi-Agent Local Review
@@ -18,7 +18,7 @@ Runs five narrow-lane reviewer agents in parallel, then a verifier pass that kee
 ## Pipeline
 
 ```
-detect scope → dispatch 5 reviewers (parallel Task) → verifier (1 Task) → synthesize → REVIEW.md
+detect scope → dispatch 5 reviewers (parallel Agent) → verifier (1 Agent) → synthesize → REVIEW.md
 ```
 
 The five reviewers, each in a tight lane (full prompts in **[reference/AGENTS.md](./reference/AGENTS.md)** — load when dispatching):
@@ -41,11 +41,11 @@ Before dispatching, you MUST have a concrete file list + the diff text, and repo
 
 ## Phase 2: Parallel dispatch
 
-**Send all five Task calls in a single message** so they run concurrently; use `subagent_type: Explore` for all (read-only traversal). Each prompt includes the file list + diff, states the lane and what to ignore, specifies the output format, and demands `file:line` specificity. Use the exact skeletons in [reference/AGENTS.md](./reference/AGENTS.md) — each agent returns findings as `[SEVERITY] path:line` blocks or `NO FINDINGS`.
+**Send all five Agent calls in a single message** so they run concurrently; use `subagent_type: Explore` for all (read-only traversal). Each prompt includes the file list + diff, states the lane and what to ignore, specifies the output format, and demands `file:line` specificity. Use the exact skeletons in [reference/AGENTS.md](./reference/AGENTS.md) — each agent returns findings as `[SEVERITY] path:line` blocks or `NO FINDINGS`.
 
 ## Phase 2.5: Verification + impact re-rating
 
-After all five return, dispatch **one verifier** (single Task, `Explore`) with the file list, diff, and merged candidates. Full prompt: [reference/AGENTS.md#verifier](./reference/AGENTS.md). It runs two stages, then distills:
+After all five return, dispatch **one verifier** (single Agent, `Explore`) with the file list, diff, and merged candidates. Full prompt: [reference/AGENTS.md#verifier](./reference/AGENTS.md). It runs two stages, then distills:
 
 **Stage 1 — Evidence.** Re-read each finding's cited `file:line` against current code:
 - **Holds** → carry into Stage 2.
@@ -79,13 +79,13 @@ Full worked report (promoted finding, distillation, grouped nits, clean-report f
 
 ## Example
 
-✅ **Good:** all five Task calls in one message → wait for all → verifier Task → write REVIEW.md → chat shows only `REVIEW.md written — 2 Critical, 1 Major, 4 Minor, 3 Nit`. A good finding is specific: `[Major] src/lib/fetch-user:42 — new timeout error path has no test; risk: silent retry-loop exit loses the request; fix: add "retries once on timeout" test asserting the retry counter`.
+✅ **Good:** all five Agent calls in one message → wait for all → verifier Agent → write REVIEW.md → chat shows only `REVIEW.md written — 2 Critical, 1 Major, 4 Minor, 3 Nit`. A good finding is specific: `[Major] src/lib/fetch-user:42 — new timeout error path has no test; risk: silent retry-loop exit loses the request; fix: add "retries once on timeout" test asserting the retry counter`.
 
 ❌ **Bad:** agents dispatched sequentially (wastes time — they're independent); the full report dumped into chat instead of REVIEW.md; a finding like "could use more tests, consider error cases" (no file:line, no risk, no fix); lanes bleeding into each other (`basics` flagging naming, `clarity` flagging an unused import) — duplicates findings and dilutes attribution.
 
 ## Quality signals
 
-- Five Task calls in one turn, then one verifier Task before synthesis.
+- Five Agent calls in one turn, then one verifier Agent before synthesis.
 - `## What to fix first` sits at the top; severities reflect the verifier's **impact** re-rating (moves carry a `Verifier note:`), not the lane.
 - Every finding has `file:line`, a concrete fix, and evidence the verifier confirmed.
 - Architecture findings cite siblings; repo-hygiene findings cite the actual manifest/`.env.example`/lockfile read.
