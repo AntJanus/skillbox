@@ -24,8 +24,17 @@ Round results to whole/half px and expose as `rem`. Pick the ratio by product ty
 
 Large systems often run **two scales**: a tight UI scale (1.125–1.2) and a looser content scale (1.333–1.5), applied by context. Tools: [type-scale.com](https://typescale.com/), [modularscale.com](https://www.modularscale.com/).
 
-**Worked example — base 16, ratio 1.2:**
-12 · 14 · 16 · 20 · 24 · 30 · 36 · 48 (rounded). Each step is the prior × 1.2, snapped to a clean px.
+**Worked example — base 16, ratio 1.2.** Multiply up from the base and divide down from it:
+
+```
+÷1.2  ÷1.2    base    ×1.2   ×1.2   ×1.2   ×1.2   ×1.2   ×1.2
+11.11 13.33 · 16  ·  19.2 · 23.04 · 27.65 · 33.18 · 39.81 · 47.78
+   11    13 · 16  ·   19 ·    23 ·    28 ·    33 ·    40 ·    48   ← snapped to whole px
+```
+
+Snapping moves each step off the exact ratio (the rounded pairs run 1.18–1.23), which is fine — the ratio sets the cadence, rounding keeps the values usable.
+
+**A hand-tuned scale is also legitimate**, and common: 12 · 14 · 16 · 20 · 24 · 30 · 36 · 48 is widely shipped, but its steps run 1.14 → 1.33 and *widen* toward the display end. That's a deliberate choice (tighter at text sizes, more drama at headline sizes) — just don't describe it as a 1.2 scale, because it isn't one.
 
 ## Line-height (leading)
 
@@ -43,7 +52,17 @@ Large systems often run **two scales**: a tight UI scale (1.125–1.2) and a loo
 
 **Always unitless.** `line-height: 1.5` inherits as a multiplier and recomputes per element. `line-height: 24px` or `1.5em` inherits a *fixed length* — an `h1` then gets 24px leading and overlaps. ([MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/line-height))
 
-Optional fluid leading (longer measure wants more leading): `line-height: clamp(1.3, 0.9rem + 0.4vw, 1.6);`
+**Fluid leading is a trap — `clamp()` can't mix types.** `clamp(1.3, 0.9rem + 0.4vw, 1.6)` looks reasonable and is **invalid CSS**: the bounds are `<number>`s while the preferred term is a `<length>`, so the whole declaration is dropped and you silently get the inherited leading. There's no unitless fix, because `vw` is itself a length. Two valid options:
+
+```css
+line-height: clamp(1.3rem, 0.9rem + 0.4vw, 1.6rem);  /* all lengths — valid */
+```
+…but a **length** line-height is inherited as a fixed value, so children with a different font-size keep the parent's leading. Prefer the unitless ratio and step it at breakpoints instead:
+
+```css
+line-height: 1.5;
+@media (min-width: 60rem) { line-height: 1.6; }       /* stays unitless, still scales */
+```
 
 ## Vertical rhythm & the 8px grid
 
