@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Evidence-driven pass on the three heaviest-used skills, from 20 days of real activation data across 1,912 transcripts rather than a fresh read of the prose.
+
+### Changed
+
+- **track-session** (5.1.2 → 5.2.0): added a **Start mode** with a collision policy for when a `SESSION_PROGRESS.md` already exists (6 of 31 real invocations were "create a new file" with no documented procedure; on disk, files were stacking four sessions under invented headings that the dashboard can't parse). Added an official `## Decisions` section (16 of 36 files had already invented one). Gave **Resume** a required 2-3 line opening template (status + tasks-done + last commit + next) so handoffs stop burying state under fresh analysis. Added a re-check-frontmatter step to Resume (`project:` was silently stale in real files). Carved out an **environment-scoped exception** to "never retry a failed approach" (an MCP-not-connected block was correctly logged, then wrongly refused after the environment changed). Relaxed the task-id rule to allow stable mnemonic slugs (`t_authfix`) — verified the cc-dash parser accepts `[a-z0-9-]+` on the read path, so the old `{5}`-random rule was fighting a sensible instinct for no gain.
+- **track-roadmap** (2.5.3 → 2.5.4): front-loaded the **Update** triggers the description omitted ("add an item to the roadmap", "mark a feature done", "log the work I shipped") — Update is ~80% of real use but was invisible in the trigger surface, while `audit` (advertised) had zero uses. Documented that there is no `save` mode (it means Update) and that `roadmap_ref` may be a comma-separated list. No schema changes — the skill is structurally healthy (100% ROADMAP.md schema compliance, live `roadmap_ref` links in 11 session files).
+
+### Fixed
+
+- **code-review** (1.6.0 → 1.6.1): renamed the subagent tool from the removed `Task` to `Agent` throughout SKILL.md and reference/AGENTS.md (9 occurrences, incl. `allowed-tools`). Every real run already dispatched via `Agent`; the stale name was a latent break waiting on `allowed-tools` enforcement. The pipeline itself is healthy (verified: exactly 6 Agent dispatches per run) — the fix is de-rot only.
+- **CLAUDE.md**: corrected the multiline-`description:` bug citation from `anthropics/skills #9817` to `anthropics/claude-code #9817` (4 occurrences). Re-verified the issue: it and its three duplicates were closed without a fix, so the single-line rule stands unchanged.
+
 ## [5.0.0] - 2026-07-22
 
 Major cut: **local-first-app v2.0.0 reverses two rules the blueprint previously stated**, so anyone who built against v1.7.0 gets different instructions on re-read. The release also carries a full 72-file manual audit of the repo (every tracked file read end to end) and the 22 fixes it produced — including several regressions introduced by the local-first-app rewrite itself and caught before they shipped.
