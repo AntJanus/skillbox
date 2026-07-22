@@ -113,7 +113,7 @@ export const UserProfile = ({ initialName }: UserProfileProps) => {
 **Why it's problematic:**
 - `useState` initializer runs only once (first render)
 - Prop changes don't update state automatically
-- Function initializers (`useState(() => expensive())`) also run every render but discard results after first render
+- The *eager* form `useState(expensive())` re-evaluates its argument on **every** render and throws the result away after the first — pass a **function initializer** (`useState(() => expensive())`) so the work happens once
 
 ✅ **Good:**
 
