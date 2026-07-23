@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.0.0] - 2026-07-23
+
+Major: **code-review is rebuilt as 2.0** with breaking changes to its lanes, verifier, default output, and flags — anyone using the old lane names or expecting the always-visible nit list gets different behavior. The rebuild was driven by a six-agent audit of why the skill had gone unused and validated end-to-end (planted-bug fixture + verifier impact-floor test) before shipping.
+
 ### Breaking Changes
 
 - **code-review (1.6.1 → 2.0.0)** — rebuilt around correctness and signal, from a 6-agent diagnosis of why the skill went unused (slow, nitpicky, architecture suggestions that didn't land). Anyone relying on the old lane names or the always-visible nit list gets different behavior:
