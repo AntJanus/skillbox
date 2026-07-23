@@ -4,86 +4,84 @@ Extended troubleshooting for the `code-review` skill. SKILL.md keeps the three m
 
 ---
 
-### Problem: Agent returns vague findings
+### Problem: Reviewer returns vague findings
 
-**Cause:** Agent drifted from the output format, usually because the prompt was paraphrased.
+**Cause:** The agent drifted from the output format, usually because the prompt was paraphrased.
 
-**Solution:** Re-dispatch that one agent with the exact output format skeleton from this skill. Include the phrase "no preamble, no summary — only findings in the specified format."
+**Solution:** Re-dispatch that one agent with the exact skeleton from `reference/AGENTS.md`. Include "no preamble, no summary — only findings in the specified format."
 
-### Problem: Architecture agent didn't read siblings
+### Problem: Correctness lane returns only style/hygiene observations
 
-**Cause:** The mandatory-first-step instruction got dropped or softened.
+**Cause:** The lane reverted to surface reading instead of tracing data flow.
 
-**Solution:** Look at its output — if there are no sibling file references in the findings, re-dispatch with "MANDATORY FIRST STEP" capitalized and first in the prompt body. Consider listing specific sibling candidates in the prompt.
+**Solution:** Its findings must each carry a `Trigger:` (a concrete input) and a `Wrong result:`. If they don't, re-dispatch with the exact correctness prompt and "for every finding, name the input that produces the wrong output — if you can't, it's not a correctness finding."
 
-### Problem: Two agents flag the same issue
+### Problem: Architecture finding reads as "a sibling does it differently"
 
-**Cause:** Natural overlap (e.g., a dead function is both "basics: dead code" and "testing: no test for it"; a stale comment can be flagged by both `basics` and `repo-hygiene`).
+**Cause:** The lane reverted to the old consistency-mode bar.
 
-**Solution:** In synthesis, keep the most severe finding and add a `(also flagged by X)` note. Don't print both. Lane attribution rule of thumb: if it's *unused/dead*, it's basics; if it points at a renamed/moved/missing target, it's repo-hygiene.
+**Solution:** The 2.0 architecture lane judges soundness *for the code's purpose* and must state a concrete `Consequence:`. "Inconsistent with a peer but nothing breaks" is not a finding — it should have been dropped. Re-dispatch with the exact prompt; in `--blueprint` mode confirm the blueprint skill name was passed in.
 
-### Problem: repo-hygiene flags every env var as undocumented
+### Problem: ui-ux lane fired on a backend/CLI diff
 
-**Cause:** The `.env.example` (or equivalent) file isn't in the repo, so the agent has nothing to compare against — and reads that as "all env vars undocumented."
+**Cause:** Scope detection matched a non-UI file as UI, or the lane was dispatched unconditionally.
 
-**Solution:** If the project genuinely has no env-template file, that itself is one Major finding ("no `.env.example` exists; document required env vars there"), not one finding per env var. If the file lives under a non-standard name (`env.template`, `config.example.yml`), tell the agent where to look in the prompt.
+**Solution:** ui-ux is dispatched *only* when the scope includes components/templates/styles/design-token files. If it fired on a pure backend change, fix Phase-1 UI detection — don't send the lane at all when there's no UI in scope.
 
-### Problem: repo-hygiene flags secrets that are obviously fixtures
+### Problem: Two lanes flag the same line
 
-**Cause:** Test fixtures and example values look like real secrets to a pattern matcher (e.g., `"sk_test_..."` keys, fake JWTs in tests).
+**Cause:** Natural overlap (a hardcoded key is both a `[Secret]` and a config-drift note; a wrong-result branch is both correctness and "no test").
 
-**Solution:** Findings should be **Critical only** when the value looks live (production-shaped key, real domain, non-test path). Test files, `*.example`, `*.sample`, and anything under a fixtures directory should be Minor at most, or skipped entirely if clearly placeholder. Re-dispatch the agent with that distinction stated explicitly.
+**Solution:** In synthesis, keep the most severe finding and add `(also flagged by X)`. Don't print both. Rule of thumb: if it computes a wrong answer, it's **correctness**; if it's dead/typo/drift, it's **hygiene**; a real committed credential is **hygiene `[Secret]`** (blocking).
 
-### Problem: Scope is empty
+### Problem: Report is still too nitpicky
 
-**Cause:** No uncommitted changes and no branch diff against main.
+**Cause:** The verifier isn't enforcing the impact floor — it's keeping true-but-trivial findings instead of dropping them.
 
-**Solution:** Stop and tell the user — "No changes detected. Pass a path to review specific files, or use --branch <base> to compare against another branch." Do not fabricate a review.
+**Solution:** This is the single most important thing to get right. Re-dispatch the verifier with the exact `reference/AGENTS.md#verifier` prompt and "default to DROP; every kept blocking finding must name a concrete bad outcome (wrong result, data loss, security, real regression, reader-trap). Cosmetic/stylistic/doc-only fails the floor." Nits belong in the held bucket, not the report — they only show with `--nits`.
 
-### Problem: Diff is huge (hundreds of files)
+### Problem: The nit tail is showing up by default
 
-**Cause:** Review scope caught a merge commit or a rebase.
+**Cause:** Synthesis rendered the `[Nit]` bucket without `--nits`.
 
-**Solution:** Show the user the file count and ask whether to narrow scope (e.g., only files touched in the last commit). A 300-file review from five agents will be slow and the signal will be buried.
+**Solution:** Nits are held back unless the run passed `--nits`. The summary line still reports how many were held (`H nits held`). Only a `[Secret]` Critical from the hygiene lane surfaces without the flag.
 
-### Problem: Report is too long to be useful
+### Problem: Verifier dropped a finding the user thinks is real
 
-**Cause:** Nits rendered as full finding blocks scattered through the report instead of grouped.
+**Cause:** Either the citation didn't hold against current code (evidence drop), or the finding was true but failed the impact floor (no concrete bad outcome on this change).
 
-**Solution:** Phase 3 groups every Nit under its file path in a single `## Nit` block as terse one-liners (no full Risk/Fix block, no cap). Critical/Major/Minor stay in full-block form. If the actionable buckets themselves are long, that's real signal — point the user at the `## What to fix first` section, which the verifier caps at 3-6 items.
-
-### Problem: REVIEW.md keeps showing up as a dirty file in git
-
-**Cause:** REVIEW.md is a local review artifact, not a committed file.
-
-**Solution:** Add `REVIEW.md` to `.gitignore` (project-level) or `~/.config/git/ignore` (global). The skill always overwrites it at the repo root — it's meant to be ephemeral.
-
-### Problem: REVIEW.md written to the wrong directory
-
-**Cause:** Used `cwd` instead of the git repo root.
-
-**Solution:** Always resolve the target path with `git rev-parse --show-toplevel` before writing. If not inside a git repo, fall back to `cwd` and tell the user.
-
-### Problem: Verifier dropped findings the user thinks are real
-
-**Cause:** Verifier couldn't substantiate the citation against the current code (e.g., file moved between agent run and verification, or the agent quoted an approximate line number).
-
-**Solution:** Verifier-demoted findings are tagged `[Unverified]` rather than dropped silently — they still appear in REVIEW.md one severity tier lower. If the user wants to re-promote, they can re-run `/code-review` after re-staging the file so the line numbers align. Persistent demotions usually point at agent-side line-number drift; refresh the diff and re-dispatch.
-
-### Problem: Verifier kept everything (no demotions, no drops)
-
-**Cause:** Verifier prompt was paraphrased and lost the substantiation requirement, or the agent findings were already strong enough.
-
-**Solution:** Check the verifier's summary line — if it says `kept N of N; promoted 0; demoted 0; dropped 0` on a large finding set, re-dispatch with the exact verifier prompt from `reference/AGENTS.md#verifier`, emphasizing "re-read the cited line and confirm the issue is present in the current code."
-
-### Problem: Verifier promoted a finding and the user disagrees with the new severity
-
-**Cause:** Stage 2 impact re-rating is the verifier's judgment call. It can over-promote (e.g. reading a dev-only path as production) or under-demote.
-
-**Solution:** Every moved severity carries a `Verifier note:` with the impact reasoning — point the user at it so the call is transparent, not silent. The re-rated severity is authoritative by design (one severity per finding, not two). If the user wants the lane reviewer's original take, re-run `/code-review`; the per-lane agent output is regenerated each run. Persistent mis-promotion usually means the verifier prompt's impact rubric (data-loss/security = Critical, real-path = Major, localized = Minor, cosmetic = Nit) was paraphrased — re-dispatch with the exact prompt from `reference/AGENTS.md#verifier`.
+**Solution:** Drops are intentional in 2.0 — the skill removes low-impact truths on purpose. If the user believes it was high-impact, they can re-run with `--nits` (a floor-failed finding tagged `[Nit]` is preserved in the held bucket), or re-stage and re-run so line numbers align if it was an evidence drop from drift. There is no `[Unverified]` demote-and-keep tier anymore; the impact floor replaced it.
 
 ### Problem: `## What to fix first` is empty or missing
 
-**Cause:** Either only Minor/Nit findings survived (correct — the verifier emits `Nothing blocking — only polish remains.`), or the verifier's distillation block was dropped during synthesis.
+**Cause:** Either only Minor survived (correct — the verifier emits `Nothing blocking — only polish remains.`), or the distillation block was dropped in synthesis.
 
-**Solution:** If Criticals or high-impact Majors exist but the section is empty, the synthesizer skipped step 1 of Phase 3 — re-render from the verifier's returned distillation block. The section always appears, even when its content is the single "Nothing blocking" line.
+**Solution:** If Criticals or high-impact Majors exist but the section is empty, the synthesizer skipped it — re-render from the verifier's returned distillation. The section always appears, even when it's the single "Nothing blocking" line.
+
+### Problem: `--blueprint <skill>` had no effect / skill not found
+
+**Cause:** The blueprint skill name was not resolvable, so the architecture/ui-ux lanes fell back to sibling/default judgment.
+
+**Solution:** Confirm the skill exists (`ls ~/.claude/skills/<name>` or the project skills dir). Load its SKILL.md and pass its rules into the lane prompts explicitly. If it genuinely doesn't exist, tell the user and run without `--blueprint`.
+
+### Problem: Background review never wrote REVIEW.md
+
+**Cause:** `--background` was run by launching the whole skill as one subagent — which can't spawn the reviewers (subagents don't fan out) — or a reviewer tried to write into the worktree.
+
+**Solution:** Background must be orchestrated from the MAIN thread: main dispatches each reviewer with `run_in_background: true` + `isolation: "worktree"`, then the verifier, then main itself writes REVIEW.md to the real repo root (`git rev-parse --show-toplevel` of the main tree — not the worktree, which is torn down). Reviewers stay read-only so the worktree auto-cleans.
+
+### Problem: Scope is empty
+
+**Cause:** No uncommitted changes and no branch diff against main (diff modes only).
+
+**Solution:** Stop and tell the user — "No changes detected. Pass a path, use `--branch <base>`, or `--repo` for a whole-repo pass." Do not fabricate a review. (`--repo` is never empty.)
+
+### Problem: Diff / repo is huge (hundreds of files)
+
+**Cause:** A merge/rebase caught in scope, or `--repo` on a large codebase.
+
+**Solution:** Show the file count and confirm before dispatching. For a large `--repo` pass, prefer `--background` so it doesn't block, and consider `--blueprint` to keep the lanes focused on conformance rather than open-ended review.
+
+### Problem: REVIEW.md shows up as a dirty file in git
+
+**Solution:** Add `REVIEW.md` to `.gitignore` (project) or `~/.config/git/ignore` (global). It's an ephemeral artifact, always overwritten at the repo root.
