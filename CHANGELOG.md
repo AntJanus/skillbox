@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Breaking Changes
+
+- **code-review (1.6.1 → 2.0.0)** — rebuilt around correctness and signal, from a 6-agent diagnosis of why the skill went unused (slow, nitpicky, architecture suggestions that didn't land). Anyone relying on the old lane names or the always-visible nit list gets different behavior:
+  - **Lanes changed.** `basics` is replaced by a **correctness** lane (data-flow tracing for wrong answers: boundary/off-by-one, DST/tz bucketing, money/rate math, swallowed errors, non-atomic writes, unterminated loops, discarded async results). `architecture` is **re-aimed from sibling-consistency to intent-conformance** (flags a real consequence, never "a peer does it differently"; blueprint-aware). A new conditional **ui-ux** lane (dispatched only when the diff touches UI) is briefed against the typography + color-system floors. `clarity` and `repo-hygiene` are folded into a single **non-blocking hygiene sweep** — its findings are suppressed unless `--nits`, except a real `[Secret]`, which always surfaces.
+  - **Verifier is now a signal filter, not just a false-positive filter.** It enforces an **impact floor**: a kept finding must name a concrete bad outcome (wrong result, data loss, security, real regression, reader-trap); anything whose worst realistic outcome is cosmetic/stylistic/doc-only is dropped or held as a nit. The old "when in doubt, demote rather than drop" rule (which produced the noise) is retired, along with the `[Unverified]` demote-and-keep tier.
+  - **Report output changed.** Nits are hidden by default (`--nits` to show). A new `## What the repo does well` (verifier-confirmed strengths) leads the report. New summary line: `kept N blocking of M; dropped J (W wrong-evidence, L low-impact); H nits held`.
+  - **New modes.** `--repo [--blueprint <skill>]` for a whole-repo/blueprint conformance pass, and `--background` for a detached, git-worktree-isolated run (orchestrated from the main thread, since subagents can't fan out) so review doesn't block editing.
+  - Validated end-to-end before shipping: the correctness lane returned clean on correct code (no false positives) and caught 3/3 planted + 2 unplanted real bugs on a buggy fixture while ignoring nit-bait; the verifier kept all 5 bugs and held both nits.
+
 ## [5.1.0] - 2026-07-22
 
 Evidence-driven pass on the three heaviest-used skills, from 20 days of real activation data across 1,912 transcripts rather than a fresh read of the prose.
