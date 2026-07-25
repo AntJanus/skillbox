@@ -15,6 +15,23 @@ The chrome is `'use client'`, so the server-read `colorScheme` is threaded in as
 ```tsx
 // components/AppShellChrome.tsx — 'use client'
 // props: { colorScheme: "light" | "dark", children }
+
+// Declared once, rendered by both identity-row branches below.
+const collapseToggle = (
+  <Tooltip label={collapsed ? "Expand sidebar" : "Collapse sidebar"} position="right" withArrow>
+    <ActionIcon
+      variant="subtle"
+      color="gray"
+      onClick={toggleCollapsed}
+      visibleFrom="sm"                           // desktop-only: mobile uses the Burger
+      aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+    >
+      {collapsed ? <IconLayoutSidebarLeftExpand size={20} />
+                 : <IconLayoutSidebarLeftCollapse size={20} />}
+    </ActionIcon>
+  </Tooltip>
+);
+
 <AppShell
   layout="alt"                                   // sidebar spans full height, header sits beside it
   header={{ height: 64 }}
@@ -25,23 +42,19 @@ The chrome is `'use client'`, so the server-read `colorScheme` is threaded in as
   }}
 >
   <AppShell.Navbar p="md">
-    {/* Identity row — fixed height, never scrolls, never moves. */}
-    <Group h={36} mt={4} mb="lg" px={collapsed ? 0 : 4} wrap="nowrap"
-           justify={collapsed ? "center" : "space-between"}>
-      {collapsed ? null : <Logo />}
-      <Tooltip label={collapsed ? "Expand sidebar" : "Collapse sidebar"} position="right" withArrow>
-        <ActionIcon
-          variant="subtle"
-          color="gray"
-          onClick={toggleCollapsed}
-          visibleFrom="sm"                       // desktop-only: mobile uses the Burger
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          {collapsed ? <IconLayoutSidebarLeftExpand size={20} />
-                     : <IconLayoutSidebarLeftCollapse size={20} />}
-        </ActionIcon>
-      </Tooltip>
-    </Group>
+    {/* Identity row — fixed height, never scrolls, never moves.
+        Collapsed keeps the glyph and stacks; expanded is glyph + wordmark in a row. */}
+    {collapsed ? (
+      <Stack align="center" gap={6} mt={4} mb="lg">
+        <AppGlyph width={28} height={28} />
+        {collapseToggle}
+      </Stack>
+    ) : (
+      <Group h={36} mt={4} mb="lg" px={4} justify="space-between" wrap="nowrap">
+        <Logo />
+        {collapseToggle}
+      </Group>
+    )}
 
     {/* Links scroll; the identity row above and any pinned footer below do not. */}
     <AppShell.Section grow component={ScrollArea} type="hover">
@@ -67,6 +80,8 @@ The chrome is `'use client'`, so the server-read `colorScheme` is threaded in as
 
 - **`layout="alt"`** is the load-bearing prop — it puts the sidebar full-height against the viewport edge with the header beside it, rather than a header spanning the top. This single prop is most of the silhouette.
 - **264px expanded ↔ 72px collapsed.** Collapsed shows icons only, with the label as a `Tooltip`. Persist the collapsed flag to `localStorage` under `"<app>-sidebar-collapsed"` — this is ephemeral view state, unlike theme (below), so client storage is correct here.
+- **Collapsing drops the wordmark, never the mark.** The 72px rail keeps the SVG glyph; only the text half of the logo goes. A rail that collapses to pure anonymous icons loses the one element telling the user *which* app they're in — and in a family of near-identical shells, that is the only thing distinguishing them at a glance. This is why `Logo` and the bare glyph are **two exports from the same file** (see below): the chrome needs the mark on its own, not a `size` prop on the full lockup. The glyph is also the natural "back to home" target in the collapsed state.
+- **The rail is too narrow for the mark and the toggle side by side.** 72px minus padding leaves roughly 52px — a 28px glyph plus a 34px `ActionIcon` does not fit. Stack them (`<Stack align="center">`) when collapsed and use a `Group` when expanded, rather than trying to shrink either one. Hoist the toggle into a variable so both branches render the same element.
 - **The collapse toggle belongs in the navbar's identity row — never `mt="auto"` at the bottom.** `AppShell.Navbar` is a flex column with `overflow: visible` and *no* scroll container of its own, so a bottom-pinned control is pushed past the viewport edge the moment the nav list outgrows the screen. It doesn't clip and it doesn't scroll — it silently becomes unclickable, and the sidebar reads as "not collapsible" with the code still perfectly correct. A list that fits on a 27" display will not fit on a laptop. Put the toggle in the fixed top row and let the *links* scroll.
 - **Anything pinned below the links needs `AppShell.Section grow component={ScrollArea}` above it.** That is the only structure that makes a navbar footer safe; without it, "pin to bottom" means "push off-screen".
 - **`visibleFrom="sm"` on the toggle.** On mobile the navbar is a drawer and collapsing it is meaningless — the `Burger` already owns that job.
@@ -90,8 +105,12 @@ const { bottom } = toggle.getBoundingClientRect();
 
 A custom SVG glyph beside a two-weight wordmark. The weight split is the whole trick: a quiet shared part and a bold distinctive part read as one mark while letting a family of apps differ only in the second word.
 
+**Export the glyph separately from the lockup.** `Logo` (glyph + wordmark) goes in the expanded navbar; the bare `AppGlyph` goes in the 72px collapsed rail, and may also be reused for the favicon and the binary's app icon. Building only the combined lockup forces the chrome to either hide the brand entirely when collapsed or scale down text that is already at its legibility floor — so make the glyph a first-class export from day one, with its own `width`/`height` props rather than a `size` prop on the pair.
+
 ```tsx
 // components/Logo.tsx
+export function AppGlyph({ width = 26, height = 26 }) { /* one custom SVG per app */ }
+
 export function Logo() {
   return (
     <Group gap={8} wrap="nowrap">
