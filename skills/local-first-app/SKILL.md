@@ -4,7 +4,7 @@ description: Local-first CRUD blueprint — Next.js + node:sqlite, single-user. 
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "2.0.0"
+  version: "2.1.0"
   tags: [nextjs, react, typescript, sqlite, local-first, desktop, architecture, charts]
 ---
 
