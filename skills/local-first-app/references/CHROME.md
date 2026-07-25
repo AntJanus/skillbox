@@ -10,6 +10,8 @@ One `'use client'` chrome wraps every route. Dashboard layout, never single-colu
 
 The chrome is `'use client'`, so the server-read `colorScheme` is threaded in as a prop from the root layout — that thread is the whole mechanism, not an incidental detail.
 
+**The brand lives in the sidebar, not the header.** Because `layout="alt"` gives the navbar the full-height left edge *including the top-left corner*, that corner is where the logo goes — and the collapse toggle sits beside it. The header is a **topbar over the content only**: burger, page/app title, and right-aligned controls. Getting this backwards (logo in the header) is the single most common way a new app stops looking like the rest of the family.
+
 ```tsx
 // components/AppShellChrome.tsx — 'use client'
 // props: { colorScheme: "light" | "dark", children }
@@ -22,22 +24,42 @@ The chrome is `'use client'`, so the server-read `colorScheme` is threaded in as
     collapsed: { mobile: !drawerOpen },
   }}
 >
+  <AppShell.Navbar p="md">
+    {/* Identity row — fixed height, never scrolls, never moves. */}
+    <Group h={36} mt={4} mb="lg" px={collapsed ? 0 : 4} wrap="nowrap"
+           justify={collapsed ? "center" : "space-between"}>
+      {collapsed ? null : <Logo />}
+      <Tooltip label={collapsed ? "Expand sidebar" : "Collapse sidebar"} position="right" withArrow>
+        <ActionIcon
+          variant="subtle"
+          color="gray"
+          onClick={toggleCollapsed}
+          visibleFrom="sm"                       // desktop-only: mobile uses the Burger
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          {collapsed ? <IconLayoutSidebarLeftExpand size={20} />
+                     : <IconLayoutSidebarLeftCollapse size={20} />}
+        </ActionIcon>
+      </Tooltip>
+    </Group>
+
+    {/* Links scroll; the identity row above and any pinned footer below do not. */}
+    <AppShell.Section grow component={ScrollArea} type="hover">
+      <Stack gap={2}>{primaryItems.map(renderNav)}</Stack>
+    </AppShell.Section>
+
+    <Divider my="md" />
+    <Stack gap={2}>{footerItems.map(renderNav)}</Stack>
+  </AppShell.Navbar>
+
   <AppShell.Header>
-    <Group h="100%" px="md" justify="space-between">
-      <Group gap="sm">
-        <Burger opened={drawerOpen} onClick={toggleDrawer} hiddenFrom="sm" size="sm" />
-        <Logo />
-      </Group>
-      <Group gap="xs">
-        <ColorSchemeToggle scheme={colorScheme} />
-      </Group>
+    <Group h="100%" px="lg" gap="md" wrap="nowrap">
+      <Burger opened={drawerOpen} onClick={toggleDrawer} hiddenFrom="sm" size="sm"
+              aria-label="Toggle navigation" />
+      <Box style={{ flex: 1, minWidth: 0 }}>{/* title, or app-specific search */}</Box>
+      <ColorSchemeToggle scheme={colorScheme} />
     </Group>
   </AppShell.Header>
-
-  <AppShell.Navbar p="xs">
-    <NavLinks collapsed={collapsed} />
-    <CollapseButton onClick={toggleCollapsed} mt="auto" />
-  </AppShell.Navbar>
 
   <AppShell.Main>{children}</AppShell.Main>
 </AppShell>
@@ -45,9 +67,24 @@ The chrome is `'use client'`, so the server-read `colorScheme` is threaded in as
 
 - **`layout="alt"`** is the load-bearing prop — it puts the sidebar full-height against the viewport edge with the header beside it, rather than a header spanning the top. This single prop is most of the silhouette.
 - **264px expanded ↔ 72px collapsed.** Collapsed shows icons only, with the label as a `Tooltip`. Persist the collapsed flag to `localStorage` under `"<app>-sidebar-collapsed"` — this is ephemeral view state, unlike theme (below), so client storage is correct here.
+- **The collapse toggle belongs in the navbar's identity row — never `mt="auto"` at the bottom.** `AppShell.Navbar` is a flex column with `overflow: visible` and *no* scroll container of its own, so a bottom-pinned control is pushed past the viewport edge the moment the nav list outgrows the screen. It doesn't clip and it doesn't scroll — it silently becomes unclickable, and the sidebar reads as "not collapsible" with the code still perfectly correct. A list that fits on a 27" display will not fit on a laptop. Put the toggle in the fixed top row and let the *links* scroll.
+- **Anything pinned below the links needs `AppShell.Section grow component={ScrollArea}` above it.** That is the only structure that makes a navbar footer safe; without it, "pin to bottom" means "push off-screen".
+- **`visibleFrom="sm"` on the toggle.** On mobile the navbar is a drawer and collapsing it is meaningless — the `Burger` already owns that job.
 - **Nav links** use the current pathname for active state, not click handlers.
 - **Mobile is a drawer**, opened by the `Burger`. Anything that renders into the navbar slot is invisible on mobile until the drawer opens — see the batch-bar caveat in `UI.md`.
 - **A collapsed rail cannot hold wide controls.** Any mode that renders controls into the navbar (bulk selection) must force the shell back to full width while it lasts.
+
+### Verifying the toggle is actually reachable
+
+Overflow bugs of this class don't fail a typecheck, a test, or a screenshot taken on a tall window. Check the geometry directly, at a laptop-sized viewport:
+
+```js
+// in the browser console, or via shot-scraper javascript
+const toggle = document.querySelector('[aria-label$="sidebar"]');
+const { bottom } = toggle.getBoundingClientRect();
+({ bottom, viewport: innerHeight, belowFold: Math.round(bottom - innerHeight) });
+// belowFold > 0 → the control exists in the DOM and cannot be clicked
+```
 
 ## Logo
 
@@ -385,5 +422,6 @@ export function ConfirmDeleteButton({ entityLabel, cascade, options, onConfirm }
 - **`lightHidden`/`darkHidden` lose to any inline style.** Mantine's visibility props work through a class (`[data-mantine-color-scheme] .mantine-light-hidden { display: none }`) with no `!important`. Add a `display` **style prop** to the same element — `<Box lightHidden display="inline-flex">` — and React emits an inline style that wins, so the "hidden" element renders anyway. In a dark/light toggle that means both sun and moon show at once. This shipped across an entire app family by copy-porting and was only caught in manual QA. Fix: move the layout to a CSS class, never the `display` style prop. **Better fix:** with server-persisted color scheme (above), render the correct icon directly and delete the hide-one-of-two pattern entirely.
 - **Sidebar collapse state is client state; theme is not.** They look like the same kind of setting and they aren't — collapse is per-window view state (`localStorage` is right), theme is a user preference that must be correct in the first server-rendered byte (settings table is right). Mixing them up produces either a flash or a preference that doesn't stick.
 - **`AppShell` navbar content is invisible on mobile until the drawer opens.** Anything mode-critical rendered there (a batch bar, a selection count) needs a header affordance too, or the feature is unreachable on small screens.
+- **`mt="auto"` in the navbar pushes a control off-screen instead of pinning it.** `AppShell.Navbar` is `display: flex; flex-direction: column` with `overflow: visible` — so `margin-top: auto` pins to the bottom of the *content*, which is free to extend past the bottom of the *viewport*. Once the nav list is tall enough, the bottom-pinned control renders with no clipping and no scrollbar, entirely below the fold, and no longer receives clicks. The failure is silent and viewport-dependent: fine on the display it was built on, gone on a laptop. Wrap the links in `AppShell.Section grow component={ScrollArea}` before pinning anything beneath them — or keep the control in the fixed top row, which is what the shell above does.
 - **A sticky preview needs an explicit `top`.** `pos="sticky"` with no offset sticks to viewport top and slides under the fixed header. Use header height + gutter.
 - **Don't wire an accent serif into `theme.headings`.** It reaches Mantine internals (Modal titles, Alert titles, table captions) far beyond the page titles you meant, and the result reads as inconsistent rather than accented.
