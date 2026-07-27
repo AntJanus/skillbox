@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.1.0] - 2026-07-27
+
+Eval-driven pass on **local-first-app**, from a browser audit of the app family built to this blueprint. The theme runs through all four changes: a rule can be followed exactly and still produce a broken app, so the fix is a gate that fails rather than a stronger instruction.
+
+### Changed
+
+- **local-first-app** (2.1.0 → 2.2.0): eval-driven pass from a browser audit of the app family built to this blueprint. Four changes:
+  - **New section: "The five gates a green test suite does not give you."** Route smoke, restore-not-backup, schema-drift, hydration, and legibility — the failure classes a typecheck, a full vitest suite, and a clean production build all pass through. Each was paid for in real debugging: a backup routine calling a `.backup()` method that doesn't exist on `node:sqlite` (test only checked a file appeared); a table added to the migrations but not `BASE_SCHEMA`, breaking 100% of new installs while 100% of dev machines stayed green; a server component rendering a client-only compound component, which 500s in the browser with no component name in the stack. Closes with fixture realism — a five-row fixture passed while a missing SQL predicate made a 5,000-row library report zero results, because `LIMIT` truncated before the pure filter ran.
+  - **Legibility promoted from a quality signal to a gate.** Across ten apps audited in a real browser, **nine shipped text under 4.5:1** — including a wordmark at **1.00:1** (text color identical to its background) on five separate routes — and *every one of them had overridden the `fontSizes` scale correctly*. The instruction was followed and the outcome was still unreadable, because only two of the floor's four parts are visible in source: line-height resolves against the computed font-size and contrast depends on the painted background. Also added: a line-length cap (65–85ch) and a rule that swatches/status dots/category chips must be *measurably* distinct, after a theme picker shipped five swatches that render as five identical black squares (every pair between 1.00:1 and 1.10:1).
+  - **Two rules demoted from unconditional, both cases of "fully satisfiable and still wrong."** `/docs` is now conditional on the app having a concept a new user would get wrong — of eleven apps, eight skipped it and were right to; mandating it in a domain with no such concept (a music library) produces a stub nobody reads. **Bulk edit** is now explicitly deferrable — six of eleven shipped without it despite plainly batchable fields, and its absence is a scheduling decision, not non-conformance. Where it was built it was built well, so its rules are unchanged.
+  - **"Architecture — three hard layers" renamed to "one hard rule, five directories."** The heading promised three layers and then listed five directories, so "is this app's architecture correct?" was unanswerable. The testable claim was always import purity: `src/<domain>/` may not import React, Next, or the DB.
+  - **All audit census data removed from the skill body** (including two pre-existing mentions). Counts like "nine of ten apps" or "across a five-app blueprint family" are provenance for *why* a rule exists, not knowledge an agent building an app can act on — they go stale as the family grows and cost context on every load. The evidence lives here; the skill states the failure mode.
+
 ## [6.0.0] - 2026-07-23
 
 Major: **code-review is rebuilt as 2.0** with breaking changes to its lanes, verifier, default output, and flags — anyone using the old lane names or expecting the always-visible nit list gets different behavior. The rebuild was driven by a six-agent audit of why the skill had gone unused and validated end-to-end (planted-bug fixture + verifier impact-floor test) before shipping.
