@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **local-first-app** (2.2.0 → 2.2.1): reconciled `references/` with the v6.1.0 body changes — the progressive-disclosure links were serving pre-audit advice, so an agent that followed them landed on guidance the SKILL.md had just reversed.
+  - **`UI.md` contradicted the `/docs` demotion outright.** It read "a pure CRUD tracker … **still ships the in-app `/docs` concept area**" and mandated the area unconditionally — exactly what 2.2.0 demoted. Both spots now carry the same conditional test (ship it only for a concept a new user would get wrong).
+  - **`UI.md` legibility framed insufficiency as a source-level problem** ("you might still land `xs` at 14px"). Added the actual reason the theme can't be trusted: line-height resolves against the computed font-size and contrast against the painted background, so **two of the floor's four values don't exist until a page renders**. Points at the legibility gate, and picks up the 65–85ch line-length cap and the measurably-distinct-swatch rule.
+  - **`ARCHITECTURE.md` had the same three-vs-five defect** the SKILL.md heading rename fixed — "The three layers are:" followed by five directories. Now leads with import purity.
+  - **`ARCHITECTURE.md` backup section documented recovery but never verified it.** Added the restore gate (open the copy, read a row back out) and sub-second filename stamping, next to the `VACUUM INTO` snapshot code it applies to.
+  - **`UI.md` bulk-selection section** picked up the deferability note from the body.
+
 ## [6.1.0] - 2026-07-27
 
 Eval-driven pass on **local-first-app**, from a browser audit of the app family built to this blueprint. The theme runs through all four changes: a rule can be followed exactly and still produce a broken app, so the fix is a gate that fails rather than a stronger instruction.
