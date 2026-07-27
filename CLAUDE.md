@@ -62,32 +62,26 @@ Every SKILL.md MUST have:
 ```yaml
 ---
 name: kebab-case-name
-description: |
-  Trigger-rich description with 3-5 specific phrases.
-  Use when [situation], when asked to "[phrase]", or when [context].
+description: Use this skill whenever the user wants to [job], asks to "[phrase 1]", "[phrase 2]", or [context]. Do NOT use for [near-neighbor] — see [other-skill].
 license: MIT
+argument-hint: "[optional-args]"
 metadata:
   author: author-name
   version: "1.0.0"
-  argument-hint: <optional-args>
-tags: [relevant, tags]
 ---
 
 # Skill Title
 
 ## Overview
-[1-2 sentences + core principle]
-
-## When to Use
-[Specific situations]
+[1-2 sentences + core principle. When-to-use lives in the description, not a body section — the body only loads after triggering.]
 
 [Main Content - Pattern Specific]
 
 ## Examples
 [✅/❌ code comparisons]
 
-## Troubleshooting
-[Common issues and solutions]
+## Gotchas
+[Concrete edge cases and failure modes]
 
 ## Integration
 [How it works with other skills]
@@ -112,13 +106,12 @@ tags: [relevant, tags]
 
 - Vague descriptions like "A skill for testing" or "Helps with React"
 - Single-sentence descriptions without specific triggers
-- Multiline `description: |` YAML block scalars — they silently break skill discovery (anthropics/claude-code #9817). Always single-line.
 - First-person POV ("I'll help you…") — empirically degrades activation reliability
-- Descriptions over 1024 chars (Anthropic spec hard cap; soft target ≤230 chars for listing-budget safety past ~15-25 installed skills)
+- Descriptions over 1024 chars (Anthropic spec hard cap — the only length rule; the old ≤230 soft target was dropped 2026-07-27, listing eviction is least-invoked-first so workhorse skills keep full text)
 - Skills over 500 lines without progressive disclosure (aim under 300)
 - Examples without ✅ / ❌ comparisons
 - `<Good>` / `<Bad>` XML tag wrappers — non-canonical (zero of 8 surveyed top community skills use them); recommend ✅ / ❌ instead
-- ALL-CAPS "IRON LAW" / "NEVER" / "ALWAYS" framing without explained reasoning (Anthropic skill-creator: yellow flag)
+- ALL-CAPS "IRON LAW" / "NEVER" / "ALWAYS" framing without explained reasoning — officially backed as of the Claude 5 prompting guidance ("Do X because Y" outperforms bare "ALWAYS X"); previously an Anthropic skill-creator yellow flag
 - Top-level `version`, `author`, `tags`, `category` in frontmatter — produce "unexpected key" errors (anthropics/skills #37). They live under `metadata` (except `argument-hint`, which is top-level; `hooks` is a valid Claude Code runtime key — see the three-tier note in Learnings).
 - Methodology skills without verification checklists
 
@@ -128,12 +121,11 @@ tags: [relevant, tags]
 
 - **DO** use the `generate-skill` skill when creating new skills
 - **DO** include 3-5 specific trigger phrases in the description field
-- **DO** target the `description` field at **≤230 characters** as a soft cap for listing-budget safety past ~15-25 installed skills. No penalty up to 500. Spec hard cap is 1024 (per agentskills.io). The historical 250-char display cap was a Claude Code v2.1.86 regression, removed in v2.1.105+. Always front-load the distinctive trigger noun in the first ~50 chars.
-- **DO** use single-line `description:` strings — never `description: |` block scalars (silently breaks discovery per anthropics/claude-code #9817)
+- **DO** keep the `description` field within the **1024-char spec hard cap** (agentskills.io) — the only length rule. The old ≤230 soft target was dropped 2026-07-27: it had no official basis, and listing eviction is least-invoked-first, so workhorse skills keep their full text. Guidance says "err on the side of being pushy." Still front-load the distinctive trigger noun in the first ~50 chars.
 - **DO** write descriptions in third person ("Use this skill whenever the user wants to…", not "I help you…"). First-person POV empirically degrades activation.
 - **DO** use directive register: "Use this skill whenever the user wants to…" with a "Do NOT use this skill for…" negative scope clause for collision-prone domains
 - **DO** provide ✅ / ❌ example comparisons (community convention per Anthropic skill-creator + docx)
-- **DO** include a `## Gotchas` section — concrete edge cases and failure modes are the body content agents can't infer (house convention; the spec's nearest equivalent is its recommended "common edge cases")
+- **DO** include a `## Gotchas` section — concrete edge cases and failure modes are the body content agents can't infer (canonical as of 2026-07: agentskills.io now recommends Gotchas sections; previously house convention)
 - **DO** keep SKILL.md under 300 lines (house aim) / 500 (canonical hard cap — Claude Code docs, spec, and skill-creator all state it). Use `references/` (plural) for extended content in new skills; existing singular `reference/` dirs are fine — nothing validates directory names. ETH Zurich arXiv 2602.11988 found context files generally don't improve task success while adding >20% inference cost.
 - **DO** add verification checklists for methodology enforcement skills
 - **DO** use clear, imperative language (short sentences, bullet points)
@@ -268,13 +260,12 @@ Includes:
 Before marking skill work complete:
 
 - [ ] SKILL.md has valid YAML frontmatter
-- [ ] Description is single-line (not `description: |` block scalar)
 - [ ] Description in third-person directive form ("Use this skill whenever the user wants to…")
 - [ ] Description includes 3-5 trigger phrases front-loaded in first ~50 chars
-- [ ] Description ≤230 chars (soft target) / ≤500 chars (no penalty) / ≤1024 chars (spec hard cap)
+- [ ] Description ≤1024 chars (spec hard cap — the only length rule)
 - [ ] Negative scoping ("Do NOT use this skill for X — see Y") for collision-prone domains
 - [ ] Examples show ✅ / ❌ comparisons (✅ first)
-- [ ] Gotchas section present (house convention — concrete edge cases agents can't infer)
+- [ ] Gotchas section present (canonical per agentskills.io — concrete edge cases agents can't infer)
 - [ ] Integration points documented (when concrete; drop if filler)
 - [ ] SKILL.md aim under 300 lines, hard cap 500. Use `references/` (plural) for overflow.
 - [ ] Verification checklist included (if methodology skill)
@@ -385,8 +376,6 @@ If you catch yourself doing any of these, reconsider — each has a paired ✅ a
   ✅ Read 2-3 existing SKILL.md files to learn the house patterns first
 - ❌ Vague description ("A skill for testing")
   ✅ Directive third-person form with 3-5 concrete user-language triggers and a `Do NOT use for…` scope clause
-- ❌ Multiline `description: |` block scalar
-  ✅ Single-line `description:` string (multiline silently breaks discovery, anthropics/claude-code #9817)
 - ❌ First-person POV in description ("I help you…")
   ✅ Third-person ("Use this skill whenever the user wants to…")
 - ❌ Skipping examples section
@@ -408,7 +397,7 @@ If you catch yourself doing any of these, reconsider — each has a paired ✅ a
 - ❌ Creating tag for individual skill update
   ✅ Tags mark SkillBox releases that bundle multiple skill bumps
 - ❌ ALL-CAPS "IRON LAW" / "NEVER" / "ALWAYS" framing
-  ✅ "Quality Signals" and "Anti-Patterns" with explained reasoning
+  ✅ "Quality Signals" and "Anti-Patterns" with explained reasoning ("Do X because Y" — officially backed by Claude 5 prompting guidance as of 2026-07)
 
 ## Troubleshooting
 
@@ -484,7 +473,7 @@ Read SKILL.md → Make changes → Increment version → Commit → Update CHANG
 
 ### Validating Skill
 ```
-Check: Single-line desc | Triggers in first 50 chars | ✅/❌ examples | Gotchas | < 300 lines preferred
+Check: Directive third-person desc ≤1024 | Triggers in first 50 chars | ✅/❌ examples | Gotchas | < 300 lines preferred
 ```
 
 ### Testing Activation
@@ -523,14 +512,15 @@ Treat every issue working with SkillBox as an opportunity to update this file.
 
 - **Progressive disclosure via `references/` (plural) for 300-500 line limits** — When a SKILL.md approaches 300 lines, move troubleshooting (highest line count, lowest immediate-need) to `references/TROUBLESHOOTING.md`, keeping only 3-4 most common issues inline with a progressive disclosure link. The `references/` dir can also hold EXAMPLES.md and STANDARDS.md. _(captured 2026-03-21; updated 2026-05-14 to plural)_
 - **Release commit ordering matters** — SkillBox releases follow specific ordering: (1) one commit per skill change with `type(skill-name): description`, (2) separate `docs(changelog): prepare vX.Y.Z release` commit, (3) annotated tag `git tag -a vX.Y.Z`, (4) push with `git push && git push origin vX.Y.Z`. Don't bundle skill changes and changelog into one commit. _(captured 2026-03-21)_
-- **Multiline `description: |` is the #1 silent killer** — YAML parses fine, but skill discovery never sees it (anthropics/claude-code #9817). Always single-line. Found across 9 SkillBox skills in 2026-05-14 audit. _(captured 2026-05-14)_
+- **~~Multiline `description: |` is the #1 silent killer~~ OVERTURNED 2026-07-27** — the #9817 bug is not reproducible on Claude Code 2.1.220. Empirical test (three probe skills — `|` literal, `>` folded, single-line control — in a scratch project, fresh headless sessions asked to quote the listing verbatim): all three descriptions appeared intact, with block-scalar formatting correctly preserved. The rule is dropped entirely (user decision 2026-07-27); scalar style is no longer policed. The 2026-05-14 audit finding was real for its era — the bug existed then and was quietly fixed without the issues being closed as fixed. _(captured 2026-05-14; overturned 2026-07-27)_
 - **Directive third-person descriptions carry ~20× higher activation odds** — Empirical study (Seleznov n=650, CMH odds ratio 20.6, p<0.0001): "Use this skill whenever the user wants to…" form hits 94-100% activation vs passive "Use when X" at 37-87%. Note it's an odds ratio — "20× more reliably" overstates the absolute delta. First-person POV ("I help you…") degrades further. _(captured 2026-05-14; wording corrected 2026-07-02)_
 - **`<Good>`/`<Bad>` XML tags are SkillBox-only** — Zero of 8 surveyed top community skills (Anthropic, Vercel, Superpowers) use them. Migrate to ✅ / ❌ markdown emoji. _(captured 2026-05-14; repo fully migrated 2026-07-02)_
 - **Frontmatter is three-tier — know which validator you're serving** — (1) Universal spec (agentskills.io): `name`, `description`, `license`, `compatibility`, `allowed-tools`, `metadata` only. (2) Claude Code runtime: adds `argument-hint`, `when_to_use`, `hooks`, `paths`, `arguments`, `disable-model-invocation`, `user-invocable`, `model`, `effort`, `context`, `agent`, `shell`, `disallowed-tools`. (3) Anthropic's repo packaging validator (`quick_validate.py`) rejects everything outside tier 1. Verified 2026-07-02: the Vercel `npx skills add` channel (SkillBox's actual distribution) tolerates the CC extension keys — keep `argument-hint` etc. unless submitting to anthropics/skills. _(captured 2026-07-02)_
-- **Convention tiers clarified by 2026-07-02 re-validation** — Canonical (cited): 1024-char description cap, front-loaded triggers, when-to-use folded into description (never a body section), directive third-person register, 500-line body cap, progressive disclosure. House style (keep, but don't label as spec): ✅/❌ convention, `## Gotchas`/`## Troubleshooting` headings, 230-char soft target, <300-line aim, the exact "Use this skill whenever…" phrasing. Claude Code also applies a separate ~1,536-char listing cap to `description` + `when_to_use` combined, distinct from the 1024 spec cap. `references/` plural is the spec-documented name but nothing validates directory names — plural for new dirs, no renames. _(captured 2026-07-02)_
+- **Convention tiers clarified by 2026-07-02 re-validation** — Canonical (cited): 1024-char description cap, front-loaded triggers, when-to-use folded into description (never a body section), directive third-person register, 500-line body cap, progressive disclosure. House style (keep, but don't label as spec): ✅/❌ convention, `## Troubleshooting` headings, <300-line aim, the exact "Use this skill whenever…" phrasing. Claude Code also applies a separate ~1,536-char listing cap to `description` + `when_to_use` combined, distinct from the 1024 spec cap. `references/` plural is the spec-documented name but nothing validates directory names — plural for new dirs, no renames. _(captured 2026-07-02; amended 2026-07-27 — Gotchas moved to canonical, 230-char soft target dropped, see next entry)_
+- **2026-07-27 doctrine sync — four entries overturned by the Claude 5 research pass + one empirical test.** The research verdict on "newer models need less prescription" is SPLIT: descriptions unchanged (stay pushy, no official basis for shortening), bodies strongly de-prescribe (Fable 5 page: prior-model skills are "often too prescriptive… can degrade output quality" — prefer "Do X because Y" over rigid mandates). Overturned: (1) Gotchas sections are now canonical — agentskills.io recommends them; (2) anti-IRON-LAW framing now has official backing, not just a yellow flag; (3) the 230-char description soft target is dropped — no official basis, and listing eviction is least-invoked-first, so workhorse skills keep full text; (4) the multiline-description rule is dropped — #9817 not reproducible on CC 2.1.220 (see the overturned entry above for the test method). Note the skill-authoring docs themselves have NOT been revised for Claude 5 — all Claude-5 guidance lives in the prompting pages + the 2026-07-24 blog; the doc sets disagree by omission. _(captured 2026-07-27)_
 
 ---
 
-**Last Updated:** 2026-07-02
-**Applies To:** Claude Code 2.1.105+
+**Last Updated:** 2026-07-27
+**Applies To:** Claude Code 2.1.220+
 **Source:** https://antjanus.com/ai/claude-code-best-practices
