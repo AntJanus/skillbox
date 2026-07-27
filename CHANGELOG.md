@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.1.1] - 2026-07-27
+
+Follow-up to v6.1.0: the eval pass rewrote the SKILL.md body but left `references/` on pre-audit advice, so the progressive-disclosure links pointed at guidance the body had just reversed — including one outright contradiction.
+
 ### Fixed
 
 - **local-first-app** (2.2.0 → 2.2.1): reconciled `references/` with the v6.1.0 body changes — the progressive-disclosure links were serving pre-audit advice, so an agent that followed them landed on guidance the SKILL.md had just reversed.
