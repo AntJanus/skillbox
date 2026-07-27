@@ -1,6 +1,6 @@
 # Architecture — deep reference
 
-Load when wiring up the data layer, migrations, or shared state. The three layers are: pure core (`src/<domain>/`), server-only store (`src/db/`), glue (`lib/`), routes (`app/`), UI (`components/`).
+Load when wiring up the data layer, migrations, or shared state. The one hard rule is **import purity** — `src/<domain>/` imports no React, no Next, no DB — expressed across five directories: pure core (`src/<domain>/`), server-only store (`src/db/`), glue (`lib/`), routes (`app/`), UI (`components/`).
 
 ## The pure core (`src/<domain>/`)
 
@@ -82,6 +82,8 @@ function backupBeforeMigrate(db: DatabaseSync) {
 ```
 
 Gate it on pending migrations, or every dev-server restart writes a snapshot. Recovery is a file copy — document that in the app's README, because a backup nobody knows how to restore isn't one.
+
+**Test the restore, not the backup.** Write the snapshot, then **open the copy and read a row back out**. A routine calling a method that doesn't exist on `node:sqlite` (there is no `.backup()`) still passes a test that only checks a file appeared — so the safety net is missing on precisely the day it's needed. Stamp filenames to sub-second precision as well: a pre-migration backup racing a scheduled one collides, and `VACUUM INTO` throws when the target already exists.
 
 **Two details the obvious version gets wrong.** Sort the rotation by **mtime, not filename**: `v10-…` sorts before `v9-…` lexicographically, so a naive `.sort()` prunes the *newest* snapshots once you pass nine migrations — in the one routine whose whole job is protecting unrecoverable data. (The zero-padded version prefix keeps the names sortable for humans; the mtime sort is what the code relies on.) And `VACUUM INTO` takes no bound parameters, so the path is string-interpolated — reject a path containing a quote rather than letting it break the statement.
 
