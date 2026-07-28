@@ -1,10 +1,10 @@
 ---
 name: typography
-description: Typography & type systems — font sizing, type scale, line-height, weight, vertical rhythm, font pairing, and a readability floor that stops tiny/thin/low-contrast text. Use this skill whenever the user wants to size text, build a type scale, fix unreadable type, set vertical rhythm, or pick and pair fonts. Do NOT use for color palettes — see color-system; layout — see frontend-design.
+description: Use this skill whenever the user wants typography work — sizing text, building a type scale, setting line-height or vertical rhythm, fixing unreadable type, or picking and pairing fonts. Triggers include "what font size should I use", "set up a type scale", "this text is too small to read", "what line-height for paragraphs", or "pair a heading font with a body font" — even if the user never says "typography" and only describes text that looks cramped, thin, or washed out. Do NOT use this skill for choosing a color palette or checking a color's contrast ratio — see color-system; or for page layout and component structure — see frontend-design.
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.3.1"
+  version: "1.4.0"
   tags: [typography, type-scale, font-size, line-height, vertical-rhythm, readability, accessibility, fonts]
 ---
 
@@ -14,11 +14,11 @@ metadata:
 
 Ready-to-use **type systems** (Product UI, Editorial, Marketing, Docs/Technical) plus the methodology to size text, build scales, set vertical rhythm, and pick fonts — so generated UI is readable instead of tiny, thin, and low-contrast.
 
-**Core principle:** size text by **role on a scale**, never by eyeballed pixels. Pick a base (16px), a ratio (~1.2), and derive every size from it. Then keep text above the **readability floor** — the four numbers below — because most "impossible to read" output violates at least one of them.
+**Core principle:** size text by **role on a scale**, never by eyeballed pixels. Pick a base (16px), a ratio (~1.2), and derive every size from it — then keep every role above the readability floor, because most "impossible to read" output violates at least one of its four numbers.
 
 ## The readability floor (the contract)
 
-These are the recede-defaults. Most unreadable AI typography breaks one of them; meet all four and text is legible by construction. Deviate only deliberately, with a reason.
+These are the recede-defaults. Meet all four and text is legible by construction; deviate only deliberately and name the reason (a 14px compact scale for genuine enterprise density is a legitimate reason — "it looked better" is not).
 
 | Floor | Default | Why |
 |---|---|---|
@@ -27,45 +27,44 @@ These are the recede-defaults. Most unreadable AI typography breaks one of them;
 | **Contrast** | text **≥ 4.5:1** (large ≥ 3:1) | WCAG 2 AA. Re-check dark mode / thin fonts with APCA — WCAG2 overstates contrast near black. |
 | **Line-height** | body **≥ 1.5** | Cramped leading hurts reading and fails the WCAG 1.4.12 spacing override. |
 
-The single worst combination is **small + thin + low-contrast** — any two is risky, all three is the canonical unreadable panel. → [references/readability.md](references/readability.md)
+The single worst combination is **small + thin + low-contrast** — any two is risky, all three is the canonical unreadable panel.
 
-**Verify computed, not authored.** Reading the class/prop/token in source only tells you intent — check the actual rendered value (devtools Computed panel, or `getComputedStyle(el).fontSize`) before calling a size fixed. A "should be 16px" edit that's still 13px on screen is a common failure mode, not a rare one.
+**Verify computed, not authored.** Reading the class, prop, or token in source only tells you intent — check the rendered value (devtools Computed panel, or `getComputedStyle(el).fontSize`) before calling a size fixed. A "should be 16px" edit that still renders 13px is a common failure mode, not a rare one.
 
-## How to use this skill
+## Navigation
 
-1. **Need a ready system?** → scan the Type System Library below, pick one, copy its token table from [references/systems.md](references/systems.md).
-2. **Building a custom scale?** → [references/scale.md](references/scale.md) (ratios, vertical rhythm, measure).
-3. **Checking readability?** → [references/readability.md](references/readability.md) (minimum sizes, WCAG/APCA, fluid `clamp()`, failure modes).
-4. **Choosing/pairing fonts?** → [references/fonts.md](references/fonts.md) (system stacks, curated webfonts, pairing, font-level CSS, loading).
+| Load this | When |
+|---|---|
+| [references/systems.md](references/systems.md) | Copying a ready-made system — full token tables (size · line-height · weight · tracking) for all four |
+| [references/scale.md](references/scale.md) | Building a custom scale, vertical rhythm, or measure from scratch |
+| [references/readability.md](references/readability.md) | Verifying readability — minimum sizes, WCAG/APCA, fluid `clamp()`, known failure modes |
+| [references/fonts.md](references/fonts.md) | Choosing, pairing, styling, or loading typefaces |
+| [references/EVAL.md](references/EVAL.md) | Re-tuning this skill's own description |
 
-Load a reference only when the task needs it — keep context lean.
+Load one reference only when the task needs it — keep context lean.
 
-## Type System Library (quick index)
+## Type System Library
 
-Each system ships a full token table (size · line-height · weight · tracking, light + values) in [references/systems.md](references/systems.md).
+Pick one, then copy its token table from [references/systems.md](references/systems.md). When the product type is ambiguous, default to **Product UI**.
 
 - **Product UI** — system sans, 16px base, ratio **1.2**. Dense dashboards, apps, dev tools. Tabular numerals for data. A 14px "compact" variant for enterprise density.
 - **Editorial / Long-form** — serif body at **18px / LH 1.6**, ratio **1.25**, measure **66ch**. Articles, blogs, docs prose. Space-before > space-after on headings.
 - **Marketing / Landing** — fluid `clamp()` display, ratio **1.333**, tight tracking at scale. Heroes, landing pages. Bigger body (18px), scrim on text-over-image.
 - **Docs / Technical** — Product UI scale + first-class **mono** (code blocks, inline code, API tables). Ligatures off in code, slashed-zero, tabular numerals.
 
-→ **Full token tables:** [references/systems.md](references/systems.md)
-
 ## Methodology (essentials)
 
 - **Build the scale from a base × ratio.** `size(n) = base × ratio^n`. Dense UI → 1.125–1.2; product/general → 1.2–1.25; editorial → 1.333–1.414; hero/display → 1.5–1.618. Round to whole/half px, expose as `rem`.
-- **Line-height scales inversely with size.** Body 1.5; headings 1.2; display 1.0–1.1. The bigger the text, the tighter the leading. Keep `line-height` **unitless** so it recomputes per element.
-- **Vertical rhythm on an 8px grid.** Rhythm unit = body size × body LH = 24px. Make every margin/padding a multiple of 4/8px. Don't pixel-chase a literal baseline grid — enforce a consistent spacing scale instead.
+- **Line-height scales inversely with size.** Body 1.5; headings 1.2; display 1.0–1.1. The bigger the text, the tighter the leading. Keep `line-height` **unitless** so it recomputes per element instead of inheriting a fixed length.
+- **Vertical rhythm on an 8px grid.** Rhythm unit = body size × body LH = 24px. Make every margin/padding a multiple of 4/8px. Enforce a consistent spacing scale rather than pixel-chasing a literal baseline grid — sub-pixel rounding and nested padding break literal grids anyway.
 - **Cap the measure.** Body `max-width: ~66ch` (≈ 45–75 characters/line). Too-long lines cause return-sweep errors; too-short break rhythm.
-- **Tracking is optical.** 0 on body; **−0.01 to −0.025em** on large headings (tighten as size grows); **+0.05 to +0.12em** on ALL-CAPS / small labels. Set in `em` so it scales.
-- **Weight carries hierarchy.** Body 400, headings 600 (700 for stronger). Large display can go lighter (400) because mass substitutes for weight. Prefer one good family with multiple weights before adding a second.
-- **Size in `rem`, fluid via `clamp()`.** `clamp(min_rem, calc(rem + vw), max_rem)` — keep min/max in `rem` and the preferred mixing a `rem` term, so text still scales at 200% zoom. Never `vw`-only.
-
-→ Deep dives: [scale.md](references/scale.md) · [readability.md](references/readability.md) · [fonts.md](references/fonts.md)
+- **Tracking is optical.** 0 on body; **−0.01 to −0.025em** on large headings (tighten as size grows); **+0.05 to +0.12em** on ALL-CAPS / small labels. Set in `em` so it scales with size.
+- **Weight carries hierarchy.** Body 400, headings 600 (700 for stronger). Large display can go lighter (400) because mass substitutes for weight. Reach for one good family with multiple weights before adding a second.
+- **Size in `rem`, fluid via `clamp()`.** `clamp(min_rem, calc(rem + vw), max_rem)` — keep both bounds in `rem` and mix a `rem` term into the preferred value, because browsers don't scale `vw` on zoom and a `vw`-only size fails WCAG 1.4.4.
 
 ## Examples
 
-### Example: body text sizing
+### Body text sizing
 
 ✅ Desired
 
@@ -81,7 +80,7 @@ body { font-size: 13px; line-height: 1.25; font-weight: 300; color: #9ca3af; } /
 
 Why it fails: 13px is below the floor, 300 thins the stroke, `#9ca3af` on white is ≈2.5:1 — all three readability failures at once, and px ignores the user's font-size setting.
 
-### Example: fluid heading
+### Fluid heading
 
 ✅ Desired
 
@@ -89,33 +88,25 @@ Why it fails: 13px is below the floor, 300 thins the stroke, `#9ca3af` on white 
 h1 { font-size: clamp(1.75rem, 1.1rem + 3.2vw, 3rem); line-height: 1.1; letter-spacing: -0.02em; } /* scales, caps, still zooms */
 ```
 
-Why it works: `rem` bounds + a `rem`-anchored preferred keep it readable at 200% zoom; the cap stops a runaway hero size.
+Why it works: `rem` bounds plus a `rem`-anchored preferred value keep it readable at 200% zoom, and the cap stops a runaway hero size.
 
 ## Gotchas
 
 - **Symptom:** Headings size right but feel cramped or loose. **Cause:** one fixed line-height everywhere. **Fix:** line-height *inverse* to size — body 1.5, headings 1.2, display ~1.05.
-- **Symptom:** Inputs zoom/jump on iPhone. **Cause:** form control text < 16px. **Fix:** inputs ≥16px; never `user-scalable=no`.
+- **Symptom:** Inputs zoom/jump on iPhone. **Cause:** form-control text < 16px. **Fix:** inputs ≥16px; never `user-scalable=no` (it disables pinch-zoom and fails WCAG).
 - **Symptom:** Long paragraphs are tiring to read. **Cause:** lines run 100+ characters. **Fix:** `max-width: 66ch` on body/prose containers.
-- **Symptom:** Heading floats between two sections. **Cause:** equal margin above and below. **Fix:** space-before > space-after (bind heading to the text under it).
+- **Symptom:** Heading floats between two sections. **Cause:** equal margin above and below. **Fix:** space-before > space-after, binding the heading to the text under it.
 - **Symptom:** Numbers in a table shift width as they change. **Cause:** proportional figures. **Fix:** `font-variant-numeric: tabular-nums`.
 - **Symptom:** Fluid type stops scaling at 200% zoom. **Cause:** `vw`-only `font-size`. **Fix:** `clamp(rem, calc(rem + vw), rem)`; browsers don't zoom `vw`.
-- **Symptom:** Text over a hero image is unreadable in spots. **Cause:** no scrim; contrast varies per pixel. **Fix:** add a semi-opaque overlay / `text-shadow`; verify the worst-case region.
-- **Symptom:** Bold looks smeared, italics weak. **Cause:** faux-synthesized weight/style the font file lacks. **Fix:** load real weights or use a variable font; `font-synthesis: none` to expose gaps.
-- **Symptom:** Theme/CSS says text should be ≥16px, but it renders small anyway. **Cause:** size-token names lie — Mantine `size="sm"`/`"xs"` compute to 14px/12px, Tailwind `text-sm`/`text-xs` to 14px/12px, both under the floor; nested `em` units also compound multiplicatively per level, shrinking silently as components nest. **Fix:** read the *computed* font-size in devtools, not the source class/token; prefer `rem` for font-size so it can't compound.
-- **Symptom:** Body text passes the floor but chart/graph text is still tiny and washed out. **Cause:** charting libraries (Recharts, Mantine charts) render text as SVG with their own inline `font-size`/`fill` — it doesn't inherit your CSS type scale or color tokens. **Fix:** target the library's text elements directly (e.g. `.recharts-wrapper text { font-size: …; fill: var(--text) }`) and re-verify the computed size/color — your stylesheet's cascade never reaches it.
-- **Symptom:** Every heading — often all body text too — silently renders in the browser's fallback serif (e.g. `Times`), even though the right fonts are imported and the theme references them correctly; source review finds nothing wrong. **Cause:** a CSS-variable-scope bug from combining `next/font`'s `variable` mode with a UI library that injects its font-family at `:root` (Mantine does this: `:root, :host { --mantine-font-family: var(--font-body) } `). If the font's `.variable` class name is applied only to `<body>` (a common `next/font` pattern), `--font-body` doesn't exist at `:root` — CSS custom properties never inherit upward from a descendant to an ancestor — so the `var()` reference is guaranteed-invalid and every consuming `font-family` rule falls back to the browser default. This is invisible from source; it only shows up in `getComputedStyle(document.body).fontFamily`. **Fix:** apply the font's `.variable` class name to `<html>`, not `<body>` — or better, follow the library's own documented pattern where one exists (Mantine's official guidance injects the resolved `font.style.fontFamily` string directly instead of a CSS variable, which sidesteps the bug entirely: [help.mantine.dev/q/next-load-fonts](https://help.mantine.dev/q/next-load-fonts)).
-- **Symptom:** Body text passes the floor everywhere you checked, but tables, nav labels, tooltips, menus, and form-field labels are still ~14px — and there's no `size` prop anywhere to explain it. **Cause:** component libraries commonly ship internal default sizes *below their own base* on specific components even though `Text`'s own default is safe — e.g. Mantine's `Table` cells, `NavLink` label, `Tooltip`, `Menu` item, `Alert`, `Notification`, `Tabs` tab, and `Input` label/description all default to the `sm` (14px) or `xs` (12px) token while `Text` defaults to `md` (16px). Grepping app code for `size="xs"`/`"sm"` finds none of these — there's no prop authored to grep for. **Fix:** override the *entire* size scale explicitly in the shared theme rather than assuming a safe `md` base means smaller components inherit it, and spot-check components you never explicitly sized, not just the ones you did.
+- **Symptom:** `line-height: clamp(1.3, 0.9rem + 0.4vw, 1.6)` silently does nothing. **Cause:** `clamp()` can't mix `<number>` bounds with a `<length>` preferred value, so the declaration is dropped. **Fix:** keep the unitless ratio and step it at a breakpoint instead of making leading fluid.
+- **Symptom:** Text over a hero image is unreadable in spots. **Cause:** no scrim; contrast varies per pixel. **Fix:** add a semi-opaque overlay or `text-shadow`, and verify the worst-case region.
+- **Symptom:** Bold looks smeared, italics weak. **Cause:** faux-synthesized weight/style the font file lacks. **Fix:** load real weights or a variable font; `font-synthesis: none` exposes the gaps.
+- **Symptom:** The theme says text should be ≥16px, but it renders small anyway. **Cause:** size-token names lie — Mantine `size="sm"`/`"xs"` and Tailwind `text-sm`/`text-xs` all compute to 14px/12px, under the floor; nested `em` units also compound multiplicatively as components nest. **Fix:** read the *computed* font-size in devtools, not the source token, and prefer `rem` for font-size so it can't compound.
+- **Symptom:** Body text passes the floor but chart text is still tiny and washed out. **Cause:** charting libraries (Recharts, Mantine charts) render SVG text with their own inline `font-size`/`fill`, which never inherits your type scale or color tokens. **Fix:** target the library's text elements directly (e.g. `.recharts-wrapper text { font-size: …; fill: var(--text) }`) and re-verify computed size and color.
+- **Symptom:** Every heading — often all body text too — renders in the browser's fallback serif, even though the fonts are imported and the theme references them correctly; source review finds nothing wrong. **Cause:** `next/font` in `variable` mode combined with a UI library that injects its font-family at `:root` (Mantine does: `:root, :host { --mantine-font-family: var(--font-body) }`). If the font's `.variable` class is applied only to `<body>`, `--font-body` doesn't exist at `:root` — custom properties never inherit upward — so every `var()` reference is invalid and falls back. It only shows up in `getComputedStyle(document.body).fontFamily`. **Fix:** apply the `.variable` class to `<html>`, or follow the library's own documented pattern where one exists ([Mantine injects the resolved `font.style.fontFamily` string](https://help.mantine.dev/q/next-load-fonts)).
+- **Symptom:** Body text passes the floor everywhere you checked, but tables, nav labels, tooltips, menus, and form-field labels are still ~14px — with no `size` prop anywhere to explain it. **Cause:** component libraries ship individual components below their own base — Mantine's `Table` cell, `NavLink` label, `Tooltip`, `Menu` item, `Alert`, `Notification`, `Tabs` tab, and `Input` label/description all default to `sm` (14px) or `xs` (12px) while `Text` defaults to `md` (16px). There's no authored prop to grep for. **Fix:** override the whole size scale explicitly in the shared theme, and spot-check components you never sized rather than only the ones you did.
 
 ## Integration
 
-- **color-system** — supplies the text/background hexes and contrast verification; this skill sets size, weight, and rhythm. Use together: pick colors there, size type here.
-- **frontend-design** — builds the actual components/layout; this one decides the type. Pick a system here, implement the UI there.
-- **generate-skill / rate-skill** — used to author and grade this skill itself.
-
-## References
-
-- Full token tables for all four systems (light, with rem/px/LH/weight/tracking): [references/systems.md](references/systems.md)
-- Type scale, vertical rhythm, measure, ratios: [references/scale.md](references/scale.md)
-- Readability & accessibility — minimum sizes, WCAG/APCA, fluid `clamp()`, failure modes: [references/readability.md](references/readability.md)
-- Fonts — system stacks, curated webfonts, pairing, font-level CSS, loading: [references/fonts.md](references/fonts.md)
-- Activation eval set (spot-check triggers): [references/EVAL.md](references/EVAL.md)
+- **color-system** — supplies the text/background hexes and verifies contrast; this skill sets size, weight, and rhythm. Pick colors there, size type here.
+- **frontend-design** — builds the components and layout; this skill decides the type. Pick a system here, implement the UI there.
