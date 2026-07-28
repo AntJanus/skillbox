@@ -7,11 +7,11 @@
 ```
 user: research htmx for me — thinking about using it for a side project
 
-assistant: [P0] No local material found.
-[P1] Interpreted as: htmx for a side project. Mode: default.
+assistant: [1] No local material found.
+[2] Interpreted as: htmx for a side project. Mode: default.
 Angles: Official, Comparative, Criticism, Currency, Community.
-[P3: 8 searches; WebFetch on htmx.org, two recent comparison posts, HN thread.]
-[P4: 8 searches, 5 angles, 4 full reads. Gap: htmx + auth flows thin.]
+[4] 8 searches; WebFetch on htmx.org, two recent comparison posts, HN thread.
+[5] searches: 8 | angles: 5 | full reads: 4 | gaps: htmx + auth flows thin
 
 # htmx — Research Summary
 
@@ -59,7 +59,7 @@ It's lightweight and an alternative to React. Some people like it.
 Sources: htmx.org
 ```
 
-**Why this is bad:** No Phase 0, no plan, single search, no cross-referencing, no Tl;dr, no confidence, vague unsourced claims, one source.
+**Why this is bad:** No local-first check, no plan, single search, no cross-referencing, no Tl;dr, no confidence, vague unsourced claims, one source.
 
 ## Example 2: Comparison Mode
 
@@ -68,10 +68,10 @@ Sources: htmx.org
 ```
 user: should I use Postgres or SQLite for a small SaaS?
 
-assistant: [P0] No local notes.
-[P1] Interpreted as: small SaaS = single-region, modest scale.
+assistant: [1] No local notes.
+[2] Interpreted as: small SaaS = single-region, modest scale.
 Mode: comparison. All five angles. Matrix required.
-[P3: 12 searches; WebFetch on official docs, Litestream/LiteFS, migration writeups.]
+[4] 12 searches; WebFetch on official docs, Litestream/LiteFS, migration writeups.
 
 # Postgres vs SQLite for Small SaaS — Research Summary
 
