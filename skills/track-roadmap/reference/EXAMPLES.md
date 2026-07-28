@@ -24,7 +24,6 @@ last_updated: 2026-03-16T10:00:00-07:00
 
 <!-- category:core -->
 
-- <!-- id:r_k8x2m status:done completed:2026-01-15 --> ~~**Task CRUD**~~ - Create, read, update, and delete tasks with title, description, and due date. *(Completed: 2026-01-15)*
 - <!-- id:r_m3p7q status:in-progress started:2026-02-01 --> **Task lists** - Organize tasks into named lists (e.g., Work, Personal, Shopping).
 - <!-- id:r_x9w1n status:planned --> **Due date reminders** - Notify users when tasks are approaching their due date.
 

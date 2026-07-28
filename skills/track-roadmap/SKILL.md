@@ -1,6 +1,6 @@
 ---
 name: track-roadmap
-description: Use this skill to maintain ROADMAP.md whenever the user wants to "add an item to the roadmap", "mark a feature done", "log the work I shipped", "create a roadmap", "what should we build next", "brainstorm features", or "audit the roadmap" — even if they don't mention the roadmap file by name. Covers the plan, update, audit, brainstorm, and resume modes. Do NOT use this skill for session-level task progress (see track-session), manual QA checklists (see track-qa), or free-form idea backlogs that aren't landing in a roadmap file.
+description: Use this skill to maintain ROADMAP.md whenever the user wants to "add an item to the roadmap", "mark a feature done", "log the work I shipped", "create a roadmap", "what should we build next", "brainstorm features", or "audit the roadmap" — even if they don't mention the roadmap file by name. Covers the generate, update, audit, brainstorm, and resume modes. Do NOT use this skill for session-level task progress (see track-session), manual QA checklists (see track-qa), or free-form idea backlogs that aren't landing in a roadmap file.
 license: MIT
 argument-hint: "[generate|update|audit|brainstorm|resume]"
 metadata:
@@ -87,8 +87,13 @@ last_updated: YYYY-MM-DDTHH:MM:SS-TZ
 
 <!-- category:core -->
 
-- <!-- id:r_k8x2m status:done completed:2026-01-15 --> ~~**Task CRUD**~~ - Create/read/update/delete tasks with title, description, due date. *(Completed: 2026-01-15)*
 - <!-- id:r_m3p7q status:in-progress started:2026-02-01 --> **Task lists** - Organize tasks into named lists (Work, Personal, Shopping).
+
+## Completed
+
+<!-- category:completed -->
+
+- <!-- id:r_k8x2m status:done completed:2026-01-15 --> ~~**Task CRUD**~~ - Create/read/update/delete tasks with title, description, due date. *(Completed: 2026-01-15)*
 ```
 
 ❌ **Bad** — `- tasks` / `- lists` / `- make it look good` / `- fix bugs`: no descriptions, no groupings, mixes features with tasks, no IDs or purpose.
