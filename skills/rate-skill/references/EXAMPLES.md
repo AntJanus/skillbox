@@ -1,35 +1,22 @@
 # Rate Skill — Worked Examples
 
-## Example 1 — a description that trips the vague-trigger cap
+## Example 1 — a matchable description vs one that trips the vague-trigger cap
 
-❌ Caps Category 1 at 50 — no user-language triggers, no distinctive noun, nothing an agent can match a request against:
-
-```yaml
-description: Use this skill whenever the user needs help with documentation tasks and related workflows.
-```
-
-✅ Same job, made matchable:
+✅ Distinctive noun, literal user-language triggers, negative scope:
 
 ```yaml
 description: Use this skill to update a CHANGELOG.md whenever the user wants to log a release. Triggers include "add this to the changelog", "prepare the v2.1 release notes", or "what changed since the last tag". Do NOT use this skill for writing commit messages.
 ```
 
-## Example 2 — frontmatter cleanup
-
-❌ Top-level fields that belong in `metadata`, plus a first-person vague description:
+❌ Same job, caps Category 1 at 50 — no user-language triggers, no distinctive noun, nothing an agent can match a request against:
 
 ```yaml
----
-name: My-Skill                # uppercase
-version: "1.0.0"              # top-level — move under metadata
-tags: [react, hooks]          # top-level — move under metadata
-description: I help you work with React and hooks.   # first-person + no triggers
----
+description: Use this skill whenever the user needs help with documentation tasks and related workflows.
 ```
 
-*(`hooks` is **not** a finding — it's a valid Claude Code top-level key. Don't deduct for it; see the extension-key gotcha in SKILL.md.)*
+## Example 2 — frontmatter cleanup
 
-✅ Patch:
+✅ The target shape — accepted keys only, extras nested under `metadata`:
 
 ```yaml
 ---
@@ -43,6 +30,19 @@ metadata:
   tags: [react, hooks]
 ---
 ```
+
+❌ What it looked like before the patch — top-level fields that belong in `metadata`, plus a first-person vague description:
+
+```yaml
+---
+name: My-Skill                # uppercase
+version: "1.0.0"              # top-level — move under metadata
+tags: [react, hooks]          # top-level — move under metadata
+description: I help you work with React and hooks.   # first-person + no triggers
+---
+```
+
+*(`hooks` is **not** a finding — it's a valid Claude Code top-level key. Don't deduct for it; see the extension-key gotcha in SKILL.md.)*
 
 ## Example 3 — a complete report (abridged category rows, one finding shown)
 

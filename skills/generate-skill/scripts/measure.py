@@ -2,7 +2,10 @@
 """Report description length, body lines, and estimated body tokens for a SKILL.md."""
 import sys
 
-import yaml
+try:
+    import yaml
+except ModuleNotFoundError:
+    sys.exit("measure.py needs PyYAML: pip install pyyaml (or pipx/uv equivalent)")
 
 path = sys.argv[1] if len(sys.argv) > 1 else "SKILL.md"
 raw_text = open(path).read()
