@@ -29,3 +29,13 @@ description: I help you work with Word documents. Use when you need to edit file
 ```
 
 Why it fails: (1) first-person POV depresses activation (Seleznov n=650); (2) no distinctive noun in the first 50 chars ("Word documents" is buried, "docx" absent); (3) no literal trigger phrases; (4) no negative scoping against the pdf near-neighbor.
+
+## Example: the same skill, repaired
+
+✅ Desired description
+
+```yaml
+description: docx authoring toolkit. Use whenever the user asks to "create a Word doc", "edit a .docx", "add tracked changes", or "extract text from docx" — even if they only say "this report" and name a .docx file. Do NOT use for PDF — see the pdf skill.
+```
+
+Why it works: the counter-example's four defects reversed — third person, "docx" in the first 5 chars, four literal triggers plus a coverage clause, explicit negative scope.
