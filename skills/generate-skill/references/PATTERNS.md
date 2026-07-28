@@ -12,6 +12,17 @@ Full body templates for the five skill types used in the generate-skill workflow
 | reference | Domain schemas, conventions, lookup tables (bigquery, style guides) | Information on demand | Overview + navigation, per-domain references/ files |
 | automation | Wraps a script or external command (screenshots, recordings) | Workflow automation | Command Surface, Sample Invocation, Failure Modes, Gotchas |
 
+The Key Sections columns here and `rate-skill`'s Category 4 table are the same shared spec — keep them in sync.
+
+## Calibrating Control (applies to every template)
+
+Match specificity to fragility, per section — not per skill (official: agentskills.io best-practices):
+
+- **Give the agent freedom** when multiple approaches are valid and the task tolerates variation. State the goal and constraints, not the steps.
+- **Be prescriptive** when operations are fragile, consistency matters, or a specific sequence must be followed ("Run exactly this sequence…" is legitimate there).
+- **Explain the why either way** — "Do X because Y tends to cause Z" outperforms bare mandates; an agent that understands the purpose makes better context-dependent decisions.
+- Never instruct the agent to echo its reasoning in the response — triggers the `reasoning_extraction` refusal on Claude Fable 5.
+
 ---
 
 ## methodology — Workflow Enforcement
@@ -158,7 +169,7 @@ command-here
 |--------|--------|-------|
 | [Signal 1] | 25 | [How to measure it] |
 
-## How It Works
+## Workflow
 1. Read specified files
 2. Check against the rubric
 3. Output findings in priority order
