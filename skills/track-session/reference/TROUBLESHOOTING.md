@@ -8,8 +8,8 @@ Additional troubleshooting beyond the common issues covered in SKILL.md.
 
 **Solution:**
 - Collapse finished phases to one-line entries under `## Completed Work` — the detail already lives in git history and commit messages, so it doesn't need to sit in the file.
-- When a session is genuinely done, start the next one by **replacing** the file (see the Start-mode collision policy in SKILL.md), not by appending to it. Don't accrete `# (Previous session)` blocks.
-- Only if you truly need the old context readable, move it to a topic-named `SESSION_ARCHIVE_<topic>.md` and keep `SESSION_PROGRESS.md` to the active session. In practice, replace-and-trust-git is simpler and is the default.
+- When a session is genuinely done, start the next one from a clean file rather than appending to it — don't accrete `# (Previous session)` blocks.
+- Before replacing anything, run the tracked check from the Start-mode collision policy in SKILL.md (`git ls-files --error-unmatch SESSION_PROGRESS.md`). Tracked means git holds the old copy and replacing is reversible. Untracked or gitignored means it isn't, so move the old content to a topic-named `SESSION_ARCHIVE_<topic>.md` first and keep `SESSION_PROGRESS.md` scoped to the active session.
 
 ## Problem: Repeated failed attempts with same approach
 
