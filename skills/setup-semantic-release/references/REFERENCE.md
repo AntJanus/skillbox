@@ -1,40 +1,25 @@
 # Semantic Release — Extended Reference
 
-## Commit message cheat sheet
+## Commit type cheat sheet
+
+The full accepted-type list and what each one does to the version. `feat` and `fix` are the only types that release on their own.
 
 ```
-feat(auth): add login endpoint          # minor bump
+feat(auth): add login endpoint           # minor bump
 fix(api): handle null response           # patch bump
 feat!: redesign user model               # MAJOR bump
 docs: update readme                      # no release
-test: add unit tests for parser          # no release
-chore: update dependencies               # no release
+style: reformat with prettier            # no release
 refactor(core): simplify error handling  # no release
-
-# With body and breaking-change footer:
-feat(api): add pagination support
-
-Adds offset/limit parameters to all list endpoints.
-
-BREAKING CHANGE: removed `page` parameter in favor of `offset`
+perf(parser): cache compiled regexes     # no release
+test: add unit tests for parser          # no release
+build: switch to esbuild                 # no release
+ci: cache node_modules                   # no release
+chore: update dependencies               # no release
+revert: revert "feat: add login"         # no release
 ```
 
-✅ **Good** — clear types, optional scopes, lowercase subjects; semantic-release produces a clean changelog grouped by type:
-
-```
-feat(parser): add yaml frontmatter extraction
-fix(writer): handle unicode in file paths
-test: add e2e tests for compile workflow
-chore(release): 1.0.0 [skip ci]
-```
-
-❌ **Bad** — no types, mixed concerns, uppercase, vague subjects; commitlint rejects these and no meaningful changelog can be derived:
-
-```
-Added parser stuff
-WIP
-updated tests and also fixed a bug and refactored
-```
+A history of only no-release types produces no version at all — semantic-release exits reporting there is nothing to release, which is correct behavior, not a misconfiguration.
 
 ## Multi-branch / pre-release config
 
@@ -72,17 +57,25 @@ npx semantic-release --dry-run                # shows next version (needs token 
 
 ## Troubleshooting
 
-### Commitlint rejects valid-looking messages
-Subject starts with uppercase or header exceeds 100 chars. `feat: Add feature` fails; `feat: add feature` passes (the `subject-case` rule enforces lowercase).
+Symptoms whose cause is already covered by the Gotchas in `SKILL.md` — check the named setting first:
 
-### Husky hooks don't run
-Hooks not installed or `.husky/` missing. Re-run `npx husky init`, re-create the hook files, verify `"prepare": "husky"` is in package.json, run `npm install` to trigger it.
+| Symptom | Setting to check |
+|---|---|
+| Commitlint rejects a message that looks fine | `subject-case` (lowercase subject) and `header-max-length` (100) |
+| Every commit fails before commitlint prints any rule violations | `commitlint.config.js` module syntax vs the package's `"type"` |
+| Release commit itself fails the hook | `'body-max-line-length': [0]` |
+| CI releases in a loop | `[skip ci]` in the `@semantic-release/git` message |
+| `ENOGITHEAD` / `EGITNOBRANCH` in CI | `fetch-depth: 0` on the checkout step |
+| Release succeeds but nothing lands on npm | `@semantic-release/npm` missing from the `plugins` array |
 
-### Semantic-release creates duplicate changelog entries
-The `body-max-line-length` rule conflicts with semantic-release's generated notes. Set `'body-max-line-length': [0]` in commitlint config (already in the template).
+### Husky hooks don't run at all
 
-### CI release creates an infinite loop
-The release commit triggers another CI run. The `[skip ci]` tag in the `@semantic-release/git` commit `message` prevents this — verify it's present.
+`.husky/` is missing, or the hooks were never installed into `.git/hooks`. Re-run `npx husky init`, re-create the hook files, confirm `"prepare": "husky"` is in package.json scripts, then run `npm install` to trigger it. Hooks also stay dormant for anyone who cloned before `prepare` existed until they reinstall.
 
-### "ENOGITHEAD" / "EGITNOBRANCH" in CI
-Shallow clone lacks full git history. Ensure `fetch-depth: 0` in the checkout step.
+### semantic-release reports "no release published" on a branch with new work
+
+Either every commit since the last tag is a no-release type (see the cheat sheet above), or `branches` in `.releaserc.json` doesn't include the branch being pushed. `npx semantic-release --dry-run` prints which branch it matched and which commits it analyzed.
+
+### The GitHub release fires but `CHANGELOG.md` is empty
+
+`@semantic-release/changelog` is listed after `@semantic-release/git`, so the changelog file is written after the commit that was supposed to contain it. Reorder: analyzer → notes-generator → changelog → git → github.
