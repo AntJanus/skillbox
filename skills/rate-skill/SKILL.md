@@ -1,6 +1,6 @@
 ---
 name: rate-skill
-description: Grades a SKILL.md A-F with prioritized, paste-ready fixes. Use whenever the user asks to "rate this skill", "grade this skill", "audit my SKILL.md", or "score this skill". Do NOT use for code review or for new skills (see generate-skill).
+description: Use this skill whenever the user wants to grade a SKILL.md — rate, audit, or score it. Triggers include "rate this skill", "grade this skill", "audit my SKILL.md", "score this skill against best practices", or "is this SKILL.md up to spec", even if they don't use the word "rate". Returns a letter grade A-F, weighted category scores, and prioritized paste-ready patches. Do NOT use this skill for code review (see code-review) or for authoring a new skill (see generate-skill).
 license: MIT
 argument-hint: "<path/to/SKILL.md>"
 allowed-tools: Read, Glob, Grep
@@ -11,9 +11,9 @@ metadata:
 
 # Rate Skill
 
-Audits a single `SKILL.md` against current activation-driven authoring practice and returns a letter grade, weighted category scores, prioritized findings with concrete patches, named strengths, and a projected grade after fixes.
+## Overview
 
-The rubric is anchored to (a) the agentskills.io spec and its skill-creation pages (best-practices, optimizing-descriptions, evaluating-skills), (b) Anthropic's `skill-creator` guidance, (c) Seleznov's activation study (n=650, p<0.0001) showing directive third-person descriptions carry ~20× higher activation odds (CMH OR 20.6) than passive prose, and (d) the Claude Fable 5 prompting guidance on prescriptiveness and reasoning extraction.
+Audits a single `SKILL.md` against current activation-driven authoring practice and returns a letter grade, weighted category scores, prioritized findings with concrete patches, named strengths, and a projected grade after fixes. Grade against the rubric text below, not memory — every rule's source lives in `## References`.
 
 ## Workflow
 
@@ -39,6 +39,8 @@ The rubric is anchored to (a) the agentskills.io spec and its skill-creation pag
 
 Letter mapping: A 90–100, B 80–89, C 70–79, D 60–69, F <60.
 
+**Deduction scale.** Magnitudes are anchored so one violation is recoverable and repeated ones are not: −15 (frontmatter) means four errors floor the category; −20 (missing required section, §7 occurrence) means three floor it; −10 marks soft/style issues a skill can absorb several of before dropping a letter overall. Caps (40 / 50 / 70) express "this defect alone determines the ceiling regardless of what else is right."
+
 ### 1. Description quality (25)
 
 Full marks require all five:
@@ -54,7 +56,7 @@ Length and style:
 - Official conciseness guidance is "a few sentences to a short paragraph" — no numeric target. Note verbosity in the report; don't deduct by character count below the cap.
 - >1024 chars: cap at 50 (spec hard cap per agentskills.io).
 - Vague triggers ("helps with documents", "use for tasks"): cap at 50.
-- YAML scalar style (`|`, `>`, single-line) is **not scored**. The old multiline-breaks-discovery bug (#9817) is fixed as of Claude Code 2.1.220 — verified empirically 2026-07-27.
+- YAML scalar style (`|`, `>`, single-line) is **not scored** (see Retired rules in references/EXAMPLES.md).
 
 ### 2. Frontmatter validity (20)
 
@@ -80,7 +82,7 @@ Deduct 10: `compatibility` over its 500-char spec cap.
 
 ### 4. Structure fit for type (15)
 
-This table is the **shared section spec** — `generate-skill` emits it, `rate-skill` grades it. Keep the two skills in sync when editing.
+This table is the **shared section spec**, identical to the one `generate-skill` emits.
 
 | Type | Required sections | Optional |
 |---|---|---|
@@ -183,22 +185,28 @@ Every report includes at least one strength (even on F-tier skills — users aba
 
 ## Examples
 
-Worked examples — directive-description rewrite, frontmatter cleanup, and a desired report opener: **[references/EXAMPLES.md](./references/EXAMPLES.md)**.
+✅ Directive third person, distinctive token front-loaded, enumerated triggers, negative scope:
+
+```yaml
+description: Use this skill whenever the user wants to review a React component for hook misuse, infinite-loop risk, or dependency-array bugs. Triggers include "review this component", "check my hooks", or "audit this React file". Do NOT use this skill for general code review.
+```
+
+❌ Passive and trigger-free — caps Category 1 at 70:
+
+```yaml
+description: Use when reviewing React components for hook issues.
+```
+
+Further worked examples — frontmatter cleanup, a full sample report, and retired rules: **[references/EXAMPLES.md](./references/EXAMPLES.md)**.
 
 ## Gotchas
 
-- **YAML scalar style is not a finding.** The historical "multiline `description:` breaks discovery" rule (#9817) was real through mid-2026 but is fixed as of Claude Code 2.1.220 (verified empirically 2026-07-27 with probe skills). Don't reintroduce it; don't deduct for `|` or `>`.
-- **No numeric description soft target exists.** Official guidance is "a few sentences to a short paragraph" plus the 1024 hard cap. The old ≤230 house target had no official basis; Claude Code's listing eviction is least-invoked-first, so workhorse skills keep full text anyway.
-- **The listing cap is separate from the spec cap.** Claude Code caps `description` + `when_to_use` at a combined 1,536 chars for the listing (configurable via `skillListingMaxDescChars`); `skillListingBudgetFraction` defaults to ~1% of context.
-- **`tags` does nothing functionally at top level.** No discovery system consumes it. If found at top level, demote to `metadata.tags` rather than deleting — preserves user intent.
-- **First-person POV breaks activation.** "I'll help you…" empirically under-activates even with identical body. Cap Category 1 at 40 on detection.
-- **`<Good>`/`<Bad>` XML tags are a SkillBox-only convention.** Zero of 8 surveyed Anthropic/Vercel/Superpowers skills use them. Recommend ✅/❌ or prose `## Anti-Pattern:` headers.
-- **Claude Code extension keys vs the packaging validator.** `argument-hint`, `hooks`, `paths`, `when_to_use` are valid Claude Code runtime keys but are rejected by Anthropic's repo packaging validator (`quick_validate.py`) and absent from the universal spec. Don't penalize them — note the portability caveat only if the skill targets submission to anthropics/skills.
-- **The official structural validator is `skills-ref validate <path>`** (from agentskills/agentskills, cited by the spec). Recommend it — not `npx skills lint`/`validate`, which does not exist (vercel-labs/skills ships no validation command; the one PR for it died unmerged).
-- **Negation is poorly handled by LLMs** (arXiv 2503.22395). When you see a bare "DO NOT X" inside the body, recommend pairing with a positive directive — "Do Y instead of X."
-- **Don't grade prescription as a defect per se.** "Be prescriptive when operations are fragile, consistency matters, or a specific sequence must be followed" is official. The finding is *miscalibration*, in either direction.
-- **Standards are calibrated for activation reliability, not curve-grading.** B grade is "production ready" — not a near-failure. Anchor every category to the rubric, not "most skills are worse than this one."
-- **Eval sets are a requirement with a finding, not a bonus.** The old +5 for shipping one is gone; its absence is a P1. The skill-creator optimizer behind this shipped 2026-03-03 (not "May 2026" — a date error that circulated in earlier notes).
+- **The listing cap is separate from the spec cap.** Claude Code caps `description` + `when_to_use` at a combined 1,536 chars for the listing (configurable via `skillListingMaxDescChars`); `skillListingBudgetFraction` defaults to ~1% of context. Neither is the 1024-char spec cap in §1.
+- **`tags` does nothing functionally at top level.** No discovery system consumes it. Demote to `metadata.tags` rather than deleting — preserves user intent.
+- **Claude Code extension keys vs the packaging validator.** `argument-hint`, `hooks`, `paths`, and `when_to_use` are valid Claude Code runtime keys but are rejected by Anthropic's repo packaging validator (`quick_validate.py`) and absent from the universal spec. Don't penalize them — raise the portability caveat only if the skill targets submission to anthropics/skills.
+- **Recommend `skills-ref validate <path>`** (agentskills/agentskills) as the structural validator. Do not recommend `npx skills lint` or `npx skills validate` — vercel-labs/skills ships no validation command.
+- **Negation is poorly handled by LLMs** (arXiv 2503.22395). When a bare "DO NOT X" appears in a graded skill's body, recommend pairing it with a positive directive — "Do Y instead of X."
+- **B is production ready, not a near-failure.** Anchor every category to the rubric text, never to "most skills are worse than this one."
 
 ## References
 
