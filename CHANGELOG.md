@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Breaking Changes
+
+- **rate-skill** (3.2.0 → 4.0.0): rubric re-anchored to the official agentskills.io skill-creation pages (best-practices, optimizing-descriptions, evaluating-skills) and the Claude Fable 5 prompting guidance. Grades under the old rubric are not comparable.
+  - **Eval sets are now a requirement, not a bonus.** The +5 for shipping one is gone; a missing set is a standing P1 finding. Present sets are verified against the official description-optimization loop: ~20 queries (8–10 each direction), 60/40 train/validation split with proportional mix, 3-runs-per-query trigger-rate protocol against the 0.5 default threshold, select-by-validation-score.
+  - **Dropped scoring:** the multiline-`description:` automatic 0 (#9817 is not reproducible on Claude Code 2.1.220 — verified empirically 2026-07-27; scalar style is no longer policed at all) and the ≤230-char soft-target ladder (no official basis; official sizing is "a few sentences to a short paragraph" plus the 1024 hard cap).
+  - **New checks:** miscalibrated control in either direction (official rule is "match specificity to fragility" — prescription itself is not a defect); reasoning-echo instructions (always a P0 — `reasoning_extraction` refusal risk on Fable 5); instruction-pattern fit (the six official patterns, rewarded by fit, not presence); the ~5,000-token joint body cap alongside 500 lines; `compatibility` ≤500 chars; the context-economy cut test ("would the agent get this wrong without this instruction?").
+  - Category 4's table is now the **shared section spec** with generate-skill, with Gotchas required for every type (canonical per agentskills.io).
+  - Corrections baked in: the skill-creator eval announcement is dated 2026-03-03 (not "May 2026"); the validator to recommend is `skills-ref validate` (agentskills/agentskills) — `npx skills lint`/`validate` does not exist.
+- **generate-skill** (3.2.1 → 4.0.0): Phase 8 is replaced by the official agentskills.io description-optimization loop — train/validation split, fixed across iterations, trigger-rate measurement, iterate-on-train-only, select-by-validation (overfitting guard), with a pointer to the with/without-skill output-quality loop for methodology/auditing bodies. Phase 2 drops the ≤230 target and all block-scalar prohibitions and adds the officially recommended "even if they don't explicitly mention X" coverage clause. Phase 4's section lists are now the shared spec with rate-skill and add calibrate-control-per-section, the six official instruction patterns, defaults-not-menus, procedures-over-declarations, and the reasoning-echo prohibition. Core principles gain the add-what-the-agent-lacks cut test. Both meta-skills now ship their own `references/EVAL.md` in the new format.
+
 ## [6.1.1] - 2026-07-27
 
 Follow-up to v6.1.0: the eval pass rewrote the SKILL.md body but left `references/` on pre-audit advice, so the progressive-disclosure links pointed at guidance the body had just reversed — including one outright contradiction.
