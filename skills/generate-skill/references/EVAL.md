@@ -36,7 +36,9 @@ Official-loop format (agentskills.io optimizing-descriptions): 18 queries, 9 sho
 
 | Variant | Date | Train pass | Validation pass | Selected |
 |---|---|---|---|---|
-| 4.0.0 (coverage clause added) | | | | |
+| 4.0.0 (near-neighbor scope: +track-roadmap, +track-qa) | 2026-07-28 | not yet run | 7/8 | ✓ |
+
+Measured rates 2026-07-28 (3 fresh sonnet sessions per query, scratch project with all 14 skills installed): V1 1.00, V2 1.00, V3 1.00, V4 0.00 **FAIL**, V5–V8 all 0.00 (all four should-nots correctly silent, including "create a QA list"). V4 ("make this checklist into a reusable skill") is the known cost of dropping "checklist" from the coverage clause to avoid the track-qa collision — a deliberate precision-over-recall trade. If a future variant re-adds checklist coverage, it must keep V6 at 0.00; iterate on train, not against this query.
 
 ## Notes
 

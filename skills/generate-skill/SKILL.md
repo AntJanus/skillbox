@@ -1,6 +1,6 @@
 ---
 name: generate-skill
-description: Interactive SKILL.md builder. Use whenever the user asks to "create a skill", "generate a skill", "scaffold a SKILL.md", "write a SKILL.md", or "turn this workflow into a skill" — even if they don't say "skill" and only describe wanting to make a workflow, checklist, or convention reusable for the agent. Do NOT use for grading existing skills (see rate-skill).
+description: Interactive SKILL.md builder. Use this skill whenever the user asks to "create a skill", "generate a skill", "scaffold a SKILL.md", "write a SKILL.md", or "turn this workflow into a skill" — even if they don't say "skill" and only describe wanting to make a repeatable agent workflow or convention. Do NOT use for grading an existing SKILL.md (see rate-skill), project roadmaps (see track-roadmap), or manual-QA checklists (see track-qa).
 license: MIT
 argument-hint: "[skill-topic]"
 metadata:
@@ -110,7 +110,7 @@ Pick the template that matches the skill type. Full templates live in [reference
 
 Compact summary — this is the **shared section spec** graded by `rate-skill` Category 4; keep the two skills in sync:
 
-- **methodology** — Overview, Workflow (phased, one task per phase), Examples (✅ first, ❌ last), Gotchas. Optional: Verification Checklist, Quality Signals / Anti-Patterns.
+- **methodology** — Overview, Workflow (phased, one task per phase), Examples (✅ first; end on ✅ too where there's room — see Phase 5), Gotchas. Optional: Verification Checklist, Quality Signals / Anti-Patterns.
 - **technical** — Overview, Quick Start / Setup (one minimal code block), Quick Reference or API surface, Examples, Gotchas. Optional: Troubleshooting. Move long API surface to `references/API.md`.
 - **auditing** — Overview, Workflow, Rubric (table: signal → weight → check), Output Format, Examples of high/low-quality artifacts, Gotchas.
 - **reference** — Overview, Navigation (load-when table), Gotchas; optional short Core Concepts. SKILL.md stays a router; don't inline the data.
@@ -124,7 +124,7 @@ Body rules that apply to every type:
 - Favor procedures over declarations: teach how to approach the class of problem, not what to output for one instance.
 - **Never instruct the agent to echo its reasoning** ("show your thinking", "explain your reasoning in the response") — this can trigger the `reasoning_extraction` refusal category on Claude Fable 5 and causes model fallbacks.
 
-Length budget: aim <300 lines in SKILL.md (house aim); the canonical cap is joint — **under 500 lines and ~5,000 tokens** (a dense code-heavy body can breach tokens while passing lines). The ETH Zurich AGENTS.md study (arXiv 2602.11988) found context files generally don't improve task success while adding >20% inference cost.
+Length budget: aim <300 lines in SKILL.md (house aim); the canonical cap is joint — **under 500 lines and ~5,000 tokens** (a dense code-heavy body can breach tokens while passing lines; sources in `## References`).
 
 ### Phase 5 — Examples
 
@@ -152,7 +152,7 @@ Why it works: <one sentence>.
 Why it fails: <one sentence>.
 ```
 
-Do not use `<Good>` / `<Bad>` XML tags — they appear in zero of the 8 surveyed top community skills.
+Use ✅ / ❌ markdown markers, not `<Good>` / `<Bad>` XML tags — the XML form appears in zero of the 8 surveyed top community skills.
 
 ### Phase 6 — Gotchas
 
@@ -162,7 +162,7 @@ Pair every "do not X" with a positive directive — negation handling in LLMs is
 
 ### Phase 7 — Progressive disclosure check
 
-Measure with `scripts/measure.py`. The canonical cap is joint — 500 lines and ~5,000 tokens — and the house aim sits at 60% of it, so extract once SKILL.md exceeds 300 lines or ~3,000 tokens, whichever comes first:
+Measure with `scripts/measure.py`. Extract once SKILL.md exceeds 300 lines (the house aim); treat the canonical joint cap from Phase 4 — 500 lines / ~5,000 tokens — as the hard ceiling either way:
 
 1. List candidate sections to extract, largest first.
 2. Propose `references/<TOPIC>.md` files (plural — the spec-documented name; nothing validates directory names, so never rename an existing singular `reference/` dir just for style).
@@ -176,7 +176,7 @@ Build the eval set the official description-optimization loop consumes (agentski
 1. **Generate ~20 queries**: 8–10 **should-trigger** (from the Phase 1 trigger phrases, plus paraphrases and indirect asks) and 8–10 **should-not-trigger** (near-neighbor skills from the Phase 1 negative scope, plus unrelated work).
 2. **Split 60% train / 40% validation**, with a proportional mix of should/should-not in both halves. Shuffle once; keep the split fixed across iterations.
 3. **Save as `references/EVAL.md`** with the split marked and the measurement protocol stated: run each query in a fresh session ~3 times; trigger rate = fraction of runs that invoked the skill; should-trigger passes above 0.5, should-not-trigger below 0.5 (official default threshold).
-4. **Iterate on train failures only** — rework the Phase 2 description, never peek at validation to choose wording. Check validation after; **select the description with the best validation score** (an earlier draft can beat the last one — later iterations overfit). Five iterations is usually enough.
+4. **Iterate on train failures only** — rework the Phase 2 description, never peek at validation to choose wording. Check validation after; **select the description with the best validation score** (an earlier draft can beat the last one — later iterations overfit). "Five iterations is usually enough" (official guidance).
 5. Ask the user to spot-check 3–5 queries in a fresh Claude session before finalizing.
 
 Caveat (official): agents consult skills for tasks beyond what they can handle alone — a trivially simple query may not trigger even a perfectly described skill. Don't churn the description over those.
@@ -197,7 +197,19 @@ For measuring whether the **body** actually improves output (not just triggering
 
 ## Examples
 
-Worked description examples (methodology ✅, technical ✅, counter-example ❌): **[references/EXAMPLES.md](references/EXAMPLES.md)**.
+✅ Distinctive token first, literal triggers, coverage clause, negative scope:
+
+```yaml
+description: docx authoring toolkit. Use whenever the user asks to "create a Word doc", "edit a .docx", or "add tracked changes" — even if they only say "this report" and name a .docx file. Do NOT use for PDF — see the pdf skill.
+```
+
+❌ First person, buried noun, no triggers, no scope:
+
+```yaml
+description: I help you work with Word documents. Use when you need to edit files.
+```
+
+Full worked set (methodology ✅, technical ✅, counter-example ❌, repaired ✅): **[references/EXAMPLES.md](references/EXAMPLES.md)**.
 
 ## Gotchas
 
