@@ -1,18 +1,20 @@
 ---
 name: record-tui
-description: Records terminal demos and TUI screencasts with VHS. Use this skill whenever the user wants to "record a demo", "create a GIF of my CLI", "write a VHS tape", "make a terminal recording", or "add a demo GIF to the README".
+description: Use this skill to record a terminal or TUI demo with VHS whenever the user wants to "record a demo", "create a GIF of my CLI", "write a VHS tape", "make a terminal recording", or "add a demo GIF to the README" — even if they never say "VHS" and only ask for an animated demo of a command-line tool. Covers tape syntax, dimensions, pacing, GIF size reduction, and CI golden-file recording. Do NOT use this skill to screenshot a web app on localhost (see screenshot-local) or to capture video of anything outside a terminal.
 license: MIT
 argument-hint: "<app-command> [output-format]"
 metadata:
   author: Antonin Januska
-  version: "1.5.1"
+  version: "1.6.0"
 ---
 
 # Record TUI — VHS Terminal Recording
 
-Record polished terminal demos with [Charmbracelet VHS](https://github.com/charmbracelet/vhs) — `.tape` scripts → GIF / MP4 / WebM, reproducible and CI-friendly. **Core principle:** write tape files as code, not screen captures; every demo reproducible from one `.tape`. For web UIs use `screenshot-local` instead; for throwaway recordings use `asciinema`.
+## Overview
 
-## Prerequisites
+[Charmbracelet VHS](https://github.com/charmbracelet/vhs) renders a `.tape` script to GIF / MP4 / WebM / ASCII. Write the demo as code rather than capturing a screen, because a `.tape` re-renders unattended when the app changes and runs the same way in CI. For a throwaway recording nobody will re-run, `asciinema` is lighter.
+
+## Setup
 
 ```bash
 # macOS
@@ -20,18 +22,18 @@ brew install charmbracelet/tap/vhs ffmpeg ttyd
 # Debian/Ubuntu
 sudo apt install ffmpeg && sudo snap install ttyd --classic && go install github.com/charmbracelet/vhs@latest
 
-vhs --version && ffmpeg -version && ttyd --version   # verify all three
+vhs --version && ffmpeg -version && ttyd --version   # all three are required
 ```
 
 ## Tape file structure
 
-Settings must come before commands:
+Every `Set` goes above the first interaction command. A `Set` placed lower is silently discarded — see Gotchas.
 
 ```tape
 Output demo.gif              # 1. output (gif/mp4/webm/ascii)
-Require my-app               # 2. fail fast if dependency missing
+Require my-app               # 2. fail fast if the app is missing
 
-Set Shell "bash"             # 3. settings, grouped before any command
+Set Shell "bash"             # 3. settings, all grouped before any command
 Set FontSize 20
 Set Width 1200
 Set Height 600
@@ -40,7 +42,7 @@ Set WindowBar Colorful
 Set Padding 20
 Set TypingSpeed 75ms
 
-Hide                         # 4. hidden setup — always Ctrl+L before Show
+Hide                         # 4. hidden setup — Ctrl+L before Show
 Type "export TERM=xterm-256color"
 Enter
 Sleep 500ms
@@ -51,38 +53,36 @@ Type "my-app --demo"         # 5. visible interactions, with deliberate pauses
 Sleep 500ms
 Enter
 Sleep 2s
-Down Down Down               # 6. app interaction
+Down 3                       # 6. app interaction
 Enter
-Sleep 3s                     # generous final frame for the loop
+Sleep 3s                     # generous final frame before the loop restarts
 ```
+
+## Quick reference
 
 | Command | Purpose |
 |---------|---------|
-| `Output file.gif` | Output file + format (gif/mp4/webm/ascii) |
-| `Require app` | Fail if dependency missing |
-| `Set Key Value` | Terminal settings (FontSize, Width, Height, Theme, …) |
-| `Type "text"` / `Type@100ms "text"` | Emulate typing (optionally at a set speed) |
-| `Enter` / `Tab` / `Space` | Key presses |
-| `Up`/`Down`/`Left`/`Right` (`Down 3`) | Navigation with optional repeat |
-| `Ctrl+key` | Modifier combos |
-| `Sleep 2s` | Pause (ms or s) |
-| `Wait+Screen /regex/` | Wait until screen content matches |
-| `Hide` / `Show` | Control recording visibility |
-| `Screenshot file.png` | Capture current frame |
-| `Env VAR "val"` / `Source other.tape` | Set env var / include another tape |
-
-Full command + settings detail: **[reference/COMMAND-REFERENCE.md](./reference/COMMAND-REFERENCE.md)**.
-
-## CLI
+| `Output file.gif` | Output file + format (gif/mp4/webm/ascii); repeat for several formats |
+| `Require app` | Fail if the program is not on PATH |
+| `Set Key Value` | Terminal settings (FontSize, Width, Height, Theme, Framerate, …) |
+| `Type "text"` / `Type@100ms "text"` | Emulate typing (optionally at a per-line speed) |
+| `Enter` / `Tab` / `Space` / `Escape` | Key presses |
+| `Up`/`Down`/`Left`/`Right` (`Down 3`) | Navigation with optional repeat count |
+| `Ctrl+key`, `Alt+key`, `Shift+key` | Modifier combos |
+| `Sleep 2s` | Fixed pause (ms or s) |
+| `Wait+Screen@30s /regex/` | Block until screen content matches, with a timeout |
+| `Hide` / `Show` | Control recording visibility (execution continues either way) |
+| `Screenshot file.png` | Capture the current frame |
+| `Env VAR "val"` / `Source other.tape` | Set an env var / include another tape |
 
 ```bash
-vhs validate demo.tape    # check syntax
+vhs validate demo.tape    # parse-check, no rendering
 vhs demo.tape             # record
 vhs themes                # list themes
 vhs new demo.tape         # scaffold from template
 ```
 
-## Recommended dimensions
+Full command + settings detail: **[reference/COMMAND-REFERENCE.md](./reference/COMMAND-REFERENCE.md)**.
 
 | Use case | Width | Height | FontSize |
 |----------|-------|--------|----------|
@@ -92,25 +92,70 @@ vhs new demo.tape         # scaffold from template
 | Full TUI app | 1600 | 900 | 16 |
 | Compact CLI | 800 | 400 | 20 |
 
-## Generating a tape for an app
+## Recording a tape for an app
 
-Read the app's code or `--help` to learn how it launches, which keys it responds to, and the states worth showing. Build a tape covering its key features, then `vhs validate demo.tape` → `vhs demo.tape` → review → adjust timing/interactions. Copy-paste starting points (Basic CLI, Interactive TUI, Build-and-Run, Multi-Panel, CI golden file, composable `Source` tapes): **[reference/TEMPLATES.md](./reference/TEMPLATES.md)**.
+Read the app's `--help` output or its source to learn how it launches, which keys it responds to, and which states are worth showing. Draft a tape covering those states, then `vhs validate demo.tape` → `vhs demo.tape` → watch the rendered file → adjust. Watching is the step that matters: validation parses syntax and cannot tell you the demo outruns the viewer.
 
-✅ **Good** — output first, settings grouped, `Require`, hidden setup with `Ctrl+L`, deliberate pacing (`Sleep 500ms` after typing, `2-3s` after Enter, `3s` final frame).
+Copy-paste starting points (Basic CLI, Interactive TUI, Build-and-Run, Multi-Panel, CI golden file, composable `Source` tapes): **[reference/TEMPLATES.md](./reference/TEMPLATES.md)**.
 
-❌ **Bad** — no `Output`; `Set` scattered among commands (errors/ignored); no `Sleep` after `Enter` (output flashes by); rapid-fire `Tab Tab Tab` the viewer can't follow; dimensions too small for a TUI; no `Require` (silently fails if app missing).
+## Examples
+
+✅ Output first, settings grouped above the commands, `Require` guarding the binary, a pause after typing and a long final frame:
+
+```tape
+Output demo.gif
+Require my-app
+
+Set Shell "bash"
+Set FontSize 20
+Set Width 1200
+Set Height 600
+
+Type "my-app status"
+Sleep 500ms
+Enter
+Sleep 3s
+```
+
+❌ Same tape, three defects — `Set Width` lands after `Type` and is dropped, nothing separates typing from execution, and a missing binary produces a confusing empty GIF instead of an error:
+
+```tape
+Output demo.gif
+
+Type "my-app status"
+Enter
+Set Width 1200
+```
+
+✅ Pacing a TUI whose startup time varies — wait on a screen match instead of guessing a `Sleep`:
+
+```tape
+Type "my-tui"
+Enter
+Wait+Screen@30s /Ready/
+Down 3
+Sleep 500ms
+Enter
+Sleep 3s
+```
+
+## Gotchas
+
+- **A `Set` below the first command is silently dropped, and `vhs validate` still exits 0.** Verified on vhs 0.11.0: `Set FontSize 40` after a `Type` rendered at the default size, and the same holds for `Set TypingSpeed` — there is no per-setting exception. Keep every `Set` above the first `Type`/key command and confirm by watching the output, because nothing in the toolchain reports this.
+- **`vhs validate` only parses.** It never launches the app, so a missing binary, a wrong keybinding, or a demo that races ahead of the app all pass. Add `Require <app>` so a missing dependency fails loudly rather than rendering an empty terminal.
+- **`Type "cmd"` does not press Enter.** Follow it with an explicit `Enter`, and put `Sleep 500ms` between them so the viewer can read the command before it runs.
+- **`Hide` hides output, not execution.** Commands inside a `Hide` block still run. End the block with `Ctrl+L` before `Show` so leftover setup output doesn't open the recording.
+- **`Wait` times out.** Raise it per command (`Wait+Screen@30s /ready/`) or globally (`Set WaitTimeout 30s`) for a slow-booting TUI, rather than padding with a longer `Sleep` that will still be wrong on a slower machine.
+- **VHS records in a fresh shell, so your prompt customizations are absent.** Pin `Set Shell "bash"` to get the same prompt on your machine and in CI.
+- **A TUI that renders with wrong colors or wrapping is usually a terminal-setup problem.** Pin it in the `Hide` block: `Env TERM "xterm-256color"` plus `Type "stty rows 50 cols 120"`.
+- **GIFs cross 5 MB quickly.** GitHub renders them inline, but the README crawls. Try `Set Framerate 15` first — it is the cheapest win and costs little perceived smoothness — then `gifsicle -O3 --lossy=80`, and switch to MP4 before shrinking dimensions past readability.
 
 ## Optimize & CI
 
-Keep README GIFs under ~5 MB: `Set Framerate 15`, reduce dimensions, speed slow sections with `Set PlaybackSpeed`, or post-process `gifsicle -O3 --lossy=80 demo.gif -o demo-small.gif`; if still large, use MP4 with a `<video>` tag. Details + format decision tree: **[reference/OPTIMIZATION.md](./reference/OPTIMIZATION.md)**. Automate recording in CI (ASCII output enables golden-file regression tests): **[reference/CI-INTEGRATION.md](./reference/CI-INTEGRATION.md)**.
+Size reduction, playback tuning, and the GIF-vs-MP4-vs-WebM decision tree: **[reference/OPTIMIZATION.md](./reference/OPTIMIZATION.md)**. Recording in GitHub Actions, plus ASCII output as a golden file for UI regression tests: **[reference/CI-INTEGRATION.md](./reference/CI-INTEGRATION.md)**.
 
-## Troubleshooting
+## Integration
 
-- **Choppy GIF** — `Set Framerate 15`, don't speed playback; if still choppy reduce dimensions or use MP4.
-- **TUI renders wrong** — set the terminal up in a `Hide` block: `Env TERM "xterm-256color"`, `Type "stty rows 50 cols 120"`, `Ctrl+L`, `Show`.
-- **Keys arrive before app is ready** — add `Sleep 1-3s` after launch, or `Wait+Screen /ready/` for variable startup.
-- **GIF too large for GitHub** — reduce dimensions/framerate, speed slow sections, `gifsicle` post-process, or switch to MP4.
+Pairs with **build-tui** — record the TUI right after building it, and commit the `.tape` next to the source so the GIF regenerates with the app. Use **screenshot-local** instead when the target is a web UI on localhost.
 
-## Integration & references
-
-Pairs with **build-tui** (record TUIs you build) and **track-session** (iteration tracking). External: [VHS](https://github.com/charmbracelet/vhs) · [VHS Action](https://github.com/charmbracelet/vhs-action) · [examples](https://github.com/charmbracelet/vhs/tree/main/examples) · [themes](https://github.com/charmbracelet/vhs/blob/main/THEMES.md) · [gifsicle](https://www.lcdf.org/gifsicle/).
+External: [VHS](https://github.com/charmbracelet/vhs) · [VHS Action](https://github.com/charmbracelet/vhs-action) · [examples](https://github.com/charmbracelet/vhs/tree/main/examples) · [themes](https://github.com/charmbracelet/vhs/blob/main/THEMES.md) · [gifsicle](https://www.lcdf.org/gifsicle/).
