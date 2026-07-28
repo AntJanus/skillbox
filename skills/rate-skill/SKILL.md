@@ -1,6 +1,6 @@
 ---
 name: rate-skill
-description: Use this skill whenever the user wants to grade a SKILL.md — rate, audit, or score it. Triggers include "rate this skill", "grade this skill", "audit my SKILL.md", "score this skill against best practices", or "is this SKILL.md up to spec", even if they don't use the word "rate". Returns a letter grade A-F, weighted category scores, and prioritized paste-ready patches. Do NOT use this skill for code review (see code-review) or for authoring a new skill (see generate-skill).
+description: Use this skill to grade a SKILL.md whenever the user wants to rate, audit, or score one. Triggers include "rate this skill", "grade this skill", "audit my SKILL.md", "score this skill against best practices", or "is this SKILL.md up to spec", even if they don't use the word "rate". Returns a letter grade A-F, weighted category scores, and prioritized paste-ready patches. Do NOT use this skill for code review (see code-review) or for authoring a new skill (see generate-skill).
 license: MIT
 argument-hint: "<path/to/SKILL.md>"
 allowed-tools: Read, Glob, Grep
@@ -93,8 +93,8 @@ This table is the **shared section spec**, identical to the one `generate-skill`
 | automation | Overview, Command Surface, Sample Invocation, Failure Modes, Gotchas | Troubleshooting |
 
 - Missing a required section: −20 each. Gotchas is required for every type — agentskills.io: "the highest-value content in many skills is a list of gotchas."
-- Penalize an `## Integration` section that contains nothing concrete (rare in surveyed top skills).
-- **Instruction-pattern fit:** the six official patterns are gotchas sections, output-format templates, checklists, validation loops, plan-validate-execute, and bundled scripts. Reward *fit*, not presence — flag a missing pattern only when the skill's job clearly calls for it (e.g., a batch-destructive workflow with no plan-validate-execute step), and flag patterns bolted on where they don't fit.
+- An `## Integration` section containing nothing concrete: −10 (rare in surveyed top skills).
+- **Instruction-pattern fit:** the six official patterns are gotchas sections, output-format templates, checklists, validation loops, plan-validate-execute, and bundled scripts. Reward *fit*, not presence: −10 for a pattern the skill's job clearly calls for and omits (e.g., a batch-destructive workflow with no plan-validate-execute step), −10 for a pattern bolted on where it doesn't fit.
 - A **Verification Checklist** is recommended for *enforcement*-style methodology skills but is **not** required — note its absence, don't deduct.
 
 ### 5. Examples (10)
@@ -109,7 +109,15 @@ This table is the **shared section spec**, identical to the one `generate-skill`
 
 Apply the official cut test to every instruction: **"Would the agent get this wrong without this instruction?"** If no, the line is bloat.
 
-Penalize: paragraphs restating general programming knowledge; "why this matters" prose longer than the rule it precedes; verbose intros before the workflow; inconsistent terminology (e.g., swapping "skill" / "command" for the same thing); menus of alternatives where a default should be picked ("provide defaults, not menus"); instance-specific outputs prescribed where a procedure would generalize ("favor procedures over declarations").
+Deduct 10 per distinct occurrence, floor 40:
+
+- Paragraphs restating general programming knowledge.
+- "Why this matters" prose longer than the rule it precedes.
+- A verbose intro before the workflow.
+- Inconsistent terminology for the same thing (e.g., swapping "skill" / "command").
+- Menus of alternatives where a default should be picked ("provide defaults, not menus").
+- Instance-specific outputs prescribed where a procedure would generalize ("favor procedures over declarations").
+- Payload duplicated between `SKILL.md` and a `references/` file.
 
 ### 7. Anti-patterns & calibration (5)
 
@@ -210,14 +218,4 @@ Further worked examples — frontmatter cleanup, a full sample report, and retir
 
 ## References
 
-- agentskills.io spec: https://agentskills.io/specification
-- Official description-optimization loop: https://agentskills.io/skill-creation/optimizing-descriptions.md
-- Official output-quality eval loop: https://agentskills.io/skill-creation/evaluating-skills.md
-- Official authoring best practices: https://agentskills.io/skill-creation/best-practices.md
-- Claude Code skills docs: https://code.claude.com/docs/en/skills
-- Anthropic skill-creator: https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md
-- Claude Fable 5 prompting guidance (prescriptiveness, reasoning extraction): https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5
-- Description activation study (Seleznov n=650): https://medium.com/@ivan.seleznov1/why-claude-code-skills-dont-activate-and-how-to-fix-it-86f679409af1
-- Skill listing budget: https://claudefa.st/blog/guide/mechanics/skill-listing-budget
-- SkillsBench (focused-skill finding only): https://arxiv.org/abs/2602.12670
-- skills-ref validator: https://github.com/agentskills/agentskills/tree/main/skills-ref
+Full source list with URLs: **[references/SOURCES.md](./references/SOURCES.md)** — load only when a user disputes a rule and you need to cite the spec.
