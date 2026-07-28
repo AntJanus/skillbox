@@ -17,7 +17,7 @@ Multiple outputs can be declared — VHS generates all of them in one run.
 
 ## Settings
 
-All settings MUST appear before interaction commands (except `TypingSpeed`).
+Settings take effect only when they appear before the first interaction command — there is no exception for `TypingSpeed`. A later `Set` is silently discarded and `vhs validate` still exits 0, so the only way to catch a misplaced setting is to watch the rendered output. To vary typing speed mid-tape, use the per-line `Type@100ms "…"` form instead.
 
 ### Terminal Dimensions
 
@@ -100,14 +100,27 @@ Delete                              # Delete key
 ### Modifier Keys
 
 ```tape
-Ctrl+c                              # Control+C (interrupt)
-Ctrl+d                              # Control+D (EOF)
-Ctrl+l                              # Control+L (clear)
-Ctrl+z                              # Control+Z (suspend)
+Ctrl+C                              # Control+C (interrupt)
+Ctrl+D                              # Control+D (EOF)
+Ctrl+L                              # Control+L (clear)
+Ctrl+Z                              # Control+Z (suspend)
 Alt+Enter                           # Alt+Enter
 Shift+Tab                           # Shift+Tab
 Ctrl+Alt+Delete                     # Multiple modifiers
 Shift+Up                            # Shift+Arrow
+```
+
+Key names are case-insensitive (`Ctrl+l` and `Ctrl+L` both parse); this reference uses
+uppercase throughout so tapes read consistently.
+
+### Other Keys
+
+```tape
+Escape                              # Escape key
+ScrollUp 3                          # Scroll wheel up, with repeat
+ScrollDown 3                        # Scroll wheel down, with repeat
+Copy "text"                         # Put text on the clipboard
+Paste                               # Paste from the clipboard
 ```
 
 ## Timing Commands
@@ -124,9 +137,13 @@ Sleep 1.5s                          # Pause (fractional seconds)
 Wait /regex/                        # Wait for text pattern in output
 Wait+Screen /regex/                 # Wait for pattern on screen
 Wait+Line /regex/                   # Wait for pattern on a line
+Wait+Screen@30s /ready/             # Same, with a per-command timeout
+Set WaitTimeout 30s                 # Global timeout for every Wait
 ```
 
-`Wait` is essential for TUI apps with variable startup times.
+`Wait` is essential for TUI apps with variable startup times. It gives up once the
+timeout elapses, so raise the timeout for a slow-booting app rather than falling back
+to a fixed `Sleep` that will still be wrong on a slower machine.
 
 ## Visibility Control
 
@@ -163,27 +180,11 @@ Screenshot demo-step1.png           # Capture current frame as PNG
 ```tape
 Env MY_VAR "value"                  # Set environment variable
 Env TERM "xterm-256color"           # Common for TUI color support
-Source setup.tape                    # Include commands from another tape
+Source setup.tape                   # Include commands from another tape
 Require node                        # Fail if program not in PATH
 ```
 
-## Recommended Dimensions by Use Case
+## Where the rest lives
 
-| Use Case | Width | Height | FontSize |
-|----------|-------|--------|----------|
-| README GIF | 1200 | 600 | 20 |
-| Docs/tutorial | 1400 | 800 | 18 |
-| Social media | 1200 | 630 | 22 |
-| Full TUI app | 1600 | 900 | 16 |
-| Compact CLI demo | 800 | 400 | 20 |
-
-## Timing Guidelines
-
-| Situation | Recommended Sleep |
-|-----------|------------------|
-| After typing a command | 500ms |
-| After pressing Enter | 2-3s |
-| After launching a TUI | 2-3s |
-| Between navigation steps | 300-500ms |
-| Final frame (before loop) | 3-5s |
-| After form submission | 1-2s |
+Recommended dimensions per use case are in `SKILL.md`; sleep/pacing guidelines are in
+`OPTIMIZATION.md`. Both are kept in one place so they can't drift apart.
