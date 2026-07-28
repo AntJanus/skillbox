@@ -44,18 +44,52 @@ metadata:
 ---
 ```
 
-## Example 3 — desired report opener (high-quality skill)
+## Example 3 — a complete report (abridged category rows, one finding shown)
 
-✅ What a good report looks like in practice:
+✅ A full instance of the Output Format — every section present, the finding ships a paste-ready patch:
 
 ```
 # Skill Rating: track-session
 
 **Detected type:** methodology
 **Overall grade:** A (92/100)
+**Eval set:** present + conforms (20 queries, 60/40 split, protocol stated)
+
+## Category scores
+
+| Category | Score | Weight | Weighted |
+|---|---|---|---|
+| Description quality | 95 | 25 | 23.8 |
+| Frontmatter validity | 100 | 20 | 20.0 |
+| Length & disclosure  | 100 | 15 | 15.0 |
+| Structure            | 90 | 15 | 13.5 |
+| Examples             | 85 | 10 |  8.5 |
+| Conciseness          | 80 | 10 |  8.0 |
+| Anti-patterns/calib. | 65 |  5 |  3.3 |
 
 ## Strengths
 - Description front-loads "track-session resumes work" — distinctive trigger in first 30 chars.
 - ✅/❌ examples with desired pattern shown first.
 - Body 287 lines with `references/TROUBLESHOOTING.md` for overflow.
+
+## Findings (prioritized)
+
+### P1 — Bare "NEVER retry" mandate without reasoning
+**Why:** §7 — rigid directive where explained reasoning is official guidance.
+**Fix:**
+```markdown
+Don't retry a failed approach unchanged — repeating it wastes the turn and
+re-triggers the same failure. Exception: the environment changed (e.g., an MCP
+server reconnected); then one retry is justified.
 ```
+
+## Estimated grade after P0+P1: A (95/100)
+
+fix(track-session): replace bare NEVER-retry mandate with explained rule
+```
+
+## Retired rules (do not reintroduce)
+
+- **Multiline `description:` breaking discovery (#9817)** — real through mid-2026, fixed as of Claude Code 2.1.220, verified with probe skills 2026-07-27. Scalar style is no longer scored.
+- **The ≤230-char description soft target** — no official basis. Listing eviction is least-invoked-first, so workhorse skills keep their full text; official sizing is "a few sentences to a short paragraph."
+- **The +5 bonus for shipping an eval set** — replaced by a standing P1 for its absence (skill-creator optimizer shipped 2026-03-03).
