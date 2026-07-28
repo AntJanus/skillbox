@@ -39,6 +39,7 @@ Run: `cd my-notes-app && npm run dev` → open http://localhost:5173
 - Items target what tests can't catch (visual rendering, responsive layout, theme persistence, real network behavior)
 - Items are specific to the project's domain (not generic "test the website")
 - A QAer can knock the whole list out in 15-30 minutes
+
 ❌ **Bad:**
 
 ```markdown
@@ -67,6 +68,7 @@ Refer to README.
 - "Test the homepage" → test *what* exactly?
 - "Make sure mobile works" → resize to what width? what feature on mobile?
 - The fourth item is a composite — five behaviors crammed into one. If any single behavior breaks, the whole item gets marked failed and the note has to enumerate which sub-check failed.
+
 ---
 
 ### Example: A TUI/Game QA.md
@@ -103,6 +105,7 @@ Run: `cd my-roguelike && cargo run --release`
 - "First boss reachable in 15-20 min" is calibrated against a specific past tuning decision — anchors the check to history
 - Edge-case lockups are exactly the kind of thing tests can't catch easily — they require human curiosity
 - The long-session check explicitly says "15 min continuous" so the time investment is upfront
+
 ---
 
 ## Mode: Update
@@ -135,6 +138,7 @@ Wrote 2 new items to QA.md. Total: 10 items.
 - Each new item is one observable behavior
 - Items reference the actual achievement count (12) — concrete, not generic
 - Existing items were not touched (rule: don't reset existing status)
+
 ❌ **Bad:**
 
 ```
@@ -146,6 +150,7 @@ Reset all existing "passed" items to "pending" because "the codebase changed."
 - Bypassed the user-confirms rule
 - Reset of existing items destroys QA history (someone already verified those)
 - "Auto-generated from commits" produces generic items that don't match how QA actually works
+
 ---
 
 ## Mode: Audit
@@ -179,6 +184,7 @@ Updated: 1 item edited, 1 reset to pending, 1 removed, 1 added. Total: 12 items.
 - Doesn't auto-apply — user confirms
 - Recognizes that "passed 3 months ago" is unverified-fact, not verified-fact
 - Removes obsolete items rather than letting QA.md bloat
+
 ---
 
 ## Mode: Migrate
@@ -219,6 +225,7 @@ Wrote QA.md (7 items). Recommend deleting my-repo's section from ../QA_BACKLOG.m
 - Generated stable IDs once (rule: IDs are permanent)
 - Defaulted to `pending` rather than guessing status
 - Surfaced the cleanup follow-up (delete the consolidated file once migration is complete)
+
 ---
 
 ## Mode: Resume

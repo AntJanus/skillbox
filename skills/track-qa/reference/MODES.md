@@ -6,7 +6,7 @@ Detailed per-mode workflows. SKILL.md has the one-line essence; load this for th
 
 Create a new QA.md interactively.
 
-1. **Discovery** — Scan the project for QA-worthy surfaces: frontend/UI → visual checks, breakpoints, theme switching; TUI/CLI → layout, terminal-resize, ANSI rendering; game → core-loop playability, save/load, edge-case lockups; network/integration → real-API smoke tests, auth flows, error paths; filesystem/data → migrations, save-corruption recovery. Summarize, then ask: (1) how do you run this locally? (the Setup command) (2) what does "ready to ship" look like? (3) what bugs have bitten you that tests don't catch? (4) any integrations/external services needing a real-environment check?
+1. **Discovery** — Scan the project for QA-worthy surfaces: frontend/UI → visual checks, breakpoints, theme switching; TUI/CLI → layout, terminal-resize, ANSI rendering; game → core-loop playability, save/load, edge-case lockups; network/integration → real-API smoke tests, auth flows, error paths; filesystem/data → migrations, save-corruption recovery. Report the surfaces you found, then ask: (1) how do you run this locally? (the Setup command) (2) what does "ready to ship" look like? (3) what bugs have bitten you that tests don't catch? (4) any integrations/external services needing a real-environment check?
 2. **Organize & write** — Propose a draft checklist; user confirms/adds/removes. Verify before writing: the Setup command actually runs, each item is a *single* observable behavior, items focus on what tests can't verify (no `expect X === Y`), no duplicates.
 
 ## Update

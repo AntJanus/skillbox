@@ -20,7 +20,7 @@ Audits a single `SKILL.md` against current activation-driven authoring practice 
 1. Resolve the input path. If the user passes a directory, look for `SKILL.md` inside it. If nothing is passed, ask once: "Which SKILL.md should I rate?"
 2. Read the whole file. Parse frontmatter and body separately. Count body lines (exclude frontmatter) and estimate body tokens (`chars / 4` is close enough).
 3. Detect the skill type — the same five `generate-skill` uses, so a generated skill can be graded against the profile it was built from: **methodology** (enforces a multi-step workflow), **technical** (wraps an API, format, or tool), **auditing** (grades or inspects an artifact), **reference** (schemas, conventions, lookup tables), or **automation** (wraps a script or external command). State it in the report.
-4. Check for an eval set (`references/EVAL.md` or `evals/evals.json`) and grade it against the **Eval set check** below. Missing eval set is a standing P1 finding.
+4. Check for an eval set — `EVAL.md` in the skill's reference dir (plural `references/` or legacy singular `reference/`) or `evals/evals.json` — and grade it against the **Eval set check** below. Missing eval set is a standing P1 finding.
 5. Score each category 0–100 against the rubric below, weight, sum, map to a letter.
 6. Emit the report in the shape under **Output Format**.
 7. Estimate the post-fix grade assuming the P0 and P1 findings are applied.

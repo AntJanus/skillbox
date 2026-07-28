@@ -1,26 +1,34 @@
 ---
 name: track-qa
-description: Manual QA tracking — things tests can't verify. Use this skill whenever the user wants to "create a QA list", "set up QA for this project", "what should I QA", "track manual QA", "audit the QA list", or "start manual QA".
+description: Use this skill for manual QA tracking — the QA.md checklist of behaviors automated tests can't verify. Triggers include "create a QA list", "set up QA for this project", "what should I QA", "track manual QA", "audit the QA list", "start manual QA", or "what's left to check before release", even if the user never says "QA" and only describes verifying things by hand before shipping. Do NOT use this skill for writing or running automated test suites, for feature planning and milestones (see track-roadmap), or for cross-session work progress (see track-session).
 license: MIT
 argument-hint: "[generate|update|audit|migrate|resume]"
 metadata:
   author: Antonin Januska
-  version: "1.2.3"
+  version: "1.3.0"
 ---
 
 # Track QA
 
-Maintain `QA.md` in the project root — the manual checklist of things a human must exercise (visual rendering, multi-step flows, race conditions, real integrations) before a release is ready. **Core principle:** tests prove correctness; QA proves shippability. The `cc-dash/qa@1` schema lets dashboards ingest the file into a portfolio queue with approve/fail/skip workflows. Don't duplicate test coverage — if a unit/integration test can verify it, write the test instead.
+## Overview
 
-## Modes
+Maintain `QA.md` in the project root — the manual checklist of things a human must exercise (visual rendering, multi-step flows, race conditions, real integrations) before a release is ready. Tests prove correctness; QA proves shippability. Don't duplicate test coverage: if a unit or integration test can verify it, write the test instead.
 
-| Mode | Command | Essence |
-|------|---------|---------|
-| **Generate** | `/track-qa` or `generate` | Scan for QA-worthy surfaces, ask 4 discovery questions (incl. the Setup command), write QA.md after the user confirms |
-| **Update** | `/track-qa update` | Read current file, ask what changed, apply after confirmation (new IDs for new items) |
-| **Audit** | `/track-qa audit` | Re-evaluate each item against current code; flag stale/obsolete/missing checks |
+The `cc-dash/qa@1` schema below is machine-parsed, so its markers are exact. Everything else here is guidance to adapt to the project in front of you.
+
+## Workflow
+
+Every mode runs the same three phases: **read** the current state → **propose** a concrete diff → **write** only after the user confirms. The confirm gate matters because a QA list the user didn't agree to is a list nobody runs.
+
+| Mode | Command | What it does |
+|------|---------|--------------|
+| **Generate** | `/track-qa` or `generate` | Scan for QA-worthy surfaces, ask 4 discovery questions (incl. the Setup command), write QA.md |
+| **Update** | `/track-qa update` | Ask what changed, add or remove items — new IDs for new items, existing statuses untouched |
+| **Audit** | `/track-qa audit` | Re-evaluate each item against current code; flag stale, obsolete, and missing checks |
 | **Migrate** | `/track-qa migrate` | Convert ad-hoc QA notes (CLAUDE.md, README, scratch, QA_BACKLOG.md) into a compliant QA.md |
 | **Resume** | `/track-qa resume` | Report pending/passed/failed counts, surface the next pending item |
+
+Bare `/track-qa` means generate. If a QA.md already exists, say so and treat the request as **update** unless the user confirms they want a fresh file — regenerating discards verified history.
 
 Full per-mode procedures (discovery questions, audit signals, migrate steps): **[reference/MODES.md](./reference/MODES.md)**.
 
@@ -50,52 +58,75 @@ Run: `cd project-name && npm run dev`
 - <!-- id:q_XXXXX status:skipped at:... --> Intentionally bypassed (e.g., env-dependent).
 ```
 
-**Format rules** (cc-dash schema is dashboard-parsed — don't omit the markers):
+**Format rules** — the dashboard parser reads these markers literally, so a malformed item is silently dropped:
 
 - Frontmatter requires `schema`, `project`, `last_updated`.
-- Every item: `q_` + 5 random `[a-z0-9]` (**permanent**) and a status: `pending | passed | failed | needs-decision | skipped`.
+- Every item carries `q_` + 5 random `[a-z0-9]` (**permanent**) and a status: `pending | passed | failed | needs-decision | skipped`.
 - Non-pending items record `at:` (ISO timestamp); failed items record `ref:r_xxxxx` (the roadmap issue filed).
 - Notes are blockquotes immediately after the item (`  > Note text`).
 - Two parsed sections only: `## Setup` (free-form) and `## Checklist`. Other sections round-trip but aren't interpreted.
 
-## What makes a good QA item
+## Writing QA items
 
-- **One observable behavior** — "settings page persists changes across reload", not "everything in settings works".
-- **Verifiable in <2 minutes** — split anything longer.
-- **Phrased as a claim** — "First major upgrade reachable in 10-15 min of play" beats "playtest".
-- **Specific to this project** — "test all features" helps no one.
+- **One observable behavior** — "settings page persists changes across reload", not "everything in settings works". Composite items hide failures: one sub-check breaks and the note has to enumerate which.
+- **Verifiable in under 2 minutes** — split anything longer, because long items get deferred and then skipped.
+- **Phrased as a claim to confirm or refute** — "first major upgrade reachable in 10-15 min of play" beats "playtest".
+- **Specific to this project** — "test all features" tells the next QAer nothing.
+- **Failed items always carry a note** — a `failed` status with no explanation is unactionable a week later.
+- **Verify the Setup command actually runs** before the first write; a list whose entry point is broken stalls at item one.
+- **Keep the list finishable** — roughly 5–30 items. Past that a QAer can't complete a pass in one sitting, and a pass that never completes stops happening. Audit periodically; QA lists drift as features ship.
 
-## Rules
+## Examples
 
-- **User drives the list** — never add items without confirmation.
-- **One observable behavior per item** — composite items hide failures.
-- **QA.md is the source of truth.** Failed items need a note — a "failed" without context is unactionable.
-- **The Setup command must work** — verify it before the first write.
-- **Audit regularly** — QA lists drift. Healthy size is 5-30 items; most reviewed within 30 days.
+✅ One observable behavior, under a minute, unambiguous pass/fail, specific to the domain:
 
-## Example
+```markdown
+- <!-- id:q_a1b2c status:pending --> Save a session, reload the page, confirm gold/inventory/equipped items all restore.
+```
 
-✅ **Good:** `<!-- id:q_a1b2c status:pending --> Save a session, reload the page, confirm gold/inventory/equipped items all restore.` — one observable behavior, under a minute, unambiguous pass/fail, specific to the domain.
+❌ Unscoped — two QAers would check different things and both would call it done:
 
-❌ **Bad:** `<!-- id:q_a1b2c status:pending --> Test save/load.` — test what, in what state, with what expected outcome? Two QAers check different things.
+```markdown
+- <!-- id:q_a1b2c status:pending --> Test save/load.
+```
+
+✅ Propose, then write once the user confirms:
+
+```
+Read QA.md (8 items). Asked what changed since the last pass.
+Proposed 2 new items covering the achievement overlay. Confirm?
+→ user: yes → wrote 2 items. Total: 10.
+```
+
+❌ Writing unasked, and destroying verification history in the process:
+
+```
+Auto-generated 12 items from recent commits.
+Reset every passed item to pending because "the codebase changed."
+```
+
+✅ A failed item that carries its own evidence:
+
+```markdown
+- <!-- id:q_g5h6i status:failed at:2026-07-28T09:12:00-06:00 ref:r_x1y2z --> Theme preference persists across navigation.
+  > **Note (2026-07-28):** Reverts to light on the settings route only. Filed as r_x1y2z.
+```
 
 Full ✅/❌ walkthroughs for every mode: **[reference/EXAMPLES.md](./reference/EXAMPLES.md)**.
 
+## Gotchas
+
+- **A malformed item vanishes silently.** The parser skips anything not matching `- <!-- id:q_xxxxx status:... --> Description`. When items don't show on a dashboard, check that shape first, then that `schema: cc-dash/qa@1` is exact and QA.md sits in the project root.
+- **failed → pending is never automatic.** Completing the linked roadmap item does not flip the QA item back. Re-verify by hand with `/track-qa update`, because "the fix shipped" is not the same claim as "the behavior is right".
+- **`q_` IDs are permanent and share no namespace** with `r_`, `t_`, or `i_`. Reusing a deleted item's ID reattaches old dashboard history to an unrelated check.
+- **"Passed three months ago" is an unverified fact.** Audit treats a stale pass as a reset candidate — tune the 30-day default to the project's release cadence instead of applying it flat.
+- **needs-decision items don't resolve on their own.** They block on a conversation, not on engineering. Surface any older than two weeks during audit and either schedule it, convert it to a concrete pending check, or delete it.
+- **Migrate expects per-repo notes or `### project-name` headings.** Other layouts need manual splitting before the mode can do anything useful — ask the user which lines belong to which project rather than guessing.
+
+Extended edge cases (ID collisions, dangling roadmap refs, dashboard discovery caching): **[reference/TROUBLESHOOTING.md](./reference/TROUBLESHOOTING.md)**.
+
 ## Integration
 
-- **track-roadmap** — failed QA items file roadmap issues (a "QA Issues" category); after fixing, mark the roadmap item done and reset the QA item to pending.
-- **track-session** — drive a focused QA pass over many items at once; reference QA item IDs in the session plan.
-- **`cc-dash/qa@1` dashboards / MCP** — render a portfolio queue, inline approve/fail/skip, focus mode; expose tools like `list_qa_pending`, `approve_qa_item`, `fail_qa_item`.
-
-```
-generate → write QA.md   ·   migrate → convert ad-hoc notes
-resume   → next item     ·   audit   → relevance review   ·   update → add as features ship
-```
-
-## Troubleshooting
-
-- **Items don't appear on a dashboard after writing QA.md** — verify `schema: cc-dash/qa@1` is exact, the file lives in the project root, and each item matches the `- <!-- id:q_xxxxx status:... --> Description` shape (malformed items are silently skipped by the parser).
-- **A failed item stays failed after the linked roadmap fix ships** — the failed→pending reset is intentionally one-way; re-verify manually with `/track-qa update`, don't assume the fix worked.
-- **Migrate mode chokes on an unfamiliar file layout** — it expects ad-hoc per-repo notes or `### project-name` headings; other layouts need manual splitting first.
-
-Extended edge cases (ID collisions, audit staleness tuning, needs-decision items piling up, dangling roadmap refs): **[reference/TROUBLESHOOTING.md](./reference/TROUBLESHOOTING.md)**.
+- **track-roadmap** — a failed QA item files a roadmap issue under a "QA Issues" category; after the fix ships, mark the roadmap item done and reset the QA item to pending.
+- **track-session** — drive a focused pass over many QA items at once, referencing item IDs in the session plan.
+- **`cc-dash/qa@1` dashboards / MCP** — portfolio queue, inline approve/fail/skip, focus mode at `/project/<slug>/qa?focus=<id>`; tools include `list_qa_pending`, `approve_qa_item`, `fail_qa_item`.
