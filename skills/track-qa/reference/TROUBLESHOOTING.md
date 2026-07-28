@@ -24,7 +24,7 @@ Edge cases and gotchas not covered in the main `SKILL.md` Troubleshooting sectio
 
 **Resolution:**
 - Verify the migrator is generating `q_` prefixed IDs
-- Run the validate-skills script to catch malformed IDs
+- Grep the file for items the parser would drop: `grep -n '^- <!--' QA.md | grep -v 'id:q_[a-z0-9]\{5\}'` — anything it prints is malformed
 
 ---
 
@@ -85,11 +85,11 @@ Edge cases and gotchas not covered in the main `SKILL.md` Troubleshooting sectio
 
 ## QA.md disagrees with ROADMAP.md after manual edits
 
-**Symptom:** A user manually edited ROADMAP.md to delete a `qa-issues` category item that was filed by `failQaItem`. Now the QA item's `roadmapRef` points to a non-existent ID.
+**Symptom:** A user manually edited ROADMAP.md to delete a `qa-issues` category item that was filed by `failQaItem`. Now the QA item's `ref:r_xxxxx` points to a non-existent ID.
 
 **Diagnosis:** The cross-link is one-way (QA item references roadmap item, not vice versa). Deleting the roadmap item without updating the QA item leaves a dangling reference.
 
 **Resolution:**
 - A dashboard that renders the roadmap ref as a link will 404 (or show the missing item gracefully)
 - Run `/track-qa audit`; the audit should detect dangling refs
-- Reset the QA item to pending OR clear the `roadmapRef` (manually editing the HTML comment is fine — IDs are immutable but optional fields aren't)
+- Reset the QA item to pending OR drop the `ref:r_xxxxx` field (editing the HTML comment by hand is fine — `id:` is immutable, but the optional fields aren't)
