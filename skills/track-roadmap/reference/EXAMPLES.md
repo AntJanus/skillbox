@@ -58,6 +58,7 @@ last_updated: 2026-03-16T10:00:00-07:00
 ```
 
 **Why this is good:** Includes frontmatter with schema version, every item has a unique ID and status, categories have slug comments, completed items have strikethrough and date, Future Ideas uses `idea` status, human-readable AND machine-parseable.
+
 ❌ **Bad:**
 
 ```markdown
@@ -75,6 +76,7 @@ last_updated: 2026-03-16T10:00:00-07:00
 ```
 
 **Why this is bad:** No descriptions, no groupings, mixes features with tasks ("fix bugs", "add tests"), vague items ("make it look good"), no project purpose, no structure.
+
 ---
 
 ## Example: Auditing a Roadmap
@@ -101,6 +103,7 @@ last_updated: 2026-03-16T10:00:00-07:00
 ```
 
 **Why this is good:** Every feature checked, evidence cited with file paths, actionable recommendations, surfaced a new feature from codebase discovery.
+
 ❌ **Bad:**
 
 ```markdown
@@ -109,6 +112,7 @@ Looks like some stuff is done. Maybe we should build more things.
 ```
 
 **Why this is bad:** No specifics, no evidence, no per-feature assessment, no actionable recommendations.
+
 ---
 
 ## Example: Updating a Roadmap
@@ -136,6 +140,7 @@ User says: *"We decided not to do offline support, and I want to add calendar in
 ```
 
 **Why this is good:** Confirms removal before acting, places new feature in appropriate category with description, only changes what the user asked for.
+
 ❌ **Bad:**
 
 ```markdown
@@ -145,6 +150,7 @@ User says: *"We decided not to do offline support, and I want to add calendar in
 ```
 
 **Why this is bad:** Removed features the user didn't ask about. Never make unilateral roadmap decisions.
+
 ---
 
 ## Example: Resuming from Roadmap
@@ -185,6 +191,7 @@ user: "In-app only, 1 hour and 1 day before"
 ```
 
 **Why this is good:** Checks session state first, presents roadmap features for user to choose, asks clarifying questions before starting, creates a session plan that references the roadmap feature, then starts working.
+
 ❌ **Bad:**
 
 ```bash
@@ -197,6 +204,7 @@ assistant: "I'll start working on Cloud sync since it's the most important featu
 ```
 
 **Why this is bad:** Skipped session check (might have overwritten active work), auto-selected a feature without asking the user, violated the "user drives the roadmap" rule.
+
 ---
 
 ## Example: Brainstorming Ideas
@@ -242,6 +250,7 @@ a personal task manager. The focus mode idea — yes, keep that."
 ```
 
 **Why this is good:** Starts with user pain points (not a feature list), explores the "why" before the "what", deepens each idea with journey/inspirations/requirements/questions, presents multiple angles, user decides what stays, rejected ideas are noted with reasons, captured ideas use `status:idea` with cc-dash IDs and include open questions.
+
 ❌ **Bad:**
 
 ```bash
