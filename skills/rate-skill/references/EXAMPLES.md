@@ -1,17 +1,17 @@
 # Rate Skill — Worked Examples
 
-## Example 1 — directive description rewrite (the most common P0 fix)
+## Example 1 — a description that trips the vague-trigger cap
 
-✅ Anthropic middle-ground form, third person, enumerated triggers, negative scoping:
+❌ Caps Category 1 at 50 — no user-language triggers, no distinctive noun, nothing an agent can match a request against:
 
 ```yaml
-description: Use this skill whenever the user wants to review a React component for hook misuse, infinite-loop risk, or dependency-array bugs. Triggers include "review this component", "check my hooks", or "audit this React file". Do NOT use this skill for non-React JavaScript or for general code review.
+description: Use this skill whenever the user needs help with documentation tasks and related workflows.
 ```
 
-❌ Passive single sentence — caps Category 1 at 70 and bleeds into Conciseness:
+✅ Same job, made matchable:
 
 ```yaml
-description: Use when reviewing React components for hook issues.
+description: Use this skill to update a CHANGELOG.md whenever the user wants to log a release. Triggers include "add this to the changelog", "prepare the v2.1 release notes", or "what changed since the last tag". Do NOT use this skill for writing commit messages.
 ```
 
 ## Example 2 — frontmatter cleanup
