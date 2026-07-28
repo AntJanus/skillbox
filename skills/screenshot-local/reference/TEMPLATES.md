@@ -254,15 +254,20 @@ shot-scraper auth http://localhost:3000/login auth.json
 ```
 
 ```yaml
-# Step 2: shots.yml — Use saved auth
+# Step 2: shots.yml — no auth key here; auth is passed to the whole batch
 - url: http://localhost:3000/admin
   output: screenshots/admin-dashboard.png
   width: 1280
   height: 900
-  auth: auth.json
 
 - url: http://localhost:3000/admin/users
   output: screenshots/admin-users.png
   width: 1280
-  auth: auth.json
 ```
+
+```bash
+# Step 3: apply the saved context to every shot in the batch
+shot-scraper multi shots.yml -a auth.json
+```
+
+A per-shot `auth:` key is silently ignored (verified on 1.9.1) — the shot succeeds while logged out, so use the CLI flag. Split logged-in and logged-out pages into two config files when a run needs both.
