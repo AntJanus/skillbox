@@ -4,15 +4,15 @@ Full body templates for the five skill types used in the generate-skill workflow
 
 ## Template Selection Guide
 
-| Type | Use When | Enforcement | Key Sections |
-|------|----------|-------------|--------------|
-| methodology | Enforces a multi-step workflow (code review, TDD, session tracking) | Phased workflow + verification checklist | Phased Workflow, Examples, Gotchas, Verification |
-| technical | Wraps an API, format, or tool (docx, semantic-release, build setup) | Step-by-step guidance | Quick Start, How It Works, Quick Reference, Gotchas |
-| auditing | Grades or inspects an artifact (rate-skill, security review) | Rule-based checking | Scoring Rubric, Output Format, Examples, Gotchas |
-| reference | Domain schemas, conventions, lookup tables (bigquery, style guides) | Information on demand | Overview + navigation, per-domain references/ files |
-| automation | Wraps a script or external command (screenshots, recordings) | Workflow automation | Command Surface, Sample Invocation, Failure Modes, Gotchas |
+| Type | Use When | Enforcement | Required sections | Optional |
+|------|----------|-------------|-------------------|----------|
+| methodology | Enforces a multi-step workflow (code review, TDD, session tracking) | Phased workflow | Overview, Workflow (phased), Examples, Gotchas | Verification Checklist, Quality Signals / Anti-Patterns |
+| technical | Wraps an API, format, or tool (docx, semantic-release, build setup) | Step-by-step guidance | Overview, Quick Start / Setup, Quick Reference or API surface, Examples, Gotchas | Troubleshooting |
+| auditing | Grades or inspects an artifact (rate-skill, security review) | Rule-based checking | Overview, Workflow, Rubric, Output Format, Examples, Gotchas | — |
+| reference | Domain schemas, conventions, lookup tables (bigquery, style guides) | Information on demand | Overview, Navigation (load-when table), Gotchas | Core Concepts |
+| automation | Wraps a script or external command (screenshots, recordings) | Workflow automation | Overview, Command Surface, Sample Invocation, Failure Modes, Gotchas | Troubleshooting |
 
-The Key Sections columns here and `rate-skill`'s Category 4 table are the same shared spec — keep them in sync.
+The Required/Optional columns here, the Phase 4 compact summary in SKILL.md, and `rate-skill`'s Category 4 table are one shared spec — edit all three together.
 
 ## Calibrating Control (applies to every template)
 
@@ -163,7 +163,7 @@ command-here
 ## Overview
 [What gets audited and what the output is.]
 
-## Scoring Rubric
+## Rubric
 
 | Signal | Weight | Check |
 |--------|--------|-------|

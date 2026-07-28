@@ -1,6 +1,6 @@
 ---
 name: generate-skill
-description: Interactive SKILL.md builder. Use whenever the user asks to "create a skill", "generate a skill", "scaffold a SKILL.md", "write a SKILL.md", or "turn this workflow into a skill". Do NOT use for grading existing skills (see rate-skill).
+description: Interactive SKILL.md builder. Use whenever the user asks to "create a skill", "generate a skill", "scaffold a SKILL.md", "write a SKILL.md", or "turn this workflow into a skill" — even if they don't say "skill" and only describe wanting to make a workflow, checklist, or convention reusable for the agent. Do NOT use for grading existing skills (see rate-skill).
 license: MIT
 argument-hint: "[skill-topic]"
 metadata:
@@ -19,11 +19,7 @@ One skill, one job. This skill's job is the SKILL.md and its frontmatter — not
 ## Core principles
 
 - **The description is the product.** It is the only thing Claude reads to decide whether to invoke the skill. Tune it like a prompt.
-- **Imperative third person.** "Use this skill when…" activates reliably; err on the side of being pushy about when it applies.
-- **Front-load distinctive triggers.** The first ~50 chars must contain the noun phrase that makes this skill unique; listing budgets truncate at high skill counts (least-invoked skills lose their text first).
-- **One skill, one job.** Bundling unrelated workflows is the most-cited mega-skill failure mode; focused skills empirically outperform bundles (SkillsBench).
 - **Add what the agent lacks, omit what it knows.** For every instruction ask: *would the agent get this wrong without it?* If no, cut it. Encode only non-inferable, procedural, skill-specific knowledge.
-- **Calibrate control per section.** Give the agent freedom where multiple approaches are valid; be prescriptive where operations are fragile or a sequence must be followed. Explain the why — "Do X because Y tends to cause Z" outperforms "ALWAYS X / NEVER Y".
 
 ## Workflow
 
@@ -52,7 +48,7 @@ Compose the description — official sizing is "a few sentences to a short parag
 <Third-person noun phrase>. Use whenever the user <wants/asks to> <trigger 1>, "<trigger 2>", or <trigger 3> — even if they don't explicitly mention <domain term>. Do NOT use this skill for <near-neighbor> — see <other-skill>.
 ```
 
-Show the draft, count chars (`python3 -c "import yaml; print(len(yaml.safe_load(open('SKILL.md').read().split('---',2)[1])['description']))"`), iterate.
+Show the draft, measure it (`python3 scripts/measure.py <path/to/SKILL.md>` — reports description chars, body lines, and estimated body tokens against their caps), iterate.
 
 Quality signals:
 
@@ -115,10 +111,10 @@ Pick the template that matches the skill type. Full templates live in [reference
 Compact summary — this is the **shared section spec** graded by `rate-skill` Category 4; keep the two skills in sync:
 
 - **methodology** — Overview, Workflow (phased, one task per phase), Examples (✅ first, ❌ last), Gotchas. Optional: Verification Checklist, Quality Signals / Anti-Patterns.
-- **technical** — Overview, Quick Start / Setup (one minimal code block), Quick Reference or API surface, Examples, Gotchas. Move long API surface to `references/API.md`.
+- **technical** — Overview, Quick Start / Setup (one minimal code block), Quick Reference or API surface, Examples, Gotchas. Optional: Troubleshooting. Move long API surface to `references/API.md`.
 - **auditing** — Overview, Workflow, Rubric (table: signal → weight → check), Output Format, Examples of high/low-quality artifacts, Gotchas.
 - **reference** — Overview, Navigation (load-when table), Gotchas; optional short Core Concepts. SKILL.md stays a router; don't inline the data.
-- **automation** — Overview, Command Surface table, Sample Invocation, Failure Modes, Gotchas. Put the actual script in `scripts/`.
+- **automation** — Overview, Command Surface table, Sample Invocation, Failure Modes, Gotchas. Optional: Troubleshooting. Put the actual script in `scripts/`.
 
 Body rules that apply to every type:
 
@@ -166,7 +162,7 @@ Pair every "do not X" with a positive directive — negation handling in LLMs is
 
 ### Phase 7 — Progressive disclosure check
 
-Count lines and estimate tokens (chars/4). If SKILL.md exceeds 300 lines or ~3,000 tokens:
+Measure with `scripts/measure.py`. The canonical cap is joint — 500 lines and ~5,000 tokens — and the house aim sits at 60% of it, so extract once SKILL.md exceeds 300 lines or ~3,000 tokens, whichever comes first:
 
 1. List candidate sections to extract, largest first.
 2. Propose `references/<TOPIC>.md` files (plural — the spec-documented name; nothing validates directory names, so never rename an existing singular `reference/` dir just for style).
@@ -195,7 +191,7 @@ For measuring whether the **body** actually improves output (not just triggering
 ├── references/                    # plural — load on demand
 │   ├── PATTERNS.md                # optional: body templates by type
 │   └── EVAL.md                    # train/validation eval set (Phase 8)
-├── scripts/                       # optional: deterministic helpers
+├── scripts/                       # optional: deterministic helpers (this skill bundles measure.py)
 └── assets/                        # optional: templates copied into output
 ```
 
