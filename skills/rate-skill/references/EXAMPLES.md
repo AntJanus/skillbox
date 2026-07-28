@@ -16,16 +16,14 @@ description: Use when reviewing React components for hook issues.
 
 ## Example 2 — frontmatter cleanup
 
-❌ Top-level fields that belong in `metadata`, plus a multiline description:
+❌ Top-level fields that belong in `metadata`, plus a first-person vague description:
 
 ```yaml
 ---
 name: My-Skill                # uppercase
 version: "1.0.0"              # top-level — move under metadata
 tags: [react, hooks]          # top-level — move under metadata
-description: |                # multiline silently breaks discovery
-  A skill for working with React.
-  Helps with hooks.
+description: I help you work with React and hooks.   # first-person + no triggers
 ---
 ```
 
