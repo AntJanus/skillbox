@@ -1,20 +1,22 @@
 ---
 name: deep-research
-description: Multi-source web research with cited synthesis in chat. Use this skill whenever the user wants to "research X", "deep research on Y", "deep dive on Z", "investigate this topic", "compare X and Y", "pros and cons of X", or "survey the landscape of Y".
+description: Use this skill for deep, multi-source web research with cited synthesis whenever the user wants to "research X", "deep research on Y", "deep dive on Z", "investigate this topic", "compare X and Y", "pros and cons of X", or "survey the landscape of Y" — even if they never say "research", any ask needing several independent sources cross-referenced and cited counts. Do NOT use this skill for a single fact one WebSearch answers, for reviewing code (see code-review), or for exploring files in the current repo (use Explore).
 license: MIT
 argument-hint: "<topic>"
 metadata:
   author: Antonin Januska
-  version: "2.2.1"
+  version: "2.3.0"
 ---
 
 # Deep Research
 
-Multi-source research that earns its name through **breadth of angle, depth of cross-reference, and discipline of citation.** Run 5+ web searches across diverse angles, prefer primary sources, surface disagreements, and return a structured, cited summary in the conversation. Always cite. Never fabricate. Output stays in chat — no files unless asked.
+## Overview
 
-## Five Search Angles
+Research a topic across many sources and return a cited, structured synthesis in the conversation. Breadth of angle, depth of cross-reference, and citation discipline are what separate this from a search snippet. Cite only pages you opened this run, and keep output in chat — write a file only when asked.
 
-Cover at least 3 every run; state which in the plan and tag each search.
+## Five search angles
+
+Cover at least 3 every run; name them in the plan and tag each search.
 
 | Angle | Looks for |
 |-------|-----------|
@@ -33,17 +35,17 @@ Cover at least 3 every run; state which in the plan and tag each search.
 | `comparison` | "compare X and Y", "pros and cons" | 10-15 | Matrix required at top of report |
 | `landscape` | "survey the landscape of X", broad space | 10+ | Parallel subagents → consensus ([PLAYBOOK](./references/PLAYBOOK.md)) |
 
-For **opinion-shaped** asks ("should I use X?") where you already have a grounded take: give a brief direct answer first, then offer to escalate. Don't launch 10 searches when the user wanted a confident opinion.
+For **opinion-shaped** asks ("should I use X?") where you already have a grounded take: answer directly first, then offer to escalate. Ten searches in response to a request for a confident opinion wastes the user's turn.
 
-## Process — each phase gates the next
+## Workflow — each step gates the next
 
-1. **Local-first** — `rg "<topic>" .` and Read obvious matches before any web search. If local material covers it, default to UPDATE not CREATE. State what you found ("no local hits" is fine).
-2. **Plan** — Post the interpretation, the angles you'll use, and the mode. Wait one beat before searching.
-3. **Disambiguate** (when needed) — For ambiguous proper nouns/acronyms, run one broad search to fix the referent; state it. Ask the user if still unclear.
-4. **Search** — 5+ searches minimum. Broad → specific → tension ("X criticism", "X vs alternatives") → currency. **WebFetch every source you'll cite substantively** — don't cite from snippets. Prefer primary > secondary > tertiary; look past SEO content farms to the authoritative source. If two sources disagree, surface it — don't silently pick one.
-5. **Reflect** (sufficiency gate) — Post one line: `searches: N | angles: <list> | full reads: M | gaps: <list>` and answer "what would change my conclusion?" If a planned section has no material, search more or cut it. Don't pad.
-6. **Synthesize** — Use the template below; adapt section names to the topic.
-7. **Cite-verify** — Every cited URL must have been actually fetched this run. Walk each non-trivial claim to a source. Restate the original question and confirm every section serves it.
+1. **Local-first** — `rg "<topic>" .` and Read the obvious matches before any web search. If local material already covers it, default to UPDATE rather than CREATE. State what you found; "no local hits" is a fine result.
+2. **Plan** — Post the interpretation, the angles you'll use, and the mode, then start searching. The posted plan is what step 5 measures against.
+3. **Disambiguate** (when needed) — For ambiguous proper nouns and acronyms, run one broad search to fix the referent and state it. Ask the user if it's still unclear.
+4. **Search** — 5+ searches minimum. Broad → specific → tension ("X criticism", "X vs alternatives") → currency. **WebFetch every source you'll cite substantively** — a search-results snippet is not a read. Prefer primary > secondary > tertiary. When two sources disagree, carry the disagreement into the report instead of silently picking one.
+5. **Sufficiency gate** — Post one line: `searches: N | angles: <list> | full reads: M | gaps: <list>`. If a planned section has no material behind it, search again or cut it — don't pad.
+6. **Synthesize** — Use the template below; adapt section names to the topic. Check the last round of findings against the plan from step 2; when they conflict, revise the Tl;dr rather than burying the conflict lower down.
+7. **Cite-verify** — Every cited URL must trace to a page you fetched this run. Walk each non-trivial claim to its source, then restate the user's original question and cut sections that don't serve it.
 
 ## Synthesis template
 
@@ -74,27 +76,17 @@ Recent developments, adoption signal, direction. Note disagreements. *Confidence
 - [Title (YYYY-MM-DD)](url) — what this contributed
 ```
 
-**Source rules:** 8-15+ for a substantive topic; every claim traceable; annotate each with what it contributed; include publication dates; mix official, industry, and community.
+**Source rules:** 8-15+ for a substantive topic; every claim traceable; annotate each source with what it contributed; include publication dates; mix official, industry, and community.
 
-## Failure-mode defenses
+## Examples
 
-The non-obvious value of this skill — guard against the documented LLM-research failure modes:
-
-- **Sycophancy** — Don't flip a sourced claim under user pushback without new evidence. The next move on pushback is *another search*, not capitulation.
-- **Anchoring** — At synthesis, ask "what would change my conclusion?" If late searches contradict the early framing, update.
-- **SEO / source laundering** — Top search hits ≠ authoritative. Prefer official docs, .gov, .edu, peer-reviewed for technical claims.
-- **Fabricated citations** — The dominant hallucination class. If you didn't open it, don't cite it.
-- **Drift** — Restate the original question at synthesis and cut sections that don't serve it (multi-agent runs drift hardest).
-
-## Example
-
-✅ **Good** (default mode, abbreviated):
+✅ **Good** (default mode, abbreviated — step numbers match the workflow above):
 
 ```
 user: research htmx for me — thinking about a side project
 assistant:
-[P0] No local material. [P1] Mode: default. Angles: Official, Comparative, Criticism, Currency, Community.
-[P4] 8 searches, 5 angles, 4 full reads. Gap: htmx + auth thin.
+[1] No local material. [2] Mode: default. Angles: Official, Comparative, Criticism, Currency, Community.
+[5] searches: 8 | angles: 5 | full reads: 4 | gaps: htmx + auth thin
 
 # htmx — Research Summary
 ## Tl;dr
@@ -107,14 +99,26 @@ Fits server-rendered side projects with light-to-moderate interactivity; poor fi
 ### Comparative — [htmx vs React (Mar 2026)](url) — benchmarks
 ```
 
-❌ **Bad:** one search "htmx" → "It's a lightweight JS library, alternative to React, some people like it. Sources: htmx.org" — no Phase 0, no plan, no cross-reference, no confidence, one source.
+❌ **Bad:** one search for "htmx" → "It's a lightweight JS library, alternative to React, some people like it. Sources: htmx.org" — no local check, no plan, no cross-reference, no confidence label, one source.
 
-See [references/EXAMPLES.md](./references/EXAMPLES.md) for full default-mode and comparison-mode walkthroughs.
+✅ **Good** (disagreement handled): "Source A (official docs, 2026) says the flag defaults on; Source B (widely-cited blog, 2024) says off. The default changed in v3 — B predates it." Both cited, dates carry the resolution.
+
+Full default-mode and comparison-mode walkthroughs: [references/EXAMPLES.md](./references/EXAMPLES.md).
+
+## Gotchas
+
+- **Fabricated citations are the dominant failure mode.** Cite a URL only if you fetched it this run. If a fetch fails, find a reachable equivalent or drop the claim — never reconstruct a plausible-looking URL.
+- **WebFetch returns boilerplate or nothing on paywalled and JS-rendered pages.** That counts as not read. Say so, or search for an accessible mirror; don't backfill from the search snippet and count it toward `full reads`.
+- **Top-ranked is not authoritative.** SEO content farms and AI-written recaps outrank primary docs on most technical queries. Prefer official docs, .gov/.edu, and peer-reviewed sources for technical claims, and take the publication date from the page itself — search-result dates are often re-index dates.
+- **Pushback is not evidence.** When the user disputes a sourced claim, run another search rather than reversing. Report what the new sources say, including "they still support the original claim."
+- **Multi-agent landscape runs drift hardest.** Restate the user's original question at the top of the synthesis, then cut every section that doesn't serve it.
+- **Three or more items still need the matrix, even in `quick` mode.** Prose comparison of 3+ options is unreadable; a five-row matrix costs less space than the paragraphs it replaces.
+- **A stale year in a query silently poisons currency.** Put the current year in currency-angle queries — undated results skew years old.
 
 ## Integration
 
-- **track-session** — for long research projects, save the plan + source list to SESSION_PROGRESS.md so it's resumable.
+- **track-session** — for long research projects, save the plan and source list to SESSION_PROGRESS.md so the run is resumable.
 - **track-roadmap** — research informs roadmap decisions; cite the summary in the entry.
-- Does **not** replace reading the codebase (that's Phase 0), asking the user for preferences (use AskUserQuestion), or making the design decision (research informs, it doesn't decide).
+- Research informs a decision; it doesn't make one. Reading the codebase is step 1, user preferences come from AskUserQuestion, and the design call stays with the user.
 
-See [references/PLAYBOOK.md](./references/PLAYBOOK.md) for multi-agent landscape mode, the save-as-note handoff, and troubleshooting.
+Multi-agent landscape mode, the save-as-note handoff, and troubleshooting: [references/PLAYBOOK.md](./references/PLAYBOOK.md).
