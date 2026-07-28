@@ -1,15 +1,6 @@
 # Track Roadmap — Extended Troubleshooting
 
-Additional troubleshooting beyond the common issues covered in SKILL.md.
-
-## Problem: Roadmap doesn't match what's actually being built
-
-**Cause:** Roadmap wasn't updated as priorities shifted.
-
-**Solution:**
-- Run `/track-roadmap audit` to reconcile plan vs. reality
-- Update the roadmap to reflect actual direction
-- Set a habit: audit after every major feature completion
+Additional troubleshooting beyond the Gotchas in SKILL.md. Load when a mode stalls or produces unusable output.
 
 ## Problem: Codebase scan suggests irrelevant features
 
@@ -28,24 +19,22 @@ Additional troubleshooting beyond the common issues covered in SKILL.md.
 - Run `/track-roadmap generate` to create a ROADMAP.md first
 - Then use `/track-roadmap resume` to pick a feature and start working
 
-## Problem: Resume finds an active session but user wants to switch features
+## Problem: User wants to switch features mid-session
 
-**Cause:** User changed their mind about what to work on.
-
-**Solution:**
-- Resume will ask whether to continue the active session or pick a new item
-- If switching: the current SESSION_PROGRESS.md will be overwritten with the new feature's plan
-- Consider running `/track-session save` first to preserve progress if needed
-
-## Problem: Roadmap has ballooned to 30+ features
-
-**Cause:** Every idea gets committed to the roadmap with no filtering.
+**Cause:** Resume found an active SESSION_PROGRESS.md but the user changed their mind.
 
 **Solution:**
-- Run `/track-roadmap audit` — most items will be stale or speculative
-- Move speculative features to "Future Ideas" with `status:idea`
-- Delete items that no longer fit the project direction (don't archive — history is in git)
-- If the roadmap still exceeds 15 committed features, consider splitting into milestones
+- Offer `/track-session save` first — switching replaces the file with the new feature's plan
+- Only proceed once the user has confirmed the in-flight progress is safe to lose
+
+## Problem: Roadmap still exceeds 15 committed features after an audit
+
+**Cause:** The project genuinely has more scope than one roadmap can express.
+
+**Solution:**
+- Split into milestones rather than continuing to trim
+- Each milestone gets its own category with a `<!-- category:slug -->` marker
+- Keep only the current milestone's features in the top sections
 
 ## Problem: Brainstorm produces no useful ideas
 
@@ -57,24 +46,14 @@ Additional troubleshooting beyond the common issues covered in SKILL.md.
 - Reference adjacent projects — "what would [similar tool] do here?"
 - If still stuck, note the block in the conversation and try again after a break
 
-## Problem: Audit can't determine if a feature is Done
-
-**Cause:** Codebase scan sees partial implementations or experimental code.
-
-**Solution:**
-- Default to "Unclear" status when evidence is ambiguous — don't guess
-- Present findings to the user: "I see `src/auth/` exists but no tests — is auth done?"
-- User confirms Done/In-Progress/Not-Started status before committing to the roadmap
-- When Done, always add `completed:YYYY-MM-DD` date for future audit grounding
-
 ## Problem: Features keep drifting from original scope
 
 **Cause:** Feature descriptions are too vague ("user authentication") and interpretation shifts session-to-session.
 
 **Solution:**
 - Tighten descriptions during audit — add a 1-sentence success criterion
-- Bad: "User authentication"
-- Good: "User authentication — email/password login with session persistence across browser restarts"
+- ✅ Good: "User authentication — email/password login with session persistence across browser restarts"
+- ❌ Bad: "User authentication"
 - The criterion should be testable, not aspirational
 
 ## Problem: Can't decide priority order
@@ -85,14 +64,4 @@ Additional troubleshooting beyond the common issues covered in SKILL.md.
 - Ask the user: "If we could only ship 3 things this quarter, which 3?"
 - Put those at the top of their respective categories
 - Move the rest to "Future Ideas" temporarily — you can promote them back up next planning cycle
-- Avoid numeric priority scores (P0/P1/P2) — they encourage false precision; category + order is enough
-
-## Problem: User wants to rename or merge features
-
-**Cause:** Feature naming or grouping has evolved since initial roadmap.
-
-**Solution:**
-- **Rename:** Edit the feature text but preserve the `<!-- id:r_XXXXX -->` comment. IDs are permanent.
-- **Merge:** Pick the surviving ID, delete the other item, update the survivor's description to cover both
-- **Split:** Keep the original ID on one half, generate a new ID for the new half
-- Always ask the user before structural changes — IDs link to SESSION_PROGRESS.md references
+- Prefer category + order over numeric priority scores (P0/P1/P2), which encourage false precision
