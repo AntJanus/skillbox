@@ -36,7 +36,7 @@ Official-loop format (agentskills.io optimizing-descriptions): 18 queries, 9 sho
 
 | Variant | Date | Train pass | Validation pass | Selected |
 |---|---|---|---|---|
-| 4.0.0 (imperative register, front-loaded noun) | 2026-07-28 | not yet run | 7/8 | ✓ |
+| 4.0.0 (imperative register, front-loaded noun) | 2026-07-28 | not yet run | 7/8 | ✓ (selection is validation-based) |
 
 Measured rates 2026-07-28 (3 fresh sonnet sessions per query, scratch project with all 14 skills installed): V1 1.00, V2 0.33 **FAIL**, V3 1.00, V4 1.00, V5–V8 all 0.00 (all four should-nots correctly silent). V2 ("give my new skill a letter grade") under-fires because the phrasing carries no "SKILL.md"/"rate"/"audit" token — a train-side iteration candidate for 4.1.0; do not reword against this validation query directly.
 
