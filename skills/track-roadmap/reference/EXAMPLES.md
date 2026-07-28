@@ -123,22 +123,34 @@ User says: *"We decided not to do offline support, and I want to add calendar in
 ```markdown
 # Before:
 ## Technical Infrastructure
-- **Cloud sync** - Sync tasks across devices via a backend API.
-- **Offline support** - App works without internet, syncs when reconnected.
+
+<!-- category:infra -->
+
+- <!-- id:r_w5e9h status:planned --> **Cloud sync** - Sync tasks across devices via a backend API.
+- <!-- id:r_n1y6k status:planned --> **Offline support** - App works without internet, syncs when reconnected.
 
 ## User Experience
-- **Dark mode** - Support system-level dark/light theme preference.
+
+<!-- category:ux -->
+
+- <!-- id:r_j4t8v status:planned --> **Dark mode** - Support system-level dark/light theme preference.
 
 # After (confirmed with user):
 ## Technical Infrastructure
-- **Cloud sync** - Sync tasks across devices via a backend API.
+
+<!-- category:infra -->
+
+- <!-- id:r_w5e9h status:planned --> **Cloud sync** - Sync tasks across devices via a backend API.
 
 ## User Experience
-- **Dark mode** - Support system-level dark/light theme preference.
-- **Calendar integration** - Show tasks with due dates in a calendar view.
+
+<!-- category:ux -->
+
+- <!-- id:r_j4t8v status:planned --> **Dark mode** - Support system-level dark/light theme preference.
+- <!-- id:r_c8h4z status:planned --> **Calendar integration** - Show tasks with due dates in a calendar view.
 ```
 
-**Why this is good:** Confirms removal before acting, places new feature in appropriate category with description, only changes what the user asked for.
+**Why this is good:** Confirms removal before acting, places the new feature in an existing category with a fresh unique id and a `planned` status, carries the surviving items' ids through unchanged, and only changes what the user asked for. A dropped feature is deleted outright — unlike a *completed* one, which moves to Completed with a `completed:` date.
 
 ❌ **Bad:**
 
