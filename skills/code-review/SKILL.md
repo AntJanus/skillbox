@@ -1,15 +1,17 @@
 ---
 name: code-review
-description: Use this skill whenever the user wants a multi-agent review of local changes — triggers include "review my code", "review these changes", "do a code review", "check my changes before I commit", "review the whole repo", or "review this in the background". Prioritizes correctness over nitpicks; writes REVIEW.md. Do NOT use for an open PR by number (use /review) or a security-specific pass (use /security-review).
+description: Use this skill to run a multi-agent code review of local uncommitted changes whenever the user asks to "review my code", "review these changes", "do a code review", "check my changes before I commit", "review the whole repo", or "review this in the background" — even if they never say "review" and only ask whether the work is ready to ship or safe to commit. Prioritizes correctness over nitpicks and writes REVIEW.md. Do NOT use this skill for an open PR by number (use /review), a security-specific pass (use /security-review), grading a SKILL.md file (see rate-skill), or a quality-only cleanup that does not hunt for bugs (see simplify).
 license: MIT
 argument-hint: "[path | --staged | --branch <base> | --repo [--blueprint <skill>]] [--background] [--nits]"
 allowed-tools: Read, Write, Glob, Grep, Bash, Agent
 metadata:
   author: Antonin Januska
-  version: "2.0.0"
+  version: "2.1.0"
 ---
 
 # Code Review — Multi-Agent Local Review
+
+## Overview
 
 Runs narrow-lane reviewer agents in parallel, then a verifier that keeps only findings with real impact, distills the "fix first" shortlist, and suppresses the nit tail — merged into `REVIEW.md` at the repo root. **Core principle:** a review is worth reading when it finds *wrong answers*, not style. The lanes are aimed at correctness and structural soundness; the verifier defaults low-impact findings to DROP so the signal isn't buried. The skill scopes, dispatches, and renders — the reviewers and verifier judge.
 
@@ -47,7 +49,7 @@ Parse flags first. Resolve files to review, in priority order: `--repo` (all sou
 
 **Filter out** binary/image assets, generated files, build/dependency/venv output. **Do NOT filter** lockfiles, package manifests, env templates, or project docs — `hygiene` needs them. **Detect UI scope:** if the file list includes components/templates/styles/design-token files, include the **ui-ux** lane; otherwise skip it.
 
-Before dispatching, you MUST have a concrete file list + the diff text (for `--repo`, the "diff" is the full current content of the in-scope files), and report scope to the user ("Reviewing N files: …"). If scope is empty in a diff mode, stop — don't invent work. (`--repo` is never empty; that's its purpose.)
+Dispatch only once you hold a concrete file list **and** the diff text (for `--repo`, the "diff" is the full current content of the in-scope files), because reviewer subagents start with no conversation context and can read nothing you didn't pass them. Report scope to the user first ("Reviewing N files: …"). If scope is empty in a diff mode, stop rather than inventing work. (`--repo` is never empty; that's its purpose.)
 
 ## Phase 2: Parallel dispatch
 
@@ -60,7 +62,7 @@ Dispatch **one verifier** (single Agent, `Explore`) with the file list, diff, an
 - **Evidence:** re-read each finding's cited `file:line`; if the citation is wrong, DROP.
 - **Impact floor:** a surviving finding must name a *concrete bad outcome* it prevents (wrong result, data loss, security, real regression, genuine reader-trap). If the worst realistic outcome is cosmetic/stylistic/doc-only/"inconsistent but nothing breaks", it FAILS the floor → routed to the nit bucket (if tagged `[Nit]`) or DROPPED. **When in doubt about impact, DROP.**
 - **Severity** by blast radius is authoritative (replaces the lane's).
-- **STRENGTHS:** the verifier lists 2-4 things the code does right that it *confirmed by reading* — this proves comprehension and flips the felt tone from nitpicking to reviewing.
+- **STRENGTHS:** the verifier lists 2-4 things the code does right that it *confirmed by reading*, each tied to the file or line where it checked — grounded praise flips the felt tone from nitpicking to reviewing; ungrounded praise reads as filler.
 
 The verifier returns: STRENGTHS, the "what to fix first" distillation (3-6 items), the kept blocking findings at re-rated severities, a NITS section (only if `--nits`), and `Verifier summary: kept N blocking of M; dropped J (W wrong-evidence, L low-impact); H nits held.`
 
@@ -93,7 +95,7 @@ Reviewers read the diff **from the prompt**, never by re-running `git diff` in t
 
 `REVIEW.md` at repo root, section order: **header** (`Generated` / `Scope` / `Lanes` / `Verifier: kept N blocking of M; dropped …; H nits held` / `Total`) → **`## What the repo does well`** → **`## What to fix first`** → **`## Critical` → `## Major` → `## Minor`** (blocks: `[lane]` `line` — issue, risk/evidence + fix; re-rated findings carry a `Verifier note:`) → **`## Nit`** (only with `--nits`). Full worked report: **[reference/EXAMPLE-REVIEW.md](./reference/EXAMPLE-REVIEW.md)**.
 
-## Example
+## Examples
 
 ✅ **Good:** reviewer Agent calls in one message → wait → verifier Agent → write REVIEW.md → chat shows only `REVIEW.md written — 1 Critical, 2 Major, 0 Minor; 5 nits held (--nits to show)`. A good correctness finding is specific: `[correctness] src/allowance.ts:42 — detail page shows $10/wk but accrual pays $5/wk forever (rate-row shadowing); trigger: any item with a weekly rate; fix: read the rate from the accrual row, not the display row`.
 
@@ -108,14 +110,22 @@ Reviewers read the diff **from the prompt**, never by re-running `git diff` in t
 - Severities reflect the verifier's impact judgment; low-impact truths are dropped, not demoted-and-kept.
 - REVIEW.md is the deliverable (chat gets one line), overwritten in place.
 
+## Gotchas
+
+- **`--background` can't be delegated.** A subagent has no Agent tool, so running the whole skill as one subagent produces zero reviewers and no error — it just finishes. Orchestrate background runs from the main thread.
+- **A worktree reviewer sees a clean tree.** The `isolation: "worktree"` checkout shares HEAD, so `git diff` inside it returns nothing. Reviewers read the diff from their prompt; never let a lane re-derive it.
+- **`--repo` mode has no diff.** What the lanes receive is full file content, so a lane hunting `+` lines returns NO FINDINGS on real problems. Pass the mode into the prompt so lanes review whole files.
+- **Dropped findings are the product, not a bug.** The verifier deletes true-but-trivial findings on purpose; `--nits` is the recovery path, and there is no demote-and-keep tier to fall back on.
+- **The ui-ux lane is conditional.** If it fires on a backend/CLI diff, Phase-1 UI detection matched a non-UI file — fix detection rather than accepting the lane's noise.
+- **Architecture findings drift back to "a peer differs."** That bar was removed in 2.0; a finding without a stated consequence should have been dropped, so re-dispatch the lane with its exact prompt.
+- **REVIEW.md is overwritten every run** and written at the true repo root (`git rev-parse --show-toplevel`, not a worktree). The prior review is gone — add it to `.gitignore`.
+
 ## Troubleshooting
 
 - **Still too nitpicky** — the verifier isn't enforcing the impact floor. Re-dispatch it with the [reference/AGENTS.md#verifier](./reference/AGENTS.md) prompt verbatim and "default to DROP; every kept finding must name a concrete bad outcome."
-- **ui-ux lane fired on a backend diff** — scope detection matched a non-UI file as UI. It should dispatch only when components/templates/styles are in scope.
-- **Architecture finding reads as "peer differs"** — the lane reverted to consistency-mode. Its finding must state a concrete consequence; if it can't, it should have dropped it.
 
 Empty scope, huge diffs, blueprint not found, worktree cleanup: **[reference/TROUBLESHOOTING.md](./reference/TROUBLESHOOTING.md)**.
 
 ## Integration
 
-Pairs with `/security-review` (security), `/review` (open PRs), `track-session` (track fixes), `typography` + `color-system` (the ui-ux lane's standard), and blueprint skills like `local-first-app` via `--blueprint`. Typical loop: edit → `/code-review` → read REVIEW.md, fix what's first → re-run (overwrites) → commit when clean. For a big pass, `/code-review --repo --blueprint <skill> --background` and keep working. Add `REVIEW.md` to `.gitignore`. Not a replacement for CI linting or human PR review — a pre-commit pass that catches wrong answers linters miss. **Maintainers:** keep an `evals/` dir with representative diffs (clean / real correctness bug / tempting nitpick); re-run after every prompt edit.
+Pairs with `/security-review` (security), `/review` (open PRs), `track-session` (track fixes), `typography` + `color-system` (the ui-ux lane's standard), and blueprint skills like `local-first-app` via `--blueprint`. Typical loop: edit → `/code-review` → read REVIEW.md, fix what's first → re-run (overwrites) → commit when clean. For a big pass, `/code-review --repo --blueprint <skill> --background` and keep working. Add `REVIEW.md` to `.gitignore`. Not a replacement for CI linting or human PR review — a pre-commit pass that catches wrong answers linters miss. **Maintainers:** activation triggers are measured in **[reference/EVAL.md](./reference/EVAL.md)**; lane quality is measured against representative diffs (clean / real correctness bug / tempting nitpick). Re-run both after every prompt edit.

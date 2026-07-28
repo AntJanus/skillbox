@@ -22,10 +22,10 @@ Files in scope: <list>
 Diff:
 <diff content>
 
-MANDATORY: don't review the diff in isolation — read the current full
-contents of each changed function and the code it calls, so you can trace
-values end to end. A bug is usually the interaction between the changed line
-and code the diff doesn't show.
+Read the current full contents of each changed function and the code it
+calls, not just the diff, so you can trace values end to end — a bug is
+usually the interaction between the changed line and code the diff doesn't
+show, which reviewing the hunk alone can never surface.
 
 Hunt specifically for these classes (they recur and reviewers miss them):
 - Boundary / off-by-one: date math (month-end rollover — "Jan 31 + 1 month",
@@ -95,10 +95,12 @@ Diff:
 <diff content>
 Blueprint (if provided): <blueprint skill name, else "none — infer intent from the code and its neighbours">
 
-MANDATORY FIRST STEP: establish the INTENT. What is this module/entity/route
-for? Read the changed code plus 2-4 neighbours to understand the purpose and
-the invariants it must hold. If a blueprint skill was named, load its rules
-and treat THEM as the standard, not the nearest sibling.
+Start by establishing the INTENT — what is this module/entity/route for?
+Read the changed code plus 2-4 neighbours to understand the purpose and the
+invariants it must hold, because a structural judgment made without knowing
+the intent collapses into "this differs from a peer." If a blueprint skill
+was named, load its rules and treat THEM as the standard, not the nearest
+sibling.
 
 Then flag, each with a concrete consequence:
 - Wrong semantics for the entity's purpose: e.g. `ON DELETE CASCADE` on a
@@ -398,7 +400,8 @@ hang, perf cliff), or a genuine reader-trap that will cause a future bug.
   demote rather than drop" rule is retired; it produced the noise.
 
 Severity is authoritative here — it replaces the lane reviewer's. When you
-move it, add a one-line `Verifier note:` with the impact reasoning.
+move it, add a one-line `Verifier note:` naming the concrete outcome that
+set the new severity.
 
 TAGS:
 - `[Secret]` (a real committed credential) → always Critical, always
@@ -411,9 +414,10 @@ STRENGTHS (verified) — the trust-builder:
 Before the findings, list 2-4 things this change/code does RIGHT that you
 CONFIRMED by reading (not assumed) — e.g. "pure calc core has zero
 db/framework imports (verified in src/core)", "the new error path is tested
-(saw the case in foo.test.ts:88)". This proves the review understood the
-code rather than pattern-matching complaints. If you genuinely found nothing
-verifiable to praise, omit the section — don't invent filler.
+(saw the case in foo.test.ts:88)". Tie each one to the file or line where
+you confirmed it, because an ungrounded compliment reads as filler and
+undercuts the findings next to it. If you genuinely found nothing verifiable
+to praise, omit the section rather than inventing one.
 
 DISTILLATION — "what to fix first":
 Every kept Critical plus the highest-impact Majors, 3-6 items, ordered by
