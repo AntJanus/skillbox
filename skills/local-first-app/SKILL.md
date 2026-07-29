@@ -1,6 +1,6 @@
 ---
 name: local-first-app
-description: Local-first CRUD blueprint — Next.js + node:sqlite, single-user. Use this skill whenever the user wants to scaffold a tracker/dashboard app, add a persisted entity, or package as a desktop binary. Do NOT use for palette (color-system) or layout (frontend-design).
+description: Local-first CRUD blueprint — Next.js + node:sqlite, single-user, no backend. Use this skill whenever the user wants to "build a local app to track my X", "a tracker that saves to my machine", "an offline single-user app with no account", "add a persisted entity", or "package this as a desktop binary" — even if they never say local-first and only describe a personal tracker, catalog, or dashboard whose data stays on disk. Covers the pure-core/db/loader architecture, screen-based CRUD, migrations and backups, and the verification gates. Do NOT use this skill for choosing a palette (see color-system), layout and visual design (see frontend-design), font sizing (see typography), or any app needing multi-user auth, a hosted API, or server-side secrets.
 license: MIT
 metadata:
   author: Antonin Januska
