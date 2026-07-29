@@ -1,16 +1,14 @@
 # App chrome, identity & shared shells — deep reference
 
-Load when scaffolding a new app's shell, wiring theming, or building the screens. This file exists because everything in it is what makes a family of apps *look* related — and it is exactly the layer a fresh build reinvents when the blueprint only specifies architecture. Copy these implementations rather than re-deriving them.
+Load when scaffolding a shell, wiring theming, or building screens. Copy these implementations rather than re-deriving them: this is the layer that makes a family of apps look related, and the one a fresh build reinvents when the blueprint specifies only architecture.
 
-Pairs with **color-system** (the actual palette values) and **typography** (the type decisions). This file specifies the *structure*; those skills choose the *values*.
+Pairs with **color-system** (palette values) and **typography** (type decisions). This file specifies structure; those skills choose values.
 
 ## The shell
 
-One `'use client'` chrome wraps every route. Dashboard layout, never single-column.
+One `'use client'` chrome wraps every route. Dashboard layout, never single-column. The server-read `colorScheme` threads in as a prop from the root layout — that thread is the mechanism, not an incidental detail.
 
-The chrome is `'use client'`, so the server-read `colorScheme` is threaded in as a prop from the root layout — that thread is the whole mechanism, not an incidental detail.
-
-**The brand lives in the sidebar, not the header.** Because `layout="alt"` gives the navbar the full-height left edge *including the top-left corner*, that corner is where the logo goes — and the collapse toggle sits beside it. The header is a **topbar over the content only**: burger, page/app title, and right-aligned controls. Getting this backwards (logo in the header) is the single most common way a new app stops looking like the rest of the family.
+**The brand lives in the sidebar, not the header.** `layout="alt"` gives the navbar the full-height left edge including the top-left corner, so that corner holds the logo with the collapse toggle beside it. The header is a topbar over the content only: burger, title, right-aligned controls. Logo-in-the-header is the most common way a new app stops looking like the family.
 
 ```tsx
 // components/AppShellChrome.tsx — 'use client'
@@ -42,8 +40,7 @@ const collapseToggle = (
   }}
 >
   <AppShell.Navbar p="md">
-    {/* Identity row — fixed height, never scrolls, never moves.
-        Collapsed keeps the glyph and stacks; expanded is glyph + wordmark in a row. */}
+    {/* Identity row — fixed height, never scrolls, never moves. */}
     {collapsed ? (
       <Stack align="center" gap={6} mt={4} mb="lg">
         <AppGlyph width={28} height={28} />
@@ -78,23 +75,19 @@ const collapseToggle = (
 </AppShell>
 ```
 
-- **`layout="alt"`** is the load-bearing prop — it puts the sidebar full-height against the viewport edge with the header beside it, rather than a header spanning the top. This single prop is most of the silhouette.
-- **264px expanded ↔ 72px collapsed.** Collapsed shows icons only, with the label as a `Tooltip`. Persist the collapsed flag to `localStorage` under `"<app>-sidebar-collapsed"` — this is ephemeral view state, unlike theme (below), so client storage is correct here.
-- **Collapsing drops the wordmark, never the mark.** The 72px rail keeps the SVG glyph; only the text half of the logo goes. A rail that collapses to pure anonymous icons loses the one element telling the user *which* app they're in — and in a family of near-identical shells, that is the only thing distinguishing them at a glance. This is why `Logo` and the bare glyph are **two exports from the same file** (see below): the chrome needs the mark on its own, not a `size` prop on the full lockup. The glyph is also the natural "back to home" target in the collapsed state.
-- **The rail is too narrow for the mark and the toggle side by side.** 72px minus padding leaves roughly 52px — a 28px glyph plus a 34px `ActionIcon` does not fit. Stack them (`<Stack align="center">`) when collapsed and use a `Group` when expanded, rather than trying to shrink either one. Hoist the toggle into a variable so both branches render the same element.
-- **The collapse toggle belongs in the navbar's identity row — never `mt="auto"` at the bottom.** `AppShell.Navbar` is a flex column with `overflow: visible` and *no* scroll container of its own, so a bottom-pinned control is pushed past the viewport edge the moment the nav list outgrows the screen. It doesn't clip and it doesn't scroll — it silently becomes unclickable, and the sidebar reads as "not collapsible" with the code still perfectly correct. A list that fits on a 27" display will not fit on a laptop. Put the toggle in the fixed top row and let the *links* scroll.
-- **Anything pinned below the links needs `AppShell.Section grow component={ScrollArea}` above it.** That is the only structure that makes a navbar footer safe; without it, "pin to bottom" means "push off-screen".
-- **`visibleFrom="sm"` on the toggle.** On mobile the navbar is a drawer and collapsing it is meaningless — the `Burger` already owns that job.
+- **`layout="alt"`** is the load-bearing prop: sidebar full-height against the viewport edge, header beside it. This single prop is most of the silhouette.
+- **264px expanded ↔ 72px collapsed.** Collapsed shows icons with the label as a `Tooltip`. Persist the flag to `localStorage` under `"<app>-sidebar-collapsed"` — ephemeral view state, unlike theme.
+- **Collapsing drops the wordmark, never the mark.** The rail keeps the glyph; only the text half goes. A rail of anonymous icons loses the one element telling the user *which* app they're in, which in a family of near-identical shells is the only thing distinguishing them at a glance.
+- **The rail is too narrow for mark and toggle side by side.** 72px minus padding leaves ~52px; a 28px glyph plus a 34px `ActionIcon` doesn't fit. Stack when collapsed, `Group` when expanded, rather than shrinking either.
+- **The collapse toggle belongs in the identity row, never `mt="auto"`** — see the navbar-overflow gotcha below.
+- **`visibleFrom="sm"` on the toggle.** On mobile the navbar is a drawer; the `Burger` already owns that job.
 - **Nav links** use the current pathname for active state, not click handlers.
-- **Mobile is a drawer**, opened by the `Burger`. Anything that renders into the navbar slot is invisible on mobile until the drawer opens — see the batch-bar caveat in `UI.md`.
-- **A collapsed rail cannot hold wide controls.** Any mode that renders controls into the navbar (bulk selection) must force the shell back to full width while it lasts.
+- **A collapsed rail cannot hold wide controls.** Any mode rendering controls into the navbar (bulk selection) must force the shell back to full width while it lasts.
 
-### Verifying the toggle is actually reachable
-
-Overflow bugs of this class don't fail a typecheck, a test, or a screenshot taken on a tall window. Check the geometry directly, at a laptop-sized viewport:
+Overflow bugs of this class don't fail a typecheck, a test, or a screenshot on a tall window. Check the geometry at a laptop-sized viewport:
 
 ```js
-// in the browser console, or via shot-scraper javascript
+// browser console, or via shot-scraper javascript
 const toggle = document.querySelector('[aria-label$="sidebar"]');
 const { bottom } = toggle.getBoundingClientRect();
 ({ bottom, viewport: innerHeight, belowFold: Math.round(bottom - innerHeight) });
@@ -103,9 +96,9 @@ const { bottom } = toggle.getBoundingClientRect();
 
 ## Logo
 
-A custom SVG glyph beside a two-weight wordmark. The weight split is the whole trick: a quiet shared part and a bold distinctive part read as one mark while letting a family of apps differ only in the second word.
+A custom SVG glyph beside a two-weight wordmark. The weight split is the trick: a quiet shared part and a bold distinctive part read as one mark while letting a family of apps differ only in the second word.
 
-**Export the glyph separately from the lockup.** `Logo` (glyph + wordmark) goes in the expanded navbar; the bare `AppGlyph` goes in the 72px collapsed rail, and may also be reused for the favicon and the binary's app icon. Building only the combined lockup forces the chrome to either hide the brand entirely when collapsed or scale down text that is already at its legibility floor — so make the glyph a first-class export from day one, with its own `width`/`height` props rather than a `size` prop on the pair.
+**Export the glyph separately from the lockup.** `Logo` goes in the expanded navbar; the bare `AppGlyph` goes in the 72px rail, and doubles as favicon and app icon. Building only the combined lockup forces the chrome to hide the brand when collapsed or scale down text already at its legibility floor.
 
 ```tsx
 // components/Logo.tsx
@@ -114,7 +107,7 @@ export function AppGlyph({ width = 26, height = 26 }) { /* one custom SVG per ap
 export function Logo() {
   return (
     <Group gap={8} wrap="nowrap">
-      <AppGlyph width={26} height={26} />        {/* one custom SVG per app */}
+      <AppGlyph width={26} height={26} />
       <Text
         component="span"
         ff="var(--font-display)"
@@ -130,33 +123,23 @@ export function Logo() {
 }
 ```
 
-- **Glyph:** one hand-made SVG per app, sized to the cap height of the wordmark. It should say what the app is about in a single shape.
-- **Wordmark:** shared/quiet segment at `fw 400`, distinctive segment at `fw 700` in the primary filled color. No space between the two `<Text>` spans — they're one word visually.
-- **Always the display face**, 1.42rem, `letterSpacing: -0.03em`. Tight tracking is what stops a two-weight wordmark reading as two separate words.
+- **Glyph:** one hand-made SVG per app, sized to the cap height of the wordmark, saying what the app is about in a single shape.
+- **Wordmark:** quiet segment at `fw 400`, distinctive segment at `fw 700` in the primary filled color. No space between the spans — they're one word visually.
+- **Always the display face**, 1.42rem, `letterSpacing: -0.03em`. Tight tracking stops a two-weight wordmark reading as two words.
 
 ## Icons
 
-**`@tabler/icons-react`**, everywhere, no exceptions. Pin one icon library and use it for nav, actions, empty states, and toggles alike. A mixed icon set (or none) is immediately visible as inconsistency, and Tabler's coverage means you never have to reach outside it.
+**`@tabler/icons-react`**, everywhere. Pin one library for nav, actions, empty states and toggles alike; a mixed icon set is immediately visible as inconsistency, and Tabler's coverage means you never reach outside it.
 
 ## Theming — server-persisted, two axes
 
-Every app ships **4–7 named themes** *and* a light/dark axis. Both persist **server-side in the settings table**, not `localStorage`. That choice buys a flash-free first paint by construction — the correct attributes are in the server-rendered HTML, so there is no pre-paint script to get right and no hydration mismatch to chase.
-
-```ts
-// settings table — the existing key/value store, no new table
-//   key          | value
-//   -------------+---------
-//   theme        | forest
-//   colorScheme  | dark
-```
+**4–7 named themes** plus a light/dark axis, both persisted **server-side in the settings table**, not `localStorage`. That buys a flash-free first paint by construction: the correct attributes are in the server-rendered HTML, so there's no pre-paint script to get right and no hydration mismatch to chase.
 
 ```tsx
 // app/layout.tsx — server component
 export const dynamic = "force-dynamic";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  // Narrow the stored strings before indexing — the settings table is not typed,
-  // and `noUncheckedIndexedAccess` would otherwise hand THEMES[...] an undefined.
   const theme = asThemeName(getSetting("theme"));           // falls back to "default", logs on unknown
   const colorScheme = asColorScheme(getSetting("colorScheme"));
 
@@ -179,7 +162,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 ```
 
 - **`THEMES`** is a record of `createTheme()` results sharing one `base` (fonts, type scale, radius, spacing) and differing only in brand color scale, dark neutral tuple, and chart `Palette`. Define it once in `lib/theme.ts`.
-- **Narrow the stored key before indexing.** `getSetting()` returns an untyped string from the settings table; a renamed or hand-edited theme makes `THEMES[value]` `undefined`, which renders an unthemed app rather than failing loudly — the silent fallback the skill forbids. Guard it once:
+- **Narrow the stored key before indexing.** `getSetting()` returns an untyped string; a renamed or hand-edited theme makes `THEMES[value]` `undefined`, rendering an unthemed app rather than failing loudly — the silent fallback this blueprint forbids:
 
 ```ts
 // lib/theme.ts
@@ -189,9 +172,10 @@ export const asThemeName = (value: string | null): ThemeName =>
 export const asColorScheme = (value: string | null): "light" | "dark" =>
   value === "dark" ? "dark" : "light";
 ```
-- **`data-theme` on `<html>`** drives per-theme CSS variables in `globals.css`; `forceColorScheme` makes Mantine honor the stored value rather than consulting the OS.
-- **The font `.variable` classes go on `<html>`, not `<body>`** — see the `:root` trap in `UI.md`. This is the single most common silent failure in this stack.
-- **Both switchers live on the Settings screen** — except the color-scheme toggle, which also gets a header slot. Both call a server action that writes the setting and `revalidatePath("/", "layout")`.
+
+- **`data-theme` on `<html>`** drives per-theme CSS variables in `globals.css`; `forceColorScheme` makes Mantine honor the stored value rather than the OS.
+- **The font `.variable` classes go on `<html>`, not `<body>`** — see the `:root` trap in `UI.md`. The most common silent failure in this stack.
+- **Both switchers live on Settings**, except the color-scheme toggle which also gets a header slot. Both call a server action that writes the setting and `revalidatePath("/", "layout")`.
 
 ```tsx
 // components/ColorSchemeToggle.tsx — 'use client'
@@ -212,13 +196,11 @@ export function ColorSchemeToggle({ scheme }: { scheme: "light" | "dark" }) {
 }
 ```
 
-**Render one icon, never both.** Because the scheme is known on the server, the toggle picks its icon directly. Do **not** render both icons and hide one with Mantine's `lightHidden`/`darkHidden` — that pattern is a live bug waiting to happen (see Gotchas below), and server-side scheme makes it unnecessary.
+**Render one icon, never both.** The scheme is known on the server, so the toggle picks its icon directly. Rendering both and hiding one with `lightHidden`/`darkHidden` is a live bug (see Gotchas) that server-side scheme makes unnecessary.
 
 ## Type scale & theme base
 
-The readability floor is the rule; these values are a known-good implementation of it.
-
-**The floor (must hold, whatever values you choose):** smallest token ≥ `1rem`/16px · line-height ≥ 1.5 · weight ≥ 400 · contrast ≥ 4.5:1.
+**The floor (must hold, whatever values you choose):** smallest token ≥ `1rem`/16px · line-height ≥ 1.5 · weight ≥ 400 · contrast ≥ 4.5:1. These values are a known-good implementation of it.
 
 ```ts
 // lib/theme.ts — the shared base every named theme spreads
@@ -252,18 +234,15 @@ export const base = {
 h1, h2 { letter-spacing: -0.02em; }
 h3, h4, h5, h6 { letter-spacing: -0.01em; }
 
-/* Raise `dimmed` to clear the contrast floor — it ships at 3.32:1, under 4.5:1.
-   Fixing the token once makes every `c="dimmed"` in the components below safe;
-   patching call sites instead guarantees the next one reintroduces it. */
+/* Raise `dimmed` to clear the contrast floor — it ships at 3.32:1, under 4.5:1. */
 :root                                   { --mantine-color-dimmed: #5b6472; }  /* 5.98:1 on #fff */
 :root[data-mantine-color-scheme="dark"] { --mantine-color-dimmed: #9aa4b2; }  /* 6.83:1 on #1a1b1e */
 ```
 
-**Override the token, not the usages.** Mantine's `dimmed` is tuned for visual hierarchy, not contrast — its default `#868e96` computes to **3.32:1** on white, well under the floor. Every `c="dimmed"` in the shells below depends on this override being present; without it, the reference implementations ship sub-floor secondary text by default. Re-verify both values against your own surface colors, since a ratio that passes on the canvas can still fail on an elevated `Paper`.
-
-- **Override the entire scale, not the parts you noticed.** Several Mantine components read `xs`/`sm` internally with no prop to grep for — leaving those two at their defaults is how a "compliant" app still ships 12px text.
-- **`Badge` needs both fixes.** It sizes from its own `--badge-fz` custom property rather than the `fontSizes` scale, and it uppercases by default (which costs legibility at small sizes).
-- **`tabular-nums` globally**, so every figure column lines up without per-component styling.
+- **Override the token, not the usages.** Mantine's `dimmed` (`#868e96`) computes to 3.32:1 on white. Every `c="dimmed"` below depends on this override; patching call sites instead guarantees the next one reintroduces it. Re-verify both values against your own surfaces — a ratio that passes on the canvas can still fail on an elevated `Paper`.
+- **Override the entire scale, not the parts you noticed.** Several components read `xs`/`sm` internally with no prop to grep for, which is how a "compliant" app still ships 12px text.
+- **`Badge` needs both fixes** — it sizes from its own `--badge-fz` rather than the scale, and uppercases by default.
+- **`tabular-nums` globally**, so figure columns line up without per-component styling.
 
 ## Fonts
 
@@ -276,13 +255,13 @@ export const displayFont = Space_Grotesk({ subsets: ["latin"], weight: ["500","7
 export const monoFont    = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400","500"],       variable: "--font-mono" });
 ```
 
-Three roles, three variables: **body** (all running text), **display** (headings and the logo wordmark), **mono** (figures, IDs, code). Swap the faces freely for a given app — keep the three roles and the variable names, because the theme base and every component below reference them by name.
+Three roles, three variables: **body** (running text), **display** (headings, logo wordmark), **mono** (figures, IDs, code). Swap faces freely per app; keep the roles and variable names, because the theme base and every component below reference them by name.
 
-Serif as a page-title accent is fine as a fourth variable, but **don't wire it into `theme.headings`** — that reaches far more surfaces than intended. Apply it on the title component only.
+A serif page-title accent is fine as a fourth variable, but **don't wire it into `theme.headings`** — that reaches Modal titles, Alert titles and table captions, and reads as inconsistent rather than accented.
 
 ## Shared shells
 
-Four components every app needs and every app otherwise rewrites. These are the reference implementations — copy them into `components/` and adjust.
+Reference implementations — copy into `components/` and adjust.
 
 ### PageShell
 
@@ -309,11 +288,11 @@ export function PageShell({ backHref, backLabel, title, subtitle, actions, child
 }
 ```
 
-Every screen renders through it, so back-links, title sizing, and action placement stay identical without per-screen decisions.
+Every screen renders through it, so back-links, title sizing and action placement stay identical without per-screen decisions.
 
 ### EditorShell
 
-The form/editor shell is the highest-value reuse in the whole app — new and edit screens for *every* entity share it, and only the inner fields differ.
+The highest-value reuse in the app — new and edit screens for *every* entity share it, and only the inner fields differ.
 
 ```tsx
 // components/EditorShell.tsx
@@ -339,9 +318,9 @@ export function EditorShell({ form, preview, onCancel, saving, saveLabel = "Save
 }
 ```
 
-- **7/5 split**, form left, live preview right. The preview is sticky at `top: 80` (header height + gutter) so it stays visible while a long form scrolls.
-- **Stacks to full width below `md`** — the preview lands under the form on mobile, which is the right order.
-- **Cancel is `subtle`, Save is filled.** Destructive-weight styling belongs on delete, not on cancel.
+- **7/5 split**, form left, preview right, sticky at `top: 80` (header height + gutter) so it stays visible while a long form scrolls.
+- **Stacks to full width below `md`** — the preview lands under the form on mobile, the right order.
+- **Cancel is `subtle`, Save is filled.** Destructive-weight styling belongs on delete.
 
 ### StatTile
 
@@ -360,7 +339,7 @@ export function StatTile({ label, value, hint }: StatTileProps) {
 }
 ```
 
-The label is one of the few legitimate uses of the smallest token — it's a glanceable caption under a large figure, not running text. The figure itself is mono for column alignment across a row of tiles.
+The label is one of the few legitimate uses of the smallest token — a glanceable caption under a large figure, not running text. The figure is mono so it aligns across a row of tiles.
 
 ### EmptyState
 
@@ -380,11 +359,11 @@ export function EmptyState({ icon, headline, explanation, action }: EmptyStatePr
 }
 ```
 
-**Centered, bordered, with a CTA** — a left-aligned stack of text reads as a rendering failure rather than a designed state. A fresh local-first DB has zero rows on day one, so this is the *first* screen a user sees for every entity. Design it before the entity exists.
+**Centered, bordered, with a CTA** — a left-aligned stack of text reads as a rendering failure rather than a designed state. A fresh local-first DB has zero rows on day one, so this is the *first* screen a user sees for every entity.
 
-## ConfirmDeleteButton
+### ConfirmDeleteButton
 
-One hand-rolled controlled `<Modal>` handles every delete in the app — simple and option-carrying alike. This replaces `openConfirmModal`, and with it the `@mantine/modals` dependency and its provider.
+One hand-rolled controlled `<Modal>` handles every delete, simple and option-carrying alike. Replaces `openConfirmModal`, and with it the `@mantine/modals` dependency and its provider.
 
 ```tsx
 // components/ConfirmDeleteButton.tsx — 'use client'
@@ -431,16 +410,15 @@ export function ConfirmDeleteButton({ entityLabel, cascade, options, onConfirm }
 }
 ```
 
-- **Always show the blast radius.** `cascade` comes from the detail loader's batched counts (`also deletes 4 tasks`) — never offer a delete without the count.
-- **`options` covers the cases a bare confirm can't** — "also delete the source file", "keep child records". One component, both shapes; no second pattern to remember.
+- **Always show the blast radius.** `cascade` comes from the detail loader's batched counts (`also deletes 4 tasks`).
+- **`options` covers what a bare confirm can't** — "also delete the source file", "keep child records". One component, both shapes.
 - **The action runs inside `startTransition`** → `revalidatePath` → `redirect` to the list.
-- **Don't build a delete *screen*.** This is the one sanctioned modal in the app; everything else is an addressable route.
+- **Don't build a delete *screen*.** This is the one sanctioned modal; everything else is an addressable route.
 
 ## Gotchas
 
-- **`lightHidden`/`darkHidden` lose to any inline style.** Mantine's visibility props work through a class (`[data-mantine-color-scheme] .mantine-light-hidden { display: none }`) with no `!important`. Add a `display` **style prop** to the same element — `<Box lightHidden display="inline-flex">` — and React emits an inline style that wins, so the "hidden" element renders anyway. In a dark/light toggle that means both sun and moon show at once. This shipped across an entire app family by copy-porting and was only caught in manual QA. Fix: move the layout to a CSS class, never the `display` style prop. **Better fix:** with server-persisted color scheme (above), render the correct icon directly and delete the hide-one-of-two pattern entirely.
-- **Sidebar collapse state is client state; theme is not.** They look like the same kind of setting and they aren't — collapse is per-window view state (`localStorage` is right), theme is a user preference that must be correct in the first server-rendered byte (settings table is right). Mixing them up produces either a flash or a preference that doesn't stick.
+- **`mt="auto"` in the navbar pushes a control off-screen instead of pinning it.** `AppShell.Navbar` is `display: flex; flex-direction: column` with `overflow: visible`, so `margin-top: auto` pins to the bottom of the *content*, which extends past the bottom of the *viewport*. Once the nav list is tall enough, the control renders with no clipping and no scrollbar, entirely below the fold, and stops receiving clicks. Silent and viewport-dependent: fine on the display it was built on, gone on a laptop. Wrap the links in `AppShell.Section grow component={ScrollArea}` before pinning anything beneath them, or keep the control in the fixed top row.
+- **`lightHidden`/`darkHidden` lose to any inline style.** They work through a class (`.mantine-light-hidden { display: none }`) with no `!important`, so a `display` **style prop** on the same element wins and the "hidden" element renders anyway — both sun and moon at once in a toggle. This shipped across an entire app family by copy-porting and was caught only in manual QA. Move the layout to a CSS class; better, render the correct icon from the server-persisted scheme.
+- **Sidebar collapse is client state; theme is not.** Collapse is per-window view state (`localStorage`); theme must be correct in the first server-rendered byte (settings table). Mixing them produces either a flash or a preference that doesn't stick.
 - **`AppShell` navbar content is invisible on mobile until the drawer opens.** Anything mode-critical rendered there (a batch bar, a selection count) needs a header affordance too, or the feature is unreachable on small screens.
-- **`mt="auto"` in the navbar pushes a control off-screen instead of pinning it.** `AppShell.Navbar` is `display: flex; flex-direction: column` with `overflow: visible` — so `margin-top: auto` pins to the bottom of the *content*, which is free to extend past the bottom of the *viewport*. Once the nav list is tall enough, the bottom-pinned control renders with no clipping and no scrollbar, entirely below the fold, and no longer receives clicks. The failure is silent and viewport-dependent: fine on the display it was built on, gone on a laptop. Wrap the links in `AppShell.Section grow component={ScrollArea}` before pinning anything beneath them — or keep the control in the fixed top row, which is what the shell above does.
 - **A sticky preview needs an explicit `top`.** `pos="sticky"` with no offset sticks to viewport top and slides under the fixed header. Use header height + gutter.
-- **Don't wire an accent serif into `theme.headings`.** It reaches Mantine internals (Modal titles, Alert titles, table captions) far beyond the page titles you meant, and the result reads as inconsistent rather than accented.
