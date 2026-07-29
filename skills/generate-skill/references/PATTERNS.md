@@ -6,7 +6,7 @@ Full body templates for the five skill types used in the generate-skill workflow
 
 | Type | Use When | Enforcement | Required sections | Optional |
 |------|----------|-------------|-------------------|----------|
-| methodology | Enforces a multi-step workflow (code review, TDD, session tracking) | Phased workflow | Overview, Workflow (phased), Examples, Gotchas | Verification Checklist, Quality Signals / Anti-Patterns |
+| methodology | Enforces a multi-step workflow (code review, TDD, session tracking) | Phased workflow | Overview, Workflow (phased), Examples, Gotchas | Quality Signals / Anti-Patterns |
 | technical | Wraps an API, format, or tool (docx, semantic-release, build setup) | Step-by-step guidance | Overview, Quick Start / Setup, Quick Reference or API surface, Examples, Gotchas | Troubleshooting |
 | auditing | Grades or inspects an artifact (rate-skill, security review) | Rule-based checking | Overview, Workflow, Rubric, Output Format, Examples, Gotchas | — |
 | reference | Domain schemas, conventions, lookup tables (bigquery, style guides) | Information on demand | Overview, Navigation (load-when table), Gotchas | Core Concepts |
@@ -21,7 +21,15 @@ Match specificity to fragility, per section — not per skill (official: agentsk
 - **Give the agent freedom** when multiple approaches are valid and the task tolerates variation. State the goal and constraints, not the steps.
 - **Be prescriptive** when operations are fragile, consistency matters, or a specific sequence must be followed ("Run exactly this sequence…" is legitimate there).
 - **Explain the why either way** — "Do X because Y tends to cause Z" outperforms bare mandates; an agent that understands the purpose makes better context-dependent decisions.
+
+**Leave these out of every template.** Current models already do them; restating the instruction compounds the behavior and burns tokens with no quality gain.
+
+- No self-re-check steps ("double-check your answer", "re-verify before responding", "add a final verification step", "use a subagent to verify"). Delete rather than reword. Checks against *external* state — run the tests, confirm the file parses, validate against the schema — are real steps and stay.
 - Never instruct the agent to echo its reasoning in the response — triggers the `reasoning_extraction` refusal on Claude Fable 5.
+- Never instruct the agent not to think or not to reason — increases leakage of internal XML tags into visible output.
+- Cap delegation when a template spawns subagents: say which scenarios warrant one, keep counts low.
+- Bound the deliverable when a template writes a file: match length to the task, no filler sections or redundant summaries.
+- State where a narrow skill stops — models expand scope on their own.
 
 ---
 
@@ -77,17 +85,13 @@ Why it fails: [one sentence].
 
 ## Gotchas
 - **Symptom:** [observable failure]. **Cause:** [root cause]. **Fix:** [action].
-
-## Verification Checklist
-- [ ] Requirement 1
-- [ ] Requirement 2
 ````
 
 **Key characteristics:**
 - Phase-based workflow with checkboxes at phase boundaries
 - Every ❌ anti-pattern paired with a ✅ alternative (negation handling in LLMs is empirically weak)
 - Explained reasoning instead of all-caps mandates — state *why* a rule exists
-- Verification checklist at the end so completion is measurable
+- Phase-boundary checkboxes gate on external state (a test run, a file that exists), never on the agent re-reading its own output — no closing verification section
 
 ---
 
