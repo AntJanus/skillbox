@@ -49,7 +49,8 @@ function open(): DatabaseSync {
     PRAGMA busy_timeout = 5000;    -- retry on lock contention instead of failing instantly
     PRAGMA foreign_keys = ON;      -- per-connection; OFF by default
   `);
-  backupBeforeMigrate(db);         // VACUUM INTO snapshot — only if migrations are pending
+  snapshotBeforeMigrate(db);       // VACUUM INTO snapshot — fatal on failure, see below
+  pruneSnapshots(backupDir());     // separate call — must NOT be fatal
   migrate(db);
   db.exec("PRAGMA optimize");      // AFTER migrate: refresh planner stats against the new schema
   resolveStuckJobs(db);            // only if the app has a background-job table
@@ -59,33 +60,56 @@ function open(): DatabaseSync {
 
 **`PRAGMA optimize` goes after `migrate()`, not before.** Running it first analyzes the *old* schema and then throws that away — a migration that adds an index or rewrites a table leaves the planner with stats for a shape that no longer exists.
 
-**Back up before migrating.** Local-first means there is no server-side copy: a bad migration is unrecoverable user data. `VACUUM INTO` writes a consistent snapshot without stopping the world, and it's cheap enough to do on every migrating boot.
+**Back up before migrating — a requirement of this layer.** Local-first means there is no server-side copy: a bad migration is unrecoverable user data. An app can satisfy every other rule here, pass every gate it can run, and still have no protection at the moment this blueprint identifies as the scariest — so state it as a requirement, not as something the restore gate happens to test. `VACUUM INTO` writes a consistent snapshot without stopping the world, and it's cheap enough to do on every migrating boot.
+
+The snapshot directory is a **sibling** of the data dir, not a child: `rm -rf data/` is a routine reset during development, and it must not take the snapshots protecting that data with it.
 
 ```ts
-function backupBeforeMigrate(db: DatabaseSync) {
+function snapshotBeforeMigrate(db: DatabaseSync) {          // throws — see below
   const current = db.prepare("PRAGMA user_version").get() as { user_version: number };
   if (current.user_version >= LATEST_VERSION) return;   // nothing pending, nothing to protect
+  if (current.user_version === 0) return;               // fresh DB — nothing to protect yet
 
-  const dir = join(resolveDataDir(), "backups");
+  const dir = join(dirname(resolveDataDir()), "backups");   // SIBLING of data/, not inside it
   mkdirSync(dir, { recursive: true });
 
-  const target = join(dir, `v${String(current.user_version).padStart(4, "0")}-${stamp()}.sqlite`);
+  const target = uniqueTarget(dir, `v${String(current.user_version).padStart(4, "0")}-${stamp()}`);
   if (target.includes("'")) throw new Error(`backup path contains a quote: ${target}`);
   db.exec(`VACUUM INTO '${target}'`);                       // no bound params in VACUUM INTO
+}
 
-  const snapshots = readdirSync(dir)
-    .filter((file) => file.endsWith(".sqlite"))
-    .map((file) => ({ file, modified: statSync(join(dir, file)).mtimeMs }))
-    .sort((left, right) => left.modified - right.modified);  // oldest first
-  for (const stale of snapshots.slice(0, -20)) rmSync(join(dir, stale.file));   // keep newest 20
+function uniqueTarget(dir: string, base: string): string {
+  let candidate = join(dir, `${base}.sqlite`);
+  for (let counter = 2; existsSync(candidate); counter++) {   // ms stamps DO collide
+    candidate = join(dir, `${base}-${counter}.sqlite`);
+  }
+  return candidate;
+}
+
+function pruneSnapshots(dir: string, keep = 20) {           // never throws — see below
+  try {
+    const snapshots = readdirSync(dir)
+      .filter((file) => file.endsWith(".sqlite"))
+      .map((file) => ({ file, modified: statSync(join(dir, file)).mtimeMs }))
+      .sort((left, right) => left.modified - right.modified);  // oldest first, by TIME
+    for (const stale of snapshots.slice(0, -keep)) rmSync(join(dir, stale.file));
+  } catch (error) {
+    console.warn("snapshot rotation failed; the snapshot itself is intact", error);
+  }
 }
 ```
 
 Gate it on pending migrations, or every dev-server restart writes a snapshot. Recovery is a file copy — document that in the app's README, because a backup nobody knows how to restore isn't one.
 
-**Test the restore, not the backup.** Write the snapshot, then **open the copy and read a row back out**. A routine calling a method that doesn't exist on `node:sqlite` (there is no `.backup()`) still passes a test that only checks a file appeared — so the safety net is missing on precisely the day it's needed. Stamp filenames to sub-second precision as well: a pre-migration backup racing a scheduled one collides, and `VACUUM INTO` throws when the target already exists.
+**Test the restore, not the backup.** Write the snapshot, then **open the copy and read a row back out**. A routine calling a method that doesn't exist on `node:sqlite` (there is no `.backup()`) still passes a test that only checks a file appeared — so the safety net is missing on precisely the day it's needed.
 
-**Two details the obvious version gets wrong.** Sort the rotation by **mtime, not filename**: `v10-…` sorts before `v9-…` lexicographically, so a naive `.sort()` prunes the *newest* snapshots once you pass nine migrations — in the one routine whose whole job is protecting unrecoverable data. (The zero-padded version prefix keeps the names sortable for humans; the mtime sort is what the code relies on.) And `VACUUM INTO` takes no bound parameters, so the path is string-interpolated — reject a path containing a quote rather than letting it break the statement.
+**A filename collision must never cost a snapshot.** ISO-8601 bottoms out at the millisecond and two programmatic calls really do land inside one — a pre-migration backup racing a scheduled one is exactly that case. Milliseconds are necessary and *not* sufficient, so break ties with a counter (`…-2.sqlite`). Relying on `VACUUM INTO` throwing when the target exists gives you one of two bad outcomes, both of which have shipped: catch the throw and you **migrate with no backup at all**; treat it as fatal and the app **refuses to start**.
+
+**Prune by timestamp, and prune globally.** Sorting by filename puts `v10-…` before `v2-…` lexicographically, so an oldest-first prune deletes the *newest* snapshots once an app passes v9 — retention silently inverting in the one routine whose whole job is protecting unrecoverable data. (The zero-padded version prefix keeps names sortable for humans; the mtime sort is what the code relies on.) And "keep 20" means 20 backups total, not 20 per schema version: prune under the versioned prefix and you keep a full set for every version the database ever passed through, growing without bound — plus `v0001` also prefix-matches `v0010`.
+
+**Snapshot and rotation want opposite failure policies**, which is why they are two functions and not one. A failed snapshot is fatal: refusing to migrate without one is the entire point. A failed *rotation* must not be — the snapshot already exists, and dying during cleanup would block the migration it was just written to protect. A single fused helper cannot express both.
+
+`VACUUM INTO` takes no bound parameters, so the path is string-interpolated — reject a path containing a quote rather than letting it break the statement.
 
 **Resolve stuck jobs on boot** *(only if the app has a background-job table)*. A process killed mid-flight leaves rows in `running` forever, and nothing else will ever clear them — the worker that owned them is gone.
 
