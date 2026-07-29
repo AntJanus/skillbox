@@ -439,7 +439,7 @@ We welcome contributions! Here's how:
 - **Troubleshooting**: Address common issues
 - **Progressive disclosure**: Keep SKILL.md under 300 lines (hard cap 500); use `references/` for extensive content
 - **Eval set**: An `EVAL.md` following the official optimizing-descriptions loop — ~20 queries split ~60/40 train/validation, each run ~3 times in fresh sessions, scored against a 0.5 trigger-rate threshold, picking the description with the best *validation* score
-- **Verification checklists**: For methodology enforcement skills
+- **No agentic over-prompting**: Leave out what the model already does — self-re-check steps ("double-check your answer", "use a subagent to verify"), reasoning-echo, don't-think rules, uncapped delegation, and output templates that don't bound a written file's length. Gates that check *external* state — a test that runs, a file that exists — are a different thing and belong wherever a phase needs one
 
 See [generate-skill documentation](./skills/generate-skill/SKILL.md) for detailed guidelines.
 
@@ -455,7 +455,7 @@ See [generate-skill documentation](./skills/generate-skill/SKILL.md) for detaile
 ### For Skill Creators
 
 1. **Clear triggers**: Write specific, recognizable activation phrases
-2. **Verify, don't decree**: Enforce critical workflows with verification checklists and explained "Quality Signals" — not ALL-CAPS "Iron Laws". Reasoning-based instructions ("Do X because Y tends to cause Z") outperform rigid directives ("ALWAYS do X, NEVER do Y")
+2. **Explain, don't decree**: Enforce critical workflows with explained "Quality Signals" and gates that check something real — not ALL-CAPS "Iron Laws". Reasoning-based instructions ("Do X because Y tends to cause Z") outperform rigid directives ("ALWAYS do X, NEVER do Y")
 3. **Guide by default**: Provide recommendations with reasoning, not just rules
 4. **Test activation**: Ensure your skill triggers reliably
 5. **Version properly**: Use semantic versioning in metadata
