@@ -48,7 +48,13 @@ Applies when the app derives non-obvious numbers (projection or estimate tools).
 
 ## Bulk selection & the batch-edit overlay
 
-The pattern for editing many rows at once (see SKILL.md for the rules; this is the anatomy). **Build it when repeated single-row editing actually bites** — it is expensive, and shipping without it is a scheduling decision, not non-conformance. When you do build it: it is a **mode**, not a route — nothing about it goes in the URL.
+The pattern for editing many rows at once. **Build it when repeated single-row editing actually bites** — it is expensive, and shipping without it is a scheduling decision, not non-conformance. When you do build it: it is a **mode**, not a route — nothing about it goes in the URL.
+
+**Four rules keep it safe.**
+- **Sparse patch.** The write carries only the fields actually touched. An **absent key means "leave it alone"; an explicit `null` means "clear it"** — different writes. A status batch that silently wipes everyone's rating is this feature's worst failure mode. Enforce it at the zod boundary (`.optional()` and `.nullable()` are not the same thing) and make the patch schema **`.strict()`**, so a renamed or typo'd field errors instead of being stripped into a successful no-op.
+- **All-or-nothing.** Check every id is valid *before* writing any, then write them in one transaction. A selection goes stale easily, and half-applying a batch is worse than failing it.
+- **Selection prunes to what's visible.** Filtering a selected row off screen must drop it from the selection, or the bar reads "3 selected" while the write also hits a fourth row the user can no longer see. Pure: `retainSelected(selectedIds, visibleIds)` — and it must return the **same array reference** when nothing was pruned, or the effect syncing it re-fires forever.
+- **A field is `uniform` or `mixed`** across the selection; a control can only show a current value when every selected row agrees.
 
 **Chrome takeover.** A non-empty selection replaces the sidebar nav with a batch bar in the same slot: `N selected` + ✕ on top, one control per batchable field below. Reusing the nav slot (rather than floating a bar over the content) keeps the list fully visible while you refine the selection, which is the whole point of the mode. Two things fall out of it that are easy to miss:
 - **A collapsed icon-rail sidebar can't hold the controls** — force the shell back to full width for as long as a selection lasts.
