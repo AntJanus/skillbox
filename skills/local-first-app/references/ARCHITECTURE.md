@@ -65,7 +65,7 @@ Ship the full pragma set from day one. Without WAL + `busy_timeout`, a server ac
 
 Local-first means no server-side copy, so a bad migration is unrecoverable user data. State it as a requirement of this layer — an app can satisfy every other rule, pass every gate it runs, and still have no protection here.
 
-The snapshot directory is a **sibling** of the data dir. `rm -rf data/` is a routine dev reset and must not take the snapshots protecting that data with it.
+The snapshot directory sits **outside whatever a routine reset removes**, which resolves two ways for the same reason. In a checkout it's a sibling of the data dir — `rm -rf data/` is a normal dev reset and must not take the snapshots protecting that data with it. In a packaged build the entire app directory is disposable, so it resolves to the OS per-user data dir (`~/Library/Application Support/<app>`, `%APPDATA%`, `$XDG_DATA_HOME`). Branch once in `resolveBackupDir()`; every caller below takes what it returns.
 
 ```ts
 function snapshotBeforeMigrate(db: DatabaseSync) {          // throws
@@ -73,7 +73,7 @@ function snapshotBeforeMigrate(db: DatabaseSync) {          // throws
   if (current.user_version >= LATEST_VERSION) return;   // nothing pending
   if (current.user_version === 0) return;               // fresh DB — nothing to protect yet
 
-  const dir = join(dirname(resolveDataDir()), "backups");   // SIBLING of data/, not inside it
+  const dir = resolveBackupDir();                           // outside anything a reset removes
   mkdirSync(dir, { recursive: true });
 
   const target = uniqueTarget(dir, `v${String(current.user_version).padStart(4, "0")}-${stamp()}`);
@@ -109,7 +109,11 @@ Four rules the obvious version gets wrong:
 3. **Prune by timestamp, globally.** Sorting by filename puts `v10-…` before `v2-…`, so an oldest-first prune deletes the *newest* snapshots past v9. "Keep 20" means 20 backups total — prune under the versioned prefix and you keep a full set per version, growing without bound, and `v0001` prefix-matches `v0010`.
 4. **Two functions, opposite failure policies.** A failed snapshot is fatal; refusing to migrate without one is the point. A failed rotation must not be — the snapshot exists, and dying in cleanup blocks the migration it just protected.
 
-Recovery is a file copy. Document it in the app's README, because a backup nobody knows how to restore isn't one. Test the restore, not the backup: open the copy and read a row back.
+**Pre-migration snapshots are not a backup schedule.** They fire only when a migration is pending, so an app shipping no schema change for a month is protecting a month-old copy of data that changed daily. Add a periodic snapshot — on boot and on a fixed interval — through the same writer and the same rotation. Its failure policy is the opposite of the pre-migration one: a failed scheduled backup logs and the app starts anyway, because nothing destructive is about to happen.
+
+**Restore is a UI surface, not a README paragraph** — for any app that also follows PACKAGING.md. That bundle's recipient has no checkout, no README and no terminal, so "copy the file back" documents a procedure they cannot perform. List the snapshots, restore in place, and clear the cached handle so the next `getDb()` reopens the restored file without an app restart. An app that will only ever run from a checkout can stop at the documented file copy.
+
+Test the restore, not the backup: open the copy and read a row back.
 
 ### Migrations
 
@@ -342,5 +346,5 @@ Expose the app's read surface over MCP via `mcp-handler` at `app/api/mcp/route.t
 ## Your data is one file
 
 - **Backup** = copy the file (plus its `-wal`/`-shm` siblings, or `PRAGMA wal_checkpoint(TRUNCATE)` first). The pre-migration snapshots give you a rotating set for free.
-- **Export/import** for portability: a "download my data" that streams the file, or a per-table JSON dump. Name it as a feature — it's a core selling point of going local-first.
+- **Export/import** for portability: a "download my data" that streams the file, or a per-table CSV/JSON dump. Name it as a feature — it's a core selling point of going local-first. Serialization is pure logic, so it belongs in `src/<domain>/` and is unit-tested against fixtures; the route then only streams what the core returned and needs no test of its own.
 - **Reads load everything, filter in the browser** — fine into the low tens of thousands of rows. Past that, push filtering and pagination into the query (`LIMIT`/`OFFSET`, or keyset).

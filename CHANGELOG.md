@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **local-first-app** (3.1.0 → 3.2.0): six rules from a gap audit measuring one app built to the blueprint against its ten siblings — the operational surface around a local-first app, which the blueprint specified less thoroughly than the data layer it wraps.
+  - **Restore is a UI surface once the app ships a binary.** `references/ARCHITECTURE.md` previously ended its backup section with "recovery is a file copy, document it in the app's README" — advice that contradicts `PACKAGING.md` in the same skill, since a bundle recipient has no checkout, no README and no terminal. Restore now lists snapshots, restores in place, and clears the cached handle so the next `getDb()` reopens without a restart.
+  - **The snapshot directory resolves two ways for one reason** — outside whatever a routine reset removes: a sibling of the data dir in a checkout, the OS per-user data dir in a packaged build, where the whole app directory is disposable.
+  - **Pre-migration snapshots are not a backup schedule.** They fire only when a migration is pending, so a month with no schema change protects a month-old copy of data that changed daily. A periodic snapshot goes through the same writer with the opposite failure policy — it logs and lets the app start, because nothing destructive is about to happen.
+  - **A search route comes before a search shortcut.** `mod+K` is a shortcut to a destination, so `/search?q=` has to exist and be addressable first — a corollary of the skill's own "the URL is the state". The palette-first order ships a keyboard-only feature with no URL to link or refresh into, plus a query path that drifts from the per-list `?q=` filter.
+  - **Soft-delete what the user authored; hard-delete what you can re-fetch.** Once an app has a provider sync, the obvious delete gets this backwards — dropping the rating, notes and progress while leaving the re-fetchable cached row in place. The read-path trap is named: `deleted_at IS NULL` belongs in the store's queries, not repeated at each call site.
+  - **`loading.tsx` on the routes that actually wait**, not every route — the topology block said only "(optional)". `force-dynamic` is what makes the omission bite; adding it everywhere trades a blank page for a skeleton flash where the render was already instant.
+  - Two smaller amendments: export serialization is pure logic, so it lives in `src/<domain>/` and is fixture-tested rather than route-tested; and `references/CHROME.md` gains collapsible nav *sections* as a second axis independent of the sidebar flag, with the two traps — the 72px rail must ignore section state (a section collapsed there has no visible header left to reopen it), and persisted ids must be filtered against the sections that currently exist.
+
 ## [8.1.0] - 2026-07-29
 
 Follow-up to the v8.0.0 platform-guide release, driven by rescoring all 14 skills against the new 5.0.0 rubric. The rescore moved almost nothing — nine skills scored 100.0 and the new §7 agentic rules caught **zero** violations across the fleet — but it surfaced one defect in the rubric itself: §7 would have penalized `code-review` for the writer-verifier pattern the same Opus 5 guide endorses. Also lands the compression pass that reverses v8.0.0's token growth in the meta-pair, and the §5 rule that stops referenced examples from reading as missing. No breaking changes; every 5.0.0 grade remains valid.
