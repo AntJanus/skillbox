@@ -1,6 +1,8 @@
 # Rate Skill — Worked Examples
 
-## Example 1 — a matchable description vs one that trips the vague-trigger cap
+Four pairs, each a different situation: description matchability, frontmatter shape, verification content (§7), and a full report instance.
+
+## 1. Description — matchable vs. the vague-trigger cap
 
 ✅ Distinctive noun, literal user-language triggers, negative scope:
 
@@ -8,15 +10,15 @@
 description: Use this skill to update a CHANGELOG.md whenever the user wants to log a release. Triggers include "add this to the changelog", "prepare the v2.1 release notes", or "what changed since the last tag". Do NOT use this skill for writing commit messages.
 ```
 
-❌ Same job, caps Category 1 at 50 — no user-language triggers, no distinctive noun, nothing an agent can match a request against:
+❌ Same job, caps Category 1 at 50 — nothing an agent can match a request against:
 
 ```yaml
 description: Use this skill whenever the user needs help with documentation tasks and related workflows.
 ```
 
-## Example 2 — frontmatter cleanup
+## 2. Frontmatter — accepted keys only
 
-✅ The target shape — accepted keys only, extras nested under `metadata`:
+✅ Extras nested under `metadata`:
 
 ```yaml
 ---
@@ -31,7 +33,7 @@ metadata:
 ---
 ```
 
-❌ What it looked like before the patch — top-level fields that belong in `metadata`, plus a first-person vague description:
+❌ Before the patch — top-level fields that belong in `metadata`, plus a first-person vague description:
 
 ```yaml
 ---
@@ -42,11 +44,27 @@ description: I help you work with React and hooks.   # first-person + no trigger
 ---
 ```
 
-*(`hooks` is **not** a finding — it's a valid Claude Code top-level key. Don't deduct for it; see the extension-key gotcha in SKILL.md.)*
+*(`hooks` is **not** a finding — a valid Claude Code top-level key. See the extension-key gotcha in SKILL.md.)*
 
-## Example 3 — a complete report (abridged category rows, one finding shown)
+## 3. Verification — external state vs. self-re-check
 
-✅ A full instance of the Output Format — every section present, the finding ships a paste-ready patch:
+✅ Gates on something outside the agent. Scores fine:
+
+```markdown
+Run `npm test -- auth.spec.ts` and confirm it exits 0 before starting Phase 3.
+Confirm `dist/index.js` exists and parses before tagging.
+```
+
+❌ Tells the model to re-read its own output — §7 deduction, because it already does this and the instruction compounds:
+
+```markdown
+Before responding, double-check your answer. For any non-trivial task, add a
+final verification step and use a subagent to verify your work.
+```
+
+## 4. A complete report (abridged category rows, one finding shown)
+
+✅ Every section present; the finding ships a paste-ready patch:
 
 ```
 # Skill Rating: track-session
@@ -93,4 +111,4 @@ fix(track-session): replace bare NEVER-retry mandate with explained rule
 - **Multiline `description:` breaking discovery (#9817)** — real through mid-2026, fixed as of Claude Code 2.1.220, verified with probe skills 2026-07-27. Scalar style is no longer scored.
 - **The ≤230-char description soft target** — no official basis. Listing eviction is least-invoked-first, so workhorse skills keep their full text; official sizing is "a few sentences to a short paragraph."
 - **The +5 bonus for shipping an eval set** — replaced by a standing P1 for its absence (skill-creator optimizer shipped 2026-03-03).
-- **`## Verification Checklist` as a recommended methodology section** — dropped from the §4 section spec in 5.0.0. Opus 5 verifies and self-corrects unprompted, and the official guidance is to *remove* carried-over verification instructions rather than reword them, because they compound and add tokens with no quality gain. Self-re-check scaffolding is now a §7 deduction. Verification that checks external state ("run the test suite", "confirm the file parses") was never the target and still scores fine.
+- **`## Verification Checklist` as a recommended methodology section** — dropped from §4 in 5.0.0. The official guidance is to *remove* carried-over verification instructions rather than reword them, since they compound with behavior the model already performs. Self-re-check content is now a §7 deduction; checks against external state were never the target (see pair 3).
