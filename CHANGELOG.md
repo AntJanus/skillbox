@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [8.1.0] - 2026-07-29
+
+Follow-up to the v8.0.0 platform-guide release, driven by rescoring all 14 skills against the new 5.0.0 rubric. The rescore moved almost nothing — nine skills scored 100.0 and the new §7 agentic rules caught **zero** violations across the fleet — but it surfaced one defect in the rubric itself: §7 would have penalized `code-review` for the writer-verifier pattern the same Opus 5 guide endorses. Also lands the compression pass that reverses v8.0.0's token growth in the meta-pair, and the §5 rule that stops referenced examples from reading as missing. No breaking changes; every 5.0.0 grade remains valid.
+
 ### Fixed
 
 - **rate-skill** (5.0.0 → 5.1.0) and **generate-skill** (5.0.0 → 5.1.0): **§7's verification-scaffolding rule listed "use a subagent to verify" as a flat deduction, which would have penalized `code-review` for its central design.** code-review's Phase 2.5 dispatches a verifier agent that judges findings produced by five *other* agents — a writer-verifier pattern the Opus 5 guide explicitly endorses ("coordinates teams of subagents well, with effective writer-verifier patterns") in the same document that prohibits delegating verification of *your own* work. The 5.0.0 rescore scored code-review 98.0 only because the pipeline was read in full rather than phrase-matched. The rule now names two carve-outs — checks against external state, and one agent judging another agent's output — and states the actual defect: an agent re-checking work it produced itself. MINOR rather than MAJOR because the rubric only gets more permissive, so 5.0.0 grades remain valid. `references/PATTERNS.md` needed no matching edit; the compression pass had already replaced its copy of the rule with a pointer.
