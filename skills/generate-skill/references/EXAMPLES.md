@@ -1,4 +1,6 @@
-# Generate Skill — Description Examples
+# Generate Skill — Worked Examples
+
+Four description pairs plus one body-step pair, each a different situation.
 
 ## Example: methodology skill
 
@@ -39,3 +41,23 @@ description: docx authoring toolkit. Use whenever the user asks to "create a Wor
 ```
 
 Why it works: the counter-example's four defects reversed — third person, "docx" in the first 5 chars, four literal triggers plus a coverage clause, explicit negative scope.
+
+## Example: a body step that verifies
+
+✅ Desired
+
+```markdown
+Run `skills-ref validate <skill-dir>` and confirm it exits 0 before finalizing.
+```
+
+Why it works: it gates on external state the agent cannot know without checking.
+
+## Counter-example
+
+❌ Anti-pattern
+
+```markdown
+Before you finish, double-check your work and use a subagent to verify the output.
+```
+
+Why it fails: the model already verifies and self-corrects unprompted, so the instruction compounds with its own behavior and costs tokens with no quality gain. The official fix is deletion, not rewording.

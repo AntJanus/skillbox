@@ -1,83 +1,44 @@
 # Skill Body Templates
 
-Full body templates for the five skill types used in the generate-skill workflow (Phase 4). Use the type chosen in Phase 1; each template below expands the compact summary in SKILL.md into a complete skeleton.
+Load during Phase 4, after the type is chosen. The section lists live in SKILL.md's Phase 4 table — this file adds the *shape* each type needs beyond its section names, and is not a second copy of the spec.
 
-## Template Selection Guide
+## Calibrating control
 
-| Type | Use When | Enforcement | Required sections | Optional |
-|------|----------|-------------|-------------------|----------|
-| methodology | Enforces a multi-step workflow (code review, TDD, session tracking) | Phased workflow | Overview, Workflow (phased), Examples, Gotchas | Quality Signals / Anti-Patterns |
-| technical | Wraps an API, format, or tool (docx, semantic-release, build setup) | Step-by-step guidance | Overview, Quick Start / Setup, Quick Reference or API surface, Examples, Gotchas | Troubleshooting |
-| auditing | Grades or inspects an artifact (rate-skill, security review) | Rule-based checking | Overview, Workflow, Rubric, Output Format, Examples, Gotchas | — |
-| reference | Domain schemas, conventions, lookup tables (bigquery, style guides) | Information on demand | Overview, Navigation (load-when table), Gotchas | Core Concepts |
-| automation | Wraps a script or external command (screenshots, recordings) | Workflow automation | Overview, Command Surface, Sample Invocation, Failure Modes, Gotchas | Troubleshooting |
+Match specificity to **fragility, per section** — not per skill (agentskills.io best-practices):
 
-The Required/Optional columns here, the Phase 4 compact summary in SKILL.md, and `rate-skill`'s Category 4 table are one shared spec — edit all three together.
+- **Give the agent freedom** where multiple approaches are valid and the task tolerates variation. State the goal and constraints, not the steps.
+- **Be prescriptive** where operations are fragile, consistency matters, or a specific sequence must hold. "Run exactly this sequence…" is legitimate there.
+- **Explain the why either way** — "Do X because Y tends to cause Z" outperforms a bare mandate, and an agent that understands the purpose makes better context-dependent calls.
 
-## Calibrating Control (applies to every template)
-
-Match specificity to fragility, per section — not per skill (official: agentskills.io best-practices):
-
-- **Give the agent freedom** when multiple approaches are valid and the task tolerates variation. State the goal and constraints, not the steps.
-- **Be prescriptive** when operations are fragile, consistency matters, or a specific sequence must be followed ("Run exactly this sequence…" is legitimate there).
-- **Explain the why either way** — "Do X because Y tends to cause Z" outperforms bare mandates; an agent that understands the purpose makes better context-dependent decisions.
-
-**Leave these out of every template.** Current models already do them; restating the instruction compounds the behavior and burns tokens with no quality gain.
-
-- No self-re-check steps ("double-check your answer", "re-verify before responding", "add a final verification step", "use a subagent to verify"). Delete rather than reword. Checks against *external* state — run the tests, confirm the file parses, validate against the schema — are real steps and stay.
-- Never instruct the agent to echo its reasoning in the response — triggers the `reasoning_extraction` refusal on Claude Fable 5.
-- Never instruct the agent not to think or not to reason — increases leakage of internal XML tags into visible output.
-- Cap delegation when a template spawns subagents: say which scenarios warrant one, keep counts low.
-- Bound the deliverable when a template writes a file: match length to the task, no filler sections or redundant summaries.
-- State where a narrow skill stops — models expand scope on their own.
+The instructions to *omit* from every template — self-re-check steps, reasoning-echo, don't-think rules, uncapped delegation, unbounded deliverables and scope — are listed under Phase 4's "Agentic calibration" in SKILL.md. They apply to all five templates below.
 
 ---
 
-## methodology — Workflow Enforcement
+## methodology — workflow enforcement
 
-**Use when:** the skill enforces a multi-step process — code review, debugging protocol, quality gates, session tracking.
-
-**Structure:**
+**Use when:** the skill enforces a multi-step process — code review, a debugging protocol, quality gates, session tracking.
 
 ````markdown
 # Skill Title
 
 ## Overview
-[Core principle statement — one or two sentences.]
+[Core principle, one or two sentences.]
 
 ## Core principles
-- [Principle 1 with the reasoning behind it]
-- [Principle 2]
+- [Principle with the reasoning behind it]
 
 ## Workflow
 
 ### Phase 1: [Step Name]
 **Before proceeding:**
-- [ ] Requirement 1
-- [ ] Requirement 2
+- [ ] [Condition checkable against external state]
 
 [Instructions for this phase.]
 
 ### Phase 2: [Step Name]
-[...]
 
 ## Examples
-
-### Example: [one-line task]
-
-✅ Desired
-
-[short code or transcript]
-
-Why it works: [one sentence].
-
-### Counter-example
-
-❌ Anti-pattern
-
-[short code or transcript]
-
-Why it fails: [one sentence].
+[✅ desired / ❌ counter-example pairs — see Phase 5]
 
 ## Anti-patterns
 - ❌ [Shortcut authors are tempted by] — [why it backfires]
@@ -87,40 +48,29 @@ Why it fails: [one sentence].
 - **Symptom:** [observable failure]. **Cause:** [root cause]. **Fix:** [action].
 ````
 
-**Key characteristics:**
-- Phase-based workflow with checkboxes at phase boundaries
-- Every ❌ anti-pattern paired with a ✅ alternative (negation handling in LLMs is empirically weak)
-- Explained reasoning instead of all-caps mandates — state *why* a rule exists
-- Phase-boundary checkboxes gate on external state (a test run, a file that exists), never on the agent re-reading its own output — no closing verification section
+- Phase boundaries carry checkboxes, and each one gates on **external state** — a test run, a file that exists, a command that exits 0. Never on the agent re-reading its own output; there is no closing verification section.
+- Every ❌ pairs with a ✅ alternative — negation handling in LLMs is empirically weak.
+- Explained reasoning in place of all-caps mandates.
 
 ---
 
-## technical — Tool/API Implementation
+## technical — tool / API implementation
 
 **Use when:** project setup, build automation, deployment, wrapping a file format or API.
-
-**Structure:**
 
 ````markdown
 # Skill Title
 
 ## Overview
-[What it does and the tech stack — one or two sentences.]
+[What it does and the stack, one or two sentences.]
 
 ## Quick Start
-
 ### Step 1: Setup
 ```bash
 command-here
 ```
-
 ### Step 2: Configure
-[Instructions]
-
 ### Step 3: Execute
-```bash
-command-here
-```
 
 ## How It Works
 [The non-obvious mechanics an agent can't infer.]
@@ -130,36 +80,21 @@ command-here
 |--------|--------|---------|
 
 ## Examples
-
-✅ Desired
-
-[minimal working invocation]
-
-❌ Anti-pattern
-
-[common misconfiguration]
-
 ## Gotchas
-- **Symptom:** [failure]. **Cause:** [cause]. **Fix:** [action].
-
 ## Troubleshooting
-**Problem:** [Issue]
-**Solution:** [Fix]
+**Problem:** [Issue] · **Solution:** [Fix]
 ````
 
-**Key characteristics:**
-- Quick Start with one minimal, runnable path before any options
-- Quick-reference tables for configuration surface
-- Long API surface moves to `references/API.md` — SKILL.md keeps only the common 80%
-- Gotchas capture version floors, environment traps, and silent failure modes
+- Quick Start is one minimal runnable path, shown before any options.
+- Configuration surface goes in a table, not prose.
+- Long API surface moves to `references/API.md`; SKILL.md keeps the common 80%.
+- Gotchas capture version floors, environment traps and silent failure modes — the things that cost an hour.
 
 ---
 
-## auditing — Rule-Based Grading
+## auditing — rule-based grading
 
-**Use when:** code quality, performance, accessibility, or artifact grading.
-
-**Structure:**
+**Use when:** grading code quality, performance, accessibility, or any artifact.
 
 ````markdown
 # Skill Title
@@ -168,94 +103,64 @@ command-here
 [What gets audited and what the output is.]
 
 ## Rubric
-
 | Signal | Weight | Check |
 |--------|--------|-------|
-| [Signal 1] | 25 | [How to measure it] |
 
 ## Workflow
-1. Read specified files
+1. Read the specified files
 2. Check against the rubric
 3. Output findings in priority order
 
 ## Output Format
 ```
-CRITICAL: Issue description (file.js:123)
+CRITICAL: [description] (file.js:123)
 - Impact: [explanation]
 - Fix: [solution]
 ```
 
 ## Examples
-
-✅ High-quality artifact
-
-[what a passing artifact looks like, briefly]
-
-❌ Low-quality artifact
-
-[what a failing artifact looks like, briefly]
-
 ## Gotchas
-- **Symptom:** [scoring edge case]. **Cause:** [cause]. **Fix:** [action].
 ````
 
-**Key characteristics:**
-- Explicit rubric with weights — grades are reproducible, not vibes
-- Standardized output format with severity, impact, and fix per finding
-- Paired examples of high- and low-quality artifacts anchor the rubric
-- Severity levels (CRITICAL/HIGH/MEDIUM/LOW) ordered most-severe first
+- Weights make grades reproducible rather than vibes, and every weight names how to measure it.
+- The output format is a literal template — agents pattern-match a concrete structure better than a prose description of one.
+- Paired high- and low-quality artifacts anchor the rubric; without them the scale drifts toward "better than the last one I saw."
+- Severity ordered most-severe first, and the template bounds its own length.
 
 ---
 
-## reference — Domain Knowledge Router
+## reference — domain knowledge router
 
 **Use when:** library usage, architecture patterns, schemas, conventions, lookup tables.
-
-**Structure:**
 
 ````markdown
 # Skill Title
 
 ## Overview
-[When to reach for this knowledge — one or two sentences.]
+[When to reach for this knowledge.]
 
 ## Navigation
-
 | Topic | Load When | File |
 |-------|-----------|------|
-| [Domain 1] | [trigger situation] | [references/domain-1.md](references/domain-1.md) |
-| [Domain 2] | [trigger situation] | [references/domain-2.md](references/domain-2.md) |
+| [Domain] | [trigger situation] | [references/domain.md](references/domain.md) |
 
 ## Core Concepts
-[Only the ideas needed to pick the right reference file — keep short.]
+[Only what's needed to pick the right file — keep short.]
 
 ## Examples
-
-✅ Desired
-
-[correct application of the domain knowledge]
-
-❌ Anti-pattern
-
-[common misapplication]
-
 ## Gotchas
-- **Symptom:** [misuse]. **Cause:** [cause]. **Fix:** [action].
 ````
 
-**Key characteristics:**
-- SKILL.md stays a router — the data lives in one `references/<domain>.md` per domain
-- Every reference file gets a "load when…" pointer so the agent knows what's inside without opening it
-- Reference files exactly one level deep — deeper nesting gets truncated by preview reads
-- Core Concepts covers only what's needed to navigate, not a tutorial
+- SKILL.md stays a router; the data lives in one `references/<domain>.md` per domain.
+- Every reference file gets a "load when…" pointer so the agent knows what's inside without opening it.
+- Files exactly one level deep — deeper nesting gets truncated by preview reads.
+- Core Concepts covers navigation only, never a tutorial.
 
 ---
 
-## automation — Script/Command Wrapper
+## automation — script / command wrapper
 
 **Use when:** browser testing, screenshots, recordings, API integration, CI/CD helpers.
-
-**Structure:**
 
 ````markdown
 # Skill Title
@@ -264,57 +169,39 @@ CRITICAL: Issue description (file.js:123)
 [What the automation does, end to end.]
 
 ## Command Surface
-
 | Command | Purpose |
 |---------|---------|
-| `command --flag` | [what it does] |
 
 ## Sample Invocation
 ```bash
-# The one command that covers the common case
 command --input file --output result
 ```
 
 ## Workflow
 1. Auto-detect environment
 2. Generate configuration
-3. Execute with parameters
+3. Execute
 4. Present results
 
 ## Failure Modes
-
-✅ Desired
-
-[healthy run — what success output looks like]
-
-❌ Anti-pattern
-
-[running blind: no detection step, hardcoded paths]
-
 ## Gotchas
-- **Symptom:** [failure]. **Cause:** [cause]. **Fix:** [action].
-
 ## Troubleshooting
-[Common issues and recovery steps]
 ````
 
-**Key characteristics:**
-- Auto-detection of environment and tools before execution
-- The actual script lives in `scripts/` — SKILL.md documents the surface, not the implementation
-- Failure modes documented with recovery steps, not just the happy path
-- Pre-built invocations for the common tasks
+- Environment and tool detection runs before execution, so the skill fails with a diagnosis instead of a stack trace.
+- The script lives in `scripts/`; SKILL.md documents the surface, not the implementation.
+- Failure modes carry recovery steps — the happy path alone is the common gap.
+- Pre-built invocations for the common tasks beat a flag reference.
 
 ---
 
-## Combining Types
+## Combining types
 
-Some skills benefit from combining elements of multiple templates:
-
-| Combination | Example Use Case |
-|-------------|------------------|
+| Combination | Use case |
+|---|---|
 | methodology + automation | Enforced workflow with helper scripts |
 | technical + reference | Tool setup plus domain knowledge files |
 | auditing + automation | Automated grading with tool integration |
 | methodology + auditing | Process enforcement with rule-based checks |
 
-When combining, choose a **primary type** for the overall structure and incorporate specific sections from the secondary type.
+Choose a **primary type** for the overall structure and borrow specific sections from the secondary. Don't merge two full templates — that is how a skill ends up bundling unrelated jobs.
