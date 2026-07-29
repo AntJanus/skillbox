@@ -6,7 +6,7 @@ argument-hint: "[path | --staged | --branch <base> | --repo [--blueprint <skill>
 allowed-tools: Read, Write, Glob, Grep, Bash, Agent
 metadata:
   author: Antonin Januska
-  version: "2.1.0"
+  version: "2.2.0"
 ---
 
 # Code Review — Multi-Agent Local Review
@@ -100,6 +100,12 @@ Reviewers read the diff **from the prompt**, never by re-running `git diff` in t
 ✅ **Good:** reviewer Agent calls in one message → wait → verifier Agent → write REVIEW.md → chat shows only `REVIEW.md written — 1 Critical, 2 Major, 0 Minor; 5 nits held (--nits to show)`. A good correctness finding is specific: `[correctness] src/allowance.ts:42 — detail page shows $10/wk but accrual pays $5/wk forever (rate-row shadowing); trigger: any item with a weekly rate; fix: read the rate from the accrual row, not the display row`.
 
 ❌ **Bad:** reviewers dispatched sequentially; the full report dumped into chat instead of REVIEW.md; a kept finding like "consider renaming this variable" (no concrete bad outcome — should have failed the impact floor); the nit tail shown by default and drowning the two findings that matter.
+
+✅ **Scope detection, backend-only diff:** no components, styles or token files in the list → ui-ux lane skipped, four lanes dispatched. Empty diff scope → stop and say so rather than widening to `--repo`.
+
+❌ **Bad:** ui-ux dispatched on a CLI-only diff, then its findings kept because they were technically true.
+
+✅ **A verifier DROP working correctly:** `[architecture] src/db.ts:88 — differs from the pattern in src/cache.ts`. No stated consequence → fails the impact floor → DROPPED, counted in `dropped J (L low-impact)`.
 
 ## Quality signals
 
