@@ -83,6 +83,9 @@ const collapseToggle = (
 - **`visibleFrom="sm"` on the toggle.** On mobile the navbar is a drawer; the `Burger` already owns that job.
 - **Nav links** use the current pathname for active state, not click handlers.
 - **A collapsed rail cannot hold wide controls.** Any mode rendering controls into the navbar (bulk selection) must force the shell back to full width while it lasts.
+- **Collapsible nav *sections* are a second, independent axis** — grouped links (`Libraries`, `Views`, `App`) with each header doubling as its own collapse control, so Docs and Settings sit beside the other sections instead of pinned below a divider in a footer. Persist the open set to `localStorage` alongside the sidebar flag; it's the same class of ephemeral view state. Two things the obvious version gets wrong:
+  - **The 72px rail ignores section state entirely.** It hides every label, so a section collapsed there has no visible header left to expand it again — the links are simply gone with no way back short of expanding the whole sidebar.
+  - **Filter persisted ids against the sections that exist now.** Storage outlives the code: an id from a removed section otherwise sits there forever, and a future section reusing that id is born collapsed for every existing user and nobody else.
 
 Overflow bugs of this class don't fail a typecheck, a test, or a screenshot on a tall window. Check the geometry at a laptop-sized viewport:
 
