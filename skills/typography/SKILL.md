@@ -4,7 +4,7 @@ description: Use this skill whenever the user wants typography work — sizing t
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.4.0"
+  version: "1.5.0"
   tags: [typography, type-scale, font-size, line-height, vertical-rhythm, readability, accessibility, fonts]
 ---
 
@@ -89,6 +89,23 @@ h1 { font-size: clamp(1.75rem, 1.1rem + 3.2vw, 3rem); line-height: 1.1; letter-s
 ```
 
 Why it works: `rem` bounds plus a `rem`-anchored preferred value keep it readable at 200% zoom, and the cap stops a runaway hero size.
+
+### Table header and caption
+
+✅ Desired
+
+```css
+th         { font-size: 1rem; line-height: 1.5; font-weight: 600; }
+figcaption { font-size: 0.875rem; line-height: 1.45; color: #5b6b7d; } /* 14px floor, 4.9:1 */
+```
+
+❌ Anti-pattern
+
+```css
+th { font-size: 0.75rem; font-weight: 500; color: #9ca3af; } /* 12px, ≈2.5:1 */
+```
+
+Why it fails: chrome is where the floor breaks first — 12px is under the 14px hard minimum, and `#9ca3af` on white misses 4.5:1 by half.
 
 ## Gotchas
 
