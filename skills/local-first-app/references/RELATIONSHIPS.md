@@ -22,9 +22,9 @@ CREATE INDEX IF NOT EXISTS idx_tasks_project ON tasks(project_id);        -- ind
 `;
 ```
 
-Pick the delete rule per relationship: `CASCADE` for true ownership (a task can't exist without its project), `RESTRICT` to block deleting a parent that still has children, `SET NULL` for optional references (**the FK column must be nullable — no `NOT NULL`, or `SET NULL` errors when the parent is deleted**). Let the DB reject orphans and surface the error — don't add a fallback that masks it.
+Pick the delete rule per relationship: `CASCADE` for true ownership, `RESTRICT` to block deleting a parent that still has children, `SET NULL` for optional references (**the FK column must be nullable, or `SET NULL` errors when the parent is deleted**). Let the DB reject orphans and surface the error.
 
-Writing an explicit application-level cascade delete inside the same transaction, even where `ON DELETE CASCADE` already covers it, is a defensible belt-and-suspenders — not redundant dead code to remove. It keeps the delete correct if a future code path opens a second connection without `foreign_keys = ON`.
+An explicit application-level cascade delete inside the same transaction, even where `ON DELETE CASCADE` covers it, keeps the delete correct if a future path opens a second connection without `foreign_keys = ON`. Not dead code to remove.
 
 **Store — scoped queries + batched aggregates (no N+1).**
 
@@ -56,9 +56,9 @@ export async function loadProjectDetail(id: number): Promise<ProjectDetail> {
 }
 ```
 
-**Pure core stays relationship-agnostic.** `summarizeProject(project, tasks)` takes both plain shapes as arguments and returns derived metrics — it never imports the db, never follows `project.id` into another table. That's what keeps it unit-testable and CLI-reusable.
+**Pure core stays relationship-agnostic.** `summarizeProject(project, tasks)` takes both plain shapes as arguments and returns derived metrics, never importing the db or following `project.id` into another table.
 
-**Display — cross-link via `<RelatedList>`.** The parent's detail screen renders one `<RelatedList>` per relationship; the child's detail links back. Navigation between related entities is just links between their detail routes.
+**Display — cross-link via `<RelatedList>`.** The parent's detail screen renders one per relationship; the child's detail links back.
 
 ```tsx
 // components/RelatedList.tsx — reused for every parent→child section
@@ -71,9 +71,9 @@ export async function loadProjectDetail(id: number): Promise<ProjectDetail> {
 // the task detail screen renders: <Link href={`/projects/${task.projectId}`}>← {project.name}</Link>
 ```
 
-The `new/page.tsx` for the child reads the FK from `searchParams` (`const { projectId } = await searchParams` — async in Next 15) and passes it as the form's default FK, so creating a task from a project lands back on that project. Keep the FK select in the form too (for the standalone `/tasks/new` entry point), defaulted from the query param.
+The child's `new/page.tsx` reads the FK from `searchParams` (`await searchParams` — async in Next 15) and passes it as the form's default, so creating a task from a project lands back on that project. Keep the FK select in the form for the standalone `/tasks/new` entry point, defaulted from the query param.
 
-**Edit overfetches by default, and that's fine.** The edit page reuses `loadEntityDetail` (full aggregate) just to prefill the parent's own scalar fields — harmless at this scale. If a detail aggregate ever gets heavy, give edit a lighter parent-only loader; until then, one loader is simpler.
+**Edit overfetches by default, and that's fine.** The edit page reuses `loadEntityDetail` just to prefill scalar fields — harmless at this scale. Give edit a lighter parent-only loader only once a detail aggregate gets heavy.
 
 ### Many-to-many variant (join table)
 
@@ -95,11 +95,11 @@ CREATE INDEX IF NOT EXISTS idx_task_tags_tag ON task_tags(tag_id);   -- reverse 
 
 The pure core still receives the assembled aggregate (`{ task, tags }`); the join table never leaks past the loader.
 
-### At scale: keep the row shape stable across reads, sync writes through one path
+### At scale: stable row shape, one write path
 
-Once a tags-style N:N relationship is real (not just a demo), two refinements pay off:
+Two refinements once a tags-style N:N is real. Both exist so that migrating from a denormalized column to a join table doesn't force changes at every call site — normalize the schema, keep the shape the app already relies on.
 
-- **Reads — pre-aggregate the join into the row, not a separate query.** A `json_group_array` subquery keeps the row shape a plain string array — existing consumers that expect `task.tags: string[]` don't need to change when tags move from a denormalized column to a real join table:
+- **Reads — pre-aggregate the join into the row.** A `json_group_array` subquery keeps the row shape a plain string array, so consumers expecting `task.tags: string[]` don't change:
 
 ```sql
 -- one row per task, tags pre-aggregated — existing consumers see an unchanged shape
@@ -110,7 +110,7 @@ SELECT t.*,
 FROM tasks t;
 ```
 
-- **Writes — one `syncTags` path for both create and edit**, instead of separate attach/detach call sites. It diffs desired vs. current and applies the minimal set of inserts/deletes:
+- **Writes — one `syncTags` path for create and edit**, diffing desired vs. current and applying the minimal inserts/deletes, instead of separate attach/detach call sites:
 
 ```ts
 // lib/tags.ts — the one write path for "set the tags on this task"
@@ -121,5 +121,3 @@ export function syncTags(db: DatabaseSync, taskId: number, desiredTagIds: number
   for (const id of current) if (!desired.has(id)) detachTag(db, taskId, id);
 }
 ```
-
-Both refinements exist to avoid a migration from denormalized-column to join-table forcing changes at every call site — normalize the schema, keep the shape the rest of the app already relies on.
