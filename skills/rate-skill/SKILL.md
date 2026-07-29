@@ -6,7 +6,7 @@ argument-hint: "<path/to/SKILL.md>"
 allowed-tools: Read, Glob, Grep
 metadata:
   author: Antonin Januska
-  version: "5.0.0"
+  version: "5.1.0"
 ---
 
 # Rate Skill
@@ -120,7 +120,7 @@ Apply the official cut test to every instruction: **"Would the agent get this wr
 
 **Agentic over-prompting** — behavior the model already performs, so restating it compounds and costs tokens with no quality gain.
 
-- **Verification scaffolding**: "include a final verification step for any non-trivial task", "double-check your answer", "re-verify before responding", "use a subagent to verify". The official fix is deletion, not rewording. **Domain verification is not this** — "run the test suite", "confirm the file parses", "validate against the schema" check external state and score fine.
+- **Verification scaffolding**: "include a final verification step for any non-trivial task", "double-check your answer", "re-verify before responding", "use a subagent to verify your own work". The official fix is deletion, not rewording. **Two things are not this and score fine:** checks against external state ("run the test suite", "confirm the file parses", "validate against the schema"), and a writer-verifier pattern where one agent judges *another* agent's output — officially endorsed for multi-agent coordination. The defect is an agent re-checking work it produced itself.
 - **Reasoning-echo** ("show your thinking", "explain your reasoning in the response"). Can trigger the `reasoning_extraction` refusal on Claude Fable 5 — always **also** emit a P0. A hard failure mode, not a style issue.
 - **"Do not think" / "do not reason"** — increases leakage of internal XML tags into visible output. Delete; a rule naming the tags is less effective than saying nothing.
 - **Uncapped delegation** — subagent instructions with no statement of which scenarios warrant one or how many. Open-ended delegation multiplies cost on small tasks.

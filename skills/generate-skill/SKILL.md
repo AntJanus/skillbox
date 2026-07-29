@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "[skill-topic]"
 metadata:
   author: Antonin Januska
-  version: "5.0.0"
+  version: "5.1.0"
 ---
 
 # Generate Skill
@@ -101,7 +101,7 @@ Full templates in [references/PATTERNS.md](references/PATTERNS.md) — load only
 
 **Agentic calibration — leave these out.** Current models already do them, so restating the instruction compounds the behavior and burns tokens with no quality gain.
 
-- **No self-re-check steps** — cut "double-check your answer", "re-verify before responding", "add a final verification step for any non-trivial task", "use a subagent to verify". The official fix is deletion, not rewording. Checks against *external* state stay: run the test suite, confirm the file parses, validate against the schema.
+- **No self-re-check steps** — cut "double-check your answer", "re-verify before responding", "add a final verification step for any non-trivial task", "use a subagent to verify your own work". The official fix is deletion, not rewording. Two things stay: checks against *external* state (run the test suite, confirm the file parses, validate against the schema), and a writer-verifier pattern where one agent judges *another* agent's output — officially endorsed for multi-agent coordination. The defect is an agent re-checking work it produced itself.
 - **Never instruct the agent to echo its reasoning** ("show your thinking", "explain your reasoning in the response") — can trigger the `reasoning_extraction` refusal on Claude Fable 5 and cause model fallbacks. Ask for conclusions and evidence instead.
 - **Never instruct the agent not to think or not to reason** — increases leakage of internal XML tags into visible output.
 - **Cap delegation** when the skill uses subagents: name which scenarios warrant one, keep spawn counts low. Open-ended delegation multiplies cost on small tasks.
