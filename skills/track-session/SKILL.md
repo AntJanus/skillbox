@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "[start|save|resume|verify|recover]"
 metadata:
   author: Antonin Januska
-  version: "6.0.0"
+  version: "6.1.0"
 ---
 
 # Session Progress
@@ -55,6 +55,8 @@ Next: <specific next action — name files and functions, not "fix the bug">
 ```
 
 `## Plan` and `## Current Status` are load-bearing; `## Decisions`, `## Failed Attempts`, and `## Completed Work` are optional — add them when there's something real to record.
+
+**Length:** one line per task; Decisions and Failed Attempts get 1–2 sentences each. The file is a state record, not a narrative — no filler sections, no restated summaries, no recap of work already listed under Completed Work.
 
 **IDs:** `t_` (task) or `f_` (failed attempt) plus a short unique token. Five random `[a-z0-9]` chars is the default; a mnemonic slug (`t_redis-mw`, `t_authfix`) also works. Keep an id stable once written, because `dep:` references point at it. Every plan item carries an `id` and a `dep` (`dep:none` or `dep:t_XXXXX`).
 
