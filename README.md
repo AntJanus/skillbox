@@ -347,9 +347,11 @@ A blueprint for a single-purpose local CRUD app — a game-backlog tracker, expe
 - Packaging a Next.js app as a self-contained desktop binary (`deno compile` / `deno desktop`)
 - Deciding where computation, persistence, and view-model logic belong
 
-**Triggers:** When asked to "scaffold a tracker app", "build a local-first app", "add a persisted entity + server action", "wire a node:sqlite store", "package this as a desktop app", or "where should this calculation live?"
+**Triggers:** When asked to "build a local app to track my X", "a tracker that saves to my machine", "an offline single-user app with no account", "add a persisted entity + server action", "package this as a desktop app", or "where should this calculation live?"
 
-Not for palette/contrast choices (see [color-system](#color-system)) or pure visual layout (see frontend-design).
+Also specifies the rules a green test suite doesn't give you: a **pre-migration snapshot** as a hard requirement (`BASE_SCHEMA` is migration v1, so there's one construction path), and four verification gates that each **assert a positive property** rather than the absence of a loud failure.
+
+Not for palette/contrast choices (see [color-system](#color-system)), font sizing (see [typography](#typography)), or pure visual layout (see frontend-design).
 
 [View Documentation](./skills/local-first-app/SKILL.md)
 </details>
