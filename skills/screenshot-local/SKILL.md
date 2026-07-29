@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "<url-or-file> [--output filename.png]"
 metadata:
   author: Antonin Januska
-  version: "1.4.0"
+  version: "1.5.0"
 ---
 
 # Screenshot Local — shot-scraper
@@ -93,6 +93,24 @@ Setting up a project's screenshots: read its router config, page files, or nav t
 
 ```yaml
 - url: http://localhost:3000/dashboard
+```
+
+✅ Fixed-dimension OG image — both `-w` and `-h` set, `--retina` omitted:
+
+```bash
+shot-scraper http://localhost:3000 -w 1200 -h 630 -o og.png
+```
+
+❌ `--retina` on a spec'd size — writes a 2400×1260 file into a slot that wants 1200×630, and the failure stays invisible until the card renders wrong:
+
+```bash
+shot-scraper http://localhost:3000 -w 1200 -h 630 --retina -o og.png
+```
+
+✅ Full-page docs capture — omit `-h` deliberately so height tracks content:
+
+```bash
+shot-scraper http://localhost:3000/docs -w 1200 -o docs.png
 ```
 
 Starter configs per project type — SPA, Storybook, responsive sweep, static site, auth: **[reference/TEMPLATES.md](./reference/TEMPLATES.md)**.
