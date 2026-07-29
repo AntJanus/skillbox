@@ -34,6 +34,8 @@ Official-loop format (agentskills.io optimizing-descriptions): 18 queries, 9 sho
 
 ## Results
 
+**Measured 2026-07-28** (validation split, 3 fresh sonnet sessions per query, `--max-turns 3`, scratch project with full fleet installed): V1[T] 1.00, V2[T] 0.00 FAIL; V3-V8 unmeasured (limit abort) — 1/2 partial. **Methodology bias, read before iterating:** ~48% of fleet runs truncated at max-turns while the agent explored the empty project first, so trigger rates are a lower bound; the official capable-alone caveat also applies (agents answer simple asks directly). Do not reword the description against these validation queries — iterate on train, and re-measure with a higher turn budget before treating any 0.00 as a description defect. Fleet measurement aborted at 146/264 runs by a usage limit.
+
 | Variant | Date | Train pass | Validation pass | Selected |
 |---|---|---|---|---|
 | 1.4.0 (imperative register, coverage clause, manual-flow negative scope) | — | not yet run | not yet run | — |

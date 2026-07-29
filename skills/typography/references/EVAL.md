@@ -34,6 +34,8 @@ Official-loop format (agentskills.io optimizing-descriptions): 18 queries, 9 sho
 
 ## Results
 
+**Measurement attempt 2026-07-28:** fleet run aborted by a usage limit at 146/264 sessions before this skill's queries executed. Table pending a re-run with a higher turn budget (~48% of completed fleet runs truncated at `--max-turns 3` while exploring, undercounting trigger rates).
+
 | Variant | Date | Train pass | Validation pass | Selected |
 |---|---|---|---|---|
 | 1.4.0 (imperative register, quoted triggers, coverage clause) | 2026-07-28 | not yet run | not yet run | — |
