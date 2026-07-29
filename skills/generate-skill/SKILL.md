@@ -5,14 +5,14 @@ license: MIT
 argument-hint: "[skill-topic]"
 metadata:
   author: Antonin Januska
-  version: "4.0.0"
+  version: "5.0.0"
 ---
 
 # Generate Skill
 
 ## Overview
 
-Produces a single, ready-to-ship `SKILL.md` (plus optional `references/`, `scripts/`, `assets/`) following the current conventions distilled from the agentskills.io skill-creation pages, Anthropic's skill-creator, and empirical activation research.
+Produces one ready-to-ship `SKILL.md` (plus optional `references/`, `scripts/`, `assets/`) following the conventions distilled from the agentskills.io skill-creation pages, Anthropic's skill-creator, the platform prompting guides, and empirical activation research.
 
 One skill, one job. This skill's job is the SKILL.md and its frontmatter — not docs, releases, or auxiliary files.
 
@@ -31,14 +31,14 @@ Ask these in order, one per turn:
 
 1. **Skill purpose.** One sentence: what job does this skill do?
 2. **Skill type.** Pick one — drives the body template:
-   - `methodology` — enforces a multi-step workflow (e.g., code-review, track-session)
-   - `technical` — wraps an API, format, or tool (e.g., docx, pdf, semantic-release)
-   - `auditing` — grades or inspects an artifact (e.g., rate-skill, security-review)
-   - `reference` — domain schemas, conventions, lookup tables (e.g., bigquery)
-   - `automation` — wraps a script or external command (e.g., screenshot-local)
+   - `methodology` — enforces a multi-step workflow (code-review, track-session)
+   - `technical` — wraps an API, format, or tool (docx, pdf, semantic-release)
+   - `auditing` — grades or inspects an artifact (rate-skill, security-review)
+   - `reference` — domain schemas, conventions, lookup tables (bigquery)
+   - `automation` — wraps a script or external command (screenshot-local)
 3. **Trigger phrases.** Collect 5+ verbatim phrases a real user would say. Push for naturalese, not jargon ("create a skill", not "scaffold skill artifact").
-4. **Negative scope.** Which near-neighbor skills exist that this should *not* steal from? Drives the `Do NOT use…` clause — and the should-not-trigger half of the Phase 8 eval set.
-5. **Enforcement level.** Suggestion, guided (checklists), or strict (verification checkpoints). Defaults: methodology=guided, technical/reference=suggestion, auditing=guided, automation=suggestion.
+4. **Negative scope.** Which near-neighbor skills should this not steal from? Drives the `Do NOT use…` clause and the should-not-trigger half of the Phase 8 eval set.
+5. **Enforcement level.** Suggestion, guided (checklists), or strict (gated phases). Defaults: methodology=guided, technical/reference=suggestion, auditing=guided, automation=suggestion.
 
 ### Phase 2 — Description drafting
 
@@ -48,23 +48,23 @@ Compose the description — official sizing is "a few sentences to a short parag
 <Third-person noun phrase>. Use whenever the user <wants/asks to> <trigger 1>, "<trigger 2>", or <trigger 3> — even if they don't explicitly mention <domain term>. Do NOT use this skill for <near-neighbor> — see <other-skill>.
 ```
 
-Show the draft, measure it (`python3 scripts/measure.py <path/to/SKILL.md>` — reports description chars, body lines, and estimated body tokens against their caps), iterate.
+Show the draft, measure it (`python3 scripts/measure.py <path/to/SKILL.md>` reports description chars, body lines, and estimated body tokens against their caps), iterate.
 
 Quality signals:
 
 - ✅ Distinctive noun in first 50 chars
 - ✅ Imperative third person addressed to the agent (the skill, not "I")
 - ✅ At least one literal quoted user phrase
-- ✅ "even if they don't explicitly mention X" coverage clause for indirect asks (officially recommended pattern)
+- ✅ "even if they don't explicitly mention X" coverage clause for indirect asks (officially recommended)
 - ✅ `Do NOT use this skill for …` clause when a near-neighbor exists
-- ✅ A few sentences to a short paragraph; under the 1024-char hard cap
+- ✅ A few sentences to a short paragraph, under the 1024-char cap
 
 Anti-patterns:
 
 - ❌ First person: "I help you create skills" — degrades activation (Seleznov n=650)
 - ❌ Vague: "A skill for creating skills"
 - ❌ Bullet-list description — no surveyed top skill uses this format
-- ❌ ALL-CAPS verb spam — officially discouraged in favor of explained reasoning
+- ❌ Intensity escalation: "CRITICAL: you MUST invoke this" — current models overtrigger on it, and the official fix is normal prompting ("Use this skill when…"). Raise recall with *more triggers and a coverage clause*, never with volume.
 
 ### Phase 3 — Frontmatter
 
@@ -90,7 +90,8 @@ Add these optional fields only when the skill genuinely needs them:
 | `compatibility` | Cross-agent (Cursor, Cline, etc.) compatibility note, ≤500 chars (spec cap) |
 | `disable-model-invocation: true` | Skill is slash-only, must not auto-trigger |
 | `user-invocable: false` | Skill is only callable by subagents or other skills |
-| `model` / `effort` | Skill needs a specific model tier or thinking budget |
+| `model` | Skill needs a specific tier. Otherwise inherit — a pin outlives the model it names. |
+| `effort` | Set `low`/`medium` for mechanical, well-specified work where quality holds; reserve `xhigh` for demanding coding and agentic work. Omit to inherit the session setting. |
 | `paths` | Skill should only auto-trigger inside specific repo paths |
 | `when_to_use` | Extra listing-time routing text beyond the description (Claude Code; shares a combined 1,536-char listing cap with `description`) |
 
@@ -98,37 +99,46 @@ Anti-patterns:
 
 - ❌ Top-level `version`, `author`, `tags`, `category` — produce "unexpected key" errors (anthropics/skills #37). They live under `metadata`.
 - ❌ Nested `argument-hint` under `metadata` — Claude Code reads it at top level.
-- ❌ An unquoted `argument-hint: [a|b]` — bare brackets are a YAML **sequence**, not a string. Always quote it.
+- ❌ Unquoted `argument-hint: [a|b]` — bare brackets are a YAML **sequence**, not a string. Always quote it.
 - ❌ Reserved-word names containing `anthropic` or `claude`.
 - ❌ Consecutive hyphens or uppercase in `name`.
 
-Portability note (three-tier reality): the universal spec allows only `name`, `description`, `license`, `compatibility`, `allowed-tools`, `metadata`; Claude Code additionally accepts its extension keys (`argument-hint`, `when_to_use`, `hooks`, `paths`, `arguments`, `disable-model-invocation`, `user-invocable`, `model`, `effort`, `context`, `agent`, `shell`, `disallowed-tools`); Anthropic's repo packaging validator (`quick_validate.py`) rejects everything outside the spec set. The Vercel `npx skills add` channel tolerates the extensions (verified 2026-07-02) — keep them unless the skill targets submission to anthropics/skills. To lint against the spec itself, use `skills-ref validate <skill-dir>` (agentskills/agentskills).
+Portability, three tiers: the universal spec allows only `name`, `description`, `license`, `compatibility`, `allowed-tools`, `metadata`. Claude Code adds its extension keys (`argument-hint`, `when_to_use`, `hooks`, `paths`, `arguments`, `disable-model-invocation`, `user-invocable`, `model`, `effort`, `context`, `agent`, `shell`, `disallowed-tools`). Anthropic's repo packaging validator (`quick_validate.py`) rejects everything outside the spec set. The Vercel `npx skills add` channel tolerates the extensions (verified 2026-07-02) — keep them unless the skill targets anthropics/skills. Lint against the spec with `skills-ref validate <skill-dir>`.
 
 ### Phase 4 — Body content
 
-Pick the template that matches the skill type. Full templates live in [references/PATTERNS.md](references/PATTERNS.md) — load only when generating the body.
+Pick the template matching the skill type. Full templates live in [references/PATTERNS.md](references/PATTERNS.md) — load only when generating the body.
 
 Compact summary — this is the **shared section spec** graded by `rate-skill` Category 4; keep the two skills in sync:
 
-- **methodology** — Overview, Workflow (phased, one task per phase), Examples (✅ first; end on ✅ too where there's room — see Phase 5), Gotchas. Optional: Verification Checklist, Quality Signals / Anti-Patterns.
+- **methodology** — Overview, Workflow (phased, one task per phase), Examples, Gotchas. Optional: Quality Signals / Anti-Patterns.
 - **technical** — Overview, Quick Start / Setup (one minimal code block), Quick Reference or API surface, Examples, Gotchas. Optional: Troubleshooting. Move long API surface to `references/API.md`.
 - **auditing** — Overview, Workflow, Rubric (table: signal → weight → check), Output Format, Examples of high/low-quality artifacts, Gotchas.
 - **reference** — Overview, Navigation (load-when table), Gotchas; optional short Core Concepts. SKILL.md stays a router; don't inline the data.
 - **automation** — Overview, Command Surface table, Sample Invocation, Failure Modes, Gotchas. Optional: Troubleshooting. Put the actual script in `scripts/`.
 
-Body rules that apply to every type:
+**Content rules for every type:**
 
-- Always include a `## Gotchas` section — canonical: "the highest-value content in many skills is a list of gotchas" (agentskills.io). Keep gotchas in SKILL.md, not a reference file — the agent must read them *before* hitting the situation. When the deployed skill's agent makes a mistake you have to correct, the correction becomes a new gotcha.
-- Beyond gotchas, five more official instruction patterns: output-format **templates** ("agents pattern-match well against concrete structures" — beat prose descriptions of formats), **checklists** for multi-step workflows, **validation loops** (do → validate → fix → repeat), **plan-validate-execute** for batch or destructive operations, and **bundled scripts** when the agent would reinvent the same logic each run. Use the ones that fit — not all of them.
+- Always include `## Gotchas` — canonical: "the highest-value content in many skills is a list of gotchas" (agentskills.io). Keep them in SKILL.md, not a reference file — the agent must read them *before* hitting the situation. When the deployed skill's agent makes a mistake you have to correct, the correction becomes a new gotcha.
+- Beyond gotchas, five more official instruction patterns: output-format **templates** (agents pattern-match against concrete structures better than prose descriptions of a format), **checklists** for multi-step workflows, **validation loops** (do → validate → fix → repeat), **plan-validate-execute** for batch or destructive operations, and **bundled scripts** when the agent would reinvent the same logic each run. Use the ones that fit — not all of them.
 - Provide defaults, not menus: pick one approach, mention alternatives briefly.
 - Favor procedures over declarations: teach how to approach the class of problem, not what to output for one instance.
-- **Never instruct the agent to echo its reasoning** ("show your thinking", "explain your reasoning in the response") — this can trigger the `reasoning_extraction` refusal category on Claude Fable 5 and causes model fallbacks.
+- Pair every "do not X" with a positive directive. Official: "Tell Claude what to do instead of what not to do."
 
-Length budget: aim <300 lines in SKILL.md (house aim); the canonical cap is joint — **under 500 lines and ~5,000 tokens** (a dense code-heavy body can breach tokens while passing lines; sources in `## References`).
+**Agentic calibration — what to leave out.** Current models already do these; instructing them again compounds the behavior and burns tokens with no quality gain.
+
+- **No self-re-check steps.** Cut "double-check your answer", "re-verify before responding", "add a final verification step for any non-trivial task", "use a subagent to verify". The official fix is deletion, not rewording. Verification that checks *external* state — "run the test suite", "confirm the file parses", "validate against the schema" — is a real step and stays.
+- **Never instruct the agent to echo its reasoning** ("show your thinking", "explain your reasoning in the response"). This can trigger the `reasoning_extraction` refusal category on Claude Fable 5 and causes model fallbacks. Ask for conclusions and evidence instead.
+- **Never instruct the agent not to think or not to reason.** That kind of rule increases leakage of internal XML tags into visible output.
+- **Cap delegation when the skill uses subagents.** State which scenarios warrant one and keep spawn counts low; open-ended delegation multiplies cost on small tasks.
+- **Bound the deliverable when the skill writes a file.** Add a line to the output template: match length to the task, don't pad with filler sections, redundant summaries, or boilerplate. Written deliverables run long by default.
+- **State where a narrow skill stops.** Models expand scope on their own, adding steps that weren't requested.
+
+Length budget: aim <300 lines (house aim); the canonical cap is joint — **under 500 lines and ~5,000 tokens**. A dense, code-heavy body breaches tokens while passing lines.
 
 ### Phase 5 — Examples
 
-Produce 2–3 ✅ desired examples and 1 ❌ counter-example. Show ✅ first; if room, end on ✅ (recency bias).
+Produce 3–5 examples covering **distinct situations**, not the same situation restated — vary them enough that the agent doesn't pattern-match an unintended regularity. At least one is a ❌ counter-example. Show ✅ first; if room, end on ✅ (recency bias).
 
 Format:
 
@@ -152,36 +162,34 @@ Why it works: <one sentence>.
 Why it fails: <one sentence>.
 ```
 
-Use ✅ / ❌ markdown markers, not `<Good>` / `<Bad>` XML tags — the XML form appears in zero of the 8 surveyed top community skills.
+Use ✅ / ❌ markdown markers for the quality labels — the `<Good>` / `<Bad>` XML form appears in zero of the 8 surveyed top community skills. This is about the labels, not XML: `<example>` / `<examples>` as structural delimiters are officially recommended and fine to use.
 
 ### Phase 6 — Gotchas
 
-Concrete failure modes specific to *this* skill — not generic skill-authoring advice. Each entry: one-line symptom, one-line cause, one-line fix.
-
-Pair every "do not X" with a positive directive — negation handling in LLMs is empirically weak (arXiv 2503.22395).
+Concrete failure modes specific to *this* skill, not generic skill-authoring advice. Each entry: one-line symptom, one-line cause, one-line fix.
 
 ### Phase 7 — Progressive disclosure check
 
-Measure with `scripts/measure.py`. Extract once SKILL.md exceeds 300 lines (the house aim); treat the canonical joint cap from Phase 4 — 500 lines / ~5,000 tokens — as the hard ceiling either way:
+Measure with `scripts/measure.py`. Extract once SKILL.md exceeds 300 lines; treat the joint 500-line / ~5,000-token cap as the hard ceiling either way:
 
 1. List candidate sections to extract, largest first.
-2. Propose `references/<TOPIC>.md` files (plural — the spec-documented name; nothing validates directory names, so never rename an existing singular `reference/` dir just for style).
-3. Keep extracted files exactly one level deep from SKILL.md. Deeply nested references silently get truncated by Claude's preview reads.
-4. Add a one-line pointer in SKILL.md for each extracted file: when to load it, what's in it. Exception: gotchas stay in SKILL.md.
+2. Propose `references/<TOPIC>.md` files. Plural is the spec-documented name; nothing validates directory names, so never rename an existing singular `reference/` dir just for style.
+3. Keep extracted files exactly one level deep. Deeply nested references get silently truncated by preview reads.
+4. Add a one-line pointer in SKILL.md per extracted file: when to load it, what's in it. Exception: gotchas stay in SKILL.md.
 
 ### Phase 8 — Eval set (required before finalize)
 
 Build the eval set the official description-optimization loop consumes (agentskills.io):
 
-1. **Generate ~20 queries**: 8–10 **should-trigger** (from the Phase 1 trigger phrases, plus paraphrases and indirect asks) and 8–10 **should-not-trigger** (near-neighbor skills from the Phase 1 negative scope, plus unrelated work).
-2. **Split 60% train / 40% validation**, with a proportional mix of should/should-not in both halves. Shuffle once; keep the split fixed across iterations.
-3. **Save as `references/EVAL.md`** with the split marked and the measurement protocol stated: run each query in a fresh session ~3 times; trigger rate = fraction of runs that invoked the skill; should-trigger passes above 0.5, should-not-trigger below 0.5 (official default threshold).
+1. **Generate ~20 queries**: 8–10 **should-trigger** (Phase 1 trigger phrases plus paraphrases and indirect asks) and 8–10 **should-not-trigger** (Phase 1 near-neighbors plus unrelated work).
+2. **Split 60% train / 40% validation**, proportional mix of should/should-not in both halves. Shuffle once; keep the split fixed across iterations.
+3. **Save as `references/EVAL.md`** with the split marked and the protocol stated: run each query in a fresh session ~3 times; trigger rate = fraction of runs that invoked the skill; should-trigger passes above 0.5, should-not-trigger below 0.5 (official default threshold).
 4. **Iterate on train failures only** — rework the Phase 2 description, never peek at validation to choose wording. Check validation after; **select the description with the best validation score** (an earlier draft can beat the last one — later iterations overfit). "Five iterations is usually enough" (official guidance).
 5. Ask the user to spot-check 3–5 queries in a fresh Claude session before finalizing.
 
-Caveat (official): agents consult skills for tasks beyond what they can handle alone — a trivially simple query may not trigger even a perfectly described skill. Don't churn the description over those.
+Caveat (official): agents consult skills for tasks beyond what they can handle alone, so a trivially simple query may not trigger even a perfectly described skill. Don't churn the description over those.
 
-For measuring whether the **body** actually improves output (not just triggering): the official output-quality loop runs 2–3 test cases with and without the skill (or against a snapshot of the previous version), grades with evidence-required assertions written *after* the first run, and drops assertions that pass in both configurations. See https://agentskills.io/skill-creation/evaluating-skills.md — worth running for methodology and auditing skills; overkill for small reference skills.
+To measure whether the **body** improves output rather than just triggering, run the official output-quality loop: 2–3 test cases with and without the skill, graded with evidence-required assertions written *after* the first run, dropping any assertion that passes in both configurations. Worth it for methodology and auditing skills, overkill for small reference skills.
 
 ## Output layout
 
@@ -209,37 +217,38 @@ description: docx authoring toolkit. Use whenever the user asks to "create a Wor
 description: I help you work with Word documents. Use when you need to edit files.
 ```
 
+✅ A body step that checks external state:
+
+```markdown
+Run `skills-ref validate <skill-dir>` and confirm it exits 0 before finalizing.
+```
+
+❌ A body step that re-checks the agent's own work — cut it, the model already does this:
+
+```markdown
+Before you finish, double-check your work and use a subagent to verify the output.
+```
+
 Full worked set (methodology ✅, technical ✅, counter-example ❌, repaired ✅): **[references/EXAMPLES.md](references/EXAMPLES.md)**.
 
 ## Gotchas
 
 - **Symptom:** New skill never auto-invokes. **Cause:** Description used vague prose without specific triggers. **Fix:** Rewrite with the "Use whenever the user wants to…" form plus 3+ quoted trigger phrases.
-- **Symptom:** Skill works in isolation, breaks once user has >20 skills installed. **Cause:** Distinctive trigger is past char 50; listing budget truncated it. **Fix:** Move the distinctive noun to the start of `description`.
-- **Symptom:** Skill fires on exact trigger phrases but misses indirect asks ("clean up this data file" for a CSV skill). **Cause:** No coverage clause. **Fix:** Add "even if they don't explicitly mention X" enumeration to the description.
+- **Symptom:** Skill works in isolation, breaks once the user has >20 skills installed. **Cause:** Distinctive trigger is past char 50; listing budget truncated it. **Fix:** Move the distinctive noun to the start of `description`.
+- **Symptom:** Skill fires on exact trigger phrases but misses indirect asks ("clean up this data file" for a CSV skill). **Cause:** No coverage clause. **Fix:** Add "even if they don't explicitly mention X" to the description.
+- **Symptom:** Skill fires on prompts it has nothing to do with. **Cause:** Intensity escalation ("CRITICAL: you MUST use this") — current models overtrigger on aggressive language. **Fix:** Drop to normal register; widen recall with more literal triggers instead.
 - **Symptom:** Description scores well on train queries, regresses on validation. **Cause:** Overfitting — wording tuned against the same queries each round. **Fix:** Select by validation score; keep the split fixed; an earlier iteration may be the winner.
-- **Symptom:** Generated skill causes refusals or model fallbacks on Fable 5. **Cause:** Body instructs the agent to echo its reasoning ("show your thinking"). **Fix:** Delete reasoning-echo instructions; ask for conclusions and evidence instead.
-- **Symptom:** "Unexpected key" warning on load. **Cause:** Top-level `version`, `author`, or `tags`. **Fix:** Move them under `metadata`. Note `argument-hint` and `hooks` are **valid** Claude Code top-level keys and stay put — only Anthropic's repo packaging validator rejects them (see the three-tier note above).
+- **Symptom:** Generated skill causes refusals or model fallbacks on Fable 5. **Cause:** Body instructs the agent to echo its reasoning. **Fix:** Delete reasoning-echo instructions; ask for conclusions and evidence instead.
+- **Symptom:** Generated skill burns tokens and latency on short tasks with no quality gain. **Cause:** Body carries verification scaffolding ("double-check", "verify with a subagent") the model performs unprompted. **Fix:** Delete those steps; keep only checks against external state.
+- **Symptom:** "Unexpected key" warning on load. **Cause:** Top-level `version`, `author`, or `tags`. **Fix:** Move them under `metadata`. `argument-hint` and `hooks` are **valid** Claude Code top-level keys and stay put — only Anthropic's repo packaging validator rejects them.
 - **Symptom:** Two skills both fire on the same prompt. **Cause:** Overlapping triggers, no negative scope. **Fix:** Add `Do NOT use this skill for X — see Y` to whichever skill is the wrong fit.
-- **Symptom:** SKILL.md is 700 lines, agent quotes the wrong section. **Cause:** Single-file overflow; Claude reads the head, misses the tail. **Fix:** Extract to `references/` (plural), one level deep, with explicit "load when…" pointers.
+- **Symptom:** SKILL.md is 700 lines, agent quotes the wrong section. **Cause:** Single-file overflow; Claude reads the head, misses the tail. **Fix:** Extract to `references/`, one level deep, with explicit "load when…" pointers.
 
 ## Integration
 
-- **rate-skill** — Run after generating to grade the new SKILL.md against current standards. `generate-skill` produces; `rate-skill` audits. The Phase 4 section lists here and rate-skill's Category 4 table are the same shared spec.
+- **rate-skill** — run after generating to grade the new SKILL.md. `generate-skill` produces, `rate-skill` audits. The Phase 4 section list and rate-skill's Category 4 table are one shared spec.
 - **references/PATTERNS.md** — body templates by skill type; loaded on demand during Phase 4.
 
 ## References
 
-- agentskills.io spec: https://agentskills.io/specification
-- Official description-optimization loop (eval sets, trigger rates, splits): https://agentskills.io/skill-creation/optimizing-descriptions.md
-- Official output-quality eval loop (with/without baselines): https://agentskills.io/skill-creation/evaluating-skills.md
-- Official authoring best practices (patterns, calibrating control): https://agentskills.io/skill-creation/best-practices.md
-- Claude Code skills docs: https://code.claude.com/docs/en/skills
-- Anthropic skill-creator: https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md
-- skill-creator eval announcement (2026-03-03): https://claude.com/blog/improving-skill-creator-test-measure-and-refine-agent-skills
-- Claude Fable 5 prompting guidance (prescriptiveness, reasoning extraction): https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5
-- Description activation study (Seleznov n=650): https://medium.com/@ivan.seleznov1/why-claude-code-skills-dont-activate-and-how-to-fix-it-86f679409af1
-- Skill listing budget: https://claudefa.st/blog/guide/mechanics/skill-listing-budget
-- ETH Zurich AGENTS.md study: https://arxiv.org/abs/2602.11988
-- SkillsBench (focused-skill finding): https://arxiv.org/abs/2602.12670
-- Negation handling: https://arxiv.org/abs/2503.22395
-- anthropics/skills #37 (unsupported frontmatter fields): https://github.com/anthropics/skills/issues/37
+Full source list with URLs: **[references/SOURCES.md](references/SOURCES.md)** — load only when a user disputes a rule and you need to cite the spec.
