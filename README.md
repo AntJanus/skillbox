@@ -119,7 +119,7 @@ curl -o .claude/skills/track-session/SKILL.md \
 - Verifying completed tasks actually meet requirements before declaring done
 - Recovering a lost or corrupted SESSION_PROGRESS.md
 
-**Triggers:** When asked to "resume work", "pick up where I left off", "what was I doing", "save progress", "are we done", or "I lost my SESSION_PROGRESS"
+**Triggers:** When asked to "resume work", "pick up where I left off", "what was I doing", "save progress", "checkpoint before I lose context", "are we done", or "I lost my SESSION_PROGRESS"
 
 [View Documentation](./skills/track-session/SKILL.md)
 </details>
@@ -129,13 +129,15 @@ curl -o .claude/skills/track-session/SKILL.md \
 <details>
 <summary><b>Interactive skill builder that generates high-quality SKILL.md files using proven patterns.</b></summary>
 
+Eight phases from discovery to finalize, including a required `references/EVAL.md` eval set built to the official description-optimization loop (~20 queries, train/validation split, 0.5 trigger-rate threshold).
+
 **Use when:**
 - Asked to "create a skill"
 - Need to capture team workflows
 - Want to extend Claude Code capabilities
 - Building custom development methodologies
 
-**Triggers:** When asked to "create a skill", "generate a SKILL.md", "make me a skill"
+**Triggers:** When asked to "create a skill", "generate a skill", "scaffold a SKILL.md", "write a SKILL.md", or "turn this workflow into a skill"
 
 [View Documentation](./skills/generate-skill/SKILL.md)
 </details>
@@ -143,16 +145,16 @@ curl -o .claude/skills/track-session/SKILL.md \
 ### ideal-react-component
 
 <details>
-<summary><b>Battle-tested React component structure pattern for building maintainable, consistent components.</b></summary>
+<summary><b>A seven-section React component file layout plus the hooks antipatterns behind infinite loops and stale state.</b></summary>
 
 **Use when:**
 - Creating new React components
 - Refactoring existing components
-- Debugging React hooks issues
-- Reviewing component structure
+- Extracting a custom hook
+- Debugging React hooks issues (infinite renders, stale state)
 - Organizing component code
 
-**Triggers:** When asked to "create a React component", "structure this component", "review component structure", "refactor this component", "fix infinite loop", "useEffect not working"
+**Triggers:** When asked to "create a React component", "structure this component", "refactor this component", "extract a custom hook", "fix an infinite render loop", "my useEffect isn't working"
 
 [View Documentation](./skills/ideal-react-component/SKILL.md)
 </details>
@@ -160,15 +162,17 @@ curl -o .claude/skills/track-session/SKILL.md \
 ### rate-skill
 
 <details>
-<summary><b>Evaluate skill quality against best practices with letter grades (A-F) and actionable recommendations.</b></summary>
+<summary><b>Grade a SKILL.md against current authoring practice — a letter grade A–F, weighted category scores, and prioritized paste-ready patches.</b></summary>
+
+Seven weighted categories (description quality, frontmatter validity, length & progressive disclosure, structure fit for type, examples, conciseness, anti-patterns & calibration), plus an eval-set check against the official optimizing-descriptions loop.
 
 **Use when:**
 - Reviewing skills before publishing
-- Validating skill structure and formatting
-- Checking if skill meets quality standards
+- Validating skill structure and frontmatter
+- Checking if a skill meets current quality standards
 - Auditing skill repositories
 
-**Triggers:** When asked to "rate this skill", "review skill quality", "check skill formatting", "evaluate SKILL.md", "grade this skill"
+**Triggers:** When asked to "rate this skill", "grade this skill", "audit my SKILL.md", "score this skill against best practices", "is this SKILL.md up to spec"
 
 [View Documentation](./skills/rate-skill/SKILL.md)
 </details>
@@ -184,7 +188,7 @@ curl -o .claude/skills/track-session/SKILL.md \
 - Need to audit and reprioritize the roadmap
 - Capturing feature ideas before they're lost
 
-**Triggers:** When asked to "create a roadmap", "plan features", "what should we build next", "update the roadmap", "audit the roadmap"
+**Triggers:** When asked to "add an item to the roadmap", "mark a feature done", "log the work I shipped", "create a roadmap", "what should we build next", "brainstorm features", or "audit the roadmap"
 
 [View Documentation](./skills/track-roadmap/SKILL.md)
 </details>
@@ -202,7 +206,7 @@ Pairs with `track-roadmap` and `track-session` as the third member of the `cc-da
 - Migrating ad-hoc QA notes into the cc-dash schema
 - Resuming a paused QA pass and picking the next pending item
 
-**Triggers:** When asked to "create a QA list", "set up QA for this project", "audit the QA list", "what's left to QA", "before I ship I need to QA", "start manual QA"
+**Triggers:** When asked to "create a QA list", "set up QA for this project", "what should I QA", "track manual QA", "audit the QA list", "start manual QA", or "what's left to check before release"
 
 [View Documentation](./skills/track-qa/SKILL.md)
 </details>
@@ -218,7 +222,7 @@ Pairs with `track-roadmap` and `track-session` as the third member of the `cc-da
 - Migrating from manual versioning to automated releases
 - Need commitlint, husky hooks, and CI/CD release workflow
 
-**Triggers:** When asked to "set up semantic release", "add conventional commits", "configure automated versioning", "set up commitlint", "add husky hooks"
+**Triggers:** When asked to "set up semantic release", "add conventional commits", "configure automated versioning", "set up commitlint", "add husky hooks", or "automate our changelog and GitHub releases"
 
 [View Documentation](./skills/setup-semantic-release/SKILL.md)
 </details>
@@ -234,7 +238,7 @@ Pairs with `track-roadmap` and `track-session` as the third member of the `cc-da
 - Writing VHS `.tape` files
 - Setting up automated demo recording in CI/CD
 
-**Triggers:** When asked to "record a demo", "create a GIF of my CLI", "write a VHS tape", "make a terminal recording", "generate a demo for my TUI"
+**Triggers:** When asked to "record a demo", "create a GIF of my CLI", "write a VHS tape", "make a terminal recording", or "add a demo GIF to the README"
 
 [View Documentation](./skills/record-tui/SKILL.md)
 </details>
@@ -250,7 +254,7 @@ Pairs with `track-roadmap` and `track-session` as the third member of the `cc-da
 - Documenting UI changes or new features visually
 - Automating screenshot generation in CI/CD
 
-**Triggers:** When asked to "screenshot my app", "capture the UI", "take a screenshot of localhost", "generate screenshots for docs", "batch screenshot my pages"
+**Triggers:** When asked to "screenshot my app", "take a screenshot of localhost", "generate screenshots for the README", "batch screenshot my pages", or "set up shot-scraper"
 
 [View Documentation](./skills/screenshot-local/SKILL.md)
 </details>
@@ -258,18 +262,18 @@ Pairs with `track-roadmap` and `track-session` as the third member of the `cc-da
 ### code-review
 
 <details>
-<summary><b>Run a multi-agent code review over local changes — five specialized reviewers in parallel, synthesized into a severity-tagged report.</b></summary>
+<summary><b>Run a multi-agent code review over local changes — narrow-lane reviewers in parallel, then a verifier that keeps only findings with real impact, synthesized into a severity-tagged report.</b></summary>
 
-The five lanes: basics, architecture, clarity, testing, repo-hygiene.
+The lanes: correctness, architecture, testing, ui-ux (dispatched only when the scope touches UI), and a non-blocking hygiene sweep. Nits are suppressed by default; `--nits` surfaces them. Flags cover whole-repo (`--repo`), blueprint conformance (`--blueprint <skill>`), and detached runs (`--background`).
 
 **Use when:**
 - Self-reviewing a change before committing
 - Before opening a PR to flush issues you would fix anyway
 - After a large refactor to catch structural drift
-- Want pattern-aware feedback (architecture agent reads siblings first)
-- Want to catch committed secrets, undocumented env vars, or stale docs (repo-hygiene)
+- Auditing a whole repo against a blueprint skill (`--repo --blueprint local-first-app`)
+- Want to catch committed secrets, dead code, or doc/dep drift (hygiene)
 
-**Triggers:** When asked to "review my code", "review these changes", "do a code review", "review this diff", "check my changes before I commit"
+**Triggers:** When asked to "review my code", "review these changes", "do a code review", "check my changes before I commit", "review the whole repo", or "review this in the background"
 
 [View Documentation](./skills/code-review/SKILL.md)
 </details>
@@ -279,7 +283,7 @@ The five lanes: basics, architecture, clarity, testing, repo-hygiene.
 <details>
 <summary><b>Run multi-source web research and synthesize a comprehensive, well-sourced summary in the conversation.</b></summary>
 
-Cross-references claims across 5-10+ searches, prioritizes current and authoritative sources, and surfaces disagreements honestly. No files created unless explicitly requested.
+Runs 5+ searches across five angles (at least 3 per run), WebFetches every source it cites substantively, prioritizes current and authoritative sources, and surfaces disagreements honestly. No files created unless explicitly requested.
 
 **Use when:**
 - Pre-implementation research (libraries, patterns, trade-offs)
@@ -305,7 +309,7 @@ Domains: web-app UI, marketing/landing, data visualization, and terminal/TUI. Ev
 - Setting up light & dark mode (dark mode ≠ inversion; elevation = lighter)
 - Checking WCAG/APCA contrast or colorblind-safety
 
-**Triggers:** When asked to "pick a color palette", "create a color scheme", "choose colors for my app", "set up dark mode", "what colors should I use", "data viz colors", or "check color contrast"
+**Triggers:** When asked "what colors should I use", "pick a palette for my dashboard", "set up dark mode", "does this pass WCAG contrast", "colorblind-safe chart colors", or "give me a terminal theme" — and it applies even when the user never says "color", as in "theme this app" or "this text is hard to read on the background"
 
 [View Documentation](./skills/color-system/SKILL.md)
 </details>
@@ -323,7 +327,7 @@ Four systems (Product UI, Editorial, Marketing, Docs/Technical). Size by **role 
 - Fixing unreadable text — too small, too thin, too low-contrast, too cramped
 - Picking or pairing fonts (system stacks, curated webfonts, superfamilies)
 
-**Triggers:** When asked to "what font size should I use", "set up a type scale", "this text is too small to read", "what line-height for body", "set up vertical rhythm", "pick a font for my dashboard", "pair a heading and body font", or "make typography fluid with clamp()"
+**Triggers:** When asked "what font size should I use", "set up a type scale", "this text is too small to read", "what line-height for paragraphs", or "pair a heading font with a body font" — even when the user never says "typography" and only describes text that looks cramped, thin, or washed out
 
 [View Documentation](./skills/typography/SKILL.md)
 </details>
@@ -402,7 +406,8 @@ Each skill follows this standard structure:
 ```
 skill-name/
 ├── SKILL.md              # Core skill documentation
-├── references/           # Optional: Extended documentation (plural — canonical)
+├── references/           # Extended documentation (plural — canonical; existing singular reference/ dirs are fine)
+│   ├── EVAL.md           # Activation eval set — every SkillBox skill ships one
 │   ├── STANDARDS.md      # Detailed rules
 │   └── EXAMPLES.md       # Code examples
 ├── scripts/              # Optional: Automation scripts
@@ -411,6 +416,8 @@ skill-name/
 └── assets/               # Optional: Templates / resources used in output
     └── template.md
 ```
+
+Nothing validates directory names — plural `references/` for new skills, no renames of existing singular `reference/` dirs.
 
 ## Contributing
 
@@ -424,10 +431,12 @@ We welcome contributions! Here's how:
 
 ### Skill Quality Standards
 
-- **Trigger-rich descriptions**: Include 3-5 specific activation phrases
+- **Trigger-rich descriptions**: Directive third person ("Use this skill whenever the user wants to…"), 3-5 specific activation phrases with the distinctive one front-loaded in the first ~50 chars, and a "Do NOT use this skill for…" clause where neighboring skills could collide. The only length rule is the 1024-char spec cap; scalar style (`|`, `>`, single-line) is not policed
 - **Clear examples**: Show ✅/❌ code comparisons (desired pattern first)
+- **Gotchas**: A `## Gotchas` section of concrete edge cases and failure modes — the highest-value content in most skills, and the part an agent can't infer
 - **Troubleshooting**: Address common issues
 - **Progressive disclosure**: Keep SKILL.md under 300 lines (hard cap 500); use `references/` for extensive content
+- **Eval set**: An `EVAL.md` following the official optimizing-descriptions loop — ~20 queries split ~60/40 train/validation, each run ~3 times in fresh sessions, scored against a 0.5 trigger-rate threshold, picking the description with the best *validation* score
 - **Verification checklists**: For methodology enforcement skills
 
 See [generate-skill documentation](./skills/generate-skill/SKILL.md) for detailed guidelines.
@@ -444,7 +453,7 @@ See [generate-skill documentation](./skills/generate-skill/SKILL.md) for detaile
 ### For Skill Creators
 
 1. **Clear triggers**: Write specific, recognizable activation phrases
-2. **Verify, don't decree**: Enforce critical workflows with verification checklists and explained "Quality Signals" — not ALL-CAPS "Iron Laws" (Anthropic's skill-creator flags that framing as a yellow flag)
+2. **Verify, don't decree**: Enforce critical workflows with verification checklists and explained "Quality Signals" — not ALL-CAPS "Iron Laws". Reasoning-based instructions ("Do X because Y tends to cause Z") outperform rigid directives ("ALWAYS do X, NEVER do Y")
 3. **Guide by default**: Provide recommendations with reasoning, not just rules
 4. **Test activation**: Ensure your skill triggers reliably
 5. **Version properly**: Use semantic versioning in metadata
@@ -474,4 +483,4 @@ MIT License - see individual skills for specific licensing
 
 ---
 
-**Skill Count**: 14 | **Made for**: Claude Code 2025+
+**Skill Count**: 14 | **Made for**: Claude Code 2.1.220+
