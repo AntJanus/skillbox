@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [8.2.0] - 2026-07-29
+
+Operational-surface release for `local-first-app`, from a gap audit measuring one app built to the blueprint against its ten siblings. The blueprint specified the data layer thoroughly and the operations around it loosely, and the audit found the seam: one rule contradicted another file in the same skill, and the rest were absent rather than wrong. No breaking changes.
+
 ### Added
 
 - **local-first-app** (3.1.0 → 3.2.0): six rules from a gap audit measuring one app built to the blueprint against its ten siblings — the operational surface around a local-first app, which the blueprint specified less thoroughly than the data layer it wraps.
