@@ -105,7 +105,7 @@ curl -o .claude/skills/track-session/SKILL.md \
 | [🔬 deep-research](#deep-research) | Multi-source web research with cited synthesis |
 | [🎨 color-system](#color-system) | Curated color palettes + WCAG/APCA contrast guidance |
 | [🔠 typography](#typography) | Type systems, scale, rhythm + a readability floor |
-| [🧱 local-first-app](#local-first-app) | Local-first single-user web-app blueprint (Next.js + node:sqlite) |
+| [🧱 local-first-app](#local-first-app) | Local-first single-user app — feature set, not a code spec |
 
 ### track-session
 
@@ -335,21 +335,19 @@ Four systems (Product UI, Editorial, Marketing, Docs/Technical). Size by **role 
 ### local-first-app
 
 <details>
-<summary><b>A blueprint for building local-first, single-user web apps — trackers, dashboards, personal tools — that run in the browser, persist to a local SQLite file, and can ship as a desktop binary.</b></summary>
+<summary><b>What a local-first, single-user app needs — trackers, dashboards, personal tools — persisting to a local SQLite file and shippable as a desktop binary. Describes the feature set and leaves the code to the agent.</b></summary>
 
-A blueprint for a single-purpose local CRUD app — a game-backlog tracker, expense log, collection catalog, or habit tracker. The stack: **Next.js (App Router) + React + TypeScript**, **Mantine** UI, **`node:sqlite`** persistence (no native addon → single-binary packaging), a **pure framework-free domain core**, **zod** at the server boundary, and a themed **colorblind-safe chart palette**. Core principle: keep all domain logic (CRUD-derived state *and* any computation) in a pure core the browser imports directly; persistence is a thin `server-only` layer.
+A one-page description of what a single-purpose local app *has* — a game-backlog tracker, expense log, collection catalog, or habit tracker — leaving the implementation to the agent. Baseline stack: **Next.js (App Router) + React + TypeScript** with **SQLite** in one local file and config through **environment variables**. Everything else (UI library, forms, validation, charts, tests) is the app's own choice.
 
-**Use when:**
-- Scaffolding a tracker / dashboard / personal-tool web app (a pure computation-only calculator with no persisted entities doesn't need this machinery)
-- Adding a persisted entity + a zod-validated server action over `node:sqlite`
-- Wiring the chart color *module* (semantic roles, theme hook) — pair with **color-system** for the actual palette
-- Building the app shell, logo, theming, and the shared page/editor/stat/empty-state shells
-- Packaging a Next.js app as a self-contained desktop binary (`deno compile` / `deno desktop`)
-- Deciding where computation, persistence, and view-model logic belong
+**Covers:**
+- Entities with real relationships — FKs for one-to-many, join tables for many-to-many
+- Four addressable routes per entity: list, add, view, edit — the URL is the state
+- Top nav with a cross-entity `/search` route and a theme switcher; collapsible sidebar sections
+- Settings: named theme + light/dark, data file location, backup and restore in the UI
+- Migrations at startup with a snapshot taken first, and empty states for a zero-row install
+- Packaging as a self-contained desktop binary (`deno compile` / `deno desktop`)
 
-**Triggers:** When asked to "build a local app to track my X", "a tracker that saves to my machine", "an offline single-user app with no account", "add a persisted entity + server action", "package this as a desktop app", or "where should this calculation live?"
-
-Also specifies the rules a green test suite doesn't give you: a **pre-migration snapshot** as a hard requirement (`BASE_SCHEMA` is migration v1, so there's one construction path), and four verification gates that each **assert a positive property** rather than the absence of a loud failure.
+**Triggers:** When asked to "build a local app to track my X", "a tracker that saves to my machine", "an offline single-user app with no account", "add a persisted entity", or "package this as a desktop app"
 
 Not for palette/contrast choices (see [color-system](#color-system)), font sizing (see [typography](#typography)), or pure visual layout (see frontend-design).
 
