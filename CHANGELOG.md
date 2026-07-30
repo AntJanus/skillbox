@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [9.1.0] - 2026-07-29
+
+Additive follow-up to v9.0.0, filling the app-level surface that release's cut left implicit. v9.0.0 reduced `local-first-app` to a description of what an app *has*, specified per entity; this adds what every one of these apps has at the *app* level — its own routes, a backup schedule rather than only a migration hook, and the UI patterns that keep a multi-entity app feeling like one app instead of several CRUD screens sharing a sidebar. The framing is unchanged: still a description of the feature set, not a code spec. No other skill changes, no breaking changes.
+
 ### Added
 
 - **local-first-app** (4.0.0 → 4.1.0): the app-level surface the 4.0.0 cut left out, plus the UI patterns that make a multi-entity app feel like one app rather than several CRUD screens sharing a sidebar. Additive — nothing in 4.0.0 is retracted, and the "describes what the app has, not how to build it" framing is unchanged.
@@ -806,7 +810,8 @@ When creating a release:
 
 ---
 
-[Unreleased]: https://github.com/antjanus/skillbox/compare/v9.0.0...HEAD
+[Unreleased]: https://github.com/antjanus/skillbox/compare/v9.1.0...HEAD
+[9.1.0]: https://github.com/antjanus/skillbox/compare/v9.0.0...v9.1.0
 [9.0.0]: https://github.com/antjanus/skillbox/compare/v8.2.0...v9.0.0
 [5.0.0]: https://github.com/antjanus/skillbox/compare/v4.10.0...v5.0.0
 [4.10.0]: https://github.com/antjanus/skillbox/compare/v4.9.0...v4.10.0
