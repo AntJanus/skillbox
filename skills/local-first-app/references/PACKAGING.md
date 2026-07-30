@@ -7,11 +7,13 @@ Load when shipping the app without Node/Deno/node_modules on the target. Possibl
 ## Two build paths
 
 ### Headless single-file binary (`deno compile`)
+
 - `deno compile` the standalone `server.js` → a single executable that opens `localhost:PORT` in a browser.
 - Creates `./data/<app>.sqlite` next to the binary on first run.
 - Simplest; good for "download and run".
 
 ### Native-window app (`deno desktop`, Deno 2.9+)
+
 - Compile a custom entrypoint that sets the data-dir env (e.g. `<APP>_DATA_DIR`) to the OS per-user data dir (e.g. `~/Library/Application Support/<App>`) **before** booting Next, so the store survives app updates (vs the read-only bundle dir).
 - For slimness, **copy the entrypoint + the data-dir helper into `.next/standalone` and compile from there** — compiling from the repo root pulls in the whole root tree.
 
@@ -28,6 +30,7 @@ Load when shipping the app without Node/Deno/node_modules on the target. Possibl
 Bundles are **ad-hoc signed only** by these tools — local builds run fine (no quarantine), but a downloaded/AirDropped copy is Gatekeeper-blocked until `xattr -dr com.apple.quarantine <App>.app` (or right-click → Open).
 
 Distribution-without-warning needs **paid certs** as a post-build step on the produced bundle:
+
 - **macOS:** Apple Developer ID + notarization (`codesign --options runtime` → `xcrun notarytool` → `stapler staple`).
 - **Windows:** Authenticode cert + `signtool`.
 

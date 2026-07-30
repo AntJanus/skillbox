@@ -56,7 +56,7 @@ may not trigger even a well-described skill. Don't churn the description over th
 
 ## Load-bearing discriminators
 
-The adjacent *app-building* requests — hosted Postgres, multi-tenant auth, a mobile backend — are
+The adjacent _app-building_ requests — hosted Postgres, multi-tenant auth, a mobile backend — are
 the ones the skill rejects on scope rather than on topic, and they sit in both halves deliberately.
 If activation over-fires on those, sharpen the scope clause in the description rather than the
 trigger list.
