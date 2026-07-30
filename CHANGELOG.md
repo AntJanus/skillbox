@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [9.0.0] - 2026-07-29
+
+Breaking release, and a deliberate reversal of direction for `local-first-app`. Eight releases of accumulated detail had turned a blueprint into a code spec that constrained apps into one shape; this cuts it to a one-page description of what the app *has* and hands the implementation back to the agent. No other skill changes.
+
+### Changed
+
+- **local-first-app** (3.2.0 → **4.0.0**, breaking): rewritten as a one-page description of the app's feature set, from 1,520 lines across 8 files to 69 lines plus `references/PACKAGING.md`. The blueprint had grown into a code spec — pinned libraries with rationale columns, a five-directory architecture contract, worked loader and form code, four verification gates, and 15 gotchas — and was constraining apps into one shape instead of describing what they need.
+  - **Describes features, not implementation.** Entities and their relationships (FKs for one-to-many, join tables for many-to-many), four addressable routes per entity (list / add / view / edit), a top nav carrying cross-entity search and a theme switcher, collapsible sidebar sections, and settings covering theme, data location, and backup/restore.
+  - **The stack is a plain list, not a table of load-bearing warnings**: Next.js App Router, React, TypeScript, SQLite in one local file, environment variables for config. UI library, forms, validation, charts, and test runner are each app's own choice.
+  - **Removed:** `ARCHITECTURE.md`, `CHROME.md`, `UI.md`, `RELATIONSHIPS.md`, `EXAMPLES.md`, and `EVAL.md`. `PACKAGING.md` stays — `deno compile` / `deno desktop` steps are external knowledge an agent can't infer. Examples survive as five one-line ✅/❌ scope pairs.
+  - **Migration:** nothing in the existing True\* fleet needs to change. The removed material described one valid way to build these apps, not a contract those apps violate.
+
 ## [8.2.0] - 2026-07-29
 
 Operational-surface release for `local-first-app`, from a gap audit measuring one app built to the blueprint against its ten siblings. The blueprint specified the data layer thoroughly and the operations around it loosely, and the audit found the seam: one rule contradicted another file in the same skill, and the rest were absent rather than wrong. No breaking changes.
@@ -780,7 +792,8 @@ When creating a release:
 
 ---
 
-[Unreleased]: https://github.com/antjanus/skillbox/compare/v5.0.0...HEAD
+[Unreleased]: https://github.com/antjanus/skillbox/compare/v9.0.0...HEAD
+[9.0.0]: https://github.com/antjanus/skillbox/compare/v8.2.0...v9.0.0
 [5.0.0]: https://github.com/antjanus/skillbox/compare/v4.10.0...v5.0.0
 [4.10.0]: https://github.com/antjanus/skillbox/compare/v4.9.0...v4.10.0
 [4.9.0]: https://github.com/antjanus/skillbox/compare/v4.8.0...v4.9.0
