@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **local-first-app** (4.0.0 → 4.1.0): the app-level surface the 4.0.0 cut left out, plus the UI patterns that make a multi-entity app feel like one app rather than several CRUD screens sharing a sidebar. Additive — nothing in 4.0.0 is retracted, and the "describes what the app has, not how to build it" framing is unchanged.
+  - **An app-routes table alongside the per-entity one.** Every app has an overview home, a cross-entity `/search?q=`, and `/settings`, plus `/calendar` when its data carries dates. 4.0.0 specified the four routes each *entity* gets and left the app's own routes implicit.
+  - **Backups are a schedule, not only a migration hook.** 4.0.0 said to snapshot before a migration; that protects nothing during a month with no schema change but daily writes. Snapshots now run on a schedule as well, keeping the last few.
+  - **Sorting and filtering are server-side and URL-driven** — the client never sorts or filters a full result set. Paired with a new ✅/❌ line, since the tempting shape is to fetch every row and sort in the browser.
+  - **Tabs on two axes**: on a list view to cut the same records different ways, and on an entity view to reach its related entities.
+  - Four smaller additions: consistent placement for add/save/delete/cancel across screens; virtualization or pagination where a list can grow unbounded; bulk selection and edit where per-row editing gets tedious; and skeuomorphic treatment where the entity is a real-world object (a credit card rendered as a card).
+  - Chrome gains non-entity sidebar views (an "insights" view) and external API keys in Settings.
+
+### Changed
+
+- **local-first-app**: `## Examples` moved below `## Chrome` so the ✅/❌ block no longer interrupts the UI-pattern sections, and the top-nav bullet no longer restates the `/search?q=` route that the app-routes table declares and the Examples pair already argues for.
+
 ## [9.0.0] - 2026-07-29
 
 Breaking release, and a deliberate reversal of direction for `local-first-app`. Eight releases of accumulated detail had turned a blueprint into a code spec that constrained apps into one shape; this cuts it to a one-page description of what the app *has* and hands the implementation back to the agent. No other skill changes.
