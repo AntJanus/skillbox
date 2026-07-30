@@ -342,9 +342,11 @@ A one-page description of what a single-purpose local app *has* — a game-backl
 **Covers:**
 - Entities with real relationships — FKs for one-to-many, join tables for many-to-many
 - Four addressable routes per entity: list, add, view, edit — the URL is the state
-- Top nav with a cross-entity `/search` route and a theme switcher; collapsible sidebar sections
-- Settings: named theme + light/dark, data file location, backup and restore in the UI
-- Migrations at startup with a snapshot taken first, and empty states for a zero-row install
+- App-level routes: overview home, cross-entity `/search?q=`, `/settings`, and `/calendar` when the data carries dates
+- Shared UI patterns: tabs to cut a list or reach an entity's relations, server-side URL-driven sort and filter, bulk edit, consistent action placement
+- Top nav with search and a theme switcher; collapsible sidebar sections that also expose non-entity views
+- Settings: named theme + light/dark, data file location, restore-from-backup, external API keys
+- Migrations at startup, scheduled and pre-migration DB snapshots, and empty states for a zero-row install
 - Packaging as a self-contained desktop binary (`deno compile` / `deno desktop`)
 
 **Triggers:** When asked to "build a local app to track my X", "a tracker that saves to my machine", "an offline single-user app with no account", "add a persisted entity", or "package this as a desktop app"
