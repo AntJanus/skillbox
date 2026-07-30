@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **README**: the `local-first-app` entry caught up to 4.1.0 — its "Covers" list was written against 4.0.0 and omitted the app-level routes, the shared UI patterns, scheduled snapshots, non-entity sidebar views, and API keys in Settings. Skill count (14) and the summary line are unchanged.
+
 ## [9.1.0] - 2026-07-29
 
 Additive follow-up to v9.0.0, filling the app-level surface that release's cut left implicit. v9.0.0 reduced `local-first-app` to a description of what an app *has*, specified per entity; this adds what every one of these apps has at the *app* level — its own routes, a backup schedule rather than only a migration hook, and the UI patterns that keep a multi-entity app feeling like one app instead of several CRUD screens sharing a sidebar. The framing is unchanged: still a description of the feature set, not a code spec. No other skill changes, no breaking changes.
