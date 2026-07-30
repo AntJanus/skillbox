@@ -27,14 +27,18 @@ src/db/
 
 ```ts
 // src/db/index.ts
-declare global { var __db: DatabaseSync | undefined }
+declare global {
+  var __db: DatabaseSync | undefined;
+}
 
 let migratedThisModule = false;
 
-export function getDb(): DatabaseSync {                    // server-only
-  const db = (globalThis.__db ??= open());                 // connection survives HMR
-  if (!migratedThisModule) {                               // module state does NOT — that's the hook
-    migrate(db);                                           // cheap: user_version gate
+export function getDb(): DatabaseSync {
+  // server-only
+  const db = (globalThis.__db ??= open()); // connection survives HMR
+  if (!migratedThisModule) {
+    // module state does NOT — that's the hook
+    migrate(db); // cheap: user_version gate
     migratedThisModule = true;
   }
   return db;
@@ -48,11 +52,11 @@ function open(): DatabaseSync {
     PRAGMA busy_timeout = 5000;    -- retry on lock contention instead of failing instantly
     PRAGMA foreign_keys = ON;      -- per-connection; OFF by default
   `);
-  snapshotBeforeMigrate(db);       // fatal on failure
-  pruneSnapshots(backupDir());     // separate call — must NOT be fatal
+  snapshotBeforeMigrate(db); // fatal on failure
+  pruneSnapshots(backupDir()); // separate call — must NOT be fatal
   migrate(db);
-  db.exec("PRAGMA optimize");      // AFTER migrate: stats for the new schema, not the old one
-  resolveStuckJobs(db);            // only if the app has a background-job table
+  db.exec("PRAGMA optimize"); // AFTER migrate: stats for the new schema, not the old one
+  resolveStuckJobs(db); // only if the app has a background-job table
   return db;
 }
 ```
@@ -68,36 +72,49 @@ Local-first means no server-side copy, so a bad migration is unrecoverable user 
 The snapshot directory sits **outside whatever a routine reset removes**, which resolves two ways for the same reason. In a checkout it's a sibling of the data dir — `rm -rf data/` is a normal dev reset and must not take the snapshots protecting that data with it. In a packaged build the entire app directory is disposable, so it resolves to the OS per-user data dir (`~/Library/Application Support/<app>`, `%APPDATA%`, `$XDG_DATA_HOME`). Branch once in `resolveBackupDir()`; every caller below takes what it returns.
 
 ```ts
-function snapshotBeforeMigrate(db: DatabaseSync) {          // throws
-  const current = db.prepare("PRAGMA user_version").get() as { user_version: number };
-  if (current.user_version >= LATEST_VERSION) return;   // nothing pending
-  if (current.user_version === 0) return;               // fresh DB — nothing to protect yet
+function snapshotBeforeMigrate(db: DatabaseSync) {
+  // throws
+  const current = db.prepare("PRAGMA user_version").get() as {
+    user_version: number;
+  };
+  if (current.user_version >= LATEST_VERSION) return; // nothing pending
+  if (current.user_version === 0) return; // fresh DB — nothing to protect yet
 
-  const dir = resolveBackupDir();                           // outside anything a reset removes
+  const dir = resolveBackupDir(); // outside anything a reset removes
   mkdirSync(dir, { recursive: true });
 
-  const target = uniqueTarget(dir, `v${String(current.user_version).padStart(4, "0")}-${stamp()}`);
-  if (target.includes("'")) throw new Error(`backup path contains a quote: ${target}`);
-  db.exec(`VACUUM INTO '${target}'`);                       // no bound params in VACUUM INTO
+  const target = uniqueTarget(
+    dir,
+    `v${String(current.user_version).padStart(4, "0")}-${stamp()}`,
+  );
+  if (target.includes("'"))
+    throw new Error(`backup path contains a quote: ${target}`);
+  db.exec(`VACUUM INTO '${target}'`); // no bound params in VACUUM INTO
 }
 
 function uniqueTarget(dir: string, base: string): string {
   let candidate = join(dir, `${base}.sqlite`);
-  for (let counter = 2; existsSync(candidate); counter++) {   // ms stamps DO collide
+  for (let counter = 2; existsSync(candidate); counter++) {
+    // ms stamps DO collide
     candidate = join(dir, `${base}-${counter}.sqlite`);
   }
   return candidate;
 }
 
-function pruneSnapshots(dir: string, keep = 20) {           // never throws
+function pruneSnapshots(dir: string, keep = 20) {
+  // never throws
   try {
     const snapshots = readdirSync(dir)
       .filter((file) => file.endsWith(".sqlite"))
       .map((file) => ({ file, modified: statSync(join(dir, file)).mtimeMs }))
-      .sort((left, right) => left.modified - right.modified);  // oldest first, by TIME
-    for (const stale of snapshots.slice(0, -keep)) rmSync(join(dir, stale.file));
+      .sort((left, right) => left.modified - right.modified); // oldest first, by TIME
+    for (const stale of snapshots.slice(0, -keep))
+      rmSync(join(dir, stale.file));
   } catch (error) {
-    console.warn("snapshot rotation failed; the snapshot itself is intact", error);
+    console.warn(
+      "snapshot rotation failed; the snapshot itself is intact",
+      error,
+    );
   }
 }
 ```
@@ -106,7 +123,7 @@ Four rules the obvious version gets wrong:
 
 1. **Gate on pending migrations**, or every dev-server restart writes a snapshot.
 2. **Break filename ties with a counter.** ISO-8601 bottoms out at the millisecond and two programmatic calls land inside one. Relying on `VACUUM INTO` throwing gives one of two shipped failures: catch it and you migrate with **no backup**; treat it as fatal and the app **refuses to start**.
-3. **Prune by timestamp, globally.** Sorting by filename puts `v10-…` before `v2-…`, so an oldest-first prune deletes the *newest* snapshots past v9. "Keep 20" means 20 backups total — prune under the versioned prefix and you keep a full set per version, growing without bound, and `v0001` prefix-matches `v0010`.
+3. **Prune by timestamp, globally.** Sorting by filename puts `v10-…` before `v2-…`, so an oldest-first prune deletes the _newest_ snapshots past v9. "Keep 20" means 20 backups total — prune under the versioned prefix and you keep a full set per version, growing without bound, and `v0001` prefix-matches `v0010`.
 4. **Two functions, opposite failure policies.** A failed snapshot is fatal; refusing to migrate without one is the point. A failed rotation must not be — the snapshot exists, and dying in cleanup blocks the migration it just protected.
 
 **Pre-migration snapshots are not a backup schedule.** They fire only when a migration is pending, so an app shipping no schema change for a month is protecting a month-old copy of data that changed daily. Add a periodic snapshot — on boot and on a fixed interval — through the same writer and the same rotation. Its failure policy is the opposite of the pre-migration one: a failed scheduled backup logs and the app starts anyway, because nothing destructive is about to happen.
@@ -125,7 +142,7 @@ Test the restore, not the backup: open the copy and read a row back.
 function applyMigration(db: DatabaseSync, m: Migration) {
   runInTransaction(db, () => {
     m.up(db);
-    db.exec(`PRAGMA user_version = ${m.version}`);   // atomic with the DDL above
+    db.exec(`PRAGMA user_version = ${m.version}`); // atomic with the DDL above
   });
 }
 ```
@@ -136,8 +153,14 @@ function applyMigration(db: DatabaseSync, m: Migration) {
 ```ts
 export function runInTransaction<T>(db: DatabaseSync, fn: () => T): T {
   db.exec("BEGIN IMMEDIATE");
-  try { const result = fn(); db.exec("COMMIT"); return result; }
-  catch (error) { db.exec("ROLLBACK"); throw error; }
+  try {
+    const result = fn();
+    db.exec("COMMIT");
+    return result;
+  } catch (error) {
+    db.exec("ROLLBACK");
+    throw error;
+  }
 }
 ```
 
@@ -148,7 +171,7 @@ export function runInTransaction<T>(db: DatabaseSync, fn: () => T): T {
 - `getDb()` is `server-only`. Resolve the data dir via one helper: an env override (`<APP>_DATA_DIR`, set by the desktop entrypoint) else `./data`. **In a packaged binary the env var is mandatory** — `./data` is CWD-relative, so it follows wherever the user launched from.
 - Gitignore `data/`, `*.sqlite`, `*.sqlite-wal`, `*.sqlite-shm`, `.next/`.
 
-**Resolve stuck jobs on boot** *(only with a background-job table)*. A process killed mid-flight leaves rows in `running` forever; a single-user app has one process, so a `running` job at boot has a dead owner.
+**Resolve stuck jobs on boot** _(only with a background-job table)_. A process killed mid-flight leaves rows in `running` forever; a single-user app has one process, so a `running` job at boot has a dead owner.
 
 ```ts
 function resolveStuckJobs(db: DatabaseSync) {
@@ -161,7 +184,7 @@ function resolveStuckJobs(db: DatabaseSync) {
 
 Plumbing, not logic. It assembles data, shapes it for screens, and calls the core for every derived value.
 
-- `'server-only'` loaders the server pages call (`loadX()` = `getDb()` + query + map). A loader may *call* core helpers but holds no rollup logic.
+- `'server-only'` loaders the server pages call (`loadX()` = `getDb()` + query + map). A loader may _call_ core helpers but holds no rollup logic.
 - zod schemas, one per write boundary (`lib/schemas/<entity>.ts`); formatters; the color module; config defaults.
 - **Two row shapes:** a **list row** (scalar columns + cheap counts) and a **detail aggregate** (the row + children + a core summary). A `toX(row, derived)` mapper builds each.
 - **Sibling-props is a valid alternative for shallow relationships.** When detail needs no merged summary type — just the row plus a child list rendered as-is — one unified `toX(row)` mapper for both, with children fetched separately and passed as a sibling prop, is simpler and equally correct. Take the two-shape split when detail needs a core-computed aggregate over the children.
@@ -171,7 +194,7 @@ Plumbing, not logic. It assembles data, shapes it for screens, and calls the cor
 
 Each data page is a server component with `export const dynamic = "force-dynamic"`, loading via a `lib/` loader and passing plain rows to a `'use client'` child. Writes are `'use server'` actions: zod `.parse()` → rule guard → typed DB call → `revalidatePath()`.
 
-**`force-dynamic` and `revalidatePath` are not redundant.** `force-dynamic` keeps the *server* render fresh (no full-route cache); `revalidatePath` busts the *client* Router Cache after a write, so a route you navigate back to refreshes instead of showing a stale snapshot.
+**`force-dynamic` and `revalidatePath` are not redundant.** `force-dynamic` keeps the _server_ render fresh (no full-route cache); `revalidatePath` busts the _client_ Router Cache after a write, so a route you navigate back to refreshes instead of showing a stale snapshot.
 
 **Next 15: `params` and `searchParams` are async.** `await` them (`const { projectId } = await searchParams`); synchronous access type-errors. The FK-prefill pattern depends on this.
 
@@ -180,15 +203,15 @@ Each data page is a server component with `export const dynamic = "force-dynamic
 ```ts
 // lib/schemas/project.ts — the one schema
 export const ProjectInput = z.object({
-  id: z.coerce.number().int().optional(),                  // present on edit, absent on create
+  id: z.coerce.number().int().optional(), // present on edit, absent on create
   name: z.string().min(1),
   targetCount: z.coerce.number().int().nonnegative(),
-  archived: z.coerce.boolean().optional().default(false),  // unchecked box = absent → default
+  archived: z.coerce.boolean().optional().default(false), // unchecked box = absent → default
 });
 export type ProjectInput = z.infer<typeof ProjectInput>;
 ```
 
-**Submit via Mantine `useForm`, not a raw `<form action>`.** The controlled form gives inline client validation through `zodResolver`; `onSubmit` calls the action inside `startTransition`; on server-side failure the action *returns* field errors and the client maps them with `form.setErrors()`:
+**Submit via Mantine `useForm`, not a raw `<form action>`.** The controlled form gives inline client validation through `zodResolver`; `onSubmit` calls the action inside `startTransition`; on server-side failure the action _returns_ field errors and the client maps them with `form.setErrors()`:
 
 ```tsx
 // components/ProjectForm.tsx — 'use client'
@@ -199,32 +222,37 @@ const [pending, start] = useTransition();
   if (result?.errors) form.setErrors(result.errors);
 }))}>
 ```
+
 ```ts
 // app/projects/actions.ts — 'use server'; receives the typed values object
 "use server";
 export async function saveProject(values: unknown) {
-  const parsed = ProjectInput.safeParse(values);           // authority
+  const parsed = ProjectInput.safeParse(values); // authority
   if (!parsed.success) return { errors: parsed.error.flatten().fieldErrors };
   const input = parsed.data;
   const db = getDb();
   let id: number;
-  if (input.id) { updateProject(db, input); id = input.id; }
-  else { id = Number(createProject(db, input)); }          // lastInsertRowid is bigint → Number()
+  if (input.id) {
+    updateProject(db, input);
+    id = input.id;
+  } else {
+    id = Number(createProject(db, input));
+  } // lastInsertRowid is bigint → Number()
   revalidatePath("/projects");
   revalidatePath(`/projects/${id}`);
-  redirect(`/projects/${id}`);                             // PRG: land on the canonical detail URL
+  redirect(`/projects/${id}`); // PRG: land on the canonical detail URL
 }
 ```
 
-`redirect()` throws internally, so lines after it never run and `runInTransaction` re-throws it cleanly. `useFormStatus` only works in a component nested *inside* the `<form>`, not the one rendering it — hence `useTransition`.
+`redirect()` throws internally, so lines after it never run and `runInTransaction` re-throws it cleanly. `useFormStatus` only works in a component nested _inside_ the `<form>`, not the one rendering it — hence `useTransition`.
 
 **Delete — the one modal.** A hand-rolled controlled `<Modal>` (`<ConfirmDeleteButton>`), not `@mantine/modals`. The async action runs inside `startTransition` or its pending state breaks:
 
 ```tsx
 <ConfirmDeleteButton
   entityLabel="project"
-  cascade={`${project.tasks.length} tasks`}          // from the detail loader's counts
-  onConfirm={() => deleteProject(project.id)}        // → revalidatePath → redirect to list
+  cascade={`${project.tasks.length} tasks`} // from the detail loader's counts
+  onConfirm={() => deleteProject(project.id)} // → revalidatePath → redirect to list
 />
 ```
 
@@ -260,7 +288,7 @@ Deliberately not hidden behind a factory: the duplication is mechanical but expl
 
 ## Shared derived state for multi-step flows
 
-When several tabs or a wizard need the *same* computed data, hoist it into a **context provider above the tabs** that owns the raw inputs and the derived analysis (it calls core helpers; no logic lives in it).
+When several tabs or a wizard need the _same_ computed data, hoist it into a **context provider above the tabs** that owns the raw inputs and the derived analysis (it calls core helpers; no logic lives in it).
 
 The hard requirement: **selections and computed results survive navigating Next/Back across steps.** A "stale selection" guard fires when an upstream change invalidates a downstream choice.
 
@@ -284,12 +312,14 @@ Optional machinery — skip it for pure manual-entry CRUD, reach for it once an 
 
 ```ts
 // app/actions.ts — 'use server'
-const runningJobs = new Set<Promise<void>>();   // holds the promise so it isn't GC'd after the response
+const runningJobs = new Set<Promise<void>>(); // holds the promise so it isn't GC'd after the response
 
 export async function startSyncAction() {
   const db = getDb();
   const jobId = createJob(db, { kind: "sync", status: "running" });
-  const work = runSync(jobId).catch(err => failJob(getDb(), jobId, String(err)));
+  const work = runSync(jobId).catch((err) =>
+    failJob(getDb(), jobId, String(err)),
+  );
   runningJobs.add(work);
   work.finally(() => runningJobs.delete(work));
   return { jobId };
@@ -312,7 +342,10 @@ Isolate each third-party API behind its own `lib/sources/<name>.ts` — one func
 ```ts
 // src/import/normalize.ts — pure
 export const normalizeTitle = (title: string) =>
-  title.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
 ```
 
 - **Secrets exception.** The "no server-side secrets" scope line assumes a hosted multi-user service; a local single-user app legitimately stores third-party API keys. Keep them in a `settings` table (or `.env` in dev), never echo them back to the client, never log them.

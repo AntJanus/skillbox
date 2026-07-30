@@ -6,8 +6,9 @@ Load when wiring up foreign keys, join tables, or cross-entity views. Entities r
 
 ```ts
 // src/db/index.ts
-db.exec("PRAGMA foreign_keys = ON");   // without this, ON DELETE CASCADE and orphan-rejection do nothing
+db.exec("PRAGMA foreign_keys = ON"); // without this, ON DELETE CASCADE and orphan-rejection do nothing
 ```
+
 ```ts
 // src/db/schema.ts
 export const BASE_SCHEMA = `
@@ -31,11 +32,17 @@ An explicit application-level cascade delete inside the same transaction, even w
 ```ts
 // src/db/index.ts (typed query API)
 export const listTasksByProject = (db, projectId) =>
-  db.prepare("SELECT * FROM tasks WHERE project_id = ? ORDER BY id").all(projectId);
+  db
+    .prepare("SELECT * FROM tasks WHERE project_id = ? ORDER BY id")
+    .all(projectId);
 
 // one query for ALL parents' counts — never query per row in a list
 export const countTasksByProject = (db) =>
-  db.prepare("SELECT project_id, COUNT(*) total, SUM(done) done FROM tasks GROUP BY project_id").all();
+  db
+    .prepare(
+      "SELECT project_id, COUNT(*) total, SUM(done) done FROM tasks GROUP BY project_id",
+    )
+    .all();
 ```
 
 **Loaders — two per parent.** A list loader returns cheap counts; a detail loader assembles the full aggregate.
@@ -44,15 +51,18 @@ export const countTasksByProject = (db) =>
 // lib/projects.ts
 export async function loadProjects(): Promise<ProjectListRow[]> {
   const db = getDb();
-  const counts = new Map(countTasksByProject(db).map(r => [r.project_id, r]));   // O(1) lookup
-  return listProjects(db).map(p => ({ ...p, taskCount: counts.get(p.id)?.total ?? 0 }));
+  const counts = new Map(countTasksByProject(db).map((r) => [r.project_id, r])); // O(1) lookup
+  return listProjects(db).map((p) => ({
+    ...p,
+    taskCount: counts.get(p.id)?.total ?? 0,
+  }));
 }
 
 export async function loadProjectDetail(id: number): Promise<ProjectDetail> {
   const db = getDb();
   const project = requireProject(db, id);
   const tasks = listTasksByProject(db, id);
-  return { project, tasks, summary: summarizeProject(project, tasks) };          // pure core gets assembled data
+  return { project, tasks, summary: summarizeProject(project, tasks) }; // pure core gets assembled data
 }
 ```
 
@@ -65,8 +75,8 @@ export async function loadProjectDetail(id: number): Promise<ProjectDetail> {
 <RelatedList
   title="Tasks"
   rows={project.tasks}
-  href={t => `/tasks/${t.id}`}                       // each child links to its own detail screen
-  newHref={`/tasks/new?projectId=${project.id}`}     // "+ New" prefills the FK
+  href={(t) => `/tasks/${t.id}`} // each child links to its own detail screen
+  newHref={`/tasks/new?projectId=${project.id}`} // "+ New" prefills the FK
 />
 // the task detail screen renders: <Link href={`/projects/${task.projectId}`}>← {project.name}</Link>
 ```
@@ -114,7 +124,11 @@ FROM tasks t;
 
 ```ts
 // lib/tags.ts — the one write path for "set the tags on this task"
-export function syncTags(db: DatabaseSync, taskId: number, desiredTagIds: number[]) {
+export function syncTags(
+  db: DatabaseSync,
+  taskId: number,
+  desiredTagIds: number[],
+) {
   const current = new Set(listTagIdsForTask(db, taskId));
   const desired = new Set(desiredTagIds);
   for (const id of desired) if (!current.has(id)) attachTag(db, taskId, id);
