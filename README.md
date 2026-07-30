@@ -343,8 +343,10 @@ A one-page description of what a single-purpose local app *has* — a game-backl
 - Entities with real relationships — FKs for one-to-many, join tables for many-to-many
 - Four addressable routes per entity: list, add, view, edit — the URL is the state
 - App-level routes: overview home, cross-entity `/search?q=`, `/settings`, and `/calendar` when the data carries dates
-- Shared UI patterns: tabs to cut a list or reach an entity's relations, server-side URL-driven sort and filter, bulk edit, consistent action placement
-- Top nav with search and a theme switcher; collapsible sidebar sections that also expose non-entity views
+- Shared UI patterns: tabs to cut a list or reach an entity's relations, server-side URL-driven sort and filter, consistent action placement
+- List shape follows the records — table, image cards, or a skeuomorphic object — with a table view always reachable, sortable/filterable, legended, and expandable per row
+- Bulk selection and edit, taking over the sidebar column past one selected row
+- Top nav with search and a theme switcher; named, collapsible sidebar sections that also expose non-entity views, each paired with an icon
 - Settings: named theme + light/dark, data file location, restore-from-backup, external API keys
 - Migrations at startup, scheduled and pre-migration DB snapshots, and empty states for a zero-row install
 - Packaging as a self-contained desktop binary (`deno compile` / `deno desktop`)
