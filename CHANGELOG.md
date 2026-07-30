@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **local-first-app** (4.1.0 → 4.2.0): four presentation rules the 4.1.0 UI-pattern list left to taste, all additive.
+  - **A list renders in the shape its records have** — table by default, cards when records carry images worth previewing, skeuomorphic when the entity is a real-world object. 4.1.0 had the skeuomorphic case as a standalone bullet with no default to deviate from; the shapes are now one rule, and a table view stays reachable whatever a list defaults to.
+  - **A `## Skeuomorphism` section**, promoted out of that bullet's parenthetical, mapping six entities to the object they render as — payment method to a credit card, contact to a business card, album to a disc, game to a cartridge, book to a spine, purchase to a receipt. Two rules bound it: the object is presentation only (the record stays sortable, filterable, and reachable as a table row), and a treatment that only works at detail size stays on the detail screen.
+  - **Tables sort, filter, and explain themselves** — a legend keying the status colors or icons the rows use, and expand-in-place rows for detail the columns can't hold.
+  - **Icons pair with text labels** on sidebar sections, entity types, and statuses, alongside the label rather than replacing it.
+  - **Where the bulk editor goes**: past one selected row it takes over the sidebar column until the selection clears. 4.1.0 said bulk edit existed but not where it lived.
+  - Sidebar sections are named for what they hold ("Library", not "Other"), and three ✅/❌ pairs cover list shape, the legend, and the icon.
+
 ### Changed
 
 - **README**: the `local-first-app` entry caught up to 4.1.0 — its "Covers" list was written against 4.0.0 and omitted the app-level routes, the shared UI patterns, scheduled snapshots, non-entity sidebar views, and API keys in Settings. Skill count (14) and the summary line are unchanged.
