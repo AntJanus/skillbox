@@ -347,6 +347,7 @@ A one-page description of what a single-purpose local app *has* — a game-backl
 - List shape follows the records — table, image cards, or a skeuomorphic object — with a table view always reachable, sortable/filterable, legended, and expandable per row
 - Bulk selection and edit, taking over the sidebar column past one selected row
 - Top nav with search and a theme switcher; named, collapsible sidebar sections that also expose non-entity views, each paired with an icon
+- Themes beyond light/dark — named palettes drawn from the app's own domain, each clearing the contrast floor
 - Settings: named theme + light/dark, data file location, restore-from-backup, external API keys
 - Migrations at startup, scheduled and pre-migration DB snapshots, and empty states for a zero-row install
 - Packaging as a self-contained desktop binary (`deno compile` / `deno desktop`)
