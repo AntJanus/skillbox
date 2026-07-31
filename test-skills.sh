@@ -114,7 +114,7 @@ if [ $ERRORS -eq 0 ]; then
   echo -e "${GREEN}✅ All tests passed! Ready to publish.${NC}"
   echo ""
   echo "Next steps:"
-  echo "  1. Review PUBLISHING.md for publishing process"
+  echo "  1. Review reference/VERSION-CONTROL.md for the release process"
   echo "  2. Ensure repository is pushed to GitHub"
   echo "  3. Test with: npx skills add antjanus/skillbox -l"
   echo "  4. Announce to community"
