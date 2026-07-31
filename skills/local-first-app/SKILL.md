@@ -4,7 +4,7 @@ description: Local-first single-user app — one SQLite file on disk, no account
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "4.3.0"
+  version: "4.4.0"
   tags: [nextjs, sqlite, local-first, desktop]
 ---
 
@@ -27,7 +27,9 @@ Everything else — UI library, forms, validation, charts, test runner — is yo
 ## Data
 
 - Entities have real relationships. One-to-many is a foreign key; many-to-many is a join table. Declare what a delete does to the other side.
+- **Deleting moves a record to trash rather than out of the file** — it stays restorable until it's purged, and every list, count, and search excludes it meanwhile. Whatever a delete cascades to goes to trash alongside the parent and comes back with it, so a restore never leaves orphans.
 - **Back up the database file automatically** — on a schedule and before every migration, keeping the last few snapshots. There's no server copy, so a bad migration or a corrupt write is unrecoverable user data.
+- The app exports its data to a file.
 - Migrations run at startup.
 - A fresh install has zero rows and no seed data, so every list screen needs a real empty state with a way to add the first record.
 
@@ -39,6 +41,7 @@ Every app has these, whatever it stores:
 | ------------ | -------------------------------------------- |
 | `/`          | overview home                                |
 | `/search?q=` | search spanning every entity type            |
+| `/trash`     | deleted records, restorable or purged        |
 | `/settings`  | settings                                     |
 | `/calendar`  | calendar, when the app has date-bearing data |
 
@@ -56,7 +59,7 @@ Every entity gets four addressable routes:
 - **The URL is the state** — every screen is deep-linkable, survives a refresh, and works with the back button. Prefer full screens over modals for data entry.
 - **Add and edit are the same form**, edit just arrives prefilled.
 - **Related records cross-link both directions**, and a parent's detail screen can create a child with the relationship prefilled.
-- **Delete confirms and says what else goes with it** ("also deletes 4 tasks").
+- **Delete confirms and says what else goes with it** ("also moves 4 tasks to trash"). Purging from `/trash` is the irreversible one, so it confirms in its own right.
 - **Keep add/save/delete/cancel in the same spot** on every screen.
 
 ## Common UI patterns
@@ -99,8 +102,10 @@ Where an entity is a physical object outside the app, render it as that object r
 - ✅ `game_tags(game_id, tag_id)` join table — ❌ a comma-separated `tags` column
 - ✅ `/games?sort=title&status=playing` sorted in SQL — ❌ fetch every row, sort in the client
 - ✅ `/search?q=zelda` spanning games and platforms — ❌ a `mod+K` palette with no URL behind it
-- ✅ "Delete Zelda? Also deletes 3 sessions." — ❌ a bare "Are you sure?"
+- ✅ "Delete Zelda? Also moves 3 sessions to trash." — ❌ a bare "Are you sure?"
+- ✅ `/trash` listing Zelda with a restore that brings its 3 sessions back — ❌ `DELETE FROM games` the moment the confirm is clicked
 - ✅ Restore a backup from Settings — ❌ a README telling the user to copy a file
+- ✅ An export writing the library out to a file — ❌ the data only reachable by opening the SQLite file yourself
 - ✅ `/games` as cover-art cards with a table view still reachable — ❌ a table whose only image column is a filename
 - ✅ `/books` as spines standing in a row — ❌ a title column with a thumbnail beside it
 - ✅ A legend reading "● playing ○ backlog ◐ dropped" above the table — ❌ colored status dots with no key
