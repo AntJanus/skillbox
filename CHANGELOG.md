@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [9.2.1] - 2026-07-31
+
+Documentation-consistency pass over the repo, prompted by an audit after v9.2.0. No skill content changed and no skill version moved — all 14 skills' frontmatter versions were already logged in this changelog, and every README trigger line already matched its SKILL.md description. What was wrong was repo-level: one reference doc nothing pointed at, and two docs describing a repo layout that no longer existed.
+
 ### Removed
 
 - **`reference/local-app-hub-contract.md`** (225 lines) — a cross-app HTTP contract for running a family of local-first apps behind an aggregating hub, added in `f94d9aa` and never linked from anywhere: not `local-first-app/SKILL.md`, not CLAUDE.md, not the README. The root `reference/` directory ships with the repo but not with any skill package, so an installed `local-first-app` could not have reached it in any case.
@@ -838,7 +842,8 @@ When creating a release:
 
 ---
 
-[Unreleased]: https://github.com/antjanus/skillbox/compare/v9.2.0...HEAD
+[Unreleased]: https://github.com/antjanus/skillbox/compare/v9.2.1...HEAD
+[9.2.1]: https://github.com/antjanus/skillbox/compare/v9.2.0...v9.2.1
 [9.2.0]: https://github.com/antjanus/skillbox/compare/v9.1.0...v9.2.0
 [9.1.0]: https://github.com/antjanus/skillbox/compare/v9.0.0...v9.1.0
 [9.0.0]: https://github.com/antjanus/skillbox/compare/v8.2.0...v9.0.0
