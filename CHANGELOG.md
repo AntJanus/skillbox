@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [9.2.0] - 2026-07-31
+
+Presentation-layer follow-up to v9.1.0, all in `local-first-app`. v9.1.0 specified what a local-first app *has*; this specifies what it *looks like* — the shape a list takes from the records in it, real-world entities rendered as the objects they stand in for, and themes drawn from the app's own domain rather than a bare light/dark pair. One skill touched, no breaking changes.
+
 ### Added
 
 - **local-first-app** (4.2.0 → 4.3.0): a **Themes** rule under `## Chrome`. A neutral light/dark pair is the floor, not the whole set — apps ship named themes drawn from the domain they cover (a console-era palette for a game tracker, a ledger palette for expenses), each clearing the same contrast floor. This is the app-wide counterpart to the per-entity skeuomorphism added in 4.2.0. `## Chrome` already owned theming (the top-nav switcher and the Settings selection line), so the rule lives beside them rather than in `## Integration`, which lists which skills to reach for and carries no app requirements. One ✅/❌ pair added.
@@ -20,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **README**: the `local-first-app` entry caught up to 4.1.0 — its "Covers" list was written against 4.0.0 and omitted the app-level routes, the shared UI patterns, scheduled snapshots, non-entity sidebar views, and API keys in Settings. Skill count (14) and the summary line are unchanged.
+- **README**: the `local-first-app` entry caught up to 4.3.0 — its "Covers" list was written against 4.0.0 and omitted the app-level routes, the shared UI patterns, scheduled snapshots, non-entity sidebar views, and API keys in Settings. Skill count (14) and the summary line are unchanged.
 
 ## [9.1.0] - 2026-07-29
 
@@ -825,7 +829,8 @@ When creating a release:
 
 ---
 
-[Unreleased]: https://github.com/antjanus/skillbox/compare/v9.1.0...HEAD
+[Unreleased]: https://github.com/antjanus/skillbox/compare/v9.2.0...HEAD
+[9.2.0]: https://github.com/antjanus/skillbox/compare/v9.1.0...v9.2.0
 [9.1.0]: https://github.com/antjanus/skillbox/compare/v9.0.0...v9.1.0
 [9.0.0]: https://github.com/antjanus/skillbox/compare/v8.2.0...v9.0.0
 [5.0.0]: https://github.com/antjanus/skillbox/compare/v4.10.0...v5.0.0
