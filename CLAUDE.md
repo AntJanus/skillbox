@@ -29,7 +29,10 @@ skillbox/
 ├── README.md              # User-facing documentation
 ├── CLAUDE.md             # This file - AI onboarding doc
 ├── CHANGELOG.md          # Version history and release notes
-├── reference/            # Extended documentation
+├── SESSION_PROGRESS.md   # Active/most-recent work session (cc-dash/session@1)
+├── SESSION_ARCHIVE_*.md  # Retired session files, kept for history
+├── test-skills.sh        # Structure + Vercel Skills CLI discovery check
+├── reference/            # Repo-level docs (not shipped with any skill)
 │   └── VERSION-CONTROL.md # Complete versioning workflow
 ├── skills/               # All skills live here
 │   ├── track-session/
