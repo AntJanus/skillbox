@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [9.3.0] - 2026-07-31
+
+Two data-lifecycle rules in `local-first-app`, both filling gaps the earlier versions left to taste. v9.1.0 and v9.2.0 specified what a local-first app has and what it looks like; this covers what happens to a record after the user is done with it. One skill touched, no breaking changes.
+
+### Added
+
+- **local-first-app** (4.3.0 → 4.4.0): soft delete and export. Deleting now moves a record to trash instead of out of the file, and cascaded children go to trash with the parent and restore with it — a restore that leaves orphans is the failure mode the rule exists to prevent. Recovery is surfaced as a `/trash` top-level route beside `/search` and `/settings` rather than a per-entity tab, so there is one place to look when you don't remember which entity a record came from. The delete confirm now names what goes to trash, and purging is called out as the irreversible action that needs its own confirm. Export is a one-line capability statement in `## Data` — the format and surface are the app's call. Two ✅/❌ pairs added, one reworded.
+
 ## [9.2.1] - 2026-07-31
 
 Documentation-consistency pass over the repo, prompted by an audit after v9.2.0. No skill content changed and no skill version moved — all 14 skills' frontmatter versions were already logged in this changelog, and every README trigger line already matched its SKILL.md description. What was wrong was repo-level: one reference doc nothing pointed at, and two docs describing a repo layout that no longer existed.
