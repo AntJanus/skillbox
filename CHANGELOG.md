@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- **`reference/local-app-hub-contract.md`** (225 lines) — a cross-app HTTP contract for running a family of local-first apps behind an aggregating hub, added in `f94d9aa` and never linked from anywhere: not `local-first-app/SKILL.md`, not CLAUDE.md, not the README. The root `reference/` directory ships with the repo but not with any skill package, so an installed `local-first-app` could not have reached it in any case.
+
+### Fixed
+
+- **CLAUDE.md**: the file-structure block listed `reference/` as holding only `VERSION-CONTROL.md` and omitted `SESSION_PROGRESS.md`, `SESSION_ARCHIVE_*.md`, and `test-skills.sh`. It now lists all four and states what `reference/` is for — repo-level docs, not skill content — which is the distinction the orphaned hub contract had blurred.
+- **`test-skills.sh`**: the post-run "next steps" pointed at `PUBLISHING.md`, which has never existed in this repo. Now points at `reference/VERSION-CONTROL.md`, the actual release process.
+
 ## [9.2.0] - 2026-07-31
 
 Presentation-layer follow-up to v9.1.0, all in `local-first-app`. v9.1.0 specified what a local-first app *has*; this specifies what it *looks like* — the shape a list takes from the records in it, real-world entities rendered as the objects they stand in for, and themes drawn from the app's own domain rather than a bare light/dark pair. One skill touched, no breaking changes.
