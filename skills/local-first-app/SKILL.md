@@ -4,7 +4,7 @@ description: Local-first single-user app — one SQLite file on disk, no account
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "4.2.0"
+  version: "4.3.0"
   tags: [nextjs, sqlite, local-first, desktop]
 ---
 
@@ -89,6 +89,7 @@ Where an entity is a physical object outside the app, render it as that object r
 ## Chrome
 
 - **Top nav** — a search box and a theme switcher.
+- **Themes** — a neutral light/dark pair is the floor, not the whole set. Ship named themes drawn from the domain the app covers: a console-era palette for a game tracker, a ledger palette for expenses. Every theme clears the same contrast floor.
 - **Sidebar** — collapsible sections grouping the entities and exposing non-entity views (an "insights" view, say) alongside settings. Each section is named for what it holds ("Library", not "Other"). The app name sits at the top.
 - **Settings** — theme selection (a named theme plus light/dark), the data file location, restore-from-backup, and any external API keys. Restore has to be reachable in the UI: someone running the packaged binary has no checkout and no terminal.
 
@@ -104,6 +105,7 @@ Where an entity is a physical object outside the app, render it as that object r
 - ✅ `/books` as spines standing in a row — ❌ a title column with a thumbnail beside it
 - ✅ A legend reading "● playing ○ backlog ◐ dropped" above the table — ❌ colored status dots with no key
 - ✅ A car icon beside the "Cars" sidebar section — ❌ a bare "Cars" text label
+- ✅ A "Cartridge" theme beside light/dark on a game tracker — ❌ light and dark as the only choices
 
 ## Packaging
 
