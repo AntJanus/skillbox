@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **local-first-app** (4.4.0 → 4.5.0): dynamic collections — named, saved filter sets over a single entity list, re-run against current data on every open rather than frozen as a list of IDs at save time. What gets stored is the query string (filters, sort, and render shape together), in the same form the entity list's own URL parameters already take, so saving a filtered list and building one from scratch converge on the same record. A collection is itself an entity: four entity routes, add and edit as one form, trash and restore like anything else. A filter referencing a field that no longer exists names the field on screen and returns nothing, because a silent zero-row result can't be told apart from a collection that legitimately matches nothing. Two ✅/❌ pairs added.
+
 ## [9.3.0] - 2026-07-31
 
 Two data-lifecycle rules in `local-first-app`, both filling gaps the earlier versions left to taste. v9.1.0 and v9.2.0 specified what a local-first app has and what it looks like; this covers what happens to a record after the user is done with it. One skill touched, no breaking changes.
