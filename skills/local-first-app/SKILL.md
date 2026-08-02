@@ -4,7 +4,7 @@ description: Local-first single-user app — one SQLite file on disk, no account
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "4.4.0"
+  version: "4.5.0"
   tags: [nextjs, sqlite, local-first, desktop]
 ---
 
@@ -37,13 +37,14 @@ Everything else — UI library, forms, validation, charts, test runner — is yo
 
 Every app has these, whatever it stores:
 
-| Route        | Purpose                                      |
-| ------------ | -------------------------------------------- |
-| `/`          | overview home                                |
-| `/search?q=` | search spanning every entity type            |
-| `/trash`     | deleted records, restorable or purged        |
-| `/settings`  | settings                                     |
-| `/calendar`  | calendar, when the app has date-bearing data |
+| Route                  | Purpose                                      |
+| ---------------------- | -------------------------------------------- |
+| `/`                    | overview home                                |
+| `/search?q=`           | search spanning every entity type            |
+| `/trash`               | deleted records, restorable or purged        |
+| `/settings`            | settings                                     |
+| `/calendar`            | calendar, when the app has date-bearing data |
+| `/dynamic-collections` | saved filters over a single entity list      |
 
 ## Entity routes
 
@@ -72,6 +73,15 @@ Every entity gets four addressable routes:
 - **Tables sort, filter, and explain themselves** — a legend keying whatever status colors or icons the rows use, and a row that expands in place when a record has more detail than the columns hold.
 - **Pair icons with text labels** — one per sidebar section, entity type, and status, so a screen is scannable without reading every word. The icon sits alongside the label rather than replacing it.
 - Bulk selection and bulk edit on the lists where editing one row at a time gets tedious. Past one selected row, the bulk editor takes over the sidebar column until the selection clears.
+
+## Dynamic collections
+
+A dynamic collection is a named, saved set of filters over one entity list — "watched, 5 stars" on movies. Opening it re-runs the filters against the data as it stands now, so what it holds changes as records do.
+
+- **The saved thing is a query string, not a result** — filters, sort, and render shape all live in that one string, in the same form the entity list's own URL parameters take. Saving a filtered list and building one at `/dynamic-collections/new` produce the same record.
+- **A collection is an entity**, so it gets the four entity routes, and editing its name and filters is the same form as creating it. Its view route renders the matching records rather than the collection's own fields.
+- **A filter that no longer resolves says so and returns nothing** — a renamed or dropped field is named on screen and the collection stays empty until the filter is fixed or removed, because a silent zero-row result is indistinguishable from a collection that legitimately matches nothing.
+- A collection is a record like any other — it goes to trash and restores from there.
 
 ## Skeuomorphism
 
@@ -111,6 +121,8 @@ Where an entity is a physical object outside the app, render it as that object r
 - ✅ A legend reading "● playing ○ backlog ◐ dropped" above the table — ❌ colored status dots with no key
 - ✅ A car icon beside the "Cars" sidebar section — ❌ a bare "Cars" text label
 - ✅ A "Cartridge" theme beside light/dark on a game tracker — ❌ light and dark as the only choices
+- ✅ `/dynamic-collections/12` re-running "watched, 5 stars" on every open — ❌ a stored list of movie IDs captured at save time
+- ✅ "Filter no longer valid: unknown field `rating`" above an empty list — ❌ an empty list where a renamed field used to match
 
 ## Packaging
 
