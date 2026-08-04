@@ -88,7 +88,7 @@ curl -o .claude/skills/track-session/SKILL.md \
 
 ## Available Skills
 
-14 skills. Click any name to jump to its use-cases and triggers; expand for details.
+15 skills. Click any name to jump to its use-cases and triggers; expand for details.
 
 | Skill | What it does |
 |-------|-------------|
@@ -106,6 +106,7 @@ curl -o .claude/skills/track-session/SKILL.md \
 | [🎨 color-system](#color-system) | Curated color palettes + WCAG/APCA contrast guidance |
 | [🔠 typography](#typography) | Type systems, scale, rhythm + a readability floor |
 | [🧱 local-first-app](#local-first-app) | Local-first single-user app — feature set, not a code spec |
+| [🖼️ ui-ux-design](#ui-ux-design) | Interaction states, IA, hierarchy, tokens + the UX process |
 
 ### track-session
 
@@ -359,6 +360,31 @@ A one-page description of what a single-purpose local app *has* — a game-backl
 Not for palette/contrast choices (see [color-system](#color-system)), font sizing (see [typography](#typography)), or pure visual layout (see frontend-design).
 
 [View Documentation](./skills/local-first-app/SKILL.md)
+</details>
+
+### ui-ux-design
+
+<details>
+<summary><b>Comprehensive UI/UX: the states every surface has to ship, interaction specs, information architecture, visual hierarchy, design tokens, and the research and validation process behind them. Built from a crawl of Figma's Design basics library.</b></summary>
+
+Covers designing and critiquing interfaces end to end. Two rules generate most of it: design the *states*, not the screen — whichever rendering goes unspecified gets invented at implementation time — and name things for their role, not their appearance.
+
+**Covers:**
+- The four states every surface ships (loading, empty, error, success), varied by permission and user type, then broken deliberately with real data — long labels, empty lists, failed images, translated strings
+- Nine interaction states with their CSS hooks and the behavioral rule each carries: loading disables, error returns to clickable, disabled explains itself
+- An accessibility floor that holds in *every* state — 4.5:1, 44×44px targets, `:focus-visible`, never color alone, native semantics before ARIA
+- Six hierarchy levers including time, and proximity used defensively to keep destructive controls out of misclick range
+- Information architecture — hierarchical, sequential, and matrix structures, with every route standing on its own because any page can be an entry point
+- Design tokens in three tiers, the no-alias-chaining rule, and themes as modes rather than duplicate sets
+- Process: choosing artifact fidelity by the question asked, usability testing versus UX validation, the Rule of Five, and a pre-launch checklist
+- Layout: base-unit grids, soft over hard, responsive behavior, and section recipes for landing, pricing, and portfolio pages
+- Type and color applied to a UI — 60-30-10 allocation, grayscale-first, cultural constraints on palette, and the brand style guide as a governed artifact
+
+**Triggers:** When asked "what states does this button need", "how should I structure the navigation", "design this screen", "set up design tokens", "review my UX" — or when the description is a symptom: a cluttered screen, a flow users abandon, a component that breaks on real data
+
+Depth on type scales lives in [typography](#typography) and on palettes in [color-system](#color-system). Not for chart design (see dataviz) or React file structure (see [ideal-react-component](#ideal-react-component)).
+
+[View Documentation](./skills/ui-ux-design/SKILL.md)
 </details>
 
 ## Usage
