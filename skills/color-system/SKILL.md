@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "[ui | marketing | dataviz | tui | contrast | palette-name]"
 metadata:
   author: Antonin Januska
-  version: "1.4.0"
+  version: "1.5.0"
   tags: [color, palette, design, accessibility, dark-mode, data-viz, theme]
 ---
 
@@ -23,7 +23,7 @@ The index and role contract below answer "which palette" on their own. Load one 
 
 | Load | When |
 |---|---|
-| [references/palettes.md](references/palettes.md) | You need actual hex values — any of the four domains, light + dark |
+| [references/palettes.md](references/palettes.md) | You need actual hex values — any of the four domains, light + dark; the fill/subtle/emphasis triads; the 12-step scales behind Dusk, Driftwood and Meadow |
 | [references/contrast.md](references/contrast.md) | Verifying WCAG/APCA thresholds, colorblind safety, or debugging a pair that fails |
 | [references/build-your-own.md](references/build-your-own.md) | No library palette fits and you're generating a new scale (the OKLCH recipe) |
 | [references/theory.md](references/theory.md) | Choosing a harmony scheme, or justifying a color-space / scale decision |
@@ -32,13 +32,18 @@ The index and role contract below answer "which palette" on their own. Load one 
 
 Where one palette is the right first reach it is marked ⭐; marketing and TUI have no default because the choice follows the brand or the user's own terminal theme.
 
-### Web App UI — light + dark, 13 semantic roles each
+### Web App UI — light + dark, 13 semantic roles + a triad per color
 - **Carbon** ⭐ *(default)* — deep slate-blue, dark-first. Analytics dashboards, perf reports & dev tooling. Ships a full dashboard kit (A–F grade pills, ordered stage sequence, inline-code tone, success highlight). Reach for **Graphite** instead when light mode must be hand-tuned-equal.
 - **Graphite** — cool slate + blue. Dense B2B dashboards, dev tools; the light+dark parity default.
 - **Evergreen** — emerald brand on true-neutral zinc. Fresh, confident, non-blue identity.
 - **Terracotta** — warm clay/espresso neutrals + rust. Editorial, content platforms, writing tools.
 - **Bloom** — pastel periwinkle/violet, deep dark mode. Friendly dev tools, playful-but-clean apps.
 - **Teal Slate** — deep teal on cool slate, single warm accent. Technical reports, SRE / rate-limit dashboards; pairs with a mono face for figures.
+
+Generated from 12-step OKLCH scales, which ship alongside their roles so they can be extended or re-derived:
+- **Dusk** — indigo primary, turquoise accent, near-neutral cool greys. Focus tools, editors, long-session apps.
+- **Driftwood** — deep marine primary on warm sand neutrals, clay accent. The one that swings its neutrals cool in dark mode.
+- **Meadow** — muted sage primary, old-gold accent, warm bone neutrals. The softest of the set; restful rather than confident.
 
 ### Marketing / Landing — light + dark, hero gradients
 - **Sunbloom** — refined coral/amber warmth. Approachable consumer/creator brands.
@@ -71,6 +76,17 @@ UI palettes fill these roles. Map intent to a role, then the role to a hex.
 | `primary` / `primary-hover` | Brand action color + its hover state |
 | `accent` | Secondary emphasis, distinct from primary |
 | `success` / `warning` / `error` / `info` | Semantic states (green / amber / red / blue by Western convention) |
+
+**Each colored role then needs a triad, because one hex cannot do three jobs.** A value authored to be *sat on* is not automatically legible *as text*, and a solid fill is far too loud as a badge background at table density.
+
+| Token | Job | Bootstrap 5.3 calls it | Material 3 calls it |
+|---|---|---|---|
+| `{c}-fill` + `{c}-on-fill` | Buttons, active chips | `--bs-{c}` + `color-contrast()` | `primary` + `on-primary` |
+| `{c}-subtle` + `{c}-emphasis` | Badge / callout background + its label | `--bs-{c}-bg-subtle` + `-text-emphasis` | `primary-container` + `on-primary-container` |
+| `{c}-subtle-border` | Border around that background | `--bs-{c}-border-subtle` | — |
+| `link` | The brand hue as text on `surface` | (split in v6) | — |
+
+Ready-made triads for all nine UI palettes are in palettes.md. Dark-mode fills are light hues, so their labels are the palette's *darkest* neutral, not white.
 
 Data-viz palettes instead provide ordered color **lists** (categorical = distinct series; sequential = low→high ramp; diverging = warm↔cool with a neutral midpoint). TUI schemes provide the 16 ANSI slots plus 4 special roles.
 
@@ -132,7 +148,11 @@ Why it works: matches the data's structure to the right palette family and respe
 
 ## Gotchas
 
-- **Symptom:** Brand color is unreadable as body text. **Cause:** Saturated mid-tones (amber, coral, teal) often fail 4.5:1 on their own background. **Fix:** use the brand color as a *fill* (white/dark text on top) or step to a darker shade for text; verify in contrast.md.
+- **Symptom:** Brand color is unreadable as body text. **Cause:** Saturated mid-tones (amber, coral, teal) often fail 4.5:1 on their own background — a fill color and a text color are different steps of the same ramp. **Fix:** keep `fill` and `link` as separate values; step the text one darker until it clears. In this library only Evergreen light diverges (`#059669` carries a button label at 4.70:1 but reaches 3.77:1 as a link on white, so its `link` is `#00875b`), which is exactly why the split gets missed.
+- **Symptom:** Status badges look correct but shout at table density. **Cause:** a solid `--error` fill behind white text is right for a button and far too loud for a row-level badge. **Fix:** use the `{c}-subtle` background with its paired `{c}-emphasis` label. Reusing the status hue as its own label on that tint misses 4.5:1 more often than not — take the paired value from palettes.md rather than assuming.
+- **Symptom:** A palette generated from a 12-step scale still fails contrast. **Cause:** the step map is not a contrast guarantee. Radix guarantees steps 11 and 12 against step 2 and nothing else; step 9 rarely carries a 4.5:1 button label, and step 8 rarely reaches 3:1 as a control edge. **Fix:** solve those two against their actual ground. In light mode commit to a white label and step the fill *darker* — solving toward whichever label already scores higher produces a pale wash that passes and looks weak.
+- **Symptom:** A palette that looks right in light mode feels muddy in dark. **Cause:** the neutral tint was chosen once and inherited. A warm hue that reads as paper at high lightness reads as brown at low lightness. **Fix:** re-decide neutral hue and chroma per mode; swinging cool at very low chroma is the usual answer. Driftwood in palettes.md does this (hue 64 light, 224 dark); Meadow's sage did not need it.
+- **Symptom:** A palette copied from Color Hunt, Coolors or a trend article cannot build an interface. **Cause:** gallery palettes are four decorative hues with no neutral ramp, no dark ink and no states — 16 of the 30 most-liked Color Hunt palettes cannot carry 4.5:1 body text with *any* pair of their colors. **Fix:** take the hues as seed material and build scales from them (build-your-own.md); Dusk, Driftwood and Meadow were made this way.
 - **Symptom:** Secondary/muted text ("dimmed", `text-secondary`) looks fine in the design tool but fails contrast in the app. **Cause:** component libraries ship a default muted-text color (e.g. Mantine's `dimmed`) tuned for visual hierarchy, not contrast — commonly landing around ~3.4:1, well under the 4.5:1 AA floor. **Fix:** pick and verify your own `text-secondary` hex against contrast.md instead of inheriting the library default, and re-check per theme — the same override can pass in one theme and fail in another. Re-verify on **tinted/elevated surfaces** (cards, striped rows) too, not just the flat canvas.
 - **Symptom:** Dark mode "passes WCAG" but is hard to read. **Cause:** WCAG 2 math overstates contrast near black. **Fix:** re-check dark pairs with APCA (Lc), not the 4.5:1 ratio alone.
 - **Symptom:** Dark theme looks flat, elevation unreadable. **Cause:** pure `#000` background + same-lightness surfaces. **Fix:** raise the base to ~`#0d1117`–`#1e1e2e` and make each elevation tier *lighter*.
