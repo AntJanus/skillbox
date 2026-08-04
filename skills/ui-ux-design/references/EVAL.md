@@ -39,6 +39,7 @@ Official-loop format (agentskills.io optimizing-descriptions): 20 queries, 10 sh
 | Variant | Date | Train pass | Validation pass | Selected |
 |---|---|---|---|---|
 | 1.0.0 (initial) | 2026-08-04 | not yet run | not yet run | — |
+| 1.0.1 (routing clause names the query shape — "only about a type scale, a line-height, or a palette") | 2026-08-04 | not yet run | not yet run | — |
 
 ## Notes
 
