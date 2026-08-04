@@ -24,23 +24,22 @@ A reference implementation. The selectors matter more than the values — swap t
 .btn[aria-pressed="true"] { background: var(--color-action-selected); }
 ```
 
-| State | Rule that isn't visual |
-|---|---|
-| Default | Readable as a control with no interaction. A "mystery meat" button that only reveals itself on hover fails here. |
-| Hover | Desktop only. Never the sole carrier of an affordance or a piece of information. |
-| Pressed | The briefest state — it lasts exactly as long as the click. `scale(0.98)` or an inset shadow. |
-| Focus | 3px outline, 3px offset. `:focus-visible` so it doesn't fire on mouse clicks. WCAG 2.2 sets minimum size *and* contrast for the indicator. |
-| Disabled | Requires an adjacent explanation of what's blocking. Prefer inline validation over a mute button with no story. |
-| Loading | Disable the control. Spinner when duration is unknown, progress bar when it's measurable. |
-| Success | Immediate and unambiguous. A checkmark plus a fill change, not a fill change alone. |
-| Error | Returns to clickable. Inline message names what went wrong. |
-| Selected | Persists until deselected. `aria-pressed` for toggles; use it for filters and segmented controls too. |
+The nine states and their CSS hooks are in SKILL.md. This table carries only what that summary leaves out.
 
-**Contrast holds in all nine.** The disabled and hover variants are where 4.5:1 quietly fails.
+| State | Adds |
+|---|---|
+| Default | A "mystery meat" control that only reveals itself on hover fails the recognizable-at-rest test. |
+| Hover | Never the sole carrier of an affordance *or* of information. |
+| Pressed | `scale(0.98)` or an inset shadow — the briefest state there is. |
+| Focus | WCAG 2.2 sets a minimum size *and* contrast for the indicator, not just its presence. |
+| Disabled | Prefer inline validation naming what unlocks it over a mute control with no story. |
+| Loading | Spinner when the duration is unknown, progress bar when it's measurable. |
+| Success | A checkmark plus a fill change, not a fill change alone. |
+| Error | The inline message names what went wrong, not that something did. |
+| Selected | `aria-pressed` for toggles — and use it for filters and segmented controls too. |
 
 ## Motion
 
-- **100–200ms** for state transitions, **150ms** as the default. Slower feels sluggish; faster is missed.
 - Motion is a hierarchy channel, not decoration — a transition orders attention the same way size does.
 - Animation has a load cost. Scroll-driven animation and view transitions have native APIs now; prefer them over scripted equivalents, which also gets you the accessibility behavior for free.
 - Respect `prefers-reduced-motion`.
