@@ -49,11 +49,29 @@ Radix 12-step role map (a proven reference):
 | 5 | Active / selected | 11 | Low-contrast text |
 | 6 | Subtle border | 12 | High-contrast text |
 
-## Semantic roles & "on-" pairing
+**Know what the step map does and does not guarantee.** Radix guarantees steps 11 and 12 to Lc 60 and Lc 90 APCA *against step 2 of the same scale* — and nothing else. It does not claim step 9 carries 4.5:1 body text, and in practice it usually does not: across the three generated palettes here, raw step 9 reached only 2.9–3.7:1 against white. Tailwind makes no contrast claim about its `50`–`950` ramps at all. So the scale gives you a coherent, evenly-stepped set of values; **the contrast targets still have to be solved against the specific ground.** Expect to darken the fill for a light-mode button and to step the "hovered border" (8) further before it works as a 3:1 control edge.
 
-Every prominent color needs a guaranteed-accessible foreground. Material 3 ships colors as quads — `primary / on-primary / primary-container / on-primary-container`. Practically: each `success/warning/error/info` wants a low-saturation **container** (background tint) and a high-contrast **on-** foreground.
+## Semantic roles: the unit is a triad, not a color
+
+Every prominent color does at least three different jobs, and one hex cannot do them all. Bootstrap, Material 3 and Radix arrived at the same structure independently:
+
+| Job | Bootstrap 5.3 | Material 3 | Radix |
+|---|---|---|---|
+| Solid fill + its label | `--bs-{c}` + `color-contrast()` | `primary` + `on-primary` | step 9 + white/step 12 |
+| Subtle background + its label | `--bs-{c}-bg-subtle` + `-text-emphasis` | `primary-container` + `on-primary-container` | step 3 + step 11 |
+| Border on the subtle background | `--bs-{c}-border-subtle` | — | step 6 |
+
+Ready-made triads for every UI palette: **palettes.md → Triads**.
+
+**A fill color and a text color are different steps of the same ramp.** A hue authored to be sat on is not automatically readable as text on the same surface. Most palettes pass both and hide the distinction — in this library only Evergreen light diverges — but the roles are genuinely separate, and Bootstrap is splitting them in v6 for the same reason ([twbs #37937](https://github.com/orgs/twbs/discussions/37937)).
 
 Conventional state hues (Western, document as starting points, not universal): success = green, warning = amber, error = red, info = blue.
+
+## Choosing the neutral: follow the accent
+
+Radix's composition rule is to pair the accent scale with either a pure gray "for neutral vibes" or a gray tinted toward the accent's hue for "a more colorful and harmonious vibe." Treat neutral temperature as a **function of the accent**, not a free choice made up front.
+
+**And it is a per-mode decision.** A warm tint that reads as paper at high lightness reads as mud at low lightness. Driftwood in palettes.md keeps sand neutrals (hue 64) in light mode and swings to hue 224 in dark, tinting toward its own marine primary instead. Meadow's sage survives the trip down and holds one hue for both. Check the dark ramp before committing to a warm neutral.
 
 ## Warm vs cool & saturation (use as weak heuristics)
 
