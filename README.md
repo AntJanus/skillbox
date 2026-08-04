@@ -302,12 +302,13 @@ Runs 5+ searches across five angles (at least 3 per run), WebFetches every sourc
 <details>
 <summary><b>A curated library of ready-to-use color palettes (light + dark) across four domains, plus the methodology to build new palettes and verify accessibility.</b></summary>
 
-Domains: web-app UI, marketing/landing, data visualization, and terminal/TUI. Every palette maps hexes to **semantic roles** so themes stay swappable and accessible by construction.
+Domains: web-app UI, marketing/landing, data visualization, and terminal/TUI. Every palette maps hexes to **semantic roles** so themes stay swappable and accessible by construction, and every colored role carries a **fill / subtle / emphasis triad** — the structure Bootstrap, Material 3 and Radix each arrived at independently.
 
 **Use when:**
 - Picking a ready-made palette for an app, brand, chart, or terminal
 - Building a new palette from scratch (OKLCH scales, harmony schemes)
-- Setting up light & dark mode (dark mode ≠ inversion; elevation = lighter)
+- Applying a palette to real components — buttons, badges, callouts, links, validation states
+- Setting up light & dark mode (dark mode ≠ inversion; elevation = lighter; neutral hue is a per-mode decision)
 - Checking WCAG/APCA contrast or colorblind-safety
 
 **Triggers:** When asked "what colors should I use", "pick a palette for my dashboard", "set up dark mode", "does this pass WCAG contrast", "colorblind-safe chart colors", or "give me a terminal theme" — and it applies even when the user never says "color", as in "theme this app" or "this text is hard to read on the background"
