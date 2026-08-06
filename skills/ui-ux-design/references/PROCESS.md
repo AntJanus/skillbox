@@ -39,6 +39,7 @@ They fail differently and are not substitutes.
 **UX validation** asks *does this hold up under real data, real states, and real engineering constraints?* It needs **zero users**, which makes it the cheap one an agent can actually run:
 
 - **Heuristic evaluation** — audit against established usability heuristics.
+- **Accessibility personas, asked during the work** — not a WCAG checklist run at the end. Name specific people with specific constraints (someone autistic who needs navigation to stay put; someone with fatigue and pain who can't fight a nested dropdown), and give one person a standing *designated dissenter* role who asks "does this work for them?" while decisions are still cheap. Compliance-gating at the end is how accessibility becomes rework.
 - **Prototype stress-testing** — walk the flow hunting for where logic breaks: error states, edge cases, unexpected input, everything past the happy path.
 - **Accessibility audit** — screen reader, keyboard-only, zoom to 200%.
 - **Technical review** — walk it with engineers to catch infeasible or expensive assumptions early.

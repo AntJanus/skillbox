@@ -53,6 +53,17 @@ The single highest-value habit in this file. For each screen, list, and control,
 | **Error** | Say what failed and what to do about it, inline. The control **returns to clickable** so the user can retry — never lock it in the error state. |
 | **Success** | Confirm immediately and unambiguously, then get out of the way. |
 
+**Latency decides whether a loading state is needed at all.** Four thresholds, and they don't conflict — each measures something different:
+
+| Budget | Governs | What the UI owes |
+|---|---|---|
+| **100ms** | Perceived instantaneity | Nothing. Render the result |
+| **400ms** | Sustained productivity on a repeated action (Doherty, IBM 1982) | Stay under it for anything in an inner loop |
+| **1s** | Thought flow | Optional subtle feedback — the delay registers without breaking concentration |
+| **10s** | Attention | Progress indicator *and* a cancel affordance; assume the user leaves and returns |
+
+Nielsen's 0.1/1/10 figures predate mobile networks and have no constrained-connection variant. Treat them as floors, not as targets measured on a phone over cellular.
+
 Then vary those by **permission and user type** — an admin, a read-only viewer, and a signed-out visitor see three different renderings of the same route.
 
 **Then break it with real data**, because placeholder content hides the failures: a label three times longer than the mock, a list with 10,000 rows, a list with one row, an image that 404s, a name with diacritics, a translated string that runs 40% longer than the English. If a component collapses when the list is empty or overflows when the label runs long, that is worth knowing before it ships.
