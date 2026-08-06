@@ -26,6 +26,7 @@ Two rules generate most of what follows. **Design the states, not the screen** â
 | **[references/LAYOUT.md](references/LAYOUT.md)** | Grids, responsive behavior, and the section recipes for landing, pricing, and portfolio pages |
 | **[references/SYSTEMS.md](references/SYSTEMS.md)** | Design tokens, design systems, and design-to-code handoff |
 | **[references/VISUAL.md](references/VISUAL.md)** | Applying type and color to a UI, plus the brand style guide as a governed artifact |
+| **[references/ETHICS.md](references/ETHICS.md)** | Anything about conversion, signups, retention, or pricing presentation â€” the deceptive-pattern catalogue and where the persuasion line sits |
 | **[references/SOURCES.md](references/SOURCES.md)** | Citing a rule, or checking which claims were corrected against their source |
 
 ## The floor
