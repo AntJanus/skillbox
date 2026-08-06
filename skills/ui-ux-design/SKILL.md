@@ -22,6 +22,7 @@ Two rules generate most of what follows. **Design the states, not the screen** �
 | Load | When |
 |---|---|
 | **[references/INTERACTION.md](references/INTERACTION.md)** | Building or reviewing a control — full state specs, CSS, UX laws, motion, forms |
+| **[references/COMPONENTS.md](references/COMPONENTS.md)** | Building a named component — the ARIA, keyboard, and focus contract for tabs, menus, tables, tooltips, cards, and five more |
 | **[references/PROCESS.md](references/PROCESS.md)** | Planning research, wireframes, prototypes, usability tests, or a launch checklist |
 | **[references/LAYOUT.md](references/LAYOUT.md)** | Grids, responsive behavior, and the section recipes for landing, pricing, and portfolio pages |
 | **[references/SYSTEMS.md](references/SYSTEMS.md)** | Design tokens, design systems, and design-to-code handoff |
