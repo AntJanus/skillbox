@@ -1,12 +1,12 @@
 ---
 name: ui-ux-design
-description: UI/UX design — interaction states, information architecture, visual hierarchy, design tokens, and the research and validation process behind them. Use this skill whenever the user wants to design or critique an interface, asks to "design this screen", "what states does this button need", "how should I structure the navigation", "is this UI any good", "set up design tokens", "wireframe this flow", or "review my UX" — even if they never say design and only describe a screen that feels cluttered, a flow users abandon, or a component that breaks on real data. Covers typography and color as they apply to a UI; send a question that is only about a type scale, a line-height, or a palette and its contrast to the typography and color-system skills instead. Do NOT use this skill for chart, axis, and encoding design (see dataviz) or React file structure and hooks (see ideal-react-component).
+description: UI/UX design — interaction states, accessibility contracts, information architecture, visual hierarchy, and design tokens. Use this skill whenever the user wants to design or critique an interface, asks to "design this screen", "what states does this button need", "what ARIA does this menu need", "make this accessible", "how should I structure the navigation", "is this UI any good", "set up design tokens", "review my UX", or "make this convert better" — even if they never say design and only describe a cluttered screen, a flow users abandon, or a component that breaks on real data. Covers type and color as applied to a UI; send pure type-scale, line-height, or palette-contrast questions to typography and color-system. Deceptive patterns too — route signups, conversion, retention, and pricing-presentation asks here. Do NOT use for chart and encoding design (see dataviz), React file structure and hooks (see ideal-react-component), or copywriting and A/B testing.
 license: MIT
-argument-hint: "[screen | flow | states | tokens | audit]"
+argument-hint: "[screen | flow | states | components | tokens | ethics | audit]"
 metadata:
   author: Antonin Januska
-  version: "1.0.1"
-  tags: [ux, ui, interaction-design, information-architecture, design-tokens, accessibility, usability]
+  version: "2.0.0"
+  tags: [ux, ui, interaction-design, information-architecture, design-tokens, accessibility, usability, deceptive-patterns, aria]
 ---
 
 # UI/UX Design
@@ -22,10 +22,12 @@ Two rules generate most of what follows. **Design the states, not the screen** �
 | Load | When |
 |---|---|
 | **[references/INTERACTION.md](references/INTERACTION.md)** | Building or reviewing a control — full state specs, CSS, UX laws, motion, forms |
+| **[references/COMPONENTS.md](references/COMPONENTS.md)** | Building a named component — the ARIA, keyboard, and focus contract for tabs, menus, tables, tooltips, cards, and five more |
 | **[references/PROCESS.md](references/PROCESS.md)** | Planning research, wireframes, prototypes, usability tests, or a launch checklist |
 | **[references/LAYOUT.md](references/LAYOUT.md)** | Grids, responsive behavior, and the section recipes for landing, pricing, and portfolio pages |
 | **[references/SYSTEMS.md](references/SYSTEMS.md)** | Design tokens, design systems, and design-to-code handoff |
 | **[references/VISUAL.md](references/VISUAL.md)** | Applying type and color to a UI, plus the brand style guide as a governed artifact |
+| **[references/ETHICS.md](references/ETHICS.md)** | Anything about conversion, signups, retention, or pricing presentation — the deceptive-pattern catalogue and where the persuasion line sits |
 | **[references/SOURCES.md](references/SOURCES.md)** | Citing a rule, or checking which claims were corrected against their source |
 
 ## The floor
@@ -37,6 +39,7 @@ Non-negotiable, and cheap to get right at build time rather than in an audit lat
 - **Never let color alone carry meaning.** Pair every color shift with an icon, a border-weight change, or an underline, or the state is invisible to the 1-in-12 men with a color vision deficiency.
 - **Visible focus, via `:focus-visible`.** Never `outline: none` without a replacement ring — that cuts off keyboard and assistive-tech users entirely.
 - **Native semantic HTML before ARIA.** Pages using ARIA average *twice* as many accessibility errors as pages without it. `<header>`, `<nav>`, `<main>`, `<footer>`, and native `dialog`/`popover` carry accessibility for free.
+- **`aria-disabled` rather than the `disabled` attribute.** A natively disabled control leaves the tab order and is exempt from contrast requirements — so the control *and* any explanation next to it become unreachable for exactly the people who needed the explanation. Set `aria-disabled="true"`, block the action in the handler, and keep the text contrast-passing.
 - **Every interactive element is reachable and operable without a mouse**, in a tab order that matches reading order.
 
 ## Every surface ships four states
@@ -49,6 +52,17 @@ The single highest-value habit in this file. For each screen, list, and control,
 | **Empty** | Explain why it's empty and offer the action that fills it. A first-run empty list and a filtered-to-zero list are different screens with different copy. |
 | **Error** | Say what failed and what to do about it, inline. The control **returns to clickable** so the user can retry — never lock it in the error state. |
 | **Success** | Confirm immediately and unambiguously, then get out of the way. |
+
+**Latency decides whether a loading state is needed at all.** Four thresholds, and they don't conflict — each measures something different:
+
+| Budget | Governs | What the UI owes |
+|---|---|---|
+| **100ms** | Perceived instantaneity | Nothing. Render the result |
+| **400ms** | Sustained productivity on a repeated action (Doherty, IBM 1982) | Stay under it for anything in an inner loop |
+| **1s** | Thought flow | Optional subtle feedback — the delay registers without breaking concentration |
+| **10s** | Attention | Progress indicator *and* a cancel affordance; assume the user leaves and returns |
+
+Nielsen's 0.1/1/10 figures predate mobile networks and have no constrained-connection variant. Treat them as floors, not as targets measured on a phone over cellular.
 
 Then vary those by **permission and user type** — an admin, a read-only viewer, and a signed-out visitor see three different renderings of the same route.
 
@@ -66,8 +80,8 @@ Nine, not five. The last four are the ones that get skipped, and each carries a 
 | Hover | Interactivity, before commitment. **Does not exist on touch** | `:hover` |
 | Pressed | Input registered. Lasts only as long as the click | `:active` |
 | Focus | Keyboard position. 3px ring plus 3px offset | `:focus-visible` |
-| Disabled | Unavailable — and paired with a message saying *why* | `:disabled`, `[aria-disabled]` |
-| Loading | Working. Control disabled to block duplicate submits | `.is-loading` |
+| Disabled | Unavailable, paired with a message saying *why* — and still focusable, so that message can be reached | `[aria-disabled="true"]` |
+| Loading | Working. Control blocked to stop duplicate submits | `[aria-busy="true"]` |
 | Success | Done | `.is-success` |
 | Error | Failed, with an inline reason, and clickable again | `.is-error` |
 | Selected | Toggled on, persisting until turned off | `[aria-pressed]` |
@@ -130,6 +144,7 @@ Three tiers, in this order:
 - **Symptom:** Feature works for the author, unusable on a phone. **Cause:** The affordance lives in a hover state. **Fix:** Move it into the default state; hover never fires on touch.
 - **Symptom:** Accessibility audit fails after adding ARIA. **Cause:** ARIA layered onto non-semantic markup. **Fix:** Use the native element first — ARIA usage correlates with *more* errors, not fewer.
 - **Symptom:** Contrast passes but the UI is still unreadable in one state. **Cause:** Only the default state was checked. **Fix:** Measure hover, pressed, and disabled fills too.
+- **Symptom:** A control explains why it's unavailable, and users still ask why it's unavailable. **Cause:** The native `disabled` attribute took it out of the tab order, so keyboard and screen-reader users never reach the control or the explanation. **Fix:** `aria-disabled="true"` with a guarded handler.
 - **Symptom:** A rebrand or theme change turns into a multi-day sweep. **Cause:** Components reference primitives directly, or semantic tokens chain. **Fix:** Insert the semantic tier; point every semantic token straight at a primitive.
 - **Symptom:** Users abandon a multi-step form midway. **Cause:** Progressive disclosure without orientation. **Fix:** Show current position and steps remaining on every step.
 - **Symptom:** Stakeholder feedback is all about colors and copy when you needed structural input. **Cause:** The artifact was too polished for the question. **Fix:** Show it in grayscale with unstyled elements; visual polish hijacks the conversation.
