@@ -45,6 +45,39 @@ The nine states and their CSS hooks are in SKILL.md. This table carries only wha
 | Error | The inline message names what went wrong, not that something did. |
 | Selected | `aria-pressed` for toggles — and use it for filters and segmented controls too. |
 
+## Error messages
+
+Six checks, condensed from Nielsen Norman Group's 2023 twelve-item rubric. The first and the fourth are the ones that get skipped.
+
+1. **Name the exact problem.** "An error occurred" and "Invalid input" fail this. The message says which value, and what about it.
+2. **Put it next to its cause**, not in a summary at the top.
+3. **Plain language.** No codes, no jargon, no internal identifiers.
+4. **Preserve what the user typed.** Resetting a form on a failed submit is the most costly form defect there is, and the most common.
+5. **Drop blame words.** "Illegal", "invalid", "you failed to" — frame it as the system not accepting something, and say what it will accept.
+6. **Offer the fix, not only the diagnosis.** Where the mistake is predictable, suggest the corrected value rather than asking for re-entry.
+
+**Severity scales the container**, and current practice tends to invert it: field-level problems go inline, minor issues go to a toast, and a modal is reserved for something genuinely blocking. A verbose toast for a typo and a terse line for a failed payment is the wrong way round.
+
+Don't validate prematurely — real-time feedback earns its place on error-prone fields, not on every keystroke of every input.
+
+## Where controls go
+
+**The three laws of locality** (Kennedy). Users expect a control where its effect happens, so placement is a signal, not a layout preference:
+
+- Put a control **where it takes effect**.
+- A control governing a **larger region sits above that region** — recursive from app-level, to page-level, to section-level.
+- A control placed **far from its effect must compensate with visual prominence**, because nothing else tells the user what it acts on.
+
+## Depth and shadow
+
+Hobday's geometry, which is checkable rather than a matter of taste:
+
+- **Blur = 2× the distance value.** A 4px offset takes an 8px blur.
+- **Reduce opacity as the shadow approaches the light source.**
+- **Don't mix depth techniques** in one interface — soft shadows, hard shadows, or none, and pick one.
+- **No shadows on dark grounds** unless the background is light enough to actually render them; on a near-black surface, use a lighter fill to signal elevation instead.
+- **Lightness increases as an element comes toward the viewer**, in both light and dark modes.
+
 ## Motion
 
 - Motion is a hierarchy channel, not decoration — a transition orders attention the same way size does.
@@ -62,7 +95,9 @@ The nine states and their CSS hooks are in SKILL.md. This table carries only wha
 - On phones, keep primary actions in the **thumb zone** — toward the center and bottom, not the top corners. Moving search and menu bars to the bottom of the screen is a real one-handed-reach fix.
 - On **corners**: Figma's "magic pixel" framing treats the four corners as the hardest targets, since they're furthest from the prime pixel. The older Tognazzini reading treats a screen edge as an effectively infinite target and therefore the easiest. Both are right in their context — the edge is infinite only when the window is fullscreen and the OS pins the control to it. In a browser page, treat corners as expensive.
 
-**Hick's law** — decision time rises with the number and complexity of choices. Cut options, or group them so the first decision is between few things.
+**Hick's law** — decision time rises with the number and complexity of choices. Cut options, or group them so the first decision is between few things. Don't simplify to the point of abstraction: a user who came specifically for a long ingredient list is not helped by a short one.
+
+**Hick's law and choice overload are different phenomena.** Hick's measures decision *speed*; choice overload measures decision *quality* and the emotional paralysis of too many options. A fast decision the user regrets is a choice-overload failure that Hick's law scores as a success.
 
 **Gestalt grouping** — the perceptual rules the whole hierarchy toolkit rests on. The ones that earn their place in an interface:
 

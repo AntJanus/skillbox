@@ -5,10 +5,31 @@ Load when setting up a grid, deciding responsive behavior, or building a page wh
 ## Grid
 
 - **Pick a base unit of 8px and express it in rem** (`0.5rem`), with 4px available for fine adjustment. Every size, gap, and padding is a multiple. Pixel-locked spacing breaks when a user zooms.
-- **Soft grids over hard grids.** A hard grid snaps everything to baseline rows and columns; it's expensive to hold across device sizes and largely obsolete for screens. A consistent base unit, loosely held, is the digital default. Pixel perfection is not the goal.
+- **Baseline *alignment* is not achievable on the web; baseline *multiples* are still mandatory.** Sub-pixel rendering, webfont loading shifts, and variable content heights defeat pixel-perfect snapping — Rutter calls it not worth the cost. What survives from print is the arithmetic: every vertical measurement is a multiple of the base leading unit. Body at 16px with `line-height: 1.5` sets a 24px unit — so paragraph margins are `1.5em`, and a 20px heading takes `line-height: 1.2` to land back on 24px. Choosing the leading is judgment; everything downstream of it is mechanical.
+- **Soft grids over hard grids** for columns. A consistent base unit, loosely held, is the digital default. Pixel perfection is not the goal — vertical rhythm is the exception, per the rule above.
 - **Columns: 2–12, and three is the sweet spot** for content laid side by side. The 12-column reflex is a container for column *spans*, not a mandate to use twelve visible tracks.
 - **Gutter width is a grouping signal.** Two cards a half-gutter apart read as one unit; that's Gestalt proximity doing the work, so set gutters deliberately.
 - **Margins: small and fixed on mobile** so content never touches the edge; **liquid on desktop** so text doesn't stretch across an ultrawide display. This is the actual reason behind `max-width` on a prose container — measure, not aesthetics.
+
+## Measurable geometry
+
+Numbers rather than judgment, so they can be checked against a built screen:
+
+- **Button padding: horizontal = 2× vertical.** 12px vertical takes 24px horizontal.
+- **Nested corner radius: inner = outer − gap.** A 16px outer radius with an 8px gap gives 8px inside.
+- **Outer padding ≥ inner padding**, so containment reads as hierarchy rather than as a coincidence.
+- **Stacked-surface brightness ceiling: within 12% HSB brightness on dark interfaces, 7% on light.** Light interfaces need the *tighter* control, which is the opposite of the usual assumption.
+- **Never place two hard divides adjacent** — a background transition immediately beside a container edge or a rule reads as a rendering bug.
+- **Reduce icon contrast when an icon sits beside text**, via opacity or color, or the icon out-shouts the label it's supporting.
+- **Even pixel values only.** Odd values invite sub-pixel rendering.
+
+## Build order
+
+The order to *construct* a page, distinct from the emphasis order used within a section. Thomas's sequence, which front-loads reading and defers identity:
+
+**content → measure → typeface → spacing → contrast → primary color → secondary colors → webfont → imagery.**
+
+Identity arrives last, after the readability floor is set. Starting with the grid or the brand color is the reversal that produces a page which looks designed and reads badly.
 
 Grid shapes worth knowing by name: **manuscript** (one wide column — articles and long-form; needs whitespace, dividers, and subheads or it reads as a wall), **column**, **modular** (columns and rows — galleries, product grids), **baseline** (couples text size, line-height, margin, and padding into one rhythm), **hierarchical** (modules sized by importance; the most flexible under responsive reflow).
 
@@ -28,6 +49,7 @@ img, video { max-width: 100%; height: auto; }
 
 - Prefer intrinsic sizing (`auto-fit`, `minmax`, `clamp`) over a ladder of breakpoints. Add a breakpoint when the layout actually breaks, not at a number someone published.
 - **Navigation simplifies as the viewport shrinks** — a full menu becomes a hamburger, an accordion, or tabs. Collapse or hide secondary navigation before it compromises the primary content.
+- **Don't put content sections behind horizontal tabs on a detail page.** Baymard finds users miss what's inside them; expanded sections on desktop and accordions on mobile test better. Scope matters — this is about tabs hiding *content on a single record's page*, not about tabs as a navigation pattern, which remain fine.
 - Test at 200% zoom, not just at narrow widths. They fail differently.
 - Hover-triggered tooltips need a tap-triggered equivalent, or the content is unreachable on touch.
 
