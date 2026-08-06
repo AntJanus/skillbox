@@ -26,6 +26,8 @@ A reference implementation. The selectors matter more than the values — swap t
 .btn:disabled           { background: var(--color-surface-disabled); color: var(--color-text-disabled); cursor: not-allowed; }
 
 .btn[aria-busy="true"]  { opacity: 0.75; cursor: progress; }
+.btn.is-success         { background: var(--color-success); }
+.btn.is-error           { background: var(--color-error); }
 .btn[aria-pressed="true"] { background: var(--color-action-selected); }
 ```
 
@@ -115,7 +117,7 @@ Hobday's geometry, which is checkable rather than a matter of taste:
 
 - Inline validation beats a submit-time error list. Say what's wrong next to the thing that's wrong.
 - **A disabled submit button is the most common form dead-end**, and a natively disabled one is worse than it looks: the user can't focus it to find out why. Enable it and validate on submit, or use `aria-disabled` with the missing requirement stated next to it.
-- **Prevent the error rather than message it.** Nielsen's fifth heuristic is to eliminate error-prone conditions, or check for them and confirm before the user commits — constraints, good defaults, and a confirmation step outrank any error copy. This is *not* an argument for disabling the submit control; it is an argument for making the invalid state unreachable.
+- **Prevent the error rather than message it.** Nielsen's fifth heuristic is to eliminate error-prone conditions, or check for them and confirm before the user commits — constraints, good defaults, and a confirmation step outrank any error copy. Make the invalid state unreachable, which is not the same as making the button unclickable.
 - Real-world input breaks forms first: long names, non-Latin characters, pasted values with whitespace, autofill.
 - Label every field visibly. A placeholder is not a label — it vanishes exactly when the user needs it.
 
@@ -127,10 +129,8 @@ Hobday's geometry, which is checkable rather than a matter of taste:
   ✅ `:focus-visible` with a 3px ring at 3px offset
 - ❌ Color as the only difference between two states
   ✅ Color plus an icon, a border-weight change, or an underline
-- ❌ A grayed-out control with no reason given
-  ✅ `aria-disabled="true"` plus an adjacent message naming what unlocks it
-- ❌ `disabled` on a control whose reason the user needs to read
-  ✅ `aria-disabled="true"` and a guarded handler — it keeps focus, so the reason is reachable
+- ❌ `disabled` on a control, or a grayed-out one with no reason given
+  ✅ `aria-disabled="true"` plus a guarded handler and an adjacent message naming what unlocks it — it keeps focus, so the reason is reachable
 - ❌ Primary and secondary buttons that differ by one shade
   ✅ A clear weight difference — filled versus outlined
 - ❌ Side-scrolling with no arrows

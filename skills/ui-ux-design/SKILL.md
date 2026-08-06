@@ -1,8 +1,8 @@
 ---
 name: ui-ux-design
-description: UI/UX design — interaction states, accessibility contracts, information architecture, visual hierarchy, design tokens, and the research behind them. Use this skill whenever the user wants to design or critique an interface, asks to "design this screen", "what states does this button need", "what ARIA does this menu need", "make this accessible", "how should I structure the navigation", "is this UI any good", "set up design tokens", "review my UX", or "make this convert better" — even if they never say design and only describe a cluttered screen, a flow users abandon, or a component that breaks on real data. Covers type and color as applied to a UI; send pure type-scale, line-height, or palette-contrast questions to typography and color-system. Also covers deceptive patterns, so route conversion and retention work here. Do NOT use for chart and encoding design (see dataviz) or React file structure and hooks (see ideal-react-component).
+description: UI/UX design — interaction states, accessibility contracts, information architecture, visual hierarchy, and design tokens. Use this skill whenever the user wants to design or critique an interface, asks to "design this screen", "what states does this button need", "what ARIA does this menu need", "make this accessible", "how should I structure the navigation", "is this UI any good", "set up design tokens", "review my UX", or "make this convert better" — even if they never say design and only describe a cluttered screen, a flow users abandon, or a component that breaks on real data. Covers type and color as applied to a UI; send pure type-scale, line-height, or palette-contrast questions to typography and color-system. Deceptive patterns too — route signups, conversion, retention, and pricing-presentation asks here. Do NOT use for chart and encoding design (see dataviz), React file structure and hooks (see ideal-react-component), or copywriting and A/B testing.
 license: MIT
-argument-hint: "[screen | flow | states | tokens | audit]"
+argument-hint: "[screen | flow | states | components | tokens | ethics | audit]"
 metadata:
   author: Antonin Januska
   version: "2.0.0"
@@ -81,7 +81,7 @@ Nine, not five. The last four are the ones that get skipped, and each carries a 
 | Pressed | Input registered. Lasts only as long as the click | `:active` |
 | Focus | Keyboard position. 3px ring plus 3px offset | `:focus-visible` |
 | Disabled | Unavailable, paired with a message saying *why* — and still focusable, so that message can be reached | `[aria-disabled="true"]` |
-| Loading | Working. Control disabled to block duplicate submits | `.is-loading` |
+| Loading | Working. Control blocked to stop duplicate submits | `[aria-busy="true"]` |
 | Success | Done | `.is-success` |
 | Error | Failed, with an inline reason, and clickable again | `.is-error` |
 | Selected | Toggled on, persisting until turned off | `[aria-pressed]` |
