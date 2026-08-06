@@ -34,12 +34,28 @@ Official-loop format (agentskills.io optimizing-descriptions): 20 queries, 10 sh
 | V7 | "add a bar chart to the analytics page" | no (dataviz) |
 | V8 | "run the test suite and fix what fails" | no (unrelated) |
 
+## Scope extension (8) — added 2026-08-06 for v2.0.0
+
+The 20 above stay **fixed and unmodified** so variant scores remain comparable. v2.0.0 added two subject areas the original set cannot probe, so they get their own block, scored separately.
+
+| # | Query | Expected |
+|---|---|---|
+| X1 | "what ARIA does this dropdown menu need?" | trigger |
+| X2 | "make this data table accessible" | trigger |
+| X3 | "should this be a tooltip or something else?" | trigger |
+| X4 | "is a pre-ticked newsletter checkbox a dark pattern?" | trigger |
+| X5 | "make this checkout convert better" | trigger |
+| X6 | "add aria-label to every icon button in this file" | no — the mechanical edit, not the design question. A trigger here means the ARIA clause is over-broad |
+| X7 | "write ad copy to increase signups" | no (copywriting, not interface design) |
+| X8 | "set up an A/B test for the pricing page" | no (experimentation tooling, not design) |
+
 ## Results
 
-| Variant | Date | Train pass | Validation pass | Selected |
-|---|---|---|---|---|
-| 1.0.0 (initial) | 2026-08-04 | not yet run | not yet run | — |
-| 1.0.1 (routing clause names the query shape — "only about a type scale, a line-height, or a palette") | 2026-08-04 | not yet run | not yet run | — |
+| Variant | Date | Train pass | Validation pass | Extension pass | Selected |
+|---|---|---|---|---|---|
+| 1.0.0 (initial) | 2026-08-04 | not yet run | not yet run | n/a | — |
+| 1.0.1 (routing clause names the query shape — "only about a type scale, a line-height, or a palette") | 2026-08-04 | not yet run | not yet run | n/a | — |
+| 2.0.0 (adds ARIA/accessibility triggers and a conversion clause; 893 → 948 chars) | 2026-08-06 | not yet run | not yet run | not yet run | — |
 
 ## Notes
 
@@ -47,3 +63,5 @@ Official-loop format (agentskills.io optimizing-descriptions): 20 queries, 10 sh
 - **N1, N2, and V5 are the hardest negatives** because the user chose comprehensive scope: this skill genuinely contains typography and color content, so the description has to route narrow type-and-color questions away while still winning broad interface questions. Watch these closely — a regression here means the "load typography and color-system for depth" clause is not doing its job.
 - **V4 ("is this interface any good?") is the widest positive.** It has no noun this skill uniquely owns, which makes it the best test of whether the distinctive trigger sits early enough in the description to survive listing truncation.
 - N6 and V8 are unrelated-work controls; a trigger on either means the description is over-broad.
+- **N5 is the specific regression risk in 2.0.0.** "Write the copy for the pricing page headline" is a should-not-trigger, and the new description ends with "route conversion and retention work here." Those two are close enough that N5 may flip. If it does, the conversion clause needs narrowing to the pattern question rather than conversion work generally — X7 exists as the paired control for the same boundary.
+- **X6 is the hardest new negative.** The description now names ARIA, but "add aria-label to every icon button" is a mechanical edit and, worse, is the specific thing `COMPONENTS.md` argues against. A trigger there is not a catastrophe — the skill would give correct advice — but it means the description is claiming implementation work it does not own.
