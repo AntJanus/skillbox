@@ -30,7 +30,33 @@ Three tiers:
 - Cover **text, background, border, and action** first; those four roles carry most of an interface.
 - Skipping the semantic tier means every primitive change becomes a hunt through every component.
 - Store as JSON name/value pairs — machine-readable, portable across web, iOS, and Android, and the shape the W3C Design Tokens format is converging on. In CSS they surface as custom properties (`--color-action-primary`).
-- Spacing scales usefully start at 2px and run to about 64px.
+- **Spacing scale: 4 → 96px, perceptually distributed.** `4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96` — steps sit close together at the small end and widen at the large end, because that's where a difference is still visible. An evenly-spaced scale wastes half its steps on distinctions nobody sees. Even values only, to avoid sub-pixel rendering; a 2px floor invites decisions below the perceptual threshold.
+
+## Component tiers and how much may change
+
+**Atomic Design's vocabulary** (Frost, 2013) is still the shared language most systems use: **atoms** (HTML primitives and abstract values — a label, an input, a color), **molecules** (a few atoms bonded into something that does one job — label + input + button = a search form), **organisms** (distinct interface sections — a masthead, a product grid), **templates** (organisms arranged, showing structure), **pages** (templates filled with real content).
+
+The tier that earns its place is the last one. **Templates-to-pages exists specifically to expose variation** — text lengths, data volumes, missing values — which is the same job as "break it with real data" in SKILL.md, with a name and a citation. A component-only model has nowhere for that step to happen.
+
+**State how much each component may be changed**, because a token hierarchy answers what values exist and not who may deviate:
+
+| Tier | Contract |
+|---|---|
+| **Consistent** | Adopt unchanged. Deviation is a bug |
+| **Opinionated** | Adapt within stated bounds |
+| **Flexible** | Extend freely |
+
+Document every deviation, promote the ones that prove out into the system, and deprecate with the reason attached.
+
+## Making the system machine-readable
+
+The consumer of a design system is now often an agent, and an agent fills gaps by inventing values. Three layers close them:
+
+1. **Spec files** — the rules and their priorities as structured Markdown, not tribal knowledge. What isn't written down gets guessed.
+2. **A closed token set** — no arbitrary values permitted. An open set is exactly the affordance that lets a generator emit `#3a7bd5` next to your `--color-action-primary`.
+3. **Audit scripts** — fail the build on hard-coded values and detached instances. This is the external gate; the other two layers are only documentation without it.
+
+A side effect worth expecting: writing the spec files surfaces undocumented decisions that were never actually agreed.
 
 ## Systems worth reading before building your own
 
