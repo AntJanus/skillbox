@@ -18,11 +18,18 @@ A reference implementation. The selectors matter more than the values — swap t
 .btn:hover              { background: var(--color-action-primary-hover); }
 .btn:active             { background: var(--color-action-primary-active); transform: scale(0.98); }
 .btn:focus-visible      { outline: 3px solid var(--color-focus-ring); outline-offset: 3px; }
-.btn:disabled,
-.btn[aria-disabled="true"] { background: var(--color-surface-disabled); color: var(--color-text-disabled); cursor: not-allowed; }
-.btn.is-loading         { opacity: 0.75; cursor: wait; pointer-events: none; }
+
+/* aria-disabled stays focusable and stays in contrast scope — so this text must pass 4.5:1 */
+.btn[aria-disabled="true"] { background: var(--color-surface-disabled); color: var(--color-text-disabled-accessible); cursor: not-allowed; }
+
+/* the native attribute exempts itself from contrast and drops out of the tab order — last resort */
+.btn:disabled           { background: var(--color-surface-disabled); color: var(--color-text-disabled); cursor: not-allowed; }
+
+.btn[aria-busy="true"]  { opacity: 0.75; cursor: progress; }
 .btn[aria-pressed="true"] { background: var(--color-action-selected); }
 ```
+
+Two things that block the click without breaking anything: guard the handler (`if (button.getAttribute('aria-disabled') === 'true') return;`) and validate on the server regardless. `pointer-events: none` looks like the shortcut and is not one — it suppresses the cursor you just set, kills hover, and removes the element from pointer targeting while leaving it in the tab order, so a keyboard user can still fire it.
 
 The nine states and their CSS hooks are in SKILL.md. This table carries only what that summary leaves out.
 
@@ -32,8 +39,8 @@ The nine states and their CSS hooks are in SKILL.md. This table carries only wha
 | Hover | Never the sole carrier of an affordance *or* of information. |
 | Pressed | `scale(0.98)` or an inset shadow — the briefest state there is. |
 | Focus | WCAG 2.2 sets a minimum size *and* contrast for the indicator, not just its presence. |
-| Disabled | Prefer inline validation naming what unlocks it over a mute control with no story. |
-| Loading | Spinner when the duration is unknown, progress bar when it's measurable. |
+| Disabled | `aria-disabled` over `disabled`, because the native attribute makes the reason unreachable. Better still, prefer inline validation naming what unlocks it over a mute control with no story. |
+| Loading | Spinner when the duration is unknown, progress bar when it's measurable. Below 100ms, show nothing. |
 | Success | A checkmark plus a fill change, not a fill change alone. |
 | Error | The inline message names what went wrong, not that something did. |
 | Selected | `aria-pressed` for toggles — and use it for filters and segmented controls too. |
@@ -72,7 +79,8 @@ The nine states and their CSS hooks are in SKILL.md. This table carries only wha
 ## Forms
 
 - Inline validation beats a submit-time error list. Say what's wrong next to the thing that's wrong.
-- A disabled submit button with no explanation is the most common form dead-end. Either enable it and validate on submit, or say what's missing.
+- **A disabled submit button is the most common form dead-end**, and a natively disabled one is worse than it looks: the user can't focus it to find out why. Enable it and validate on submit, or use `aria-disabled` with the missing requirement stated next to it.
+- **Prevent the error rather than message it.** Nielsen's fifth heuristic is to eliminate error-prone conditions, or check for them and confirm before the user commits — constraints, good defaults, and a confirmation step outrank any error copy. This is *not* an argument for disabling the submit control; it is an argument for making the invalid state unreachable.
 - Real-world input breaks forms first: long names, non-Latin characters, pasted values with whitespace, autofill.
 - Label every field visibly. A placeholder is not a label — it vanishes exactly when the user needs it.
 
@@ -85,7 +93,9 @@ The nine states and their CSS hooks are in SKILL.md. This table carries only wha
 - ❌ Color as the only difference between two states
   ✅ Color plus an icon, a border-weight change, or an underline
 - ❌ A grayed-out control with no reason given
-  ✅ Disabled plus an adjacent message naming what unlocks it
+  ✅ `aria-disabled="true"` plus an adjacent message naming what unlocks it
+- ❌ `disabled` on a control whose reason the user needs to read
+  ✅ `aria-disabled="true"` and a guarded handler — it keeps focus, so the reason is reachable
 - ❌ Primary and secondary buttons that differ by one shade
   ✅ A clear weight difference — filled versus outlined
 - ❌ Side-scrolling with no arrows

@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "[screen | flow | states | tokens | audit]"
 metadata:
   author: Antonin Januska
-  version: "1.0.1"
+  version: "2.0.0"
   tags: [ux, ui, interaction-design, information-architecture, design-tokens, accessibility, usability]
 ---
 
@@ -37,6 +37,7 @@ Non-negotiable, and cheap to get right at build time rather than in an audit lat
 - **Never let color alone carry meaning.** Pair every color shift with an icon, a border-weight change, or an underline, or the state is invisible to the 1-in-12 men with a color vision deficiency.
 - **Visible focus, via `:focus-visible`.** Never `outline: none` without a replacement ring — that cuts off keyboard and assistive-tech users entirely.
 - **Native semantic HTML before ARIA.** Pages using ARIA average *twice* as many accessibility errors as pages without it. `<header>`, `<nav>`, `<main>`, `<footer>`, and native `dialog`/`popover` carry accessibility for free.
+- **`aria-disabled` rather than the `disabled` attribute.** A natively disabled control leaves the tab order and is exempt from contrast requirements — so the control *and* any explanation next to it become unreachable for exactly the people who needed the explanation. Set `aria-disabled="true"`, block the action in the handler, and keep the text contrast-passing.
 - **Every interactive element is reachable and operable without a mouse**, in a tab order that matches reading order.
 
 ## Every surface ships four states
@@ -66,7 +67,7 @@ Nine, not five. The last four are the ones that get skipped, and each carries a 
 | Hover | Interactivity, before commitment. **Does not exist on touch** | `:hover` |
 | Pressed | Input registered. Lasts only as long as the click | `:active` |
 | Focus | Keyboard position. 3px ring plus 3px offset | `:focus-visible` |
-| Disabled | Unavailable — and paired with a message saying *why* | `:disabled`, `[aria-disabled]` |
+| Disabled | Unavailable, paired with a message saying *why* — and still focusable, so that message can be reached | `[aria-disabled="true"]` |
 | Loading | Working. Control disabled to block duplicate submits | `.is-loading` |
 | Success | Done | `.is-success` |
 | Error | Failed, with an inline reason, and clickable again | `.is-error` |
@@ -130,6 +131,7 @@ Three tiers, in this order:
 - **Symptom:** Feature works for the author, unusable on a phone. **Cause:** The affordance lives in a hover state. **Fix:** Move it into the default state; hover never fires on touch.
 - **Symptom:** Accessibility audit fails after adding ARIA. **Cause:** ARIA layered onto non-semantic markup. **Fix:** Use the native element first — ARIA usage correlates with *more* errors, not fewer.
 - **Symptom:** Contrast passes but the UI is still unreadable in one state. **Cause:** Only the default state was checked. **Fix:** Measure hover, pressed, and disabled fills too.
+- **Symptom:** A control explains why it's unavailable, and users still ask why it's unavailable. **Cause:** The native `disabled` attribute took it out of the tab order, so keyboard and screen-reader users never reach the control or the explanation. **Fix:** `aria-disabled="true"` with a guarded handler.
 - **Symptom:** A rebrand or theme change turns into a multi-day sweep. **Cause:** Components reference primitives directly, or semantic tokens chain. **Fix:** Insert the semantic tier; point every semantic token straight at a primitive.
 - **Symptom:** Users abandon a multi-step form midway. **Cause:** Progressive disclosure without orientation. **Fix:** Show current position and steps remaining on every step.
 - **Symptom:** Stakeholder feedback is all about colors and copy when you needed structural input. **Cause:** The artifact was too polished for the question. **Fix:** Show it in grayscale with unstyled elements; visual polish hijacks the conversation.
