@@ -1,12 +1,12 @@
 ---
 name: ui-ux-design
-description: UI/UX design — interaction states, information architecture, visual hierarchy, design tokens, and the research and validation process behind them. Use this skill whenever the user wants to design or critique an interface, asks to "design this screen", "what states does this button need", "how should I structure the navigation", "is this UI any good", "set up design tokens", "wireframe this flow", or "review my UX" — even if they never say design and only describe a screen that feels cluttered, a flow users abandon, or a component that breaks on real data. Covers typography and color as they apply to a UI; send a question that is only about a type scale, a line-height, or a palette and its contrast to the typography and color-system skills instead. Do NOT use this skill for chart, axis, and encoding design (see dataviz) or React file structure and hooks (see ideal-react-component).
+description: UI/UX design — interaction states, accessibility contracts, information architecture, visual hierarchy, design tokens, and the research behind them. Use this skill whenever the user wants to design or critique an interface, asks to "design this screen", "what states does this button need", "what ARIA does this menu need", "make this accessible", "how should I structure the navigation", "is this UI any good", "set up design tokens", "review my UX", or "make this convert better" — even if they never say design and only describe a cluttered screen, a flow users abandon, or a component that breaks on real data. Covers type and color as applied to a UI; send pure type-scale, line-height, or palette-contrast questions to typography and color-system. Also covers deceptive patterns, so route conversion and retention work here. Do NOT use for chart and encoding design (see dataviz) or React file structure and hooks (see ideal-react-component).
 license: MIT
 argument-hint: "[screen | flow | states | tokens | audit]"
 metadata:
   author: Antonin Januska
   version: "2.0.0"
-  tags: [ux, ui, interaction-design, information-architecture, design-tokens, accessibility, usability]
+  tags: [ux, ui, interaction-design, information-architecture, design-tokens, accessibility, usability, deceptive-patterns, aria]
 ---
 
 # UI/UX Design
