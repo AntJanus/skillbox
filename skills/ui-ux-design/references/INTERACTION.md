@@ -100,5 +100,5 @@ The nine states and their CSS hooks are in SKILL.md. This table carries only wha
   ✅ A clear weight difference — filled versus outlined
 - ❌ Side-scrolling with no arrows
   ✅ Explicit affordances, because vertical scroll is the expectation
-- ❌ Dark patterns — a hidden unsubscribe, a preselected upsell, a decline link styled as body text
-  ✅ Make the reversible path as easy to find as the committing one
+- ❌ Deceptive patterns — a hidden unsubscribe, a preselected upsell, a decline link styled as body text
+  ✅ Make the reversible path as easy to find as the committing one — full catalogue and the request-handling rule in [ETHICS.md](ETHICS.md)
