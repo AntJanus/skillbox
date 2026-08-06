@@ -106,7 +106,7 @@ curl -o .claude/skills/track-session/SKILL.md \
 | [🎨 color-system](#color-system) | Curated color palettes + WCAG/APCA contrast guidance |
 | [🔠 typography](#typography) | Type systems, scale, rhythm + a readability floor |
 | [🧱 local-first-app](#local-first-app) | Local-first single-user app — feature set, not a code spec |
-| [🖼️ ui-ux-design](#ui-ux-design) | Interaction states, IA, hierarchy, tokens + the UX process |
+| [🖼️ ui-ux-design](#ui-ux-design) | Interaction states, component a11y contracts, IA, hierarchy, tokens, deceptive patterns |
 
 ### track-session
 
@@ -366,14 +366,17 @@ Not for palette/contrast choices (see [color-system](#color-system)), font sizin
 ### ui-ux-design
 
 <details>
-<summary><b>Comprehensive UI/UX: the states every surface has to ship, interaction specs, information architecture, visual hierarchy, design tokens, and the research and validation process behind them. Built from a crawl of Figma's Design basics library.</b></summary>
+<summary><b>Comprehensive UI/UX: the states every surface has to ship, per-component accessibility contracts, information architecture, visual hierarchy, design tokens, deceptive patterns, and the research process behind them. Built from 20 practitioner and research sources.</b></summary>
 
 Covers designing and critiquing interfaces end to end. Two rules generate most of it: design the *states*, not the screen — whichever rendering goes unspecified gets invented at implementation time — and name things for their role, not their appearance.
 
 **Covers:**
 - The four states every surface ships (loading, empty, error, success), varied by permission and user type, then broken deliberately with real data — long labels, empty lists, failed images, translated strings
-- Nine interaction states with their CSS hooks and the behavioral rule each carries: loading disables, error returns to clickable, disabled explains itself
+- Nine interaction states with their CSS hooks and the behavioral rule each carries: loading disables, error returns to clickable, disabled explains itself — via `aria-disabled`, because the native attribute puts the explanation out of keyboard reach
 - An accessibility floor that holds in *every* state — 4.5:1, 44×44px targets, `:focus-visible`, never color alone, native semantics before ARIA
+- Per-component ARIA, keyboard, and focus contracts for tabs, disclosures, notifications, data tables, menus, toggles, tooltips vs toggletips, and cards, plus the labeling hierarchy that puts `aria-label` last
+- The response-time ladder — 100ms, 400ms, 1s, 10s — and what the UI owes at each
+- Deceptive patterns: the 18-pattern catalogue, the four an agent ships while doing as it was told, and what to do when a conversion request is satisfiable by one
 - Six hierarchy levers including time, and proximity used defensively to keep destructive controls out of misclick range
 - Information architecture — hierarchical, sequential, and matrix structures, with every route standing on its own because any page can be an entry point
 - Design tokens in three tiers, the no-alias-chaining rule, and themes as modes rather than duplicate sets
@@ -381,7 +384,7 @@ Covers designing and critiquing interfaces end to end. Two rules generate most o
 - Layout: base-unit grids, soft over hard, responsive behavior, and section recipes for landing, pricing, and portfolio pages
 - Type and color applied to a UI — 60-30-10 allocation, grayscale-first, cultural constraints on palette, and the brand style guide as a governed artifact
 
-**Triggers:** When asked "what states does this button need", "how should I structure the navigation", "design this screen", "set up design tokens", "review my UX" — or when the description is a symptom: a cluttered screen, a flow users abandon, a component that breaks on real data
+**Triggers:** When asked "what states does this button need", "what ARIA does this menu need", "make this accessible", "how should I structure the navigation", "design this screen", "set up design tokens", "review my UX", "make this convert better" — or when the description is a symptom: a cluttered screen, a flow users abandon, a component that breaks on real data
 
 Depth on type scales lives in [typography](#typography) and on palettes in [color-system](#color-system). Not for chart design (see dataviz) or React file structure (see [ideal-react-component](#ideal-react-component)).
 
