@@ -88,7 +88,7 @@ curl -o .claude/skills/track-session/SKILL.md \
 
 ## Available Skills
 
-15 skills. Click any name to jump to its use-cases and triggers; expand for details.
+16 skills. Click any name to jump to its use-cases and triggers; expand for details.
 
 | Skill | What it does |
 |-------|-------------|
@@ -107,6 +107,7 @@ curl -o .claude/skills/track-session/SKILL.md \
 | [🔠 typography](#typography) | Type systems, scale, rhythm + a readability floor |
 | [🧱 local-first-app](#local-first-app) | Local-first single-user app — feature set, not a code spec |
 | [🖼️ ui-ux-design](#ui-ux-design) | Interaction states, component a11y contracts, IA, hierarchy, tokens, deceptive patterns |
+| [💬 discuss](#discuss) | Conversation mode — Claude debates back, in condensed Simplified Technical English |
 
 ### track-session
 
@@ -391,6 +392,28 @@ Depth on type scales lives in [typography](#typography) and on palettes in [colo
 [View Documentation](./skills/ui-ux-design/SKILL.md)
 </details>
 
+### discuss
+
+<details>
+<summary><b>Conversation mode — think a topic through with Claude instead of issuing commands, in condensed Simplified Technical English.</b></summary>
+
+Claude takes a position and defends it, asks back with `AskUserQuestion` at real forks, delegates research to capped subagents and compresses the result, and publishes an artifact when the point is structural. Read-only — no file writes unless you name the file. Slash-only (`disable-model-invocation`), and it stays on until you say "stop discuss".
+
+Writes to a practical subset of ASD-STE100: 20-word instructions, 25-word descriptions, active voice, present tense, one term per concept, no idioms. The approved-words dictionary is out of reach at write time, and the skill says so rather than claiming full compliance. Formatting follows the `i-have-adhd` rules — answer first, one idea per block, lists capped at 5, no preamble or closers.
+
+**Use when:**
+- Understanding how something works — this repository's architecture, or a general concept
+- Weighing a design decision before any code exists
+- Arguing a tradeoff with someone who will push back and concede on evidence
+- Learning a topic one concept per turn
+
+**Triggers:** Type `/discuss [topic]`. It never auto-activates.
+
+Not for implementing a change, reviewing a diff (see [code-review](#code-review)), or a cited report (see [deep-research](#deep-research)).
+
+[View Documentation](./skills/discuss/SKILL.md)
+</details>
+
 ## Usage
 
 ### Automatic Activation
@@ -520,4 +543,4 @@ MIT License - see individual skills for specific licensing
 
 ---
 
-**Skill Count**: 14 | **Made for**: Claude Code 2.1.220+
+**Skill Count**: 16 | **Made for**: Claude Code 2.1.220+
