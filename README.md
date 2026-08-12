@@ -106,7 +106,7 @@ curl -o .claude/skills/track-session/SKILL.md \
 | [🎨 color-system](#color-system) | Curated color palettes + WCAG/APCA contrast guidance |
 | [🔠 typography](#typography) | Type systems, scale, rhythm + a readability floor |
 | [🧱 local-first-app](#local-first-app) | Local-first single-user app — feature set, not a code spec |
-| [🖼️ ui-ux-design](#ui-ux-design) | Interaction states, component a11y contracts, IA, hierarchy, tokens, deceptive patterns |
+| [🖼️ ui-ux-design](#ui-ux-design) | Interaction states, component a11y contracts, IA, hierarchy, tokens, deceptive patterns, whole-app audits |
 | [💬 discuss](#discuss) | Conversation mode — Claude debates back, in condensed Simplified Technical English |
 
 ### track-session
@@ -367,11 +367,13 @@ Not for palette/contrast choices (see [color-system](#color-system)), font sizin
 ### ui-ux-design
 
 <details>
-<summary><b>Comprehensive UI/UX: the states every surface has to ship, per-component accessibility contracts, information architecture, visual hierarchy, design tokens, deceptive patterns, and the research process behind them. Built from 20 practitioner and research sources.</b></summary>
+<summary><b>Comprehensive UI/UX: the states every surface has to ship, per-component accessibility contracts, information architecture, visual hierarchy, design tokens, deceptive patterns, an audit mode for apps that already exist, and the research process behind them. Built from 20 practitioner and research sources.</b></summary>
 
 Covers designing and critiquing interfaces end to end. Two rules generate most of it: design the *states*, not the screen — whichever rendering goes unspecified gets invented at implementation time — and name things for their role, not their appearance.
 
 **Covers:**
+- An `audit` mode for reviewing an app that already exists — scope the surface list from the code rather than the brief, build the per-surface state matrix, publish one consequence-ranked report carrying a *rendered* before and after per visual change, then take approval finding by finding. A passing verdict is a legitimate outcome
+- The approved mockup as the spec: before reporting an implementation done, put it beside the artifact the user signed off on and list every element that differs
 - The four states every surface ships (loading, empty, error, success), varied by permission and user type, then broken deliberately with real data — long labels, empty lists, failed images, translated strings
 - Nine interaction states with their CSS hooks and the behavioral rule each carries: loading disables, error returns to clickable, disabled explains itself — via `aria-disabled`, because the native attribute puts the explanation out of keyboard reach
 - An accessibility floor that holds in *every* state — 4.5:1, 44×44px targets, `:focus-visible`, never color alone, native semantics before ARIA
