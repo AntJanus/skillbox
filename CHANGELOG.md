@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [9.6.0] - 2026-08-12
+
+One new skill, and one existing skill corrected by production evidence rather than by research. `discuss` ships at 1.0.0 — a slash-only conversation mode that takes a position and defends it under pushback, in condensed Simplified Technical English. `ui-ux-design` moves to 2.1.0 after a **usage audit of its first eight days in production**: 27 invocations across 24 sessions and 15 repositories, mined from local transcripts. That evidence changed what the skill documents rather than what it believes — the 159-line body was deliberately left alone, and the five changes fill a missing mode, a missing gate, and a color procedure that generated where it should have imitated. Two skills touched; 15 skills at v9.5.0, 16 now. **No breaking changes** — every `ui-ux-design` change is additive or a tightened floor.
+
 ### Added
 
 - **discuss** (new, 1.0.0): conversation mode — think a topic through with Claude instead of issuing commands. Covers repository architecture, "how does X work", design tradeoffs, and open questions. Claude takes a position and defends it under pushback, asks back with `AskUserQuestion` at genuine forks, delegates research to capped subagents and compresses the result before it reaches the conversation, and publishes an artifact when the point is structural. Two constraints shape every turn: **read-only** (no `Write`, `Edit`, or commits unless the user names the file — artifacts are the deliberate exception, since they are private by default and the alternative was a permission prompt on every diagram), and **condensed** output in a practical subset of ASD-STE100 Simplified Technical English.
