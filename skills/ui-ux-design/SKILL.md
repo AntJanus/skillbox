@@ -30,6 +30,18 @@ Two rules generate most of what follows. **Design the states, not the screen** �
 | **[references/ETHICS.md](references/ETHICS.md)** | Anything about conversion, signups, retention, or pricing presentation — the deceptive-pattern catalogue and where the persuasion line sits |
 | **[references/SOURCES.md](references/SOURCES.md)** | Citing a rule, or checking which claims were corrected against their source |
 
+## Audit mode
+
+`audit` reviews an app that already exists rather than designing a surface that doesn't. Five phases, each gated on something outside this file.
+
+1. **Scope from the repo, not from the brief.** Read the project's own agent doc, then enumerate every route and the components each one renders. A brief that describes the wrong app still yields the right audit when the surface list comes from the code.
+2. **Build the state matrix before judging anything.** One row per surface, one column per state from the four below. A cell you can't fill by reading the code is itself a finding — that state doesn't exist.
+3. **Split into lanes only when the surface count justifies it** — three or four read-only lanes by surface family (lists, forms, chrome, accessibility), each carrying the four-states table and the floor inline so a lane doesn't depend on loading this file. Always fewer lanes than surfaces; never one per route.
+4. **Publish one report, ranked by consequence, and stop.** Every visual change gets a **rendered before and after** — real markup at real sizes, side by side, with the difference named underneath. A description of a change is not a before and after. Size the report to the finding count; one longer than the fix list it produces goes unread.
+5. **Get approval per finding before implementing.** Present the ranked list and let the user accept, cut, or reorder it — audits reliably surface items the user considers not worth the pixels, and shipping those spends the credibility the real findings earned. Record what was approved, and what was cut, where the project already tracks work.
+
+**A passing verdict is a legitimate outcome.** If the surfaces hold up, say so and name what was checked. An audit that always finds ten things isn't measuring.
+
 ## The floor
 
 Non-negotiable, and cheap to get right at build time rather than in an audit later.
