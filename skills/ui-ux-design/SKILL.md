@@ -42,6 +42,14 @@ Two rules generate most of what follows. **Design the states, not the screen** �
 
 **A passing verdict is a legitimate outcome.** If the surfaces hold up, say so and name what was checked. An audit that always finds ten things isn't measuring.
 
+## An approved mockup is the spec
+
+This applies to any implementation of a design the user signed off on, whether it came out of an audit or a single-screen redesign.
+
+Before reporting the implementation done, **put the approved artifact and the running screen side by side and list every element that differs.** Name each one — the hero that isn't full-bleed, the strip that stopped short of the edge, the card layout that got simplified, the data that landed in a different section than agreed. Then either fix it or say which differences you're keeping and why.
+
+"Tests pass and it renders against the dev server" answers a different question than "it matches what we agreed to," and the second one is the one that was approved. Drift concentrates in whatever nobody thought to re-open: the sections further down the page, the second posture of a two-mode screen, the component that was specified last.
+
 ## The floor
 
 Non-negotiable, and cheap to get right at build time rather than in an audit later.
@@ -162,6 +170,7 @@ Three tiers, in this order:
 - **Symptom:** Users abandon a multi-step form midway. **Cause:** Progressive disclosure without orientation. **Fix:** Show current position and steps remaining on every step.
 - **Symptom:** Stakeholder feedback is all about colors and copy when you needed structural input. **Cause:** The artifact was too polished for the question. **Fix:** Show it in grayscale with unstyled elements; visual polish hijacks the conversation.
 - **Symptom:** Implementation drifts from the design in small ways nobody agreed to. **Cause:** The in-between moments — hover, loading, dismissal, transitions — were never specified, so they got invented at the keyboard. **Fix:** Specify them, or accept whatever the implementation chooses.
+- **Symptom:** An implementation is reported done and the reply is that it looks nothing like what was agreed. **Cause:** It was checked against the running app rather than against the approved mockup. **Fix:** Open both side by side and list the differences before reporting done.
 - **Symptom:** A deep link into the app lands somewhere confusing. **Cause:** The route was designed as step 3 of a flow. **Fix:** Every route explains itself and offers a way up — any page can be the entry point.
 
 ## Integration
