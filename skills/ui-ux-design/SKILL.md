@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "[screen | flow | states | components | tokens | ethics | audit]"
 metadata:
   author: Antonin Januska
-  version: "2.0.0"
+  version: "2.1.0"
   tags: [ux, ui, interaction-design, information-architecture, design-tokens, accessibility, usability, deceptive-patterns, aria]
 ---
 
