@@ -54,7 +54,7 @@ Before reporting the implementation done, **put the approved artifact and the ru
 
 Non-negotiable, and cheap to get right at build time rather than in an audit later.
 
-- **4.5:1 contrast for normal text, 3:1 for large — in every state.** Hover, pressed, and disabled fills are where this silently breaks; nobody rechecks them. Low-contrast text is the most common accessibility failure on the web, present on 79.1% of homepages.
+- **4.5:1 contrast for normal text, 3:1 for large — in every state, in both color schemes.** Hover, pressed, and disabled fills are where this silently breaks; nobody rechecks them. A dark scheme built after the light one breaks all three at once, so it isn't a follow-up task — it ships with the surface or the surface isn't done. Low-contrast text is the most common accessibility failure on the web, present on 79.1% of homepages.
 - **44×44px minimum touch target.** Grow it with padding, not font size.
 - **Never let color alone carry meaning.** Pair every color shift with an icon, a border-weight change, or an underline, or the state is invisible to the 1-in-12 men with a color vision deficiency.
 - **Visible focus, via `:focus-visible`.** Never `outline: none` without a replacement ring — that cuts off keyboard and assistive-tech users entirely.
@@ -163,7 +163,7 @@ Three tiers, in this order:
 - **Symptom:** Layout is fine in review, broken in production. **Cause:** Designed against placeholder content. **Fix:** Re-render every component with a long label, an empty collection, a failed image, and a translated string before calling it done.
 - **Symptom:** Feature works for the author, unusable on a phone. **Cause:** The affordance lives in a hover state. **Fix:** Move it into the default state; hover never fires on touch.
 - **Symptom:** Accessibility audit fails after adding ARIA. **Cause:** ARIA layered onto non-semantic markup. **Fix:** Use the native element first — ARIA usage correlates with *more* errors, not fewer.
-- **Symptom:** Contrast passes but the UI is still unreadable in one state. **Cause:** Only the default state was checked. **Fix:** Measure hover, pressed, and disabled fills too.
+- **Symptom:** Contrast passes but the UI is still unreadable somewhere. **Cause:** Only the default state, in one color scheme, was checked. **Fix:** Measure hover, pressed, and disabled fills, in light and dark.
 - **Symptom:** A control explains why it's unavailable, and users still ask why it's unavailable. **Cause:** The native `disabled` attribute took it out of the tab order, so keyboard and screen-reader users never reach the control or the explanation. **Fix:** `aria-disabled="true"` with a guarded handler.
 - **Symptom:** A generated palette satisfies every color rule and is still rejected as ugly. **Cause:** It was derived from hue relationships instead of sampled from whatever it was named after. **Fix:** Read the real source first — brand values, the product's stylesheet or theme files, a screenshot — then adjust from there in OKLCH.
 - **Symptom:** A rebrand or theme change turns into a multi-day sweep. **Cause:** Components reference primitives directly, or semantic tokens chain. **Fix:** Insert the semantic tier; point every semantic token straight at a primitive.
