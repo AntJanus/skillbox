@@ -23,12 +23,11 @@ Two rules generate most of what follows. **Design the states, not the screen** �
 |---|---|
 | **[references/INTERACTION.md](references/INTERACTION.md)** | Building or reviewing a control — full state specs, CSS, UX laws, motion, forms |
 | **[references/COMPONENTS.md](references/COMPONENTS.md)** | Building a named component — the ARIA, keyboard, and focus contract for tabs, menus, tables, tooltips, cards, and five more |
-| **[references/PROCESS.md](references/PROCESS.md)** | Planning research, wireframes, prototypes, usability tests, or a launch checklist |
 | **[references/LAYOUT.md](references/LAYOUT.md)** | Grids, responsive behavior, and the section recipes for landing, pricing, and portfolio pages |
 | **[references/SYSTEMS.md](references/SYSTEMS.md)** | Design tokens, design systems, and design-to-code handoff |
 | **[references/VISUAL.md](references/VISUAL.md)** | Applying type and color to a UI, plus the brand style guide as a governed artifact |
-| **[references/ETHICS.md](references/ETHICS.md)** | Anything about conversion, signups, retention, or pricing presentation — the deceptive-pattern catalogue and where the persuasion line sits |
 | **[references/SOURCES.md](references/SOURCES.md)** | Citing a rule, or checking which claims were corrected against their source |
+| Rarely: **[ETHICS.md](references/ETHICS.md)** · **[PROCESS.md](references/PROCESS.md)** | Conversion, signups, retention, or pricing presentation — the deceptive-pattern catalogue and where the persuasion line sits · planning research, wireframe fidelity, usability tests, launch checklists |
 
 ## Audit mode
 
