@@ -27,6 +27,7 @@ Load when applying type and color inside an interface, or when producing brand g
 
 ## Building the palette in code
 
+- **When the brief names something to resemble, sample that thing before generating anything.** Its published brand values, its own stylesheet, its theme files, a screenshot read for actual hexes — get real numbers first, then use the OKLCH mechanics below to *adjust* them. A palette derived from hue relationships alone can satisfy every rule in this file and still be rejected on sight, and borrowing a product's name sets a fidelity expectation the output then has to meet. The mechanics here are for adjusting a source, not for inventing one.
 - **Author in OKLCH, not HSL.** `oklch(L C H)` or `oklch(L C H / a)`. Its lightness is *perceived* lightness and holds consistent across hues, which is precisely what HSL gets wrong — `hsl(220 80% 50%)` looks markedly darker than `hsl(60 80% 50%)` at the same stated lightness, so an HSL-built ramp has invisible brightness cliffs in it.
 - **Chroma maxes out around 0.37 and the ceiling is hue-dependent.** There is no single safe value. Browsers clip out-of-gamut colors by fast RGB clipping, which shifts hue unpredictably, so enforce it — `stylelint-gamut` with `gamut/color-no-out-gamut-range`.
 - **Derive states rather than hand-picking them**, with relative color syntax:
