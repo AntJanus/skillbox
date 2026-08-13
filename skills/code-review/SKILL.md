@@ -1,12 +1,12 @@
 ---
 name: code-review
-description: Use this skill to run a multi-agent code review of local uncommitted changes whenever the user asks to "review my code", "review these changes", "do a code review", "check my changes before I commit", "review the whole repo", or "review this in the background" — even if they never say "review" and only ask whether the work is ready to ship or safe to commit. Prioritizes correctness over nitpicks and writes REVIEW.md. Do NOT use this skill for an open PR by number (use /review), a security-specific pass (use /security-review), grading a SKILL.md file (see rate-skill), or a quality-only cleanup that does not hunt for bugs (see simplify).
+description: Use this skill to run a multi-agent code review of local changes whenever the user asks to "review my code", "review these changes", "do a code review", "check my changes before I commit", "review the whole repo", "review this in the background", or "review this PR I checked out locally" — even if they never say "review" and only ask whether the work is ready to ship or safe to commit. Reviews any local diff, including a pull request checked out into a worktree (`--branch origin/dev`). Prioritizes correctness over nitpicks and writes REVIEW.md. Do NOT use this skill to fetch and review an open PR by number from GitHub (use /review), for a security-specific pass (use /security-review), for grading a SKILL.md file (see rate-skill), or for a quality-only cleanup that does not hunt for bugs (see simplify).
 license: MIT
 argument-hint: "[path | --staged | --branch <base> | --repo [--blueprint <skill>]] [--background] [--nits]"
 allowed-tools: Read, Write, Glob, Grep, Bash, Agent
 metadata:
   author: Antonin Januska
-  version: "2.2.0"
+  version: "2.3.0"
 ---
 
 # Code Review — Multi-Agent Local Review
@@ -81,13 +81,13 @@ Always write REVIEW.md even when clean (zeroed header + the STRENGTHS block + `N
 
 ## Background mode
 
-`--background` runs the review detached so the user keeps working. **It must be orchestrated from the main thread, not by running the skill as one subagent — a subagent cannot spawn the reviewers.**
+`--background` runs the review detached so the user keeps working. Orchestrate it from the thread that owns the review — usually the main thread, but a delegated agent works too, since subagents spawn subagents up to three levels deep.
 
-1. Main resolves scope + captures the diff text (Phase 1), prints `Reviewing N files in the background — keep working; REVIEW.md will appear when done.`
-2. Dispatch each reviewer with `run_in_background: true` and `isolation: "worktree"` — a clean pinned checkout so the user's concurrent edits don't move `file:line` under the reviewers. Reviewers stay read-only, so the worktree auto-cleans.
-3. Main returns control; the harness re-invokes it as each reviewer completes.
+1. The orchestrator resolves scope + captures the diff text (Phase 1), prints `Reviewing N files in the background — keep working; REVIEW.md will appear when done.`
+2. Dispatch each reviewer with `run_in_background: true`, `isolation: "worktree"`, and **no `name`** — a clean pinned checkout so the user's concurrent edits don't move `file:line` under the reviewers. Reviewers stay read-only, so the worktree auto-cleans.
+3. The orchestrator returns control; the harness re-invokes it as each reviewer completes.
 4. When all reviewers are in, dispatch the verifier (background).
-5. On completion, main writes REVIEW.md to the **real repo root** (`git rev-parse --show-toplevel` of the main tree — worktrees are torn down), which is the "done" signal.
+5. On completion, write REVIEW.md to the **real repo root** (`git rev-parse --show-toplevel` of the working tree the review was scoped to — reviewer worktrees are torn down), which is the "done" signal.
 
 Reviewers read the diff **from the prompt**, never by re-running `git diff` in the worktree (it shares HEAD with a clean tree — no unstaged changes to see). `--repo --background` is the sweet spot: a multi-minute whole-repo conformance pass that doesn't block you.
 
@@ -118,7 +118,7 @@ Reviewers read the diff **from the prompt**, never by re-running `git diff` in t
 
 ## Gotchas
 
-- **`--background` can't be delegated.** A subagent has no Agent tool, so running the whole skill as one subagent produces zero reviewers and no error — it just finishes. Orchestrate background runs from the main thread.
+- **Never pass `name` on a lane dispatch.** Naming an agent makes it a teammate, and a teammate cannot spawn teammates — inside a delegated review the whole batch is rejected with `Teammates cannot spawn other teammates`. It retries and recovers, but it costs a round-trip per lane. The lanes are never addressed by name, so leave the parameter off.
 - **A worktree reviewer sees a clean tree.** The `isolation: "worktree"` checkout shares HEAD, so `git diff` inside it returns nothing. Reviewers read the diff from their prompt; never let a lane re-derive it.
 - **`--repo` mode has no diff.** What the lanes receive is full file content, so a lane hunting `+` lines returns NO FINDINGS on real problems. Pass the mode into the prompt so lanes review whole files.
 - **Dropped findings are the product, not a bug.** The verifier deletes true-but-trivial findings on purpose; `--nits` is the recovery path, and there is no demote-and-keep tier to fall back on.
@@ -134,4 +134,4 @@ Empty scope, huge diffs, blueprint not found, worktree cleanup: **[reference/TRO
 
 ## Integration
 
-Pairs with `/security-review` (security), `/review` (open PRs), `track-session` (track fixes), `typography` + `color-system` (the ui-ux lane's standard), and blueprint skills like `local-first-app` via `--blueprint`. Typical loop: edit → `/code-review` → read REVIEW.md, fix what's first → re-run (overwrites) → commit when clean. For a big pass, `/code-review --repo --blueprint <skill> --background` and keep working. Add `REVIEW.md` to `.gitignore`. Not a replacement for CI linting or human PR review — a pre-commit pass that catches wrong answers linters miss. **Maintainers:** activation triggers are measured in **[reference/EVAL.md](./reference/EVAL.md)**; lane quality is measured against representative diffs (clean / real correctness bug / tempting nitpick). Re-run both after every prompt edit.
+Pairs with `/security-review` (security), `/review` (fetching an open PR by number), `track-session` (track fixes), `typography` + `color-system` (the ui-ux lane's standard), and blueprint skills like `local-first-app` via `--blueprint`. Typical loop: edit → `/code-review` → read REVIEW.md, fix what's first → re-run (overwrites) → commit when clean. For a big pass, `/code-review --repo --blueprint <skill> --background` and keep working. **Reviewing incoming PRs:** check each PR out into its own worktree and run `--branch <base>` there, one delegated agent per PR — REVIEW.md lands in that worktree's root, so several PRs review concurrently without colliding. Add `REVIEW.md` to `.gitignore`. Not a replacement for CI linting or human PR review — a pre-commit pass that catches wrong answers linters miss. **Maintainers:** activation triggers are measured in **[reference/EVAL.md](./reference/EVAL.md)**; lane quality is measured against representative diffs (clean / real correctness bug / tempting nitpick). Re-run both after every prompt edit.

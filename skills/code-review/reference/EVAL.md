@@ -1,6 +1,6 @@
 # code-review — Eval Set
 
-Official-loop format (agentskills.io optimizing-descriptions): 18 queries, 9 should-trigger / 9 should-not-trigger, split 10 train / 8 validation (~55/45) with a proportional 1:1 mix of positives and negatives in each half. Shuffled once 2026-07-28; keep the split fixed across iterations.
+Official-loop format (agentskills.io optimizing-descriptions): 19 queries, 10 should-trigger / 9 should-not-trigger, split 10 train / 9 validation. Shuffled once 2026-07-28; keep the split fixed across iterations. V9 was appended 2026-08-13 (see Notes) rather than reshuffled, so earlier measurements stay comparable.
 
 **Protocol:** run each query in a fresh Claude session ~3 times. Trigger rate = fraction of runs where code-review was invoked. A should-trigger query passes above 0.5; a should-not-trigger query passes below 0.5. Iterate the description on train failures only; select the variant with the best **validation** score.
 
@@ -31,6 +31,7 @@ Official-loop format (agentskills.io optimizing-descriptions): 18 queries, 9 sho
 | V6 | "do a security review of the auth flow" | no (/security-review) |
 | V7 | "write a PR description for this branch" | no (pr-description) |
 | V8 | "refactor this component to be less repetitive" | no (simplify / ideal-react-component) |
+| V9 | "I checked PR #412 out into a worktree — review it against main" | trigger (local diff, not a by-number fetch) |
 
 ## Results
 
@@ -47,3 +48,4 @@ Official-loop format (agentskills.io optimizing-descriptions): 18 queries, 9 sho
 - N4 and V8 guard the newest boundary: simplify does quality-only cleanup with no bug hunt, so cleanup phrasing must stay below threshold even though it targets the same working diff.
 - V3 is a positive that carries a flag (`--blueprint`) — it verifies the description still triggers when the ask is scoped to one directory rather than "my changes".
 - N5 ("review this contract") is the domain-collision negative: the strongest trigger verb attached to a non-code object.
+- **V9 vs N1 is the PR boundary, and the pair must be scored together.** They deliberately name the *same* PR number so the only variable is where the diff lives: N1 asks the agent to fetch #412 from GitHub (`/review`'s job), V9 already has it on disk in a worktree, which is an ordinary local review. Added 2026-08-13 after transcripts showed the worktree-per-PR workflow was the skill's most-used path while the description still disowned it. A description edit that wins V9 by dropping the by-number negative and regressing N1 has not passed.
