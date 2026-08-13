@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **code-review** (2.2.0 → 2.3.0): three corrections from a usage audit of the month since the 2.0 rebuild — 26 invocations, 13 July to 13 August 2026, mined from local transcripts. The pipeline itself needed nothing: lanes dispatched in a single message in every run checked, the verifier ran, REVIEW.md was written. What was wrong was the documentation of where the skill can run, and it was wrong in the direction that discouraged the workflow the skill is now most used for.
+
+  **The "a subagent cannot spawn the reviewers" claim was false and is removed.** SKILL.md and `AGENTS.md` both stated that delegating the skill produces zero reviewers and no error. Eight delegated PR reviews on 10 August each spawned four or five lanes plus a verifier and wrote REVIEW.md — subagents spawn subagents up to three levels deep. `--background` is delegable; the sections now say so and refer to "the orchestrating thread" rather than assuming the main one.
+
+  **The real delegation failure is `name`, and it is now documented.** Seven of those eight runs had their entire first dispatch batch rejected with `Teammates cannot spawn other teammates — the team roster is flat`, because the lanes were dispatched with a `name` set. It self-recovers on retry, so the cost is one wasted round-trip per lane rather than duplicated review work, which is why it never surfaced as a complaint. New gotcha plus a rule in the dispatch pattern: lanes are never addressed by name, so omit the parameter and the call works at any depth.
+
+  **The PR-review carve-out.** The description disowned PR review outright ("Do NOT use this skill for an open PR by number — use /review") while the dominant power-use had become exactly that: PRs checked out into per-PR worktrees, reviewed with `--branch origin/dev`, one delegated agent each, run across 8 PRs in 5 repos in a single session. The distinction that matters is *fetching* a PR by number from GitHub, which is still `/review`'s job, versus reviewing a diff already on disk, which is an ordinary local review. The description now carries the local-worktree trigger and scopes the negative to the fetch case; Integration documents the worktree-per-PR pattern. Eval gains **V9**, paired with the existing N1 so the boundary is scored from both sides — an edit that wins V9 by dropping the by-number negative and regressing N1 has not passed.
+
+  Also recorded from the audit, no change made: usage is 100% slash-invoked with no organic auto-activation, and 100% inside work repositories, none in the portfolio that owns the skill.
+
 ## [9.6.0] - 2026-08-12
 
 One new skill, and one existing skill corrected by production evidence rather than by research. `discuss` ships at 1.0.0 — a slash-only conversation mode that takes a position and defends it under pushback, in condensed Simplified Technical English. `ui-ux-design` moves to 2.1.0 after a **usage audit of its first eight days in production**: 27 invocations across 24 sessions and 15 repositories, mined from local transcripts. That evidence changed what the skill documents rather than what it believes — the 159-line body was deliberately left alone, and the five changes fill a missing mode, a missing gate, and a color procedure that generated where it should have imitated. Two skills touched; 15 skills at v9.5.0, 16 now. **No breaking changes** — every `ui-ux-design` change is additive or a tightened floor.
