@@ -118,15 +118,23 @@ Then flag, each with a concrete consequence:
 - Context dropped where it's load-bearing: request/correlation/user identity
   not threaded through where downstream needs it (auth, tenancy, tracing that
   something actually depends on — not "peers log more").
+- Egregious complexity that hides behavior: a changed function with deep
+  nesting (4+ levels) or a branch/exit-path explosion (roughly cyclomatic
+  complexity above 10 — count each if/else, loop, boolean operator, and case
+  arm) where a future editor is likely to miss a path and ship a bug. Name
+  the trap: which paths are easy to miss and what breaks when someone does.
+  Moderate complexity is hygiene's nit, not yours — flag only when the
+  structure genuinely conceals behavior.
 
 The test for every finding: "what concretely goes wrong because of this?"
 If the only answer is "it's inconsistent with a peer" and nothing breaks,
 it is NOT a finding — drop it. Your downstream verifier will re-check the
 consequence, so state it plainly.
 
-Out of scope: unused vars, typos, readability within a function, test
-coverage, UI/visual concerns (ui-ux owns), design-health judgments
-(over-engineering — that's /simplify's lane).
+Out of scope: unused vars, typos, moderate complexity and readability
+within a function (hygiene's nit), test coverage, UI/visual concerns
+(ui-ux owns), design-health judgments (over-engineering — that's
+/simplify's lane).
 
 Output format (one block per finding):
 
@@ -316,9 +324,14 @@ Check (A) — SECRETS / CREDENTIALS in the diff [BLOCKING, tag [Secret]]:
 Check (B) — HYGIENE [NON-BLOCKING, tag [Nit]]:
 - Dead/unused code, leftover debug/console/print statements, commented-out
   blocks, TODO/FIXME drift, typos in identifiers/strings.
-- Readability: a genuinely confusing name, a function too long/nested to
-  follow, a non-obvious block with no comment — only where it shares scope
-  with the change. (A nit, not a blocker; don't hunt pre-existing style.)
+- Readability: a genuinely confusing name, a non-obvious block with no
+  comment — only where it shares scope with the change. (A nit, not a
+  blocker; don't hunt pre-existing style.)
+- Moderate cyclomatic complexity: a changed function accumulating branches
+  (roughly complexity 6-10, or nesting at 3 levels) that an early return,
+  extracted helper, or lookup table would flatten. [Nit] — egregious
+  complexity that conceals behavior is architecture's blocking call, not
+  yours; don't duplicate it.
 - Orphaned new exported symbol: declared + used in-file but no external caller
   (Grep to confirm) — a forgotten wire-up. [Nit] unless it's clearly a public
   entry point.

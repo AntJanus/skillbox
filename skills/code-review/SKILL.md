@@ -6,7 +6,7 @@ argument-hint: "[path | --staged | --branch <base> | --repo [--blueprint <skill>
 allowed-tools: Read, Write, Glob, Grep, Bash, Agent
 metadata:
   author: Antonin Januska
-  version: "2.3.0"
+  version: "2.4.0"
 ---
 
 # Code Review — Multi-Agent Local Review
@@ -38,10 +38,10 @@ The lanes (full prompts in **[reference/AGENTS.md](./reference/AGENTS.md)** — 
 | Lane | Owns | Blocking? |
 |------|------|-----------|
 | **correctness** | wrong answers: boundary/off-by-one (dates, DST, month-end), tz/locale bucketing, money/rate math, swallowed errors, non-atomic writes, unterminated loops, discarded async results, null/degenerate inputs | yes — top priority |
-| **architecture** | structural soundness *for the code's purpose*: wrong persistence/idempotency semantics, missing resilience the op needs, broken invariants, dropped load-bearing context. Not "peer differs" | yes |
+| **architecture** | structural soundness *for the code's purpose*: wrong persistence/idempotency semantics, missing resilience the op needs, broken invariants, dropped load-bearing context, egregious complexity (4+ nesting levels, ~cyclomatic >10) that conceals behavior. Not "peer differs" | yes |
 | **testing** | coverage of the change + assertion strength (membership vs exact, weak truthiness, mocked oracles) | yes |
 | **ui-ux** | readability/a11y vs the typography + color-system floors (prose below 16px, contrast <4.5:1, color-as-only-signal, missing focus/label). **Dispatched only when the scope touches UI** | yes (conditional) |
-| **hygiene** | one non-blocking sweep: secrets, dead code, typos, doc/dep drift, readability nits | no — suppressed unless `--nits`; a real `[Secret]` always surfaces |
+| **hygiene** | one non-blocking sweep: secrets, dead code, typos, doc/dep drift, readability + moderate-complexity nits | no — suppressed unless `--nits`; a real `[Secret]` always surfaces |
 
 ## Phase 1: Scope detection
 
@@ -123,6 +123,7 @@ Reviewers read the diff **from the prompt**, never by re-running `git diff` in t
 - **`--repo` mode has no diff.** What the lanes receive is full file content, so a lane hunting `+` lines returns NO FINDINGS on real problems. Pass the mode into the prompt so lanes review whole files.
 - **Dropped findings are the product, not a bug.** The verifier deletes true-but-trivial findings on purpose; `--nits` is the recovery path, and there is no demote-and-keep tier to fall back on.
 - **The ui-ux lane is conditional.** If it fires on a backend/CLI diff, Phase-1 UI detection matched a non-UI file — fix detection rather than accepting the lane's noise.
+- **Complexity is two-tier by design.** Egregious complexity (4+ nesting levels, ~cyclomatic >10) that conceals behavior blocks via the architecture lane and must name the trap — which path a future editor misses and what breaks. Moderate complexity is hygiene's `[Nit]`. A complexity finding with no named trap failing the impact floor is the floor working, not a lost finding.
 - **Architecture findings drift back to "a peer differs."** That bar was removed in 2.0; a finding without a stated consequence should have been dropped, so re-dispatch the lane with its exact prompt.
 - **REVIEW.md is overwritten every run** and written at the true repo root (`git rev-parse --show-toplevel`, not a worktree). The prior review is gone — add it to `.gitignore`.
 
