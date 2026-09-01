@@ -1,11 +1,11 @@
 ---
 name: track-session
-description: Use this skill to maintain SESSION_PROGRESS.md and track multi-session work — resuming, checkpointing, and handing off long tasks. Triggers include "resume work", "pick up where I left off", "what was I doing", "save progress", "checkpoint before I lose context", "are we done", or "I lost my SESSION_PROGRESS" — even if the user never says "session", as when they return to a multi-day refactor or ask you to write down where things stand. Applies to multi-phase work, cross-file refactors, and long debugging runs; skip it for quick one-file fixes. Do NOT use this skill for feature or milestone planning (see track-roadmap) or manual QA checklists (see track-qa).
+description: Use this skill to maintain SESSION_PROGRESS.md and track multi-session work — resuming, checkpointing, and handing off long tasks. Triggers include "resume work", "pick up where I left off", "what was I doing", "save progress", "checkpoint before I lose context", "are we done", or "I lost my SESSION_PROGRESS" — even if the user never says "session", as when they return to a multi-day refactor or ask you to write down where things stand. Applies to multi-phase work, cross-file refactors, and long debugging runs; skip it for quick one-file fixes. Do NOT use this skill for feature or milestone planning (see track-roadmap).
 license: MIT
 argument-hint: "[start|save|resume|verify|recover]"
 metadata:
   author: Antonin Januska
-  version: "6.1.0"
+  version: "6.1.1"
 ---
 
 # Session Progress

@@ -1,11 +1,11 @@
 ---
 name: generate-skill
-description: Interactive SKILL.md builder. Use this skill whenever the user asks to "create a skill", "generate a skill", "scaffold a SKILL.md", "write a SKILL.md", or "turn this workflow into a skill" — even if they don't say "skill" and only describe wanting to make a repeatable agent workflow or convention. Do NOT use for grading an existing SKILL.md (see rate-skill), project roadmaps (see track-roadmap), or manual-QA checklists (see track-qa).
+description: Interactive SKILL.md builder. Use this skill whenever the user asks to "create a skill", "generate a skill", "scaffold a SKILL.md", "write a SKILL.md", or "turn this workflow into a skill" — even if they don't say "skill" and only describe wanting to make a repeatable agent workflow or convention. Do NOT use for grading an existing SKILL.md (see rate-skill) or project roadmaps (see track-roadmap).
 license: MIT
 argument-hint: "[skill-topic]"
 metadata:
   author: Antonin Januska
-  version: "5.1.0"
+  version: "5.1.1"
 ---
 
 # Generate Skill
