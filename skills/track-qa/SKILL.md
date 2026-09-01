@@ -1,14 +1,21 @@
 ---
 name: track-qa
-description: Use this skill for manual QA tracking — the QA.md checklist of behaviors automated tests can't verify. Triggers include "create a QA list", "set up QA for this project", "what should I QA", "track manual QA", "audit the QA list", "start manual QA", or "what's left to check before release", even if the user never says "QA" and only describes verifying things by hand before shipping. Do NOT use this skill for writing or running automated test suites, for feature planning and milestones (see track-roadmap), or for cross-session work progress (see track-session).
+description: DEPRECATED 2026-09-01 — QA.md manual-QA checklists were retired portfolio-wide on 2026-08-24 and this skill will be deleted in the next release. Do NOT use this skill for anything, including "create a QA list", "set up QA", "what should I QA", "track manual QA", "audit the QA list", or "what's left to check before release". Hands-on verification (playthroughs, parity gates, release sign-offs) is filed as ordinary ROADMAP.md items instead — use track-roadmap for that, and track-session for cross-session progress.
 license: MIT
-argument-hint: "[generate|update|audit|migrate|resume]"
+argument-hint: "[deprecated — do not run]"
 metadata:
   author: Antonin Januska
-  version: "1.3.0"
+  version: "1.4.0"
 ---
 
 # Track QA
+
+> **Deprecated 2026-09-01.** Every `QA.md` in the portfolio was deleted by decision on
+> 2026-08-24, and the cc-dash `/qa` views read empty by design. Do not run any mode below: do
+> not generate, update, audit, migrate, or resume a `QA.md`, and do not refile checklist items.
+> A behavior that needs a human to exercise it is filed as one roadmap item (a playthrough, a
+> parity gate, a release sign-off) with `track-roadmap`. This file is kept for one release so
+> the `cc-dash/qa@1` schema stays documented, then it is removed.
 
 ## Overview
 

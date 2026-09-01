@@ -97,7 +97,7 @@ curl -o .claude/skills/track-session/SKILL.md \
 | [⚛️ ideal-react-component](#ideal-react-component) | React component structure + hooks antipatterns |
 | [📊 rate-skill](#rate-skill) | Grade skill quality A–F with concrete fixes |
 | [🗺️ track-roadmap](#track-roadmap) | Plan, update, audit & resume a project roadmap |
-| [✅ track-qa](#track-qa) | Manual QA tracking — the things tests can't verify |
+| [⚠️ track-qa](#track-qa) | **Deprecated 2026-09-01** — QA.md retired; file hands-on checks as roadmap items |
 | [📦 setup-semantic-release](#setup-semantic-release) | Automated versioning via conventional commits |
 | [📼 record-tui](#record-tui) | Polished terminal demo GIFs/MP4s with VHS |
 | [📸 screenshot-local](#screenshot-local) | Screenshot local dev servers with shot-scraper |
@@ -198,17 +198,9 @@ Seven weighted categories (description quality, frontmatter validity, length & p
 ### track-qa
 
 <details>
-<summary><b>Plan, capture, and execute manual QA — the things tests can't verify (visual rendering, multi-step flows, race conditions, integrations, accessibility, performance feel).</b></summary>
+<summary><b>Deprecated 2026-09-01 — QA.md manual-QA checklists were retired on 2026-08-24. Kept for one release so the cc-dash/qa@1 schema stays documented, then removed.</b></summary>
 
-Pairs with `track-roadmap` and `track-session` as the third member of the `cc-dash/*@1` schema family; failed items can file back to the roadmap as `r_xxxxx` issues.
-
-**Use when:**
-- Setting up a manual QA checklist before a release
-- Auditing an existing QA list for relevance
-- Migrating ad-hoc QA notes into the cc-dash schema
-- Resuming a paused QA pass and picking the next pending item
-
-**Triggers:** When asked to "create a QA list", "set up QA for this project", "what should I QA", "track manual QA", "audit the QA list", "start manual QA", or "what's left to check before release"
+Do not run any of its modes. A behavior that needs a human to exercise it (a playthrough, a parity gate, a release sign-off) is filed as one ordinary roadmap item with `track-roadmap`; cross-session progress stays with `track-session`.
 
 [View Documentation](./skills/track-qa/SKILL.md)
 </details>
