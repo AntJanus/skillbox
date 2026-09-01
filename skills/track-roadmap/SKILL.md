@@ -1,11 +1,11 @@
 ---
 name: track-roadmap
-description: Use this skill to maintain ROADMAP.md whenever the user wants to "add an item to the roadmap", "mark a feature done", "log the work I shipped", "create a roadmap", "what should we build next", "brainstorm features", or "audit the roadmap" — even if they don't mention the roadmap file by name. Covers the generate, update, audit, brainstorm, and resume modes. Do NOT use this skill for session-level task progress (see track-session), manual QA checklists (see track-qa), or free-form idea backlogs that aren't landing in a roadmap file.
+description: Use this skill to maintain ROADMAP.md whenever the user wants to "add an item to the roadmap", "mark a feature done", "log the work I shipped", "create a roadmap", "what should we build next", "brainstorm features", or "audit the roadmap" — even if they don't mention the roadmap file by name. Covers the generate, update, audit, brainstorm, and resume modes. Do NOT use this skill for session-level task progress (see track-session) or free-form idea backlogs that aren't landing in a roadmap file.
 license: MIT
 argument-hint: "[generate|update|audit|brainstorm|resume]"
 metadata:
   author: Antonin Januska
-  version: "2.6.0"
+  version: "2.6.1"
 ---
 
 # Track Roadmap
@@ -109,7 +109,7 @@ Full ✅/❌ comparisons for generate, audit, update, brainstorm, and resume mod
 ## Integration
 
 - **track-session** — after picking a feature, use `track-session` to plan and track the implementation; SESSION_PROGRESS.md references the ROADMAP item ID.
-- **track-qa** — pair every roadmap item that ships UI/integration with a QA.md entry; failed QA files back as an `r_xxxxx` roadmap issue.
+- Hands-on verification (a playthrough, a parity gate, a release sign-off) is filed as an ordinary roadmap item here — `QA.md` and the `track-qa` skill are deprecated (2026-09-01), so nothing files back from a separate checklist.
 
 ```
 generate    → pick a feature  → /track-session → build

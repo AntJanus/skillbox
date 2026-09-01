@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "[screen | flow | states | components | tokens | ethics | audit]"
 metadata:
   author: Antonin Januska
-  version: "2.1.0"
+  version: "2.1.1"
   tags: [ux, ui, interaction-design, information-architecture, design-tokens, accessibility, usability, deceptive-patterns, aria]
 ---
 
@@ -177,4 +177,4 @@ Three tiers, in this order:
 - **typography** for type scales, line-height, and font pairing · **color-system** for palette construction and contrast math
 - **frontend-design** for layout execution and visual polish · **dataviz** for charts
 - **ideal-react-component** when the states land in React · **local-first-app** for the app-shaped feature set these patterns fill in
-- **track-qa** for the manual checks — states, zoom, keyboard paths — that automated tests can't cover
+- **track-roadmap** for the manual checks — states, zoom, keyboard paths — that automated tests can't cover; file them as roadmap sign-off items (`QA.md` and `track-qa` are deprecated)

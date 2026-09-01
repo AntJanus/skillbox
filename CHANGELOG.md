@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Deprecated
+
+- **track-qa** (1.3.0 → 1.4.0): marked deprecated. Every `QA.md` in the portfolio was deleted by decision on 2026-08-24 and the cc-dash `/qa` views read empty by design, so a skill whose only job is to generate, audit, migrate, or resume a `QA.md` has nothing left to act on. The description now opens with the deprecation and tells the model not to activate for any QA phrasing; the body carries the same banner above the (unchanged) schema reference, which stays for one release so `cc-dash/qa@1` remains documented. Hands-on verification is filed as an ordinary roadmap item (playthrough, parity gate, release sign-off) with `track-roadmap`. The skill is removed in the release after this one.
+
 ### Changed
+
+- **track-session** (6.1.0 → 6.1.1), **generate-skill** (5.1.0 → 5.1.1), **track-roadmap** (2.6.0 → 2.6.1), **ui-ux-design** (2.1.0 → 2.1.1): dropped their cross-references to the deprecated `track-qa`. track-roadmap's Integration section and ui-ux-design's hand-off list now route manual checks to roadmap sign-off items instead of a `QA.md` entry. No behavior change otherwise.
 
 - **code-review** (2.3.0 → 2.4.0): cyclomatic complexity is now reviewed, split across two tiers so the 2.0 impact floor stays intact. **Egregious complexity blocks via the architecture lane** — a changed function with 4+ nesting levels or roughly cyclomatic complexity above 10 (counting if/else, loops, boolean operators, case arms) where the structure genuinely conceals behavior; the finding must name the trap (which path a future editor misses and what breaks), which is what carries it past the verifier's "genuine reader-trap" clause. **Moderate complexity is a hygiene `[Nit]`** — roughly complexity 6–10 or nesting at 3 levels, where an early return, extracted helper, or lookup table would flatten the function; suppressed unless `--nits`, like the rest of the readability tail. The architecture lane's out-of-scope line now routes moderate complexity to hygiene instead of excluding readability wholesale, and a new gotcha documents the tier boundary plus the fact that a complexity finding with no named trap failing the impact floor is the floor working, not a lost finding.
 
