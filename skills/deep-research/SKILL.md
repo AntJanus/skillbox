@@ -3,9 +3,10 @@ name: deep-research
 description: Use this skill for deep, multi-source web research with cited synthesis whenever the user wants to "research X", "deep research on Y", "deep dive on Z", "investigate this topic", "compare X and Y", "pros and cons of X", or "survey the landscape of Y" — even if they never say "research", any ask needing several independent sources cross-referenced and cited counts. Do NOT use this skill for a single fact one WebSearch answers, for reviewing code (see code-review), or for exploring files in the current repo (use Explore).
 license: MIT
 argument-hint: "<topic>"
+effort: high
 metadata:
   author: Antonin Januska
-  version: "2.3.0"
+  version: "2.4.0"
 ---
 
 # Deep Research
@@ -41,7 +42,7 @@ For **opinion-shaped** asks ("should I use X?") where you already have a grounde
 
 1. **Local-first** — `rg "<topic>" .` and Read the obvious matches before any web search. If local material already covers it, default to UPDATE rather than CREATE. State what you found; "no local hits" is a fine result.
 2. **Plan** — Post the interpretation, the angles you'll use, and the mode, then start searching. The posted plan is what step 5 measures against.
-3. **Disambiguate** (when needed) — For ambiguous proper nouns and acronyms, run one broad search to fix the referent and state it. Ask the user if it's still unclear.
+3. **Disambiguate** (when needed) — For ambiguous proper nouns and acronyms, run one broad search to fix the referent and state it. Ask the user if it's still unclear. When a query centers on a name you recognize from a fast-moving area — AI models, developer tools, anything that shifts within months — the name itself is the thing to verify: search before answering, and include it as the user wrote it in at least one query. Partial background is exactly what makes an out-of-date answer sound authoritative, so familiarity is not a reason to skip the search.
 4. **Search** — 5+ searches minimum. Broad → specific → tension ("X criticism", "X vs alternatives") → currency. **WebFetch every source you'll cite substantively** — a search-results snippet is not a read. Prefer primary > secondary > tertiary. When two sources disagree, carry the disagreement into the report instead of silently picking one.
 5. **Sufficiency gate** — Post one line: `searches: N | angles: <list> | full reads: M | gaps: <list>`. If a planned section has no material behind it, search again or cut it — don't pad.
 6. **Synthesize** — Use the template below; adapt section names to the topic. Check the last round of findings against the plan from step 2; when they conflict, revise the Tl;dr rather than burying the conflict lower down.
@@ -114,6 +115,7 @@ Full default-mode and comparison-mode walkthroughs: [references/EXAMPLES.md](./r
 - **Multi-agent landscape runs drift hardest.** Restate the user's original question at the top of the synthesis, then cut every section that doesn't serve it.
 - **Three or more items still need the matrix, even in `quick` mode.** Prose comparison of 3+ options is unreadable; a five-row matrix costs less space than the paragraphs it replaces.
 - **A stale year in a query silently poisons currency.** Put the current year in currency-angle queries — undated results skew years old.
+- **Summaries reproduce source passages without marking them.** When a sentence is the source's wording, quote it and attribute it; otherwise reword in your own indirect speech. One short marked phrase per source is the pattern — the worked example in [references/EXAMPLES.md](./references/EXAMPLES.md) shows it.
 
 ## Integration
 
