@@ -55,7 +55,16 @@ Run `npm test -- auth.spec.ts` and confirm it exits 0 before starting Phase 3.
 Confirm `dist/index.js` exists and parses before tagging.
 ```
 
-❌ Tells the model to re-read its own output — §7 deduction, because it already does this and the instruction compounds:
+✅ Audits a progress claim against evidence, or hands the judgment to a fresh-context agent. Scores fine — both are recommended for long-running work on current Fable-tier models:
+
+```markdown
+Before reporting progress, tie each claim to a tool result from this session;
+say plainly which items are not yet verified.
+Dispatch one verifier agent with the diff and the candidate findings; it re-reads
+each cited line and drops findings whose citation is wrong.
+```
+
+❌ Tells the model to re-read its own output with nothing external to check against — §7 deduction, because it already does this and the instruction compounds:
 
 ```markdown
 Before responding, double-check your answer. For any non-trivial task, add a
@@ -111,4 +120,4 @@ fix(track-session): replace bare NEVER-retry mandate with explained rule
 - **Multiline `description:` breaking discovery (#9817)** — real through mid-2026, fixed as of Claude Code 2.1.220, verified with probe skills 2026-07-27. Scalar style is no longer scored.
 - **The ≤230-char description soft target** — no official basis. Listing eviction is least-invoked-first, so workhorse skills keep their full text; official sizing is "a few sentences to a short paragraph."
 - **The +5 bonus for shipping an eval set** — replaced by a standing P1 for its absence (skill-creator optimizer shipped 2026-03-03).
-- **`## Verification Checklist` as a recommended methodology section** — dropped from §4 in 5.0.0. The official guidance is to *remove* carried-over verification instructions rather than reword them, since they compound with behavior the model already performs. Self-re-check content is now a §7 deduction; checks against external state were never the target (see pair 3).
+- **`## Verification Checklist` as a recommended methodology section** — dropped from §4 in 5.0.0. The Opus 5 guidance was to *remove* carried-over verification instructions rather than reword them, since they compound with behavior the model already performs. Narrowed in 6.0.0: the Fable 5.1 guidance keeps test-or-check-before-reporting instructions, recommends fresh-context verifier agents over self-critique, and recommends auditing progress claims against tool results. Generic self-re-check with no external referent stays a §7 deduction; the three carve-outs in §7 score fine (see pair 3). Don't reintroduce the section as a spec requirement — judge content, not headings.
