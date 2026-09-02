@@ -5,14 +5,14 @@ license: MIT
 argument-hint: "[skill-topic]"
 metadata:
   author: Antonin Januska
-  version: "6.0.0"
+  version: "6.0.1"
 ---
 
 # Generate Skill
 
 ## Overview
 
-Produces one ready-to-ship `SKILL.md` (plus optional `references/`, `scripts/`, `assets/`) on the conventions from the agentskills.io skill-creation pages, Anthropic's skill-creator, the platform prompting guides, and empirical activation research.
+Produces one ready-to-ship `SKILL.md` (plus optional `references/`, `scripts/`, `assets/`) on the conventions from the agentskills.io skill-creation pages, Anthropic's skill-creator, the platform prompting guides, and empirical activation research. The Phase 4 calibration list is tuned for the Claude 5 generation; re-check it against the current model's prompting guide when the generation changes.
 
 **One skill, one job.** This skill's job is the SKILL.md and its frontmatter — not docs, releases, or auxiliary files.
 
@@ -59,7 +59,7 @@ Show the draft, measure it (`python3 scripts/measure.py <path/to/SKILL.md>` repo
 - ✅ `Do NOT use this skill for …` when a near-neighbor exists
 - ❌ First person ("I help you create skills") — degrades activation (Seleznov n=650)
 - ❌ Vague ("A skill for creating skills"), or a bullet-list description — no surveyed top skill uses that format
-- ❌ Intensity escalation ("CRITICAL: you MUST invoke this") — current models overtrigger on aggressive language, and the official fix is normal register. Raise recall with *more literal triggers and a coverage clause*, never with volume.
+- ❌ Intensity escalation ("CRITICAL: you MUST invoke this") — the model overtriggers on aggressive language, and the official fix is normal register. Raise recall with *more literal triggers and a coverage clause*, never with volume.
 
 ### Phase 3 — Frontmatter
 
@@ -71,14 +71,14 @@ name: <kebab-case, ≤64 chars, no "anthropic"/"claude" reserved words>
 description: <string from Phase 2>
 license: MIT
 argument-hint: "[<short-token>]"    # top-level, not nested — and QUOTED: bare [x] is a YAML list, not a string
-effort: high                        # optional Claude Code key; overrides the session level while the skill runs (verified live 2026-09-02)
+effort: high                        # optional Claude Code key; overrides the session level while the skill runs
 metadata:
   author: <user-supplied>
   version: "1.0.0"
 ---
 ```
 
-`effort` is the primary intelligence/latency/cost control on current models, and level names mean different amounts of thinking on each model — sweep on real tasks rather than trusting a guess. Defaults by type: automation and reference `low`, technical `medium`, auditing and methodology `high`, multi-source synthesis and agentic coding `xhigh`. At `low` the model searches less and answers from memory; at `xhigh`/`max` it drafts a long deliverable in its reasoning and then again as output — so a skill whose deliverable is a long file stays at `high`. Omit the key to inherit.
+`effort` defaults by type: automation and reference `low`, technical `medium`, auditing and methodology `high`, multi-source synthesis and agentic coding `xhigh`. A skill whose deliverable is a long file stays at `high` — at `xhigh`/`max` the model drafts it twice, once in reasoning and once as output. Omit the key to inherit; rationale and the live-verification note are in FRONTMATTER.md.
 
 Other optional fields, frontmatter anti-patterns and the three-tier portability rules: **[references/FRONTMATTER.md](references/FRONTMATTER.md)**.
 
@@ -102,12 +102,12 @@ Full templates in [references/PATTERNS.md](references/PATTERNS.md) — load only
 - **Favor procedures over declarations** — teach how to approach the class of problem, not what to output for one instance.
 - **Pair every "do not X" with a positive directive.** Official: "Tell Claude what to do instead of what not to do."
 
-**Agentic calibration — leave these out.** Current models already do them, so restating the instruction compounds the behavior and burns tokens with no quality gain.
+**Agentic calibration — leave these out.** The model already does them, so restating the instruction compounds the behavior and burns tokens with no quality gain.
 
-- **No generic self-re-check steps** — cut "double-check your answer", "re-verify before responding", "add a final verification step for any non-trivial task". The fix is deletion, not rewording. Three things stay, and on current Fable-tier models the last two are recommended for long-running work: checks against *external* state (run the test suite, confirm the file parses, validate against the schema); a writer-verifier pattern where a fresh-context agent judges *another* agent's output; and an evidence audit before a progress report ("only report work you can point to a tool result for"). The defect is an agent re-reading work it produced itself with nothing external to check it against.
-- **Never instruct the agent to echo its reasoning** ("show your thinking", "explain your reasoning in the response") — can trigger the `reasoning_extraction` refusal on current Fable-tier models and cause model fallbacks. Ask for conclusions and evidence instead.
+- **No generic self-re-check steps** — cut "double-check your answer", "re-verify before responding", "add a final verification step for any non-trivial task". The fix is deletion, not rewording. Three things stay, and the last two are recommended for long-running work: checks against *external* state (run the test suite, confirm the file parses, validate against the schema); a writer-verifier pattern where a fresh-context agent judges *another* agent's output; and an evidence audit before a progress report ("only report work you can point to a tool result for"). The defect is an agent re-reading work it produced itself with nothing external to check it against.
+- **Never instruct the agent to echo its reasoning** ("show your thinking", "explain your reasoning in the response") — can trigger the `reasoning_extraction` refusal and a model fallback. Ask for conclusions and evidence instead.
 - **Never instruct the agent not to think or not to reason** — increases leakage of internal XML tags into visible output.
-- **No narration suppressors** ("hold all findings for the final response", "don't narrate", "no interim updates") and **no anti-formatting rules** ("never use bullets", "no headers", "no bold"). Both were written against models that over-narrated and over-formatted; current models do the opposite, so the lines produce silence and flat prose. Say *when* a specific update or format is wanted instead ("report scope before dispatch"; "use a table when comparing three or more items"). Shaping the final message — one chat line, the file is the deliverable — is fine.
+- **No narration suppressors** ("hold all findings for the final response", "don't narrate", "no interim updates") and **no anti-formatting rules** ("never use bullets", "no headers", "no bold"). Both were written against models that over-narrated and over-formatted; the model does the opposite, so the lines produce silence and flat prose. Say *when* a specific update or format is wanted instead ("report scope before dispatch"; "use a table when comparing three or more items"). Shaping the final message — one chat line, the file is the deliverable — is fine.
 - **Scope delegation** when the skill uses subagents: name the scenarios that warrant one and the cap, dispatch independent agents in one message, and keep working while they run instead of blocking on each. Open-ended delegation multiplies cost; blocking delegation multiplies wall-clock.
 - **Bound the deliverable** when the skill writes a file — the output template needs a line like "match length to the task, no filler sections, redundant summaries or boilerplate." Written deliverables run long by default.
 - **State where a narrow skill stops** — models expand scope on their own, adding steps nobody requested. When the skill produces code, add the code-side line too: "Report a pre-existing bug or behavior the task doesn't mention as a follow-up rather than fixing it here. Commit tests only where the task asks or the repo already keeps tests for this kind of change, sized like the neighboring test files; scratch checks are not test files." Unrequested additions and committed test code drop substantially with this line, with no change in task success.
@@ -187,11 +187,7 @@ To measure whether the **body** improves output rather than just triggering, run
 - **Symptom:** New skill never auto-invokes. **Cause:** Vague prose, no specific triggers. **Fix:** Rewrite in the "Use whenever the user wants to…" form with 3+ quoted trigger phrases.
 - **Symptom:** Works in isolation, breaks once the user has >20 skills installed. **Cause:** Distinctive trigger sits past char 50 and the listing budget truncated it. **Fix:** Move the distinctive noun to the start of `description`.
 - **Symptom:** Fires on exact phrases but misses indirect asks ("clean up this data file" for a CSV skill). **Cause:** No coverage clause. **Fix:** Add "even if they don't explicitly mention X".
-- **Symptom:** Fires on prompts it has nothing to do with. **Cause:** Intensity escalation ("CRITICAL: you MUST use this") — current models overtrigger on aggressive language. **Fix:** Drop to normal register; widen recall with more literal triggers instead.
 - **Symptom:** Description scores well on train, regresses on validation. **Cause:** Overfitting — wording tuned against the same queries each round. **Fix:** Select by validation score, keep the split fixed; an earlier iteration may win.
-- **Symptom:** Refusals or model fallbacks on current Fable-tier models. **Cause:** Body instructs the agent to echo its reasoning. **Fix:** Delete those instructions; ask for conclusions and evidence.
-- **Symptom:** Burns tokens and latency on short tasks with no quality gain. **Cause:** Generic verification scaffolding ("double-check your answer") the model performs unprompted. **Fix:** Delete it; keep checks against external state, fresh-context verifier agents, and evidence-audited progress reports.
-- **Symptom:** The agent goes quiet for minutes, or the final message covers only the last step. **Cause:** A narration suppressor carried over from a chattier model. **Fix:** Delete it before adding anything; if one update is wanted, say when.
 - **Symptom:** "Unexpected key" warning on load. **Cause:** Top-level `version`, `author`, or `tags`. **Fix:** Move under `metadata`. `argument-hint` and `hooks` are **valid** top-level Claude Code keys and stay put — only Anthropic's packaging validator rejects them.
 - **Symptom:** Two skills both fire on one prompt. **Cause:** Overlapping triggers, no negative scope. **Fix:** Add `Do NOT use this skill for X — see Y` to whichever is the wrong fit.
 - **Symptom:** SKILL.md is 700 lines and the agent quotes the wrong section. **Cause:** Single-file overflow — Claude reads the head and misses the tail. **Fix:** Extract to `references/`, one level deep, with explicit "load when…" pointers.
@@ -200,6 +196,3 @@ To measure whether the **body** improves output rather than just triggering, run
 
 - **rate-skill** — run after generating to grade the result. `generate-skill` produces, `rate-skill` audits; the Phase 4 table and rate-skill's Category 4 table are one shared spec.
 
-## References
-
-Full source list with URLs: **[references/SOURCES.md](references/SOURCES.md)** — load only when a user disputes a rule and you need to cite the spec.
