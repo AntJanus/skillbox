@@ -60,35 +60,7 @@ skill-name/
 
 ### SKILL.md Format
 
-Every SKILL.md MUST have:
-
-```yaml
----
-name: kebab-case-name
-description: Use this skill whenever the user wants to [job], asks to "[phrase 1]", "[phrase 2]", or [context]. Do NOT use for [near-neighbor] — see [other-skill].
-license: MIT
-argument-hint: "[optional-args]"
-metadata:
-  author: author-name
-  version: "1.0.0"
----
-
-# Skill Title
-
-## Overview
-[1-2 sentences + core principle. When-to-use lives in the description, not a body section — the body only loads after triggering.]
-
-[Main Content - Pattern Specific]
-
-## Examples
-[✅/❌ code comparisons]
-
-## Gotchas
-[Concrete edge cases and failure modes]
-
-## Integration
-[How it works with other skills]
-```
+Frontmatter: `name`, `description`, `license`, `argument-hint` (top-level, quoted), `effort` when the job warrants a level other than the session's, and `metadata.author` / `metadata.version`. Required body sections depend on the skill type — the one shared spec is the table in `skills/generate-skill/SKILL.md` Phase 4, graded by `skills/rate-skill/SKILL.md` Category 4. Every type requires `## Gotchas`; `## Integration` is optional and is a deduction when it holds nothing concrete. When-to-use lives in the description, not a body section — the body only loads after triggering.
 
 ## Libraries and Deprecated Code
 
@@ -96,7 +68,7 @@ metadata:
 
 **DO use these patterns:**
 
-- Phase-based workflows whose checkboxes gate on **external state** — a test run, a file that exists, a command that exits 0. Never on the agent re-reading its own output.
+- Workflows that lead with the goal, the constraints, and gates on **external state** — a test run, a file that exists, a command that exits 0 — with numbered phases only where the order is load-bearing. Never a gate on the agent re-reading its own output.
 - "Quality Signals" sections listing what good looks like
 - "Anti-Patterns" sections with paired ✅ alternative for every ❌ item (negation handling in LLMs is empirically weak — pair `do not X` with `do Y instead`)
 - ✅ / ❌ markdown emoji for example comparisons (community convention per Anthropic skill-creator + docx)
@@ -110,13 +82,13 @@ metadata:
 - Vague descriptions like "A skill for testing" or "Helps with React"
 - Single-sentence descriptions without specific triggers
 - First-person POV ("I'll help you…") — empirically degrades activation reliability
-- Descriptions over 1024 chars (Anthropic spec hard cap — the only length rule; the old ≤230 soft target was dropped 2026-07-27, listing eviction is least-invoked-first so workhorse skills keep full text)
+- Descriptions over 1024 chars — the spec hard cap and the only length rule. Listing eviction is least-invoked-first, so workhorse skills keep their full text.
 - Skills over 500 lines without progressive disclosure (aim under 300)
 - Examples without ✅ / ❌ comparisons
 - `<Good>` / `<Bad>` XML tag wrappers — non-canonical (zero of 8 surveyed top community skills use them); recommend ✅ / ❌ instead
-- ALL-CAPS "IRON LAW" / "NEVER" / "ALWAYS" framing without explained reasoning — officially backed as of the Claude 5 prompting guidance ("Do X because Y" outperforms bare "ALWAYS X"); previously an Anthropic skill-creator yellow flag
+- ALL-CAPS "IRON LAW" / "NEVER" / "ALWAYS" framing without explained reasoning — "Do X because Y" outperforms a bare "ALWAYS X" (Claude 5 prompting guidance)
 - Top-level `version`, `author`, `tags`, `category` in frontmatter — produce "unexpected key" errors (anthropics/skills #37). They live under `metadata` (except `argument-hint`, which is top-level; `hooks` is a valid Claude Code runtime key — see the three-tier note in Learnings).
-- Generic self-re-check scaffolding: "double-check your answer", "re-verify before responding", "include a final verification step for any non-trivial task". Current models re-read their own output unprompted, so these compound with behavior that already happens and cost tokens with no quality gain — the fix is deletion, not rewording. Three things are not this and stay: checks against external state ("run the test suite", "confirm the file parses"), a fresh-context verifier agent judging *another* agent's output, and an evidence audit before a progress report ("only report work you can point to a tool result for"). The Fable 5.1 guidance recommends the last two for long-running work (narrowed 2026-09-02; the 2026-07-28 rule was broader).
+- Generic self-re-check scaffolding: "double-check your answer", "re-verify before responding", "include a final verification step for any non-trivial task". Current models re-read their own output unprompted, so these compound with behavior that already happens and cost tokens with no quality gain — the fix is deletion, not rewording. Three things are not this and stay: checks against external state ("run the test suite", "confirm the file parses"), a fresh-context verifier agent judging *another* agent's output, and an evidence audit before a progress report ("only report work you can point to a tool result for"). The Fable 5.1 guidance recommends the last two for long-running work.
 - Instructing the agent not to think or not to reason — increases leakage of internal XML tags into visible output.
 - Narration suppressors ("hold all findings for the final response", "don't narrate") and anti-formatting rules ("never use bullets", "no bold") — written against models that over-narrated and over-formatted; current Fable-tier models do the opposite, so these lines produce silence and flat prose. Say when a specific update or format is wanted instead.
 - Subagent instructions with no scope, or that block the orchestrator on each agent: name which scenarios warrant delegation and the cap, dispatch independent agents in one message, and keep working while they run.
@@ -129,13 +101,13 @@ metadata:
 
 - **DO** use the `generate-skill` skill when creating new skills
 - **DO** include 3-5 specific trigger phrases in the description field
-- **DO** keep the `description` field within the **1024-char spec hard cap** (agentskills.io) — the only length rule. The old ≤230 soft target was dropped 2026-07-27: it had no official basis, and listing eviction is least-invoked-first, so workhorse skills keep their full text. agentskills.io says "err on the side of being pushy"; platform.claude.com says models "may now overtrigger" on skills and to "dial back any aggressive language." Read as **coverage vs. intensity** and they agree: more literal triggers and a coverage clause raise recall, ALL-CAPS and "CRITICAL: you MUST" raise nothing. Be pushy about coverage, normal in register. Still front-load the distinctive trigger noun in the first ~50 chars.
+- **DO** keep the `description` field within the **1024-char spec hard cap** (agentskills.io) — the only length rule; listing eviction is least-invoked-first, so workhorse skills keep their full text. agentskills.io says "err on the side of being pushy"; platform.claude.com says models "may now overtrigger" on skills and to "dial back any aggressive language." Read as **coverage vs. intensity** and they agree: more literal triggers and a coverage clause raise recall, ALL-CAPS and "CRITICAL: you MUST" raise nothing. Be pushy about coverage, normal in register. Still front-load the distinctive trigger noun in the first ~50 chars.
 - **DO** write descriptions in third person ("Use this skill whenever the user wants to…", not "I help you…"). First-person POV empirically degrades activation.
 - **DO** use directive register: "Use this skill whenever the user wants to…" with a "Do NOT use this skill for…" negative scope clause for collision-prone domains
 - **DO** provide ✅ / ❌ example comparisons (community convention per Anthropic skill-creator + docx)
-- **DO** include a `## Gotchas` section — concrete edge cases and failure modes are the body content agents can't infer (canonical as of 2026-07: agentskills.io now recommends Gotchas sections; previously house convention)
+- **DO** include a `## Gotchas` section — concrete edge cases and failure modes are the body content agents can't infer (agentskills.io recommends them)
 - **DO** keep SKILL.md under 300 lines (house aim) / 500 (canonical hard cap — Claude Code docs, spec, and skill-creator all state it). Use `references/` (plural) for extended content in new skills; existing singular `reference/` dirs are fine — nothing validates directory names. ETH Zurich arXiv 2602.11988 found context files generally don't improve task success while adding >20% inference cost.
-- **DO** gate methodology phases on external state when a gate is warranted (a passing test, a file on disk), and **DO NOT** add a closing verification section — `## Verification Checklist` was dropped from the section spec in generate-skill/rate-skill 5.0.0
+- **DO** gate methodology phases on external state when a gate is warranted (a passing test, a file on disk); a closing self-verification section is not a spec section for any type
 - **DO** use clear, imperative language (short sentences, bullet points)
 - **DO** fold "When to Use" content into the description, not a body section (Anthropic skill-creator guidance: "Include all when-to-use information in the description, not the body — the body only loads after triggering.")
 - **DO** document integration points with other skills
@@ -144,8 +116,7 @@ metadata:
 
 - **DO NOT** create vague or generic skills without specific use cases
 - **DO NOT** skip examples - always show ✅ / ❌ comparisons (✅ first; if room, also last — recency bias)
-- **DO NOT** write skills without troubleshooting sections
-- **DO NOT** create monolithic skills over 1000 lines
+- **DO NOT** ship a skill without a `## Gotchas` section — concrete failure modes are the body content the agent can't infer
 - **DO NOT** use abstract language - be concrete and specific
 - **DO NOT** skip the frontmatter metadata
 - **DO NOT** create skills that duplicate existing functionality
@@ -162,28 +133,26 @@ metadata:
 **DO NOT:**
 - Delete or modify other skills without explicit request
 - Change skill names (breaks existing references)
-- Remove troubleshooting or examples sections
+- Remove Gotchas or Examples sections
 - Break markdown formatting
 
 ### Documentation Style
 
 **DO use this style:**
 ```markdown
-## Phase 1: Setup
+## Workflow
 
-**Before proceeding:**
-- [ ] Requirement 1
-- [ ] Requirement 2
+**Goal:** the file parses and the test suite passes on the new schema.
+**Constraints:** touch only the migration and its test; report anything else as a follow-up.
+**Gates:** `npm test` exits 0 before tagging.
 
-**Commands:**
-```bash
-# Clear comment
-command-here
-```
+Prose on how to approach the class of problem. Numbered phases only where the
+order is load-bearing — install before config, scope before dispatch — with the
+reason the order matters.
 
 **Anti-Patterns:**
-- ❌ Skipping a phase gate "just this once" — the gate exists because the next phase assumes it passed
-  ✅ Run the gate; if it fails, return to setup
+- ❌ Skipping a gate "just this once" — the next step assumes it passed
+  ✅ Run the gate; if it fails, go back
 ```
 
 **DO NOT use this style:**
@@ -303,80 +272,6 @@ user: Create a skill for running database migrations
 3. Ensure triggers match user's natural language
 4. Add more trigger variations
 
-## Common Tasks
-
-### Task: Add a new skill to SkillBox
-
-```markdown
-1. Read existing skills for patterns
-2. Use `/generate-skill new-skill-name`
-3. Answer the discovery questions
-4. Review generated SKILL.md
-5. Save to skills/new-skill-name/SKILL.md
-6. Update README.md to list the new skill
-7. Test activation with trigger phrases
-```
-
-### Task: Update an existing skill
-
-```markdown
-1. Read the current SKILL.md
-2. Identify sections needing updates
-3. Preserve all existing sections
-4. Make targeted changes only
-5. Increment version in metadata
-6. Test activation still works
-```
-
-### Task: Debug skill activation
-
-```markdown
-1. Read the SKILL.md description field
-2. Check if triggers are specific enough
-3. Verify YAML frontmatter is valid
-4. Test with exact trigger phrases from description
-5. Add more trigger variations if needed
-```
-
-### Task: Convert long skill to use progressive disclosure
-
-```markdown
-1. Aim SKILL.md under 300 lines (essential content only); hard cap 500
-2. Create `references/` directory (plural — canonical per Anthropic spec)
-3. Move detailed rules to `references/STANDARDS.md`
-4. Move extensive examples to `references/EXAMPLES.md`
-5. Add "Deep Reference" section with links:
-   - **[📋 Complete Standards](./references/STANDARDS.md)**
-   - **[⚡ Code Examples](./references/EXAMPLES.md)**
-6. Keep extracted files one level deep — Claude head -100s deeply nested files and misses content
-7. Note: "Only load these when specifically needed to save context"
-```
-
-### Task: Create a SkillBox release
-
-```markdown
-1. Read reference/VERSION-CONTROL.md for complete process
-2. Update CHANGELOG.md with new version section
-3. Commit changelog
-4. Create annotated git tag
-5. Push tag to remote
-6. Verify tag exists on remote
-
-For detailed steps, see reference/VERSION-CONTROL.md
-```
-
-### Task: Update skill and document change
-
-```markdown
-1. Read the current SKILL.md
-2. Make your changes
-3. Increment metadata.version (PATCH/MINOR/MAJOR)
-4. Commit with conventional format: type(skill-name): description
-5. Add change to CHANGELOG.md [Unreleased] section
-
-For versioning rules, see reference/VERSION-CONTROL.md
-```
-
 ## Anti-Patterns
 
 If you catch yourself doing any of these, reconsider — each has a paired ✅ alternative:
@@ -406,40 +301,15 @@ If you catch yourself doing any of these, reconsider — each has a paired ✅ a
 - ❌ Creating tag for individual skill update
   ✅ Tags mark SkillBox releases that bundle multiple skill bumps
 - ❌ ALL-CAPS "IRON LAW" / "NEVER" / "ALWAYS" framing
-  ✅ "Quality Signals" and "Anti-Patterns" with explained reasoning ("Do X because Y" — officially backed by Claude 5 prompting guidance as of 2026-07)
+  ✅ "Quality Signals" and "Anti-Patterns" with explained reasoning ("Do X because Y", Claude 5 prompting guidance)
 
 ## Troubleshooting
 
-### Problem: Skill not activating
-
-**Cause:** Description field too generic or missing trigger phrases
-
-**Solution:**
-1. Read the SKILL.md
-2. Check description field
-3. Add 3-5 specific trigger phrases
-4. Include user's natural language ("when asked to X")
-5. Test with exact phrases
-
-### Problem: Generated skill is too long
-
-**Cause:** Too much content in SKILL.md
-
-**Solution:**
-1. Aim SKILL.md under 300 lines (hard cap 500)
-2. Move extensive content to `references/` (plural)
-3. Use progressive disclosure pattern; keep references one level deep
-4. Link with clear descriptions of when to load each file
-
 ### Problem: Skill activation conflicts
 
-**Cause:** Multiple skills have overlapping triggers
+**Cause:** Two skills share triggers.
 
-**Solution:**
-1. Make triggers more specific
-2. Use mutually exclusive phrases
-3. Document which skill handles which scenarios
-4. Consider combining skills if overlap is high
+**Solution:** Add `Do NOT use this skill for X — see Y` to whichever is the wrong fit, and make the remaining triggers mutually exclusive. Activation misses and oversized bodies are covered by generate-skill's Gotchas.
 
 ## Integration with Other Skills
 
@@ -468,43 +338,6 @@ Start with essentials in SKILL.md, reveal complexity in `references/` (plural fo
 **Gate on external state, never on self-review:**
 Where a methodology phase needs a gate, it checks something outside the agent. Instructions to re-check its own work are removed, not reworded — the model already does that, so restating it compounds the behavior and burns tokens.
 
-## Quick Reference
-
-### Creating New Skill
-```
-/generate-skill skill-name → Answer questions → Review → Save → Test
-```
-
-### Updating Skill
-```
-Read SKILL.md → Make changes → Increment version → Commit → Update CHANGELOG
-```
-
-### Validating Skill
-```
-Check: Directive third-person desc ≤1024 | Triggers in first 50 chars | ✅/❌ examples | Gotchas | < 300 lines preferred
-```
-
-### Testing Activation
-```
-Try trigger phrases → Verify activation → Adjust description if needed
-```
-
-### Creating Release
-```
-Review changes → Update CHANGELOG → Commit → Tag → Push
-```
-
-### Commit Message
-```
-type(scope): description
-
-# Examples:
-feat(track-session): add new checkpoint feature
-fix(code-review): correct synthesis severity collapsing
-docs(readme): update installation instructions
-```
-
 ## Meta
 
 This CLAUDE.md follows its own advice:
@@ -513,27 +346,16 @@ This CLAUDE.md follows its own advice:
 - Concrete examples with code
 - Checklists that gate on something checkable
 - Anti-Patterns section with paired ✅ alternatives
-- Troubleshooting with solutions
+- A single Anti-Patterns recap, with the provenance archive kept out of the per-session load
 
 Treat every issue working with SkillBox as an opportunity to update this file.
 
 ## Learnings
 
-- **Progressive disclosure via `references/` (plural) for 300-500 line limits** — When a SKILL.md approaches 300 lines, move troubleshooting (highest line count, lowest immediate-need) to `references/TROUBLESHOOTING.md`, keeping only 3-4 most common issues inline with a progressive disclosure link. The `references/` dir can also hold EXAMPLES.md and STANDARDS.md. _(captured 2026-03-21; updated 2026-05-14 to plural)_
-- **Release commit ordering matters** — SkillBox releases follow specific ordering: (1) one commit per skill change with `type(skill-name): description`, (2) separate `docs(changelog): prepare vX.Y.Z release` commit, (3) annotated tag `git tag -a vX.Y.Z`, (4) push with `git push && git push origin vX.Y.Z`. Don't bundle skill changes and changelog into one commit. _(captured 2026-03-21)_
-- **~~Multiline `description: |` is the #1 silent killer~~ OVERTURNED 2026-07-27** — the #9817 bug is not reproducible on Claude Code 2.1.220. Empirical test (three probe skills — `|` literal, `>` folded, single-line control — in a scratch project, fresh headless sessions asked to quote the listing verbatim): all three descriptions appeared intact, with block-scalar formatting correctly preserved. The rule is dropped entirely (user decision 2026-07-27); scalar style is no longer policed. The 2026-05-14 audit finding was real for its era — the bug existed then and was quietly fixed without the issues being closed as fixed. _(captured 2026-05-14; overturned 2026-07-27)_
-- **Directive third-person descriptions carry ~20× higher activation odds** — Empirical study (Seleznov n=650, CMH odds ratio 20.6, p<0.0001): "Use this skill whenever the user wants to…" form hits 94-100% activation vs passive "Use when X" at 37-87%. Note it's an odds ratio — "20× more reliably" overstates the absolute delta. First-person POV ("I help you…") degrades further. _(captured 2026-05-14; wording corrected 2026-07-02)_
-- **`<Good>`/`<Bad>` XML tags are SkillBox-only** — Zero of 8 surveyed top community skills (Anthropic, Vercel, Superpowers) use them. Migrate to ✅ / ❌ markdown emoji. _(captured 2026-05-14; repo fully migrated 2026-07-02)_
-- **Frontmatter is three-tier — know which validator you're serving** — (1) Universal spec (agentskills.io): `name`, `description`, `license`, `compatibility`, `allowed-tools`, `metadata` only. (2) Claude Code runtime: adds `argument-hint`, `when_to_use`, `hooks`, `paths`, `arguments`, `disable-model-invocation`, `user-invocable`, `model`, `effort`, `context`, `agent`, `shell`, `disallowed-tools`. (3) Anthropic's repo packaging validator (`quick_validate.py`) rejects everything outside tier 1. Verified 2026-07-02: the Vercel `npx skills add` channel (SkillBox's actual distribution) tolerates the CC extension keys — keep `argument-hint` etc. unless submitting to anthropics/skills. _(captured 2026-07-02)_
-- **Convention tiers clarified by 2026-07-02 re-validation** — Canonical (cited): 1024-char description cap, front-loaded triggers, when-to-use folded into description (never a body section), directive third-person register, 500-line body cap, progressive disclosure. House style (keep, but don't label as spec): ✅/❌ convention, `## Troubleshooting` headings, <300-line aim, the exact "Use this skill whenever…" phrasing. Claude Code also applies a separate ~1,536-char listing cap to `description` + `when_to_use` combined, distinct from the 1024 spec cap. `references/` plural is the spec-documented name but nothing validates directory names — plural for new dirs, no renames. _(captured 2026-07-02; amended 2026-07-27 — Gotchas moved to canonical, 230-char soft target dropped, see next entry)_
-- **2026-07-27 doctrine sync — four entries overturned by the Claude 5 research pass + one empirical test.** The research verdict on "newer models need less prescription" is SPLIT: descriptions unchanged (stay pushy, no official basis for shortening), bodies strongly de-prescribe (Fable 5 page: prior-model skills are "often too prescriptive… can degrade output quality" — prefer "Do X because Y" over rigid mandates). Overturned: (1) Gotchas sections are now canonical — agentskills.io recommends them; (2) anti-IRON-LAW framing now has official backing, not just a yellow flag; (3) the 230-char description soft target is dropped — no official basis, and listing eviction is least-invoked-first, so workhorse skills keep full text; (4) the multiline-description rule is dropped — #9817 not reproducible on CC 2.1.220 (see the overturned entry above for the test method). Note the skill-authoring docs themselves have NOT been revised for Claude 5 — all Claude-5 guidance lives in the prompting pages + the 2026-07-24 blog; the doc sets disagree by omission. _(captured 2026-07-27)_
-
-- **2026-07-28 platform-guide sync — verification scaffolding reversed from required to penalized.** Until 5.0.0 this file forbade "methodology skills without verification checklists" and the meta-pair recommended a `## Verification Checklist` section. The [Prompting Claude Opus 5 guide](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5) says the opposite and says it plainly: remove carried-over verification instructions rather than reword them, because the model verifies and self-corrects unprompted and the instruction compounds with behavior already happening. The section is gone from the shared spec; self-re-check content is a rate-skill §7 deduction. **The distinction that makes this workable is external state vs. self-review** — "run the test suite", "confirm the file parses", "validate against the schema" were never the target and still score fine, and checklists remain one of the six official instruction patterns. Three sibling rules arrived from the same guide: cap subagent delegation, bound the length of any file the skill has the agent write, and state where a narrow skill stops. Note the two source families are on different revision clocks — agentskills.io has not been updated for this, so where they disagree the platform guide is the newer source. _(captured 2026-07-28)_
-- **2026-09-02 Fable 5.1 sync — the verification rule narrowed, `effort` verified, harness duplication named.** The [Prompting Claude Fable 5.1 guide](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-1) and the migration section bundled with the claude-api skill (Claude Code 2.1.258) moved four things. (1) The 2026-07-28 "delete verification instructions" rule is per-model and flipped: 5.1 guidance keeps test-or-check-before-reporting lines, recommends fresh-context verifier agents over self-critique, and recommends auditing progress claims against tool results (that line nearly eliminated fabricated status in their testing). The §7 deduction now covers only generic re-checks with no external referent — three carve-outs score fine. The guide marks the keep-it advice tentative; check the current model's guide before moving this rule again. (2) Skill frontmatter `effort` overrides the session level on invocation — verified live with `${CLAUDE_EFFORT}` (control `high`, `effort: low` skill reported `low`); generate-skill Phase 3 now carries defaults by type. (3) Two new §7 anti-patterns, narration suppressors and anti-formatting rules — 5.1 under-narrates and under-formats, so text written to hold down chattier models now produces silence. Fleet grep found zero of either; the rules are guards. (4) Seven guide snippets are injected by the Claude Code harness itself (autonomy, delivering-work scope, progress-update line, overplanning nudge, hidden-tool-output note, batch nudge, readability rules); restating any in a skill is a §6 conciseness deduction. Delegation is a real tradeoff — the guide says delegate more and asynchronously, the global rule caps spawns; the meta-pair keeps the cap and takes only the non-blocking half. Methodology template now leads with goal, constraints, and gates; phases only where the order is load-bearing. Fleet follow-ups from the same audit: deep-research (name-verification line, a full quoting example), track-session (the six-item compaction retention list), track-roadmap (edit in place), code-review (model-tier line), local-first-app and ideal-react-component (scope-and-tests line), screenshot-local (crop before judging detail). _(captured 2026-09-02)_
-- **Compression technique that actually moves the needle, from `local-first-app`:** headings that carry the claim, rationale folded into the rule as an em-dash aside instead of a following sentence, a `## Navigation` load-when table, and all ✅/❌ payload behind a one-line pointer naming what's in the file. Applied to the meta-pair it cut rate-skill 239→187 lines and generate-skill 246→191 while *adding* six rules. The single biggest win was the em-dash fold — the old bodies were consistently `rule.` followed by `Why: reason.`, which is two sentences doing one sentence's work. Second biggest was deleting duplicated payload: `PATTERNS.md` carried a third copy of the section-spec table already in both SKILL.md files, which rate-skill's own §6 penalizes. _(captured 2026-07-28)_
+The dated record of how each rule above was arrived at, including the entries that were later overturned, lives in **[reference/LEARNINGS.md](./reference/LEARNINGS.md)**. Load it when a rule looks wrong and you need its provenance before changing it. New learnings go there; the rule they produce goes in the section above that it belongs to.
 
 ---
 
 **Last Updated:** 2026-09-02
-**Applies To:** Claude Code 2.1.220+
+**Applies To:** Claude Code 2.1.258+
 **Source:** https://antjanus.com/ai/claude-code-best-practices
