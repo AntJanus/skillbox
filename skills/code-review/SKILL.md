@@ -6,7 +6,7 @@ argument-hint: "[path | --staged | --branch <base> | --repo [--blueprint <skill>
 allowed-tools: Read, Write, Glob, Grep, Bash, Agent
 metadata:
   author: Antonin Januska
-  version: "2.4.0"
+  version: "2.4.1"
 ---
 
 # Code Review — Multi-Agent Local Review
@@ -15,7 +15,7 @@ metadata:
 
 Runs narrow-lane reviewer agents in parallel, then a verifier that keeps only findings with real impact, distills the "fix first" shortlist, and suppresses the nit tail — merged into `REVIEW.md` at the repo root. **Core principle:** a review is worth reading when it finds *wrong answers*, not style. The lanes are aimed at correctness and structural soundness; the verifier defaults low-impact findings to DROP so the signal isn't buried. The skill scopes, dispatches, and renders — the reviewers and verifier judge.
 
-**Model tier:** Opus or Sonnet for the agents; Haiku needs more guidance. **Not for:** security passes (`/security-review`), open PRs by number (`/review`), or trivial one-line/doc changes.
+**Effort and model:** lanes run well at `high`, and at `medium` or `low` on a Fable-tier model — lower effort there is often competitive with Opus and Sonnet on cost per task. Haiku has no `effort` control and needs more guidance in the prompt. **Not for:** security passes (`/security-review`), open PRs by number (`/review`), or trivial one-line/doc changes.
 
 ## Modes & flags
 

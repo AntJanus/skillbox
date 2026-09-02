@@ -173,12 +173,12 @@ Diff:
 <diff content>
 
 Standard (treat as the bar, these are the house skills):
-- typography — readability FLOOR: body/prose text ≥16px, weight ≥400,
+- typography — the readability floor: body/prose text ≥16px, weight ≥400,
   contrast ≥4.5:1 against its background, line-height ≥1.5. Headings may be
-  larger/heavier. A muted color is NOT a license to also shrink the size.
-  Flag prose (sentences the user must READ) rendered at a small/caption token
-  (e.g. size="xs"/"sm", ~12-14px) — that is the #1 recurring defect.
-- color-system — contrast floors (4.5:1 text, 3:1 large text/UI), and NEVER
+  larger/heavier. A muted color is not a license to also shrink the size.
+  Flag prose (sentences the user must read) rendered at a small/caption token
+  (e.g. size="xs"/"sm", ~12-14px) — the most common defect in this lane.
+- color-system — contrast floors (4.5:1 text, 3:1 large text/UI), and never
   color as the only signal (status/error/selected must also carry text, icon,
   weight, or shape — colorblind users can't see red-vs-green alone).
 
