@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "[start|save|resume|verify|recover]"
 metadata:
   author: Antonin Januska
-  version: "6.1.1"
+  version: "6.2.0"
 ---
 
 # Session Progress
@@ -58,6 +58,8 @@ Next: <specific next action — name files and functions, not "fix the bug">
 
 **Length:** one line per task; Decisions and Failed Attempts get 1–2 sentences each. The file is a state record, not a narrative — no filler sections, no restated summaries, no recap of work already listed under Completed Work.
 
+**What must survive a context reset**, in priority order: problems that came up and how they were resolved (Failed Attempts); options raised, tried, or set aside, and why (Decisions); anything the user asked for, ruled out, or set as a constraint, stated close to their own words; exactly where things stand (Current Status); what is still open or promised (Plan); and details that are hard to reconstruct — names, numbers, exact wording, links — kept exact. Be complete on these even at the cost of length. Condense your own reasoning to what it concluded.
+
 **IDs:** `t_` (task) or `f_` (failed attempt) plus a short unique token. Five random `[a-z0-9]` chars is the default; a mnemonic slug (`t_redis-mw`, `t_authfix`) also works. Keep an id stable once written, because `dep:` references point at it. Every plan item carries an `id` and a `dep` (`dep:none` or `dep:t_XXXXX`).
 
 **Log every failed approach with its reason** so it isn't blindly retried. When a failure was environment-scoped — an MCP server not connected, missing credentials, a service down — say so in the entry; a later session may have a different environment, so re-checking it is correct rather than a repeat.
@@ -100,7 +102,7 @@ Resume is also the natural reconciliation point: if `project:` or `status:` have
 
 ### Verify and Recover — load on demand
 
-- **`/track-session verify`** confirms `[x]` tasks actually meet their requirements — read the files, run the tests, gather evidence, and append a `## Verification Results` section. Load [reference/VERIFICATION.md](./reference/VERIFICATION.md) when the user asks to verify, or when ticked boxes are the only evidence the work is done.
+- **`/track-session verify`** confirms `[x]` tasks actually meet their requirements — read the files, run the tests, tie each claim to evidence from this run, and append a `## Verification Results` section. Load [reference/VERIFICATION.md](./reference/VERIFICATION.md) when the user asks to verify, or when ticked boxes are the only evidence the work is done.
 - **`/track-session recover`** rebuilds a deleted `SESSION_PROGRESS.md` from the Claude Code transcript. Load [reference/RECOVERY.md](./reference/RECOVERY.md) when the file is missing and the user wants it back — it carries the transcript-slug derivation and a tested Python reconstructor, which the reference explains is necessary because jq mis-parses these transcripts.
 
 ## Examples

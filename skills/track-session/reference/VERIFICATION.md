@@ -6,73 +6,25 @@ This guide provides detailed methodology for verifying session work using `/trac
 
 **Purpose:** Ensure completed tasks actually meet original requirements before declaring work done.
 
-## Verification Process
+## Verification
 
-### Step 1: Check Existence
+**Goal:** every `[x]` task in SESSION_PROGRESS.md is backed by evidence gathered this run — a file you read, a test you ran, a behavior you exercised — and the report says which tasks are not.
+**Constraints:** verify, don't fix. A task that fails verification is reported, unticked, and left for the session to act on. If the file is missing, stop and say so; `/track-session` creates one.
+**Gates:** the report section is written only after every `[x]` task has an evidence line.
 
-Verify SESSION_PROGRESS.md exists. If missing, return error: "No session to verify. Use `/track-session` to create session first."
+Read the whole file first: the Plan gives the requirements, Failed Attempts tells you what was already ruled out, and each task's acceptance criteria tell you what "done" means. Where a task has no criteria, add them to its description before verifying it — "ambiguous done" is the most common cause of a false `[x]`.
 
-### Step 2: Read Original Plan
+Dependencies are mechanical and worth checking exactly: a `[x]` task whose `dep:` target is unticked is an orphan, and a chain that loops is a cycle. Report both.
 
-Read the entire SESSION_PROGRESS.md to understand:
-- Original requirements in Plan section
-- Dependencies between tasks
-- Acceptance criteria for each task
-- Context from "Failed Attempts" section
-
-### Step 3: Verify Each Completed Task
-
-For each task marked with `[x]`:
-
-**Check actual completion:**
-- Read files mentioned in task
-- Run tests if applicable
-- Validate output/behavior
-- Confirm code exists and works
-
-**Confirm requirements met:**
-- Does work match task description?
-- Are quality standards satisfied?
-- No broken tests or console errors?
-- Edge cases handled?
-
-**Evidence collection:**
-- Test results (counts, pass/fail)
-- File modifications (which files changed)
-- Behavior validation (API responses, UI updates)
-- Performance metrics if applicable
-
-### Step 4: Verify Dependencies
-
-**Check dependency tree:**
-- Tasks marked complete should have dependencies also complete
-- No orphaned dependencies (B depends on A, but A not done)
-- No circular dependencies
-- Proper sequencing maintained
-
-**Validation:**
 ```markdown
 - [x] <!-- id:t_a1b2c dep:none --> Phase 1: Setup ✅
 - [x] <!-- id:t_d3e4f dep:t_a1b2c --> Phase 2: Implementation ✅
 - [ ] <!-- id:t_g5h6i dep:t_d3e4f --> Phase 3: Testing ⚠️ Phase 2 done but Phase 3 pending
 ```
 
-### Step 5: Check for Scope Gaps
+Scope gaps are the judgment call: tasks done but unticked, requirements that surfaced during the work and never became tasks, tests written but not run, code committed but not deployed.
 
-**Requirements coverage:**
-- Are there implied requirements not captured as tasks?
-- Were tasks completed but not marked `[x]`?
-- Did requirements evolve during work?
-- Any technical debt introduced?
-
-**Common gaps:**
-- Tests written but not run
-- Code committed but not deployed
-- Documentation updated but not reviewed
-- Error handling added but not tested
-- Ambiguous "done" — when a task can't be verified because completion was never defined, add acceptance criteria to the task description before re-verifying
-
-### Step 6: Generate Report
+## Report format
 
 Create structured verification report in SESSION_PROGRESS.md under "## Verification Results":
 
@@ -138,43 +90,6 @@ Prioritized action items:
 1. Fix all blocking issues first
 2. Address high-priority improvements
 3. Plan medium/low items for future sprints
-
-## Verification Checklists
-
-### For Feature Implementation
-
-- [ ] All planned features implemented
-- [ ] Tests written and passing
-- [ ] Edge cases handled
-- [ ] Error handling complete
-- [ ] Documentation updated
-- [ ] No console errors or warnings
-- [ ] Performance acceptable
-- [ ] Security vulnerabilities addressed
-- [ ] Dependencies properly managed
-- [ ] Code reviewed (if applicable)
-
-### For Bug Fixes
-
-- [ ] Bug reproducible before fix
-- [ ] Root cause identified
-- [ ] Fix implemented and tested
-- [ ] Bug no longer reproducible
-- [ ] No regressions introduced
-- [ ] Related edge cases checked
-- [ ] Tests added to prevent recurrence
-- [ ] Documentation updated if needed
-
-### For Refactoring
-
-- [ ] Original functionality preserved
-- [ ] All tests still passing
-- [ ] No behavior changes
-- [ ] Code quality improved
-- [ ] Technical debt reduced
-- [ ] Performance maintained or improved
-- [ ] No new bugs introduced
-- [ ] Documentation reflects new structure
 
 ## Common Verification Scenarios
 
