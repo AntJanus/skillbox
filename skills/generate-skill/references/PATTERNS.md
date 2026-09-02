@@ -29,13 +29,17 @@ The instructions to *omit* from every template — self-re-check steps, reasonin
 
 ## Workflow
 
-### Phase 1: [Step Name]
+**Goal:** [what done looks like, in one sentence]
+**Constraints:** [what must hold — scope, files touched, where the skill stops]
+**Gates:** [conditions checkable against external state — a test passes, a file exists, a command exits 0]
+
+[Prose describing how to approach the class of problem.]
+
+### Phase 1: [Step Name] — only where the sequence is fragile
 **Before proceeding:**
 - [ ] [Condition checkable against external state]
 
-[Instructions for this phase.]
-
-### Phase 2: [Step Name]
+[Why this must come before Phase 2.]
 
 ## Examples
 [✅ desired / ❌ counter-example pairs — see Phase 5]
@@ -48,7 +52,8 @@ The instructions to *omit* from every template — self-re-check steps, reasonin
 - **Symptom:** [observable failure]. **Cause:** [root cause]. **Fix:** [action].
 ````
 
-- Phase boundaries carry checkboxes, and each one gates on **external state** — a test run, a file that exists, a command that exits 0. Never on the agent re-reading its own output; there is no closing verification section.
+- Lead with the goal, the constraints, and the gates. Add numbered phases only where the order is load-bearing (install before config, scope before dispatch) and say why — step scripts for judgment tasks reduce output quality on current models, and the model's own plan usually beats a hand-written one.
+- Every gate checks **external state** — a test run, a file that exists, a command that exits 0. Never the agent re-reading its own output; there is no closing verification section. A fresh-context verifier agent or an evidence audit before a progress report is fine (see SKILL.md Phase 4).
 - Every ❌ pairs with a ✅ alternative — negation handling in LLMs is empirically weak.
 - Explained reasoning in place of all-caps mandates.
 

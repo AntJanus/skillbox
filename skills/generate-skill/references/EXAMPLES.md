@@ -52,6 +52,15 @@ Run `skills-ref validate <skill-dir>` and confirm it exits 0 before finalizing.
 
 Why it works: it gates on external state the agent cannot know without checking.
 
+✅ Desired
+
+```markdown
+Before reporting progress, tie each claim to a tool result from this session;
+say plainly which items are not yet verified.
+```
+
+Why it works: the check has an external referent — a tool result — and on current Fable-tier models this line nearly eliminated fabricated status reports on long runs.
+
 ## Counter-example
 
 ❌ Anti-pattern
@@ -60,4 +69,4 @@ Why it works: it gates on external state the agent cannot know without checking.
 Before you finish, double-check your work and use a subagent to verify the output.
 ```
 
-Why it fails: the model already verifies and self-corrects unprompted, so the instruction compounds with its own behavior and costs tokens with no quality gain. The official fix is deletion, not rewording.
+Why it fails: nothing external is being checked. The model already re-reads its own output unprompted, so the instruction compounds with its own behavior and costs tokens with no quality gain. The fix is deletion, not rewording. A verifier agent that judges *another* agent's output with the diff in hand is a different pattern and stays.
