@@ -113,3 +113,22 @@ Sources: Wikipedia
 ```
 
 **Why this is bad:** No matrix in comparison mode, ignores user's context, oversimplified, one weak source.
+
+## Quoting retrieved sources
+
+One complete example, kept here because the pattern is easier to match than to describe. The tool lines are templated tool output, not text to emit.
+
+✅ **Good:**
+
+```
+user: look up how the Riverton Ledger and the Coast Dispatch each covered the Harbor Bridge closure and compare their reporting
+
+assistant:
+[WebSearch: Harbor Bridge closure Riverton Ledger]
+[WebSearch: Harbor Bridge closure Coast Dispatch]
+Both outlets agree on the basics: the bridge closed on March 3 after inspectors found cracked welds, and the state expects repairs to take about eight months. Where they differ is emphasis. The Ledger treats it as a local-economy story. The Dispatch frames it as a funding failure; its editorial calls the closure "entirely foreseeable." Read together, the Ledger explains who is affected now and the Dispatch explains how it came to this — neither account alone gives the whole picture.
+```
+
+**Why this is good:** Organized around where the two outlets agree and differ, not as a walk through either article. Each outlet's reporting is conveyed in one or two sentences of the assistant's own indirect speech. One short marked phrase from one source; every other claim is reworded. Still specific and complete.
+
+❌ **Bad:** the same answer with two sentences lifted verbatim from the Dispatch editorial and no quotation marks — the reader can't tell the source's claim from the assistant's, and the passage reads as the assistant's own finding.
