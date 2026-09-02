@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "<url-or-file> [--output filename.png]"
 metadata:
   author: Antonin Januska
-  version: "1.5.0"
+  version: "1.5.1"
 ---
 
 # Screenshot Local — shot-scraper
@@ -131,6 +131,7 @@ Starter configs per project type — SPA, Storybook, responsive sweep, static si
 - **A per-shot `auth:` key in `shots.yml` is silently ignored** — the shot still succeeds, just logged out, so the failure looks like a broken page rather than missing auth. Pass auth to the whole batch instead: `shot-scraper multi shots.yml -a auth.json`.
 - **Omitting `-h` makes the height track the content**, so two captures of the same route can differ in size. Set an explicit `-h` for before/after pairs.
 - **The YAML `server:` process spans the entire `multi` run** and is torn down at the end (`--leave-server` keeps it). One `server:` entry covers the batch; repeating it per shot doesn't start more servers.
+- **A full-page capture hides small defects.** Judging a 12px label, a contrast problem, or a clipped cell from a 1200px-wide image is guesswork. Capture the region with `-s <selector>` (plus `-p` padding) or crop the PNG before reading it — the model does its best visual work on a region it can look at up close.
 - **Screenshots don't diff cleanly.** Antialiasing and font rendering make PNG diffs noisy, so keep shot-scraper for documentation artifacts and reach for Percy, Chromatic, or Playwright's `toHaveScreenshot` when the goal is a regression gate.
 
 ## CI
