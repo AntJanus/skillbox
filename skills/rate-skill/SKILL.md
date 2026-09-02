@@ -6,7 +6,7 @@ argument-hint: "<path/to/SKILL.md>"
 allowed-tools: Read, Glob, Grep
 metadata:
   author: Antonin Januska
-  version: "5.1.0"
+  version: "6.0.0"
 ---
 
 # Rate Skill
@@ -104,7 +104,7 @@ The **shared section spec**, identical to the one `generate-skill` emits.
 
 Apply the official cut test to every instruction: **"Would the agent get this wrong without this?"** If no, it's bloat.
 
-−10 per distinct occurrence, floor 40: paragraphs restating general programming knowledge; "why this matters" prose longer than the rule it precedes; a verbose intro before the workflow; inconsistent terminology for one thing; menus where a default should be picked; instance-specific outputs where a procedure would generalize; payload duplicated between `SKILL.md` and a `references/` file.
+−10 per distinct occurrence, floor 40: paragraphs restating general programming knowledge; "why this matters" prose longer than the rule it precedes; a verbose intro before the workflow; inconsistent terminology for one thing; menus where a default should be picked; instance-specific outputs where a procedure would generalize; payload duplicated between `SKILL.md` and a `references/` file; text the Claude Code harness already injects every session — the autonomy block ("You are operating autonomously…"), the delivering-work scope block, the progress-update line ("Before you start, say in a line…"), the overplanning nudge ("When you have enough information to act, act"), the hidden-tool-output note, the batch-tool-calls nudge, the readability rules — because the model then reconciles two wordings of one rule.
 
 ### 7. Anti-patterns & calibration (5)
 
@@ -120,11 +120,13 @@ Apply the official cut test to every instruction: **"Would the agent get this wr
 
 **Agentic over-prompting** — behavior the model already performs, so restating it compounds and costs tokens with no quality gain.
 
-- **Verification scaffolding**: "include a final verification step for any non-trivial task", "double-check your answer", "re-verify before responding", "use a subagent to verify your own work". The official fix is deletion, not rewording. **Two things are not this and score fine:** checks against external state ("run the test suite", "confirm the file parses", "validate against the schema"), and a writer-verifier pattern where one agent judges *another* agent's output — officially endorsed for multi-agent coordination. The defect is an agent re-checking work it produced itself.
-- **Reasoning-echo** ("show your thinking", "explain your reasoning in the response"). Can trigger the `reasoning_extraction` refusal on Claude Fable 5 — always **also** emit a P0. A hard failure mode, not a style issue.
+- **Verification scaffolding** — deduct for generic re-checks with no external referent: "double-check your answer", "re-verify before responding", "add a final verification step for any non-trivial task". The fix is deletion, not rewording. **Three things are not this and score fine:** checks against external state ("run the test suite", "confirm the file parses", "validate against the schema"); a writer-verifier pattern where a fresh-context agent judges *another* agent's output; and an evidence audit before a progress report ("only report work you can point to a tool result for"). On current Fable-tier models the last two are recommended for long-running work, not merely tolerated — keep them when migrating a skill (platform 5.1 guidance, marked tentative there). The defect is an agent re-reading work it produced itself with nothing external to check it against.
+- **Reasoning-echo** ("show your thinking", "explain your reasoning in the response"). Can trigger the `reasoning_extraction` refusal on current Fable-tier models — always **also** emit a P0. A hard failure mode, not a style issue.
 - **"Do not think" / "do not reason"** — increases leakage of internal XML tags into visible output. Delete; a rule naming the tags is less effective than saying nothing.
-- **Uncapped delegation** — subagent instructions with no statement of which scenarios warrant one or how many. Open-ended delegation multiplies cost on small tasks.
-- **Unbounded scope on a narrow job** — models add steps that weren't requested, so a one-job skill should say where it stops.
+- **Narration suppressors** ("hold all findings for the final response", "don't narrate", "no interim updates"). Current Fable-tier models already under-narrate during long tool chains; these lines make the user watch silence. Delete first; if the skill wants one specific update, it should say when ("report scope before dispatch"). A rule shaping the *final* message (one chat line, the file is the deliverable) is not this.
+- **Anti-formatting rules** ("never use bullets", "no headers", "no bold"). Written against models that over-formatted; current models under-format, so the rule strips structure the reader wanted. Replace with a when-formatting-fits rule.
+- **Unscoped or blocking delegation** — subagent instructions with no statement of which scenarios warrant one or how many, or that make the orchestrator stop and wait on each agent in turn. Open-ended delegation multiplies cost; blocking delegation multiplies wall-clock. Independent agents dispatch in one message and the lead keeps working.
+- **Unbounded scope on a narrow job** — models add steps that weren't requested, so a one-job skill should say where it stops. For skills that produce code, the same rule covers the code: unrequested fixes to nearby behavior are reported as follow-ups, and scratch checks don't become committed test files.
 
 ## Eval set check
 
@@ -194,3 +196,4 @@ Every report names at least one strength, even on F-tier skills — users abando
 - **Extension keys are valid, just not portable.** `argument-hint`, `hooks`, `paths`, `when_to_use` run fine in Claude Code but are rejected by Anthropic's packaging validator (`quick_validate.py`) and absent from the universal spec. Don't penalize — raise the caveat only if the skill targets anthropics/skills.
 - **Recommend `skills-ref validate <path>`** as the structural validator. Never `npx skills lint` or `npx skills validate` — vercel-labs/skills ships no validation command.
 - **Negation is poorly handled.** Official: "Tell Claude what to do instead of what not to do," corroborated by arXiv 2503.22395. When a bare "DO NOT X" appears in a graded body, recommend pairing it with "Do Y instead."
+- **The verification rule is per-model and has flipped twice.** Required through 4.x, penalized in 5.0.0 on the Opus 5 guide, narrowed in 6.0.0 on the Fable 5.1 guide. Grade against the three carve-outs in §7 as written, and re-check the current model's prompting guide before tightening or loosening them again.
