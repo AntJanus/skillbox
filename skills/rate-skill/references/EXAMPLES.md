@@ -55,7 +55,7 @@ Run `npm test -- auth.spec.ts` and confirm it exits 0 before starting Phase 3.
 Confirm `dist/index.js` exists and parses before tagging.
 ```
 
-✅ Audits a progress claim against evidence, or hands the judgment to a fresh-context agent. Scores fine — both are recommended for long-running work on current Fable-tier models:
+✅ Audits a progress claim against evidence, or hands the judgment to a fresh-context agent. Scores fine — both are recommended for long-running work:
 
 ```markdown
 Before reporting progress, tie each claim to a tool result from this session;
