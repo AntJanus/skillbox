@@ -4,7 +4,7 @@ description: Local-first single-user app — one SQLite file on disk, no account
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "4.5.0"
+  version: "4.6.0"
   tags: [nextjs, sqlite, local-first, desktop]
 ---
 
@@ -15,6 +15,8 @@ metadata:
 A single-user app that does one thing — track a game backlog, log workouts, catalog a collection. It is CRUD over entities with real relationships between them, presented through one consistent set of UI patterns. Data lives in a local SQLite file on the user's machine. No accounts, no hosted API, nothing over the network to use it. It can ship as a desktop binary.
 
 This describes **what the app has**. How to build it is your call — pick the structure, the patterns, and the libraries that fit the app you're actually making.
+
+Build what the task asks for, completely, and nothing beside it. A pre-existing bug, a performance concern, or behavior the task doesn't mention is a follow-up to report, not a change to make here, unless the requested behavior can't work without it. Commit tests only where the task asks for them or the repo already keeps tests for that kind of change, sized like the neighboring test files; scratch checks are not test files.
 
 ## Stack
 
