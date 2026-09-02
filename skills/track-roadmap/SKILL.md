@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "[generate|update|audit|brainstorm|resume]"
 metadata:
   author: Antonin Januska
-  version: "2.6.1"
+  version: "2.6.2"
 ---
 
 # Track Roadmap
@@ -26,7 +26,7 @@ Every mode runs the same four beats — **read** the current state, **propose** 
 | **Brainstorm** | `/track-roadmap brainstorm` | Divergent ideation — explore directions before committing; viable ideas land in "Future Ideas" as `status:idea` |
 | **Resume** | `/track-roadmap resume` | Check session state, present remaining features, user picks one, hand off to `/track-session` |
 
-Update is the common case: adding an item, marking one done, or logging shipped work all land there. There is no `save` mode — treat `/track-roadmap save` as Update.
+Update is the common case: adding an item, marking one done, or logging shipped work all land there. There is no `save` mode — treat `/track-roadmap save` as Update. In Update and Audit, edit the affected items in place rather than regenerating the file — ids, ordering, and untouched text survive, and a whole-file rewrite costs more tokens for the same result. Generate is the only mode that writes the file from scratch.
 
 Full per-mode procedures (discovery questions, brainstorm question banks, audit steps): **[reference/MODES.md](./reference/MODES.md)**.
 
