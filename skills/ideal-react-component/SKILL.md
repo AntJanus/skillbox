@@ -4,7 +4,7 @@ description: React component structure and hooks antipatterns — a seven-sectio
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.8.0"
+  version: "1.8.1"
   tags: [react, components, hooks, useeffect, refactoring, typescript]
 ---
 
@@ -99,7 +99,7 @@ useEffect(() => { setTotal(count * price); }, [price]);          // ❌ missing 
 
 ## Refactoring
 
-When a component passes ~50 lines of logic or ~200 total, extract the stateful logic into a `use[Domain]` hook — the component becomes presentation-focused and the hook owns state and data flow. Extraction criteria and composition patterns: **[reference/REFACTORING.md](./reference/REFACTORING.md)**.
+When a component passes ~50 lines of logic or ~200 total, extract the stateful logic into a `use[Domain]` hook — the component becomes presentation-focused and the hook owns state and data flow. Refactor the component the user named; a sibling or parent that has the same problem is a follow-up to report, not a file to touch in the same change. Extraction criteria and composition patterns: **[reference/REFACTORING.md](./reference/REFACTORING.md)**.
 
 ## Gotchas
 
