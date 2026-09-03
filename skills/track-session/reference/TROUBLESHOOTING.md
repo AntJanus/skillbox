@@ -9,38 +9,19 @@ Additional troubleshooting beyond the common issues covered in SKILL.md.
 **Solution:**
 - Collapse finished phases to one-line entries under `## Completed Work` — the detail already lives in git history and commit messages, so it doesn't need to sit in the file.
 - When a session is genuinely done, start the next one from a clean file rather than appending to it — don't accrete `# (Previous session)` blocks.
-- Before replacing anything, run the tracked check from the Start-mode collision policy in SKILL.md (`git ls-files --error-unmatch SESSION_PROGRESS.md`). Tracked means git holds the old copy and replacing is reversible. Untracked or gitignored means it isn't, so move the old content to a topic-named `SESSION_ARCHIVE_<topic>.md` first and keep `SESSION_PROGRESS.md` scoped to the active session.
+- Before replacing anything, run the tracked check from Start mode in SKILL.md and archive first when it comes back non-zero.
 
 ## Problem: Repeated failed attempts with same approach
 
 **Cause:** Not reading or updating "Failed Attempts" section.
 
-**Solution:**
-Before trying new approach:
-1. Check "Failed Attempts" section
-2. Verify approach is different
-3. Document why this attempt should work
-4. Add failed attempt immediately when it fails
-
-## Problem: Save mode stops work when you wanted to continue
-
-**Cause:** Using `save` argument instead of no argument.
-
-**Solution:**
-- Use `/track-session save` ONLY when pausing work
-- Use `/track-session` (no arg) to checkpoint and continue
-- Default no-arg mode is for active work with checkpoints
+**Solution:** Read `## Failed Attempts` before retrying anything, and log a new failure the moment it happens — with its reason, and marked env-scoped when the environment rather than the approach was at fault.
 
 ## Problem: Verify reports work incomplete but all tasks are checked
 
 **Cause:** Tasks were marked complete without actually finishing the work, or requirements changed.
 
-**Solution:**
-1. Review each flagged item in the verification report
-2. Either:
-   - Complete the missing work and re-verify, OR
-   - Update SESSION_PROGRESS.md if requirements changed
-3. Never skip verification - checked boxes don't mean work is actually done
+**Solution:** For each flagged item, either finish the work and re-verify, or update the task in SESSION_PROGRESS.md if the requirement changed. A ticked box is a claim; the verification report is the evidence.
 
 ## Problem: Verify mode takes too long
 
@@ -54,12 +35,6 @@ Before trying new approach:
 
 ## Problem: Verify passes but work still has bugs
 
-**Cause:** Verification wasn't thorough enough (didn't run tests, check edge cases, etc.)
+**Cause:** The report tied tasks to reading rather than to running — a test suite that exists but was not executed, a flow that was described but not exercised.
 
-**Solution:**
-Verification should include:
-- Running test suites (unit, integration, e2e)
-- Manual testing of key user flows
-- Checking error handling and edge cases
-- Validating against original acceptance criteria
-- Code review of critical changes
+**Solution:** Each evidence line in the report names something that ran this session (a test command and its result, a request and its response). Where a task has no acceptance criteria to run against, add them to the task first — see the Verification goal in [VERIFICATION.md](./VERIFICATION.md).
