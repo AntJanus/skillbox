@@ -26,6 +26,8 @@ Scope gaps are the judgment call: tasks done but unticked, requirements that sur
 
 ## Report format
 
+**Length:** one evidence line per verified task, one line per issue; omit any subsection with nothing in it. Keep Recommended Next Steps to the top five. The report is appended to a state record — no narrative and no restatement of the Plan.
+
 Create structured verification report in SESSION_PROGRESS.md under "## Verification Results":
 
 #### ✅ Successfully Verified

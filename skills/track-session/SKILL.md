@@ -1,11 +1,11 @@
 ---
 name: track-session
-description: Use this skill to maintain SESSION_PROGRESS.md and track multi-session work — resuming, checkpointing, and handing off long tasks. Triggers include "resume work", "pick up where I left off", "what was I doing", "save progress", "checkpoint before I lose context", "are we done", or "I lost my SESSION_PROGRESS" — even if the user never says "session", as when they return to a multi-day refactor or ask you to write down where things stand. Applies to multi-phase work, cross-file refactors, and long debugging runs; skip it for quick one-file fixes. Do NOT use this skill for feature or milestone planning (see track-roadmap).
+description: Use this skill to maintain SESSION_PROGRESS.md and track multi-session work — resuming, checkpointing, and handing off long tasks. Triggers include "resume work", "pick up where I left off", "what was I doing", "save progress", "checkpoint before I lose context", "are we done", or "I lost my SESSION_PROGRESS" — even if the user never says "session", as when they return to a multi-day refactor or ask you to write down where things stand. Applies to multi-phase work, cross-file refactors, and long debugging runs; skip it for quick one-file fixes. Do NOT use this skill for feature or milestone planning (see track-roadmap) or for a one-off summary or handoff doc that doesn't live in SESSION_PROGRESS.md (see work-summary).
 license: MIT
 argument-hint: "[start|save|resume|verify|recover]"
 metadata:
   author: Antonin Januska
-  version: "6.2.0"
+  version: "6.2.1"
 ---
 
 # Session Progress
@@ -87,7 +87,7 @@ git ls-files --error-unmatch SESSION_PROGRESS.md   # exit 0 = tracked; non-zero 
 ```
 
 - **Same work, unfinished** → this isn't Start, it's Resume. Stop here.
-- **Tracked, and the prior session is `completed`/`paused` and unrelated** → confirm with the user, then replace the file. Git holds the old copy, and the dashboard reads only the top frontmatter block, so stacking sessions below a second `---` hides them from it anyway.
+- **Tracked, and the prior session is `completed`/`paused` and unrelated** → confirm with the user, then replace the file; git holds the old copy.
 - **Untracked or gitignored** → archive to `SESSION_ARCHIVE_<topic>.md` first, then write the clean file. Replacing an untracked file destroys it permanently; public repos commonly gitignore `SESSION_PROGRESS.md` on purpose. When they do, offer to add `SESSION_ARCHIVE_*.md` to `.gitignore` too, so the archive doesn't become the thing that leaks.
 
 ### Checkpoint (bare invocation) and Save
@@ -142,7 +142,22 @@ Let me start by reading your SESSION_PROGRESS.md to understand the context.
 Then I'll check the git log and look through the auth directory...
 ```
 
-✅ Both good versions name the next action and the files it touches; both weak ones make the reader rebuild context from scratch.
+✅ A failed attempt that won't be blindly retried:
+
+```markdown
+## Failed Attempts
+- <!-- id:f_k7m2p task:t_g5h6i --> Tried `ioredis` autoReconnect for the session store: reconnect storms under the test harness's socket limit. Switched to a single shared client in src/auth/redisClient.ts.
+- <!-- id:f_q9r4s task:t_g5h6i --> Ran the e2e suite against staging: env-scoped — STAGING_URL unset in this shell. Re-check before treating this as a real failure.
+```
+
+❌ A failed attempt that will be retried:
+
+```markdown
+## Failed Attempts
+- Redis didn't work, trying something else
+```
+
+✅ Every good version names the file, the id, and the reason; every weak one makes the reader rebuild context from scratch.
 
 ## Gotchas
 
