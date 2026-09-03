@@ -346,13 +346,9 @@ This CLAUDE.md follows its own advice:
 - Concrete examples with code
 - Checklists that gate on something checkable
 - Anti-Patterns section with paired ✅ alternatives
-- A single Anti-Patterns recap, with the provenance archive kept out of the per-session load
+- A single Anti-Patterns recap
 
-Treat every issue working with SkillBox as an opportunity to update this file.
-
-## Learnings
-
-The dated record of how each rule above was arrived at, including the entries that were later overturned, lives in **[reference/LEARNINGS.md](./reference/LEARNINGS.md)**. Load it when a rule looks wrong and you need its provenance before changing it. New learnings go there; the rule they produce goes in the section above that it belongs to.
+Treat every issue working with SkillBox as an opportunity to update this file. The history of how each rule was arrived at lives in CHANGELOG.md, not here.
 
 ---
 
