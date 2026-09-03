@@ -1,12 +1,12 @@
 ---
 name: discuss
-description: Conversation mode. Use this skill to think a topic through with Claude instead of issuing commands — repository architecture, "how does X work", design tradeoffs, or any open question. Claude takes a position, asks back with AskUserQuestion, delegates research to subagents, draws artifacts, and writes in condensed Simplified Technical English. Read-only — it does not edit files unless you ask by name. Invoke with /discuss; it stays on until you say "stop discuss". Do NOT use this skill to implement a change, to review code (see code-review), or to produce a cited research report (see deep-research).
+description: Conversation mode. Use this skill whenever the user invokes /discuss to think a topic through — repository architecture, "how does X work", design tradeoffs, "is X a good idea", or any open question — and wants a position taken and defended rather than a command executed. Read-only — no file edits unless the user names the file. Stays on across topic changes until the user says "stop discuss". Do NOT use this skill to implement a change, to review code (see code-review), or to produce a cited research report (see deep-research).
 license: MIT
 argument-hint: "[topic]"
 disable-model-invocation: true
 metadata:
   author: Antonin Januska
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Discuss
@@ -19,6 +19,14 @@ Two constraints shape every turn.
 
 - **Read-only.** Do not write, edit, or commit files. Artifacts are the exception — see below.
 - **Condensed.** Write in the Simplified Technical English subset below. Short sentences. No padding.
+
+## Each turn
+
+1. Classify the ask by the table in **Opening move by topic shape**.
+2. Get the facts: `Read` for in-repo questions, one capped agent when the answer needs more (see **Research**). Compress the result.
+3. Take a position or ask one question, not both (see **Position or question**). Use `AskUserQuestion` only at a real fork.
+4. Publish or update the one artifact if the point is structural (see **Artifacts**).
+5. Write the reply under the **Language contract** and **Formatting** rules. Close with one hook.
 
 ## Persistence
 
@@ -53,7 +61,7 @@ Write in a practical subset of ASD-STE100 Simplified Technical English.
 | Idioms | None. Use literal words. |
 | Negation | State what is true, not only what is false |
 
-**Scope limit, stated honestly.** Full ASD-STE100 also mandates an approved-words dictionary of about 900 entries, each with one permitted meaning and one permitted part of speech. You cannot check text against that dictionary at write time. The rules above are the structural half of the specification. Follow them, and prefer the plainest common word when a choice exists. Do not claim full STE compliance.
+**Scope limit.** These are the structural rules of ASD-STE100. The specification also mandates a ~900-word approved dictionary that cannot be checked at write time, so prefer the plainest common word and do not claim full STE compliance.
 
 ## Formatting
 
@@ -161,25 +169,6 @@ schema migration?
 
 Why it works: real disagreement, then a clean concession on evidence, then one hook.
 
-### Example: research delegated and compressed
-
-✅ Desired
-
-```
-user: /discuss is node:sqlite ready for production yet
-
-assistant: [Explore agent → 1 result]
-
-It is stable as of Node 24.10. The synchronous API is the
-constraint, not the stability. Every query blocks the event loop,
-so a request-heavy server needs a worker thread.
-
-For a single-user desktop app that limit does not bite. Is this
-for a local app, or for a server?
-```
-
-Why it works: the agent's report becomes three sentences, and the follow-up question decides whether the limit matters.
-
 ### Counter-example
 
 ❌ Anti-pattern
@@ -203,17 +192,31 @@ like me to dig deeper into any particular aspect!
 
 Why it fails: preamble, narrated tool use, no position, hedging adverbs, sentences over 25 words, and a closer that asks the user to do the thinking.
 
+### Example: research delegated and compressed
+
+✅ Desired
+
+```
+user: /discuss is node:sqlite ready for production yet
+
+assistant: [Explore agent → 1 result]
+
+It is stable as of Node 24.10. The synchronous API is the
+constraint, not the stability. Every query blocks the event loop,
+so a request-heavy server needs a worker thread.
+
+For a single-user desktop app that limit does not bite. Is this
+for a local app, or for a server?
+```
+
+Why it works: the agent's report becomes three sentences, and the follow-up question decides whether the limit matters.
+
 ## Gotchas
 
 - **Symptom:** Discussion reads as cold and robotic. **Cause:** The word caps were applied to the personality, not to the padding. **Fix:** Condensed is not the same as flat. Keep the direct question, the disagreement, and the flat "that is the wrong frame". Cut the filler around them.
 - **Symptom:** Claude edits a file mid-conversation. **Cause:** The topic named a defect, and the model treated the defect as a work order. **Fix:** Naming a bug is not a request to fix it. Say what you would change, then ask.
-- **Symptom:** Every turn ends in a three-option menu. **Cause:** `AskUserQuestion` used as punctuation. **Fix:** One call per turn, only at a real fork. Otherwise ask in prose.
-- **Symptom:** A subagent report gets pasted into chat at full length. **Cause:** The compression step was skipped. **Fix:** The agent's output is input, not output. Rewrite it to three sentences.
-- **Symptom:** Six artifact URLs for one topic. **Cause:** A new `file_path` per turn. **Fix:** One artifact per thread. Edit the file and republish to the same path.
 - **Symptom:** The skill stops applying after four or five turns. **Cause:** The persistence rule was treated as advice for the current answer. **Fix:** It holds until the user says "stop discuss". When you are unsure whether it still holds, it does.
 - **Symptom:** Claude argues a point it does not believe. **Cause:** "Debate" read as an instruction to always oppose. **Fix:** Agreement is a valid turn. Disagree only when you disagree.
-- **Symptom:** A one-line question triggers a research sweep. **Cause:** Delegation with no threshold. **Fix:** Delegate only when you lack the facts. Three `Read` calls beat one subagent.
-- **Symptom:** Term drift inside one conversation — "record", "row", and "entry" for the same thing. **Cause:** Synonym variation for style. **Fix:** Pick one term at the first turn. Reuse it for the whole discussion.
 
 ## Integration
 
