@@ -6,7 +6,7 @@ argument-hint: "<topic>"
 effort: high
 metadata:
   author: Antonin Januska
-  version: "2.4.1"
+  version: "2.4.2"
 ---
 
 # Deep Research

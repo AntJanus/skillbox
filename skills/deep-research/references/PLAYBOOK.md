@@ -50,8 +50,8 @@ Adapt the frontmatter to the user's project conventions if they have an establis
 ### Problem: Research keeps drifting from the user's actual question
 **Solution:** Re-anchor. Restate the original ask at the top of the summary and check every section serves it. Cut sections that don't. Cite-verify (workflow step 7) is the last chance to catch this.
 
-### Problem: Tempted to call it done after 1-2 searches
-**Solution:** That's not deep research — that's a search snippet. The 5+ floor exists because single-search answers consistently miss criticism, currency, and counter-examples. If the user genuinely wants a one-shot answer, they should ask for a quick fact, not invoke this skill.
+### Problem: The topic looks answerable from one or two searches
+**Solution:** Run the floor anyway — single-search answers consistently miss criticism, currency, and counter-examples. When the user wants a one-shot answer, `quick` mode is the fit.
 
 ### Problem: A cited URL doesn't actually exist or returns 404
 **Solution:** Stop. Walk every cited URL against your tool history — every citation must trace to an actual WebSearch hit or WebFetch read. Drop fabricated URLs entirely; do not "fix" them by guessing a working URL.
