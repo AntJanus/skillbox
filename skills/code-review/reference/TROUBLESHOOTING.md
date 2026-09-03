@@ -1,6 +1,6 @@
 # Code Review — Troubleshooting
 
-Extended troubleshooting for the `code-review` skill. SKILL.md keeps the three most-common entries inline; everything else lives here.
+Extended troubleshooting for the `code-review` skill. SKILL.md keeps the single most-common entry (report still too nitpicky) inline; everything else lives here.
 
 ---
 
@@ -18,9 +18,9 @@ Extended troubleshooting for the `code-review` skill. SKILL.md keeps the three m
 
 ### Problem: Architecture finding reads as "a sibling does it differently"
 
-**Cause:** The lane reverted to the old consistency-mode bar.
+**Cause:** The lane judged consistency with a peer instead of soundness for the code's purpose.
 
-**Solution:** The 2.0 architecture lane judges soundness *for the code's purpose* and must state a concrete `Consequence:`. "Inconsistent with a peer but nothing breaks" is not a finding — it should have been dropped. Re-dispatch with the exact prompt; in `--blueprint` mode confirm the blueprint skill name was passed in.
+**Solution:** The architecture lane judges soundness *for the code's purpose* and must state a concrete `Consequence:`. "Inconsistent with a peer but nothing breaks" is not a finding — it should have been dropped. Re-dispatch with the exact prompt; in `--blueprint` mode confirm the blueprint skill name was passed in.
 
 ### Problem: ui-ux lane fired on a backend/CLI diff
 
@@ -34,12 +34,6 @@ Extended troubleshooting for the `code-review` skill. SKILL.md keeps the three m
 
 **Solution:** In synthesis, keep the most severe finding and add `(also flagged by X)`. Don't print both. Rule of thumb: if it computes a wrong answer, it's **correctness**; if it's dead/typo/drift, it's **hygiene**; a real committed credential is **hygiene `[Secret]`** (blocking).
 
-### Problem: Report is still too nitpicky
-
-**Cause:** The verifier isn't enforcing the impact floor — it's keeping true-but-trivial findings instead of dropping them.
-
-**Solution:** This is the single most important thing to get right. Re-dispatch the verifier with the exact `reference/AGENTS.md#verifier` prompt and "default to DROP; every kept blocking finding must name a concrete bad outcome (wrong result, data loss, security, real regression, reader-trap). Cosmetic/stylistic/doc-only fails the floor." Nits belong in the held bucket, not the report — they only show with `--nits`.
-
 ### Problem: The nit tail is showing up by default
 
 **Cause:** Synthesis rendered the `[Nit]` bucket without `--nits`.
@@ -50,7 +44,7 @@ Extended troubleshooting for the `code-review` skill. SKILL.md keeps the three m
 
 **Cause:** Either the citation didn't hold against current code (evidence drop), or the finding was true but failed the impact floor (no concrete bad outcome on this change).
 
-**Solution:** Drops are intentional in 2.0 — the skill removes low-impact truths on purpose. If the user believes it was high-impact, they can re-run with `--nits` (a floor-failed finding tagged `[Nit]` is preserved in the held bucket), or re-stage and re-run so line numbers align if it was an evidence drop from drift. There is no `[Unverified]` demote-and-keep tier anymore; the impact floor replaced it.
+**Solution:** Drops are intentional — the skill removes low-impact truths on purpose. If the user believes it was high-impact, re-run with `--nits` (a floor-failed finding tagged `[Nit]` is preserved in the held bucket), or re-stage and re-run so line numbers align if it was an evidence drop from drift. A floor-failed finding is never kept at a lower severity.
 
 ### Problem: `## What to fix first` is empty or missing
 
@@ -66,9 +60,9 @@ Extended troubleshooting for the `code-review` skill. SKILL.md keeps the three m
 
 ### Problem: Background review never wrote REVIEW.md
 
-**Cause:** `--background` was run by launching the whole skill as one subagent — which can't spawn the reviewers (subagents don't fan out) — or a reviewer tried to write into the worktree.
+**Cause:** A lane was dispatched with a `name` set (inside a delegated review the batch is rejected with `Teammates cannot spawn other teammates`), a reviewer tried to write into its worktree, or the orchestrator wrote REVIEW.md into the worktree instead of the real repo root.
 
-**Solution:** Background must be orchestrated from the MAIN thread: main dispatches each reviewer with `run_in_background: true` + `isolation: "worktree"`, then the verifier, then main itself writes REVIEW.md to the real repo root (`git rev-parse --show-toplevel` of the main tree — not the worktree, which is torn down). Reviewers stay read-only so the worktree auto-cleans.
+**Solution:** Any thread that owns the review can orchestrate it — the main thread or a delegated agent (subagents spawn subagents up to three levels deep). Dispatch each reviewer with `run_in_background: true` + `isolation: "worktree"` and no `name`, then the verifier, then write REVIEW.md to the real repo root (`git rev-parse --show-toplevel` of the working tree the review was scoped to — reviewer worktrees are torn down). Reviewers stay read-only so the worktree auto-cleans.
 
 ### Problem: Scope is empty
 

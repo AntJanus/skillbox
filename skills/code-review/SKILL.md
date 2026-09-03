@@ -6,7 +6,7 @@ argument-hint: "[path | --staged | --branch <base> | --repo [--blueprint <skill>
 allowed-tools: Read, Write, Glob, Grep, Bash, Agent
 metadata:
   author: Antonin Januska
-  version: "2.4.1"
+  version: "2.4.2"
 ---
 
 # Code Review — Multi-Agent Local Review
@@ -15,7 +15,7 @@ metadata:
 
 Runs narrow-lane reviewer agents in parallel, then a verifier that keeps only findings with real impact, distills the "fix first" shortlist, and suppresses the nit tail — merged into `REVIEW.md` at the repo root. **Core principle:** a review is worth reading when it finds *wrong answers*, not style. The lanes are aimed at correctness and structural soundness; the verifier defaults low-impact findings to DROP so the signal isn't buried. The skill scopes, dispatches, and renders — the reviewers and verifier judge.
 
-**Effort and model:** lanes run well at `high`, and at `medium` or `low` on a Fable-tier model — lower effort there is often competitive with Opus and Sonnet on cost per task. Haiku has no `effort` control and needs more guidance in the prompt. **Not for:** security passes (`/security-review`), open PRs by number (`/review`), or trivial one-line/doc changes.
+**Not for:** trivial one-line or doc-only changes — five lanes cost more than they can find there. Pass `model: "sonnet"` on every lane and verifier call unless the user names a model; Haiku needs the full skeleton verbatim because it has no effort control.
 
 ## Modes & flags
 
@@ -84,12 +84,12 @@ Always write REVIEW.md even when clean (zeroed header + the STRENGTHS block + `N
 `--background` runs the review detached so the user keeps working. Orchestrate it from the thread that owns the review — usually the main thread, but a delegated agent works too, since subagents spawn subagents up to three levels deep.
 
 1. The orchestrator resolves scope + captures the diff text (Phase 1), prints `Reviewing N files in the background — keep working; REVIEW.md will appear when done.`
-2. Dispatch each reviewer with `run_in_background: true`, `isolation: "worktree"`, and **no `name`** — a clean pinned checkout so the user's concurrent edits don't move `file:line` under the reviewers. Reviewers stay read-only, so the worktree auto-cleans.
+2. Dispatch each reviewer with `run_in_background: true`, `isolation: "worktree"`, and no `name` — Gotchas explains both.
 3. The orchestrator returns control; the harness re-invokes it as each reviewer completes.
 4. When all reviewers are in, dispatch the verifier (background).
 5. On completion, write REVIEW.md to the **real repo root** (`git rev-parse --show-toplevel` of the working tree the review was scoped to — reviewer worktrees are torn down), which is the "done" signal.
 
-Reviewers read the diff **from the prompt**, never by re-running `git diff` in the worktree (it shares HEAD with a clean tree — no unstaged changes to see). `--repo --background` is the sweet spot: a multi-minute whole-repo conformance pass that doesn't block you.
+`--repo --background` is the sweet spot: a multi-minute whole-repo conformance pass that doesn't block you.
 
 ## Output format
 
@@ -121,10 +121,10 @@ Reviewers read the diff **from the prompt**, never by re-running `git diff` in t
 - **Never pass `name` on a lane dispatch.** Naming an agent makes it a teammate, and a teammate cannot spawn teammates — inside a delegated review the whole batch is rejected with `Teammates cannot spawn other teammates`. It retries and recovers, but it costs a round-trip per lane. The lanes are never addressed by name, so leave the parameter off.
 - **A worktree reviewer sees a clean tree.** The `isolation: "worktree"` checkout shares HEAD, so `git diff` inside it returns nothing. Reviewers read the diff from their prompt; never let a lane re-derive it.
 - **`--repo` mode has no diff.** What the lanes receive is full file content, so a lane hunting `+` lines returns NO FINDINGS on real problems. Pass the mode into the prompt so lanes review whole files.
-- **Dropped findings are the product, not a bug.** The verifier deletes true-but-trivial findings on purpose; `--nits` is the recovery path, and there is no demote-and-keep tier to fall back on.
+- **Dropped findings are the product, not a bug.** The verifier deletes true-but-trivial findings on purpose; `--nits` is the recovery path. A floor-failed finding is dropped or held as a nit, never kept at a lower severity.
 - **The ui-ux lane is conditional.** If it fires on a backend/CLI diff, Phase-1 UI detection matched a non-UI file — fix detection rather than accepting the lane's noise.
 - **Complexity is two-tier by design.** Egregious complexity (4+ nesting levels, ~cyclomatic >10) that conceals behavior blocks via the architecture lane and must name the trap — which path a future editor misses and what breaks. Moderate complexity is hygiene's `[Nit]`. A complexity finding with no named trap failing the impact floor is the floor working, not a lost finding.
-- **Architecture findings drift back to "a peer differs."** That bar was removed in 2.0; a finding without a stated consequence should have been dropped, so re-dispatch the lane with its exact prompt.
+- **Architecture findings drift back to "a peer differs."** A finding without a stated consequence is not a finding; re-dispatch the lane with its exact prompt.
 - **REVIEW.md is overwritten every run** and written at the true repo root (`git rev-parse --show-toplevel`, not a worktree). The prior review is gone — add it to `.gitignore`.
 
 ## Troubleshooting
@@ -135,4 +135,4 @@ Empty scope, huge diffs, blueprint not found, worktree cleanup: **[reference/TRO
 
 ## Integration
 
-Pairs with `/security-review` (security), `/review` (fetching an open PR by number), `track-session` (track fixes), `typography` + `color-system` (the ui-ux lane's standard), and blueprint skills like `local-first-app` via `--blueprint`. Typical loop: edit → `/code-review` → read REVIEW.md, fix what's first → re-run (overwrites) → commit when clean. For a big pass, `/code-review --repo --blueprint <skill> --background` and keep working. **Reviewing incoming PRs:** check each PR out into its own worktree and run `--branch <base>` there, one delegated agent per PR — REVIEW.md lands in that worktree's root, so several PRs review concurrently without colliding. Add `REVIEW.md` to `.gitignore`. Not a replacement for CI linting or human PR review — a pre-commit pass that catches wrong answers linters miss. **Maintainers:** activation triggers are measured in **[reference/EVAL.md](./reference/EVAL.md)**; lane quality is measured against representative diffs (clean / real correctness bug / tempting nitpick). Re-run both after every prompt edit.
+Pairs with `/security-review` (security), `/review` (fetching an open PR by number), `track-session` (track fixes), `typography` + `color-system` (the ui-ux lane's standard), and blueprint skills like `local-first-app` via `--blueprint`. Typical loop: edit → `/code-review` → read REVIEW.md, fix what's first → re-run (overwrites) → commit when clean. For a big pass, `/code-review --repo --blueprint <skill> --background` and keep working. **Reviewing incoming PRs:** check each PR out into its own worktree and run `--branch <base>` there, one delegated agent per PR — REVIEW.md lands in that worktree's root, so several PRs review concurrently without colliding. Add `REVIEW.md` to `.gitignore`. Not a replacement for CI linting or human PR review — a pre-commit pass that catches wrong answers linters miss.
