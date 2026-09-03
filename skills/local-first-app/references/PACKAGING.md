@@ -38,4 +38,4 @@ Distribution-without-warning needs **paid certs** as a post-build step on the pr
 
 ## Data-dir resolution
 
-A single helper resolves the path: the env override (set by the desktop entrypoint) else `./data`. Both the Deno entrypoint and the produced bundles are excluded from `tsc`/eslint and gitignored.
+A single helper resolves the path: the env override (set by the desktop entrypoint) else `./data`.
