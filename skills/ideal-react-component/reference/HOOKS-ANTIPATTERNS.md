@@ -115,45 +115,24 @@ export const UserProfile = ({ initialName }: UserProfileProps) => {
 - Prop changes don't update state automatically
 - The *eager* form `useState(expensive())` re-evaluates its argument on **every** render and throws the result away after the first — pass a **function initializer** (`useState(() => expensive())`) so the work happens once
 
-✅ **Good:**
+✅ **Best:** don't duplicate the prop into state when the component never edits it.
 
 ```tsx
-// ✅ Good: Use useEffect to sync when prop changes
-export const UserProfile = ({ initialName }: UserProfileProps) => {
-  const [userName, setUserName] = useState(initialName);
-
-  useEffect(() => {
-    setUserName(initialName);
-  }, [initialName]);
-
-  return (
-    <div>
-      <input
-        value={userName}
-        onChange={(e) => setUserName(e.target.value)}
-      />
-    </div>
-  );
-};
+export const UserProfile = ({ name }: UserProfileProps) => <p>{name}</p>;
 ```
 
+✅ **Good:** when local edits are needed, reset the state by remounting with `key` — the parent decides when the record changed.
+
 ```tsx
-// ✅ Better: Use key prop to reset component
-// Parent component
 <UserProfile key={userId} initialName={user.name} />
-
-// This forces React to create fresh component when userId changes
 ```
 
+❌ **Bad:** syncing the prop into state with an effect. This is Antipattern 1 in reverse — an extra render pass on every prop change, and a loop if the parent feeds the value back down.
+
 ```tsx
-// ✅ Best: Don't duplicate state if you don't need local modifications
-export const UserProfile = ({ name }: UserProfileProps) => {
-  return (
-    <div>
-      <p>{name}</p>
-    </div>
-  );
-};
+useEffect(() => {
+  setUserName(initialName);
+}, [initialName]);
 ```
 
 **When to use expensive function initializer:**
@@ -266,25 +245,9 @@ export const Modal = ({ onOpen, onClose }: ModalProps) => {
 
 ## Hooks Best Practices Summary
 
-**DO:**
-- Call `onChange` callbacks directly when setting state (not in `useEffect`)
-- Use `useEffect` with full dependency arrays (trust ESLint)
-- Memoize callbacks with `useCallback` when passed as props
-- Use function initializers for expensive `useState` computations
-- Reset state via `key` prop instead of syncing with `useEffect`
-
-**DON'T:**
-- Use `useEffect` to notify parent of state changes
-- Expect `useState` initial value to update with prop changes
-- Omit dependencies from `useEffect` to prevent re-runs
-- Disable exhaustive-deps ESLint rule to hide issues
-- Run expensive computations in `useState` initializer without function wrapper
-
-**When you see these patterns:**
-
 | Pattern | Problem | Solution |
 |---------|---------|----------|
 | `useEffect(() => onChange(value), [value])` | Double render | Call `onChange` when setting state |
-| `useState(props.value)` with changing prop | Stale state | Use `key` prop or `useEffect` to sync |
+| `useState(props.value)` with changing prop | Stale state | Reset with `key`, or don't copy the prop into state |
 | `useEffect(..., [])` with missing deps | Stale closures | Include all dependencies |
 | `useState(expensive())` | Runs every render | Use `useState(() => expensive())` |

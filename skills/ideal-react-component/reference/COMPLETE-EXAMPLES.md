@@ -13,6 +13,7 @@ Full TypeScript and JavaScript examples showing all seven sections of the ideal 
 import React, { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { format } from 'date-fns';
+import styled from 'styled-components';
 
 import { api } from '@/services/api';
 
@@ -135,6 +136,7 @@ export const UserProfile = ({
 import React, { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { format } from 'date-fns';
+import styled from 'styled-components';
 
 import { api } from '@/services/api';
 
