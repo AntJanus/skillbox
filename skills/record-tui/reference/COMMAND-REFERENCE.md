@@ -17,7 +17,7 @@ Multiple outputs can be declared — VHS generates all of them in one run.
 
 ## Settings
 
-Settings take effect only when they appear before the first interaction command — there is no exception for `TypingSpeed`. A later `Set` is silently discarded and `vhs validate` still exits 0, so the only way to catch a misplaced setting is to watch the rendered output. To vary typing speed mid-tape, use the per-line `Type@100ms "…"` form instead.
+Every `Set` must precede the first interaction command — a later one is silently discarded (see SKILL.md Gotchas). To vary typing speed mid-tape, use the per-line `Type@100ms "…"` form instead of a second `Set TypingSpeed`.
 
 ### Terminal Dimensions
 

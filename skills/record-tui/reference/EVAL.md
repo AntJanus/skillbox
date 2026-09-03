@@ -38,7 +38,7 @@ Official-loop format (agentskills.io optimizing-descriptions): 18 queries, 9 sho
 
 | Variant | Date | Train pass | Validation pass | Selected |
 |---|---|---|---|---|
-| 1.6.0 (imperative register, coverage clause, negative scope vs screenshot-local) | 2026-07-28 | not yet run | not yet run | — |
+| 1.6.0 (imperative register, coverage clause, negative scope vs screenshot-local) | 2026-07-28 | not run (fleet measurement aborted at usage limit) | 8/8 — V1 0.67, V2 1.00, V3 0.67, V4 1.00, V5–V8 0.00 | ✓ baseline |
 
 ## Notes
 

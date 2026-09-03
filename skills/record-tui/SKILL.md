@@ -1,11 +1,11 @@
 ---
 name: record-tui
-description: Use this skill to record a terminal or TUI demo with VHS whenever the user wants to "record a demo", "create a GIF of my CLI", "write a VHS tape", "make a terminal recording", or "add a demo GIF to the README" — even if they never say "VHS" and only ask for an animated demo of a command-line tool. Covers tape syntax, dimensions, pacing, GIF size reduction, and CI golden-file recording. Do NOT use this skill to screenshot a web app on localhost (see screenshot-local) or to capture video of anything outside a terminal.
+description: Use this skill to record a terminal or TUI demo with VHS whenever the user wants to "record a demo", "create a GIF of my CLI", "write a VHS tape", "make a terminal recording", or "add a demo GIF to the README" — even if they never say "VHS" and only ask for an animated demo of a command-line tool. Covers tape syntax, dimensions, pacing, GIF size reduction, and CI golden-file recording. Do NOT use this skill to build the TUI itself (see build-tui), to screenshot a web app on localhost (see screenshot-local), or to capture video of anything outside a terminal.
 license: MIT
 argument-hint: "<app-command> [output-format]"
 metadata:
   author: Antonin Januska
-  version: "1.6.0"
+  version: "1.6.1"
 ---
 
 # Record TUI — VHS Terminal Recording
@@ -96,6 +96,8 @@ Full command + settings detail: **[reference/COMMAND-REFERENCE.md](./reference/C
 
 Read the app's `--help` output or its source to learn how it launches, which keys it responds to, and which states are worth showing. Draft a tape covering those states, then `vhs validate demo.tape` → `vhs demo.tape` → watch the rendered file → adjust. Watching is the step that matters: validation parses syntax and cannot tell you the demo outruns the viewer.
 
+Bound the demo before drafting: a README GIF shows one workflow in 10–30 seconds — three to five states, each held long enough to read (`Sleep 2s`–`3s`). Past 30 seconds, cut states or split into a second tape rather than adding scenes; a demo that shows everything shows nothing, and the GIF size grows with it.
+
 Copy-paste starting points (Basic CLI, Interactive TUI, Build-and-Run, Multi-Panel, CI golden file, composable `Source` tapes): **[reference/TEMPLATES.md](./reference/TEMPLATES.md)**.
 
 ## Examples
@@ -141,7 +143,7 @@ Sleep 3s
 
 ## Gotchas
 
-- **A `Set` below the first command is silently dropped, and `vhs validate` still exits 0.** Verified on vhs 0.11.0: `Set FontSize 40` after a `Type` rendered at the default size, and the same holds for `Set TypingSpeed` — there is no per-setting exception. Keep every `Set` above the first `Type`/key command and confirm by watching the output, because nothing in the toolchain reports this.
+- **A `Set` below the first command is silently dropped, and `vhs validate` still exits 0.** Verified on vhs 0.11.0: `Set FontSize 40` after a `Type` rendered at the default size, and the same holds for `Set TypingSpeed` — there is no per-setting exception. Keep every `Set` above the first `Type`/key command and confirm by watching the output, because nothing in the toolchain reports this. To vary typing speed mid-tape, use the per-line `Type@100ms "…"` form.
 - **`vhs validate` only parses.** It never launches the app, so a missing binary, a wrong keybinding, or a demo that races ahead of the app all pass. Add `Require <app>` so a missing dependency fails loudly rather than rendering an empty terminal.
 - **`Type "cmd"` does not press Enter.** Follow it with an explicit `Enter`, and put `Sleep 500ms` between them so the viewer can read the command before it runs.
 - **`Hide` hides output, not execution.** Commands inside a `Hide` block still run. End the block with `Ctrl+L` before `Show` so leftover setup output doesn't open the recording.
