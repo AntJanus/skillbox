@@ -11,7 +11,7 @@ Load during Phase 3, when the skill needs a field beyond the canonical five or y
 | `disable-model-invocation: true` | Slash-only; must not auto-trigger |
 | `user-invocable: false` | Callable only by subagents or other skills |
 | `model` | The skill needs a specific tier. Otherwise inherit — a pin outlives the model it names. |
-| `effort` | Overrides the session level while the skill runs — verified live 2026-09-02 with `${CLAUDE_EFFORT}` (control `high`, skill with `effort: low` reported `low`). `low` for lookup and automation wrappers, `medium` for structured generation, `high` for auditing and methodology, `xhigh` for multi-source synthesis and agentic coding. Level names don't carry across models; sweep on real tasks. Omit to inherit. |
+| `effort` | Overrides the session level while the skill runs — verified live 2026-09-02 with `${CLAUDE_EFFORT}` (control `high`, skill with `effort: low` reported `low`). Per-type defaults are in SKILL.md Phase 3. Level names don't carry across models; sweep on real tasks. Omit to inherit. |
 | `paths` | Auto-trigger only inside specific repo paths |
 | `when_to_use` | Extra listing-time routing text beyond the description (Claude Code; shares a combined 1,536-char listing cap with `description`) |
 
