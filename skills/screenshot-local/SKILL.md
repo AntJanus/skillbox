@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "<url-or-file> [--output filename.png]"
 metadata:
   author: Antonin Januska
-  version: "1.5.1"
+  version: "1.5.2"
 ---
 
 # Screenshot Local — shot-scraper
@@ -18,7 +18,7 @@ Capture screenshots of local dev servers and static HTML files with [shot-scrape
 
 ```bash
 pipx install shot-scraper     # brew install pipx / apt install pipx first
-shot-scraper install          # downloads Chromium — a separate step, easy to miss
+shot-scraper install          # downloads Chromium
 shot-scraper --version
 ```
 
@@ -113,6 +113,12 @@ shot-scraper http://localhost:3000 -w 1200 -h 630 --retina -o og.png
 shot-scraper http://localhost:3000/docs -w 1200 -o docs.png
 ```
 
+❌ Fixed `-h` on a docs page — clips everything below 800px, and the missing sections look like they were never written:
+
+```bash
+shot-scraper http://localhost:3000/docs -w 1200 -h 800 -o docs.png
+```
+
 Starter configs per project type — SPA, Storybook, responsive sweep, static site, auth: **[reference/TEMPLATES.md](./reference/TEMPLATES.md)**.
 
 ## Failure Modes
@@ -125,7 +131,7 @@ Starter configs per project type — SPA, Storybook, responsive sweep, static si
 
 ## Gotchas
 
-- **`shot-scraper install` is a second, separate install step.** `pipx install shot-scraper` alone leaves no browser engine behind, so the first capture on a fresh machine or CI runner fails.
+- **`shot-scraper install` is a second, separate step.** `pipx install shot-scraper` alone leaves no browser engine behind, so the first capture on a fresh machine fails.
 - **`--quality` switches the format to JPEG regardless of the output extension.** `--quality 80 -o hero.png` writes JPEG bytes into a file named `.png` (verified on 1.9.1). Omit `--quality` when you want a real PNG.
 - **`--retina` doubles the output pixels, not the layout.** `-w 1200 --retina` produces a 2400px-wide file, which breaks fixed-size targets like a 1200×630 OG image. Use it for README art, not for spec'd dimensions.
 - **A per-shot `auth:` key in `shots.yml` is silently ignored** — the shot still succeeds, just logged out, so the failure looks like a broken page rather than missing auth. Pass auth to the whole batch instead: `shot-scraper multi shots.yml -a auth.json`.

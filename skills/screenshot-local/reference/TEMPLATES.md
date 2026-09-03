@@ -26,7 +26,7 @@ Copy-paste templates for common screenshot scenarios.
   height: 800
 ```
 
-## SPA with Loading States
+## SPA with Loading States (extends the pair in SKILL.md — adds `wait_for` and multi-element cleanup)
 
 ```yaml
 # shots.yml — SPA that needs wait times for hydration
