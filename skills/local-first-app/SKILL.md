@@ -4,7 +4,7 @@ description: Local-first single-user app — one SQLite file on disk, no account
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "4.6.1"
+  version: "4.7.0"
   tags: [nextjs, sqlite, local-first, desktop]
 ---
 
@@ -125,6 +125,15 @@ Where an entity is a physical object outside the app, render it as that object r
 - ✅ A "Cartridge" theme beside light/dark on a game tracker — ❌ light and dark as the only choices
 - ✅ `/dynamic-collections/12` re-running "watched, 5 stars" on every open — ❌ a stored list of movie IDs captured at save time
 - ✅ "Filter no longer valid: unknown field `rating`" above an empty list — ❌ an empty list where a renamed field used to match
+
+## Gotchas
+
+- **Symptom:** Deleting a parent moves it to trash, but its children stay live in every list. **Cause:** `node:sqlite` opens every connection with foreign keys off — a per-connection pragma, not a schema property — so `ON DELETE CASCADE` does nothing. **Fix:** run `PRAGMA foreign_keys = ON` when the connection opens, and move the children to trash in the same transaction as the parent rather than leaning on the cascade.
+- **Symptom:** A migration added mid-session never applies; queries on the new column return 500 in the dev server while a fresh boot and the test suite pass. **Cause:** the connection cached on `globalThis` survives hot reload, and the migration ran inside the open call the cache skips. **Fix:** run the migration check once per module load; module state resets on reload while the cache does not.
+- **Symptom:** The snapshot that should have saved a bad migration is gone. **Cause:** snapshots lived inside the data directory a routine reset wipes, or a lexical sort pruned the newest one once the count passed nine. **Fix:** write snapshots beside the data directory in a checkout and to the OS per-user data directory in a packaged build, and prune by timestamp.
+- **Symptom:** The newest backup is a month old though the app runs daily. **Cause:** snapshots fired only before migrations, and the schema had not changed in a month. **Fix:** a scheduled snapshot through the same writer as the pre-migration one — the reason the Data section asks for both.
+- **Symptom:** A card in a list renders its checkbox unchecked while the row is genuinely selected. **Cause:** the checkbox sat inside a card-wide link; preventing the link's navigation also cancelled the checkbox's activation, and React's value tracker had already recorded the new value, so the next render wrote nothing back. **Fix:** link the cover and the title rather than the whole card, and keep the checkbox a controlled input with its own change handler.
+- **Symptom:** A home-screen roll-up is lower than the sum of its parts. **Cause:** the aggregate counted one entity type and missed another that contributes to the same total. **Fix:** name every contributing source in the query, and keep a fixture with one row of each so the undercount fails a test.
 
 ## Packaging
 

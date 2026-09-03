@@ -12,7 +12,7 @@ Load when shipping the app without Node/Deno/node_modules on the target. Possibl
 - Creates `./data/<app>.sqlite` next to the binary on first run.
 - Simplest; good for "download and run".
 
-### Native-window app (`deno desktop`, Deno 2.9+)
+### Native-window app (`deno desktop`, Deno 2.9+ — floor verified 2026-09-03 against [docs.deno.com/runtime/desktop](https://docs.deno.com/runtime/desktop/))
 
 - Compile a custom entrypoint that sets the data-dir env (e.g. `<APP>_DATA_DIR`) to the OS per-user data dir (e.g. `~/Library/Application Support/<App>`) **before** booting Next, so the store survives app updates (vs the read-only bundle dir).
 - For slimness, **copy the entrypoint + the data-dir helper into `.next/standalone` and compile from there** — compiling from the repo root pulls in the whole root tree.
