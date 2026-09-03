@@ -406,11 +406,9 @@ hang, perf cliff), or a genuine reader-trap that will cause a future bug.
 - If the worst realistic outcome is cosmetic, stylistic, doc-only,
   "inconsistent with a peer but nothing breaks", or "could be slightly
   clearer" → it FAILS the floor. If it arrived tagged [Nit], route it to the
-  nit bucket. Otherwise drop it. Keeping it as a low-severity blocking
-  finding is the failure mode this stage exists to prevent.
-- When in doubt about impact, drop. (Not demote — drop.) A true-but-trivial
-  finding is precisely what this stage removes; keeping it at a lower
+  nit bucket. Otherwise drop it — a true-but-trivial finding kept at a lower
   severity is how a report fills with noise.
+- When in doubt about impact, drop.
 
 Severity is authoritative here — it replaces the lane reviewer's. When you
 move it, add a one-line `Verifier note:` naming the concrete outcome that
