@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [10.0.0] - 2026-09-03
+
+The Fable 5.1 release. The two meta-skills went major — `generate-skill` and `rate-skill` 5.1.0 → 6.2.0 — after a doctrine sync against the Claude Fable 5.1 prompting guide narrowed the verification rule for the second time in six weeks, added `effort` to the frontmatter template, and named two new anti-patterns (narration suppressors, anti-formatting rules) plus a deduction for restating text the Claude Code harness already injects. Everything else followed from grading the fleet against that rubric: a **ratings pass** on 2026-09-02 patched all fourteen active skills (every one graded A), and a **`/claude-api prompt-audit`** on 2026-09-03 removed fourteen dated instructions the ratings pass did not reach — most of them from the January 2026 CLAUDE.md skeleton and the February verify guide — and gave `local-first-app` (4.5.0 → 4.7.0) the Gotchas section and eval set it lacked. `code-review` reached 2.4.3 with a two-tier complexity check and a verifier prompt that states its drop rule once; `typography` 1.6.0 fixed a caption-floor contradiction to a 14px hard floor; `track-session` 6.2.2 cut its verify guide to the goal, constraints, and gates. **Breaking:** `track-qa` is deprecated (1.4.0) and is removed in the next release; `rate-skill` grades differently than 5.x on verification scaffolding and harness duplication, so a 5.x A is not a 6.x A. 16 skills, 57 files, every skill except `color-system` and `screenshot-local` at a new version since v9.6.0.
+
 ### Deprecated
 
 - **track-qa** (1.3.0 → 1.4.0): marked deprecated. Every `QA.md` in the portfolio was deleted by decision on 2026-08-24 and the cc-dash `/qa` views read empty by design, so a skill whose only job is to generate, audit, migrate, or resume a `QA.md` has nothing left to act on. The description now opens with the deprecation and tells the model not to activate for any QA phrasing; the body carries the same banner above the (unchanged) schema reference, which stays for one release so `cc-dash/qa@1` remains documented. Hands-on verification is filed as an ordinary roadmap item (playthrough, parity gate, release sign-off) with `track-roadmap`. The skill is removed in the release after this one.
@@ -987,7 +991,12 @@ When creating a release:
 
 ---
 
-[Unreleased]: https://github.com/antjanus/skillbox/compare/v9.2.1...HEAD
+[Unreleased]: https://github.com/antjanus/skillbox/compare/v10.0.0...HEAD
+[10.0.0]: https://github.com/antjanus/skillbox/compare/v9.6.0...v10.0.0
+[9.6.0]: https://github.com/antjanus/skillbox/compare/v9.5.0...v9.6.0
+[9.5.0]: https://github.com/antjanus/skillbox/compare/v9.4.0...v9.5.0
+[9.4.0]: https://github.com/antjanus/skillbox/compare/v9.3.0...v9.4.0
+[9.3.0]: https://github.com/antjanus/skillbox/compare/v9.2.1...v9.3.0
 [9.2.1]: https://github.com/antjanus/skillbox/compare/v9.2.0...v9.2.1
 [9.2.0]: https://github.com/antjanus/skillbox/compare/v9.1.0...v9.2.0
 [9.1.0]: https://github.com/antjanus/skillbox/compare/v9.0.0...v9.1.0
