@@ -2,7 +2,7 @@
 
 Official-loop format (agentskills.io optimizing-descriptions): 19 queries, 10 should-trigger / 9 should-not-trigger, split 10 train / 9 validation. Shuffled once 2026-07-28; keep the split fixed across iterations. V9 was appended 2026-08-13 (see Notes) rather than reshuffled, so earlier measurements stay comparable.
 
-**Protocol:** run each query in a fresh Claude session ~3 times. Trigger rate = fraction of runs where code-review was invoked. A should-trigger query passes above 0.5; a should-not-trigger query passes below 0.5. Iterate the description on train failures only; select the variant with the best **validation** score.
+**Protocol:** run each query in a fresh Claude session ~3 times, from an empty working directory, and detect the Skill call by parsing the stream-json tool_use block (not by regex on the serialized input). Trigger rate = fraction of runs where code-review was invoked. A should-trigger query passes above 0.5; a should-not-trigger query passes below 0.5. Iterate the description on train failures only; select the variant with the best **validation** score.
 
 ## Train (10)
 
@@ -19,7 +19,7 @@ Official-loop format (agentskills.io optimizing-descriptions): 19 queries, 10 sh
 | N4 | "clean up and simplify what I just wrote" | no (simplify) |
 | N5 | "review this contract for me" | no (unrelated) |
 
-## Validation (8)
+## Validation (9)
 
 | # | Query | Expected |
 |---|---|---|
@@ -39,7 +39,8 @@ Official-loop format (agentskills.io optimizing-descriptions): 19 queries, 10 sh
 
 | Variant | Date | Train pass | Validation pass | Selected |
 |---|---|---|---|---|
-| 2.1.0 (front-loaded "code review", coverage clause, 4-way negative scope) | 2026-07-28 | not yet run | not yet run | — |
+| 2.1.0 (front-loaded "code review", coverage clause, 4-way negative scope) | 2026-07-28 | not run | 5/7 parsed (V1, V3 0.00 under max-turns bias; V4 unparsed) | — (baseline) |
+| 2.2.0–2.4.2 (description unchanged since 2.1.0 except the V9 worktree clause, 2026-08-13) | — | not run | not run | — |
 
 ## Notes
 
@@ -49,3 +50,4 @@ Official-loop format (agentskills.io optimizing-descriptions): 19 queries, 10 sh
 - V3 is a positive that carries a flag (`--blueprint`) — it verifies the description still triggers when the ask is scoped to one directory rather than "my changes".
 - N5 ("review this contract") is the domain-collision negative: the strongest trigger verb attached to a non-code object.
 - **V9 vs N1 is the PR boundary, and the pair must be scored together.** They deliberately name the *same* PR number so the only variable is where the diff lives: N1 asks the agent to fetch #412 from GitHub (`/review`'s job), V9 already has it on disk in a worktree, which is an ordinary local review. Added 2026-08-13 after transcripts showed the worktree-per-PR workflow was the skill's most-used path while the description still disowned it. A description edit that wins V9 by dropping the by-number negative and regressing N1 has not passed.
+- **Lane quality** is measured separately from activation: run the skill against three representative diffs (clean; one real correctness bug; one tempting nitpick) and confirm the verifier keeps the bug, drops the nitpick, and reports the clean diff as `Nothing blocking`. Re-run both checks after every prompt edit. To restore the ~60/40 split without breaking comparability, add one train pair on the next reshuffle rather than moving rows: `T6 "look at what I changed and tell me if it's safe to commit"` (trigger) and `N6 "review the open PR on GitHub"` (no — /review).
