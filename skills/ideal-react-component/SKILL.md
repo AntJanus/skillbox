@@ -4,7 +4,7 @@ description: React component structure and hooks antipatterns — a seven-sectio
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.8.1"
+  version: "1.8.2"
   tags: [react, components, hooks, useeffect, refactoring, typescript]
 ---
 
@@ -22,6 +22,7 @@ A predictable seven-section order for function-component files — imports → s
 // 1. IMPORTS (grouped: React → third-party → internal @/ → local, blank line between)
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import styled from 'styled-components';
 import { api } from '@/services/api';
 import { Button } from './Button';
 
@@ -36,7 +37,12 @@ type UserProfileProps = {
 
 // 4. COMPONENT FUNCTION (named export, const arrow function)
 export const UserProfile = ({ userId, onUpdate }: UserProfileProps): React.JSX.Element => {
-  // 5. LOGIC, in order: local state → custom/data hooks → effects → post-processing → handlers
+  // 5. LOGIC
+  const [isEditing, setIsEditing] = useState(false);                        // 5.1 local state
+  const { data, isLoading, error } = useQuery({ queryKey: ['user', userId], queryFn: () => api.getUser(userId) }); // 5.2 custom/data hooks
+  useEffect(() => { /* focus the editor */ }, [isEditing]);                 // 5.3 effects
+  const displayName = data ? `${data.first} ${data.last}` : '';            // 5.4 post-processing
+  const handleEdit = () => setIsEditing(true);                             // 5.5 handlers
 
   // 6. CONDITIONAL RENDERING (exit early for each edge case, after every hook call)
   if (isLoading) return <Loading />;
@@ -47,6 +53,8 @@ export const UserProfile = ({ userId, onUpdate }: UserProfileProps): React.JSX.E
   return <StyledContainer>{/* Main JSX */}</StyledContainer>;
 };
 ```
+
+State first, effects after the hooks they depend on, handlers last — so each line only references things already declared above it.
 
 **JavaScript:** same pattern without type annotations — skip Section 3 or use JSDoc.
 
@@ -59,18 +67,6 @@ export const UserProfile = ({ userId, onUpdate }: UserProfileProps): React.JSX.E
 | 5. Logic | state → hooks → effects → post-processing → handlers | Respects hook rules; deps before dependents |
 | 6. Conditional render | Early returns for loading/error/empty | Reduces nesting; types narrow after guards |
 | 7. Default render | Success-state JSX | Happy path is the most visible code |
-
-## Logic flow order (Section 5)
-
-```tsx
-// 5.1 local state          const [isEditing, setIsEditing] = useState(false);
-// 5.2 custom/data hooks    const { data, isLoading, error } = useQuery(...);
-// 5.3 effects              useEffect(() => { ... }, [isEditing]);
-// 5.4 post-processing      const displayName = data ? `${data.first} ${data.last}` : '';
-// 5.5 callback handlers    const handleEdit = () => setIsEditing(true);
-```
-
-State first, effects after the hooks they depend on, handlers last — so each line only references things already declared above it.
 
 ## Top hooks antipatterns
 

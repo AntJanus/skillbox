@@ -1,10 +1,10 @@
 # ideal-react-component — Eval Set
 
-Official-loop format (agentskills.io optimizing-descriptions): 18 queries, 9 should-trigger / 9 should-not-trigger, split 10 train / 8 validation (~55/45) with a proportional 1:1 mix of positives and negatives in each half. Shuffled once 2026-07-28; keep the split fixed across iterations.
+Official-loop format (agentskills.io optimizing-descriptions): 20 queries, 10 should-trigger / 10 should-not-trigger, split 12 train / 8 validation (60/40) with a proportional 1:1 mix of positives and negatives in each half. Shuffled once 2026-07-28 (T6/N6 appended 2026-09-02); keep the split fixed across iterations.
 
 **Protocol:** run each query in a fresh Claude session ~3 times. Trigger rate = fraction of runs where ideal-react-component was invoked. A should-trigger query passes above 0.5; a should-not-trigger query passes below 0.5. Iterate the description on train failures only; select the variant with the best **validation** score.
 
-## Train (10)
+## Train (12)
 
 | # | Query | Expected |
 |---|---|---|
@@ -13,11 +13,13 @@ Official-loop format (agentskills.io optimizing-descriptions): 18 queries, 9 sho
 | T3 | "my useEffect isn't working — it never re-runs" | trigger |
 | T4 | "this page is stuck in an infinite render loop" | trigger |
 | T5 | "pull the state out of this .tsx file into a custom hook" | trigger |
+| T6 | "this .jsx file is a mess, reorganize it" | trigger |
 | N1 | "review my code before I commit" | no (code-review) |
 | N2 | "what hex colors should this dashboard use?" | no (color-system) |
 | N3 | "refactor this Express route handler" | no (non-React JS) |
 | N4 | "make this landing page look less generic" | no (frontend-design) |
 | N5 | "write a Python dataclass for this payload" | no (unrelated) |
+| N6 | "add a Mantine dark-mode toggle to the header" | no (color-system / ui-ux-design) |
 
 ## Validation (8)
 
@@ -38,7 +40,8 @@ Official-loop format (agentskills.io optimizing-descriptions): 18 queries, 9 sho
 
 | Variant | Date | Train pass | Validation pass | Selected |
 |---|---|---|---|---|
-| 1.8.0 (coverage clause + negative scoping added) | — | not yet run | not yet run | — |
+| 1.7.x (pre-coverage-clause) | 2026-07-28 | not run | 4/8 (fleet, max-turns 3, lower bound) | — |
+| 1.8.2 (coverage clause + negative scoping) | — | not yet run | not yet run | — |
 
 ## Notes
 

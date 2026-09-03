@@ -85,7 +85,7 @@ Use named exports with const arrow functions.
 
 ## Section 5: Logic Flow
 
-Organize component logic in this strict order:
+Organize component logic in this order — state, then hooks, then effects, then derived values, then handlers — so every line references only things declared above it:
 
 ```tsx
 export const UserProfile = ({ userId }: UserProfileProps): React.JSX.Element => {
