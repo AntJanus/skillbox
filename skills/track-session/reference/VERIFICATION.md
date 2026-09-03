@@ -1,11 +1,5 @@
 # Session Verification Guide
 
-## Overview
-
-This guide provides detailed methodology for verifying session work using `/track-session verify`.
-
-**Purpose:** Ensure completed tasks actually meet original requirements before declaring work done.
-
 ## Verification
 
 **Goal:** every `[x]` task in SESSION_PROGRESS.md is backed by evidence gathered this run — a file you read, a test you ran, a behavior you exercised — and the report says which tasks are not.
@@ -92,64 +86,6 @@ Prioritized action items:
 1. Fix all blocking issues first
 2. Address high-priority improvements
 3. Plan medium/low items for future sprints
-
-## Common Verification Scenarios
-
-### Scenario: All Tasks Checked but Tests Not Run
-
-**Problem:** Tasks marked complete but verification reveals tests never executed.
-
-**Verification:**
-```bash
-# Run test suite
-npm test
-# Result: Tests fail or don't exist
-```
-
-**Report:**
-```markdown
-❌ BLOCKING: Phase 4 marked complete but tests failing (5/23 red)
-📋 Fix failing tests before declaring work done
-```
-
-### Scenario: Feature Works But Missing Error Handling
-
-**Problem:** Happy path works, edge cases crash.
-
-**Verification:**
-```javascript
-// Try edge cases
-- Empty input
-- Null values
-- Invalid formats
-- Race conditions
-```
-
-**Report:**
-```markdown
-⚠️ MINOR: Feature works but crashes on empty input
-📋 Add error handling for edge cases
-```
-
-### Scenario: Dependencies Incomplete
-
-**Problem:** Phase 3 marked done but depends on incomplete Phase 2.
-
-**Verification:**
-```markdown
-- [x] <!-- id:t_d3e4f dep:t_a1b2c --> Phase 2: API integration (missing API key)
-- [x] <!-- id:t_g5h6i dep:t_d3e4f --> Phase 3: Frontend using API (fails due to Phase 2 issue)
-```
-
-**Report:**
-```markdown
-❌ BLOCKING: Phase 3 depends on Phase 2, but Phase 2 API not configured
-📋 Complete Phase 2 configuration before Phase 3 can be verified
-```
-
-## Integration with Development Workflow
-
-Verify incrementally, not only at the end: run `/track-session verify` after each major phase, again before final delivery (fix blocking issues and re-verify until the report is clean), and during code review to confirm the report's evidence holds up.
 
 For verify-mode problems — verify reports incomplete work with all tasks checked, verify takes too long, verify passes but bugs remain — see [TROUBLESHOOTING.md](./TROUBLESHOOTING.md).
 
