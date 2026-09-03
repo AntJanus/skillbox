@@ -115,9 +115,21 @@ server reconnected); then one retry is justified.
 fix(track-session): replace bare NEVER-retry mandate with explained rule
 ```
 
+## Harness-injected text (as of Claude Code 2.1.258, 2026-09-02)
+
+A skill body that restates any of these is a §6 deduction. Re-check the list when the harness version changes.
+
+- The autonomy block ("You are operating autonomously…")
+- The delivering-work scope block ("The user's request — or the plan they approved — sets the scope…")
+- The progress-update line ("Before you start, say in a line what you're about to do…")
+- The overplanning nudge ("When you have enough information to act, act")
+- The hidden-tool-output note ("Only you see that command's output…")
+- The batch-tool-calls nudge ("First privately list what you need next…")
+- The readability rules (outcome first, complete sentences, no arrow chains, no invented labels)
+
 ## Retired rules (do not reintroduce)
 
 - **Multiline `description:` breaking discovery (#9817)** — real through mid-2026, fixed as of Claude Code 2.1.220, verified with probe skills 2026-07-27. Scalar style is no longer scored.
 - **The ≤230-char description soft target** — no official basis. Listing eviction is least-invoked-first, so workhorse skills keep their full text; official sizing is "a few sentences to a short paragraph."
 - **The +5 bonus for shipping an eval set** — replaced by a standing P1 for its absence (skill-creator optimizer shipped 2026-03-03).
-- **`## Verification Checklist` as a recommended methodology section** — dropped from §4 in 5.0.0. The Opus 5 guidance was to *remove* carried-over verification instructions rather than reword them, since they compound with behavior the model already performs. Narrowed in 6.0.0: the Fable 5.1 guidance keeps test-or-check-before-reporting instructions, recommends fresh-context verifier agents over self-critique, and recommends auditing progress claims against tool results. Generic self-re-check with no external referent stays a §7 deduction; the three carve-outs in §7 score fine (see pair 3). Don't reintroduce the section as a spec requirement — judge content, not headings.
+- **`## Verification Checklist` as a recommended methodology section** — dropped from §4 in 5.0.0, narrowed in 6.0.0. Judge content under §7's three carve-outs (see pair 3); never reintroduce the section as a spec requirement.
