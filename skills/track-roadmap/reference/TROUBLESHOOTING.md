@@ -19,14 +19,6 @@ Additional troubleshooting beyond the Gotchas in SKILL.md. Load when a mode stal
 - Run `/track-roadmap generate` to create a ROADMAP.md first
 - Then use `/track-roadmap resume` to pick a feature and start working
 
-## Problem: User wants to switch features mid-session
-
-**Cause:** Resume found an active SESSION_PROGRESS.md but the user changed their mind.
-
-**Solution:**
-- Offer `/track-session save` first — switching replaces the file with the new feature's plan
-- Only proceed once the user has confirmed the in-flight progress is safe to lose
-
 ## Problem: Roadmap still exceeds 15 committed features after an audit
 
 **Cause:** The project genuinely has more scope than one roadmap can express.

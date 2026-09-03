@@ -7,7 +7,7 @@ Detailed per-mode workflows. SKILL.md has the one-line essence; load this for th
 Create a new ROADMAP.md interactively.
 
 1. **Discovery** — Offer a codebase scan (project files, structure, TODO/FIXME, dependencies, issues); summarize findings. Then ask: (1) core purpose of the project? (2) known must-have features? (3) target user and workflows? (4) technical capabilities needed (integrations, platforms)? Adapt questions to scan results.
-2. **Organize & write** — Propose a draft feature list; user confirms/adds/removes. Group into logical categories, then write ROADMAP.md in the standard format. Verify before writing: user confirmed the list, features grouped logically, each has a clear description, no duplicates.
+2. **Organize & write** — Propose a draft feature list grouped into categories; the user confirms, adds, or removes. Write ROADMAP.md in the standard format only after that confirmation.
 
 ## Update
 
