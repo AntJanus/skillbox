@@ -38,7 +38,7 @@ Official-loop format (agentskills.io optimizing-descriptions): 18 queries, 9 sho
 
 | Variant | Date | Train pass | Validation pass | Selected |
 |---|---|---|---|---|
-| 1.4.0 (imperative register, coverage clause, manual-flow negative scope) | — | not yet run | not yet run | — |
+| 1.4.0 (imperative register, coverage clause, manual-flow negative scope) | 2026-07-28 | not run | partial: V1 1.00, V2 0.00, V3–V8 unmeasured (limit abort) | — (re-measure with higher turn budget first) |
 
 ## Notes
 

@@ -4,7 +4,7 @@ description: Use this skill to set up semantic-release and conventional commits 
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.4.0"
+  version: "1.4.1"
 ---
 
 # Setup Semantic Release & Conventional Commits
@@ -36,6 +36,8 @@ npm install --save-dev \
 | `@semantic-release/git` | Commit release artifacts back to repo |
 | `husky` | Manage git hooks |
 
+Check: every package listed above appears in `devDependencies` and `npm install` exited 0.
+
 ### Phase 2: Commitlint
 
 Create `commitlint.config.js` — use `module.exports = {...}` instead of `export default` when package.json lacks `"type": "module"`:
@@ -54,6 +56,8 @@ export default {
   },
 };
 ```
+
+Check: `commitlint.config.js` exists at the root and its module syntax matches `"type"` in package.json.
 
 ### Phase 3: Semantic-release
 
@@ -77,6 +81,8 @@ Create `.releaserc.json`. Plugin order is execution order, and `branches` must n
 
 Pre-release and multi-branch variants are in [references/REFERENCE.md](./references/REFERENCE.md).
 
+Check: `.releaserc.json` exists at the root, `branches` names the default branch, and plugin order is analyzer → notes-generator → changelog → git → github.
+
 ### Phase 4: Husky hooks
 
 ```bash
@@ -94,6 +100,8 @@ If none of those scripts exist, `rm .husky/pre-commit` — a hook running a miss
 
 Confirm `"prepare": "husky"` landed in package.json scripts; add it if `husky init` didn't. It reinstalls hooks on every `npm install`, and without it a fresh clone commits with no validation at all.
 
+Check: `.husky/commit-msg` contains the commitlint command, `.husky/pre-commit` is set or deleted, and `"prepare": "husky"` is in package.json scripts.
+
 ### Phase 5: Starter CHANGELOG
 
 ```markdown
@@ -106,6 +114,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ```
 
 Semantic-release prepends each release above this header.
+
+Check: `CHANGELOG.md` exists at the root.
 
 ### Phase 6: CI workflow
 
@@ -138,6 +148,8 @@ jobs:
 ```
 
 `GITHUB_TOKEN` is supplied by Actions automatically. Update `branches` here and in `.releaserc.json` together if the default branch isn't `main`.
+
+Check: `.github/workflows/release.yml` exists, `branches` matches `.releaserc.json`, and `NPM_TOKEN` is present only if `@semantic-release/npm` is in the plugin list.
 
 ## Quick reference
 
@@ -182,6 +194,19 @@ Adds offset/limit to all list endpoints.
 BREAKING CHANGE: removed `page` in favor of `offset`
 ```
 
+✅ `commitlint.config.js` syntax matched to the package's module system:
+
+```js
+// package.json has no "type": "module"
+module.exports = { extends: ['@commitlint/config-conventional'] };
+```
+
+❌ Same file in the same package — commitlint throws at config load and every commit fails before any rule runs:
+
+```js
+export default { extends: ['@commitlint/config-conventional'] };
+```
+
 ## Gotchas
 
 - **An explicit `plugins` array replaces the defaults, it does not extend them.** semantic-release's default list includes `@semantic-release/npm`; the Phase 3 config omits it, so nothing publishes to npm. Add `"@semantic-release/npm"` before `"@semantic-release/github"` when the package should publish — otherwise remove `NPM_TOKEN` from the workflow, because it does nothing. ([docs](https://semantic-release.gitbook.io/semantic-release/usage/plugins))
@@ -190,11 +215,11 @@ BREAKING CHANGE: removed `page` in favor of `offset`
 - **`subject-case: lower-case` rejects a capitalized subject.** `feat: Add feature` fails; `feat: add feature` passes. This is the single most common "but my message looks fine" rejection.
 - **`fetch-depth: 0` is required in CI.** Actions clones shallow by default, leaving semantic-release with no tag history — it fails with `ENOGITHEAD` or `EGITNOBRANCH`.
 - **`[skip ci]` in the git plugin's `message` prevents an infinite loop.** The release commit lands on the release branch and would otherwise trigger the workflow again.
-- **Match `commitlint.config.js` to the package's module system.** `export default` in a CommonJS package throws at config load, so commitlint exits before linting anything and every commit appears to fail for no reason.
+- **Match `commitlint.config.js` to the package's module system** — see the last example pair; a mismatch fails every commit before any rule runs.
 
 ## Deep reference
 
-Commit cheat sheet, pre-release branch config, the per-phase verification table, and troubleshooting (husky hooks not running, duplicate changelog entries, CI loops, `ENOGITHEAD`) live in **[references/REFERENCE.md](./references/REFERENCE.md)** — load it when a phase fails verification, not up front.
+Pre-release branch config and troubleshooting (husky hooks not running, duplicate changelog entries, CI loops, `ENOGITHEAD`) live in **[references/REFERENCE.md](./references/REFERENCE.md)** — load it when a phase's Check line fails, not up front.
 
 ## References
 
