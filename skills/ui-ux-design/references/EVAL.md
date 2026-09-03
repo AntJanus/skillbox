@@ -55,7 +55,9 @@ The 20 above stay **fixed and unmodified** so variant scores remain comparable. 
 |---|---|---|---|---|---|
 | 1.0.0 (initial) | 2026-08-04 | not yet run | not yet run | n/a | — |
 | 1.0.1 (routing clause names the query shape — "only about a type scale, a line-height, or a palette") | 2026-08-04 | not yet run | not yet run | n/a | — |
-| 2.0.0 (adds ARIA/accessibility triggers and a conversion clause; 893 → 948 chars) | 2026-08-06 | not yet run | not yet run | not yet run | — |
+| 2.0.0 (adds ARIA/accessibility triggers and a conversion clause; 893 → 948 chars) | 2026-08-06 | not yet run | not yet run | not yet run | superseded |
+| 2.1.x (adds "accessibility contracts" to the lead, "make this accessible" and "review my UX" triggers, ARIA/dataviz/ideal-react-component negative scope; 948 → 980 chars) | 2026-08-25 | not yet run | not yet run | not yet run | superseded |
+| 2.1.2 (frontend-design added to negative scope; two fragments trimmed; 1,000 chars) | 2026-09-02 | not yet run | PENDING | not yet run | pending validation run |
 
 ## Notes
 
@@ -63,5 +65,5 @@ The 20 above stay **fixed and unmodified** so variant scores remain comparable. 
 - **N1, N2, and V5 are the hardest negatives** because the user chose comprehensive scope: this skill genuinely contains typography and color content, so the description has to route narrow type-and-color questions away while still winning broad interface questions. Watch these closely — a regression here means the "load typography and color-system for depth" clause is not doing its job.
 - **V4 ("is this interface any good?") is the widest positive.** It has no noun this skill uniquely owns, which makes it the best test of whether the distinctive trigger sits early enough in the description to survive listing truncation.
 - N6 and V8 are unrelated-work controls; a trigger on either means the description is over-broad.
-- **N5 is the specific regression risk in 2.0.0.** "Write the copy for the pricing page headline" is a should-not-trigger, and the new description ends with "route conversion and retention work here." Those two are close enough that N5 may flip. If it does, the conversion clause needs narrowing to the pattern question rather than conversion work generally — X7 exists as the paired control for the same boundary.
+- **N5 is the specific regression risk since 2.0.0.** "Write the copy for the pricing page headline" is a should-not-trigger, and the description says "route signups, conversion, retention, and pricing-presentation asks here." Those two are close enough that N5 may flip. If it does, narrow the clause to the pattern question rather than conversion work generally — X7 exists as the paired control for the same boundary.
 - **X6 is the hardest new negative.** The description now names ARIA, but "add aria-label to every icon button" is a mechanical edit and, worse, is the specific thing `COMPONENTS.md` argues against. A trigger there is not a catastrophe — the skill would give correct advice — but it means the description is claiming implementation work it does not own.

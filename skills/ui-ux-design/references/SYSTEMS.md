@@ -25,8 +25,7 @@ Three tiers:
 
 - **Naming: `category/role/variant`.** `color/action/primary`, `color/text/disabled`, `space/inset/sm`.
 - **Name for what it does, not what it is.** `text-secondary`, never `gray-text` — the second name is a lie the moment the brand changes.
-- **Semantic tokens point at primitives. Never at other semantic tokens.** Alias chaining is the specific thing that makes token systems unmaintainable, and it's the mistake a generator makes by default.
-- **Themes are modes on one token set.** `text-primary` resolves per mode. A parallel `.dark .button {}` override tree is the failure mode — it doubles maintenance and drifts within a release.
+- The three tiers and the two rules that govern them (semantic → primitive only; themes are modes on one set) are in SKILL.md. This file carries the format, the naming grammar, and the handoff.
 - Cover **text, background, border, and action** first; those four roles carry most of an interface.
 - Skipping the semantic tier means every primitive change becomes a hunt through every component.
 - Store as JSON name/value pairs — machine-readable, portable across web, iOS, and Android, and the shape the W3C Design Tokens format is converging on. In CSS they surface as custom properties (`--color-action-primary`).
