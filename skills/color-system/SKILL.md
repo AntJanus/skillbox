@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "[ui | marketing | dataviz | tui | contrast | palette-name]"
 metadata:
   author: Antonin Januska
-  version: "1.5.0"
+  version: "1.5.1"
   tags: [color, palette, design, accessibility, dark-mode, data-viz, theme]
 ---
 
@@ -95,8 +95,8 @@ Data-viz palettes instead provide ordered color **lists** (categorical = distinc
 - **Design in OKLCH, not HSL.** OKLCH is perceptually uniform; HSL "lightness" lies (equal-L blue looks far darker than equal-L yellow), so even HSL steps produce lumpy scales.
 - **Harmony:** pick a scheme (monochromatic / analogous / complementary / triadic…) and let **one** color dominate in saturation and area; desaturate the rest.
 - **Scales:** 10–12 steps, step lightness evenly, peak chroma in the mid-range and taper it at the extremes so tints aren't washed out and shades aren't muddy.
-- **Light vs dark is not an inversion.** In dark mode, raise the base off pure `#000` (use ~`#0d1117`–`#1e1e2e`) because pure black causes halation and defeats elevation; lift saturated brand/status hues one or two steps, and signal elevation by getting *lighter*.
-- **Contrast:** WCAG AA — body text ≥ 4.5:1, large text & UI/borders ≥ 3:1. Validate **dark mode with APCA**, since WCAG 2 ratios overstate contrast near black.
+- **Contrast:** WCAG AA — body text ≥ 4.5:1, large text & UI/borders ≥ 3:1.
+- **Light vs dark is not an inversion, and WCAG 2 ratios overstate contrast near black.** Both failure modes and their fixes are in Gotchas below; thresholds and the APCA procedure are in [references/contrast.md](references/contrast.md).
 - **Colorblind-safety:** encode meaning with text, icon, or position *in addition to* hue, since ~8% of men can't separate the hues alone. For diverging data use warm↔cool (blue/orange, teal/rose) rather than red↔green.
 
 ## Examples
@@ -114,7 +114,14 @@ User: "I need colors for an admin dashboard, light and dark."
   success/warning/error for status badges. Confirm text-primary on background ≥ 4.5:1.
 ```
 
-Why it works: a role-mapped palette drops straight into CSS variables and is accessible by construction.
+❌ Anti-pattern
+
+```
+→ Pick four hues from a Coolors palette and assign them ad hoc: #2b2d42 nav, #8d99ae text,
+  #edf2f4 background, #ef233c buttons. Dark mode = invert the hexes.
+```
+
+Why it works: a role-mapped palette drops straight into CSS variables and is accessible by construction. The ad-hoc version has no neutral ramp, no elevation tiers, no status colors, and inverting a light palette produces pure-black surfaces and washed-out brand hues (see Gotchas: light vs dark is not an inversion).
 
 ### Example: status badge color
 
@@ -144,7 +151,14 @@ Signed data with a midpoint → Console & Window (warm↔cool, neutral center).
 Past ~8 categorical colors, series stop being distinguishable — aggregate into "Other" instead.
 ```
 
-Why it works: matches the data's structure to the right palette family and respects the distinguishability limit.
+❌ Anti-pattern
+
+```
+Twelve categorical series colored from the UI palette's success/warning/error/info roles plus
+brand tints; profit/loss encoded green↔red with no labels.
+```
+
+Why it works: matches the data's structure to the right palette family and respects the distinguishability limit. The anti-pattern reuses UI status roles that collide with series identity, exceeds the ~8-hue limit, and encodes red↔green with no text or icon backup for colorblind viewers.
 
 ## Gotchas
 

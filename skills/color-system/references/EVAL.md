@@ -38,10 +38,12 @@ Official-loop format (agentskills.io optimizing-descriptions): 18 queries, 9 sho
 
 | Variant | Date | Train pass | Validation pass | Selected |
 |---|---|---|---|---|
-| 1.4.0 (imperative register, quoted triggers, three-way negative scope) | 2026-07-28 | not yet run | not yet run | — |
+| 1.4.0 (imperative register, quoted triggers, three-way negative scope) | 2026-07-28 | not run | 8/8 (lower bound — 48% max-turns truncation) | ✅ current |
+| 1.5.1 (description unchanged; body-only revision) | 2026-09-02 | not yet run | not yet run — description text identical to 1.4.0 | — |
 
 ## Notes
 
+- **Train has never been run.** Run T1–T5 and N1–N5 with `--max-turns 6` before the next description edit so there is a train baseline to iterate against.
 - **This set measures routing correctness, not cold auto-activation.** color-system is a specialist-vocabulary skill: measured SkillBox activation data shows such skills are invoked by name or by explicit domain vocabulary, near-zero cold. The question worth answering here is "when color vocabulary *is* present, does the right skill answer and do the near-neighbors stay quiet" — not "what fraction of unprompted design work wakes it up." Do not tune the description chasing an auto-fire rate the vocabulary cannot deliver.
 - **Near-neighbor coverage is the point of the negatives.** typography (N1, N2, V7), frontend-design (N3, N5), and dataviz (N4, V5) each get multiple probes because all three overlap color-system's surface — a user asking about "how this looks" could land in any of them. V6 and V8 are generic-adjacent controls.
 - **N4 vs T4 is the sharpest pair.** Both are chart questions; only T4 is about color. If N4 fires, the negative-scope clause naming dataviz is not carrying.
