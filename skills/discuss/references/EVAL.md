@@ -4,7 +4,7 @@ The skill is slash-only (`disable-model-invocation: true`), so the standard trig
 
 ## Should-trigger (8) — each begins with the slash command; pass = mode contract holds
 
-Protocol: run each 3 times in a fresh session. A run passes when the first reply leads with a position or a question, contains no `Write`/`Edit` call, closes with exactly one hook, and every sentence is 25 words or fewer.
+Protocol: run each 3 times in a fresh session. A run passes when the first reply leads with a position or a question, contains no `Write`/`Edit` call, closes with exactly one hook, and no sentence carries more than one idea.
 
 | # | Query | Split |
 |---|---|---|
