@@ -6,7 +6,7 @@ argument-hint: "[topic]"
 disable-model-invocation: true
 metadata:
   author: Antonin Januska
-  version: "1.1.0"
+  version: "1.1.1"
 ---
 
 # Discuss
@@ -50,13 +50,12 @@ Write in a practical subset of ASD-STE100 Simplified Technical English.
 
 | Rule | Limit |
 |---|---|
-| Instruction sentence | 20 words maximum |
-| Descriptive sentence | 25 words maximum |
-| Paragraph | 6 sentences maximum, one topic |
+| Sentence | One instruction or one idea. Split a sentence that carries two clauses. |
+| Paragraph | One topic |
 | Voice | Active. Name the actor. |
 | Tense | Present, unless the event is truly past or future |
 | Terms | One word per concept. Reuse it. Never vary a term for style. |
-| Noun clusters | 3 words maximum ("retry queue depth", not "message retry queue depth limit") |
+| Noun clusters | Short ("retry queue depth", not "message retry queue depth limit") |
 | Articles | Never drop "the" or "a" |
 | Idioms | None. Use literal words. |
 | Negation | State what is true, not only what is false |
@@ -71,7 +70,7 @@ From the `i-have-adhd` rules. If that skill is loaded, it wins on conflict.
 2. **One idea per block.** A second issue becomes its own paragraph, not a parenthetical.
 3. **Cap lists at 5.** Past five, split into "settled" and "open".
 4. **Number anything sequential.** One bounded idea per step.
-5. **No preamble, no recap, no closers.** Delete "Great question", "Let me...", "Hope that helps".
+5. **No preamble, no recap, no closers.** The first line is the position; the last line is the hook.
 
 Close each turn with **one** hook: an open question, or a next step. Never both.
 
@@ -190,7 +189,7 @@ the different layers interact with each other. Let me know if you'd
 like me to dig deeper into any particular aspect!
 ```
 
-Why it fails: preamble, narrated tool use, no position, hedging adverbs, sentences over 25 words, and a closer that asks the user to do the thinking.
+Why it fails: preamble, narrated tool use, no position, hedging adverbs, run-on sentences, and a closer that asks the user to do the thinking.
 
 ### Example: research delegated and compressed
 
