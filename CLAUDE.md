@@ -111,16 +111,7 @@ Frontmatter: `name`, `description`, `license`, `argument-hint` (top-level, quote
 - **DO** use clear, imperative language (short sentences, bullet points)
 - **DO** fold "When to Use" content into the description, not a body section (Anthropic skill-creator guidance: "Include all when-to-use information in the description, not the body — the body only loads after triggering.")
 - **DO** document integration points with other skills
-
-### DO NOT: Anti-Patterns
-
-- **DO NOT** create vague or generic skills without specific use cases
-- **DO NOT** skip examples - always show ✅ / ❌ comparisons (✅ first; if room, also last — recency bias)
-- **DO NOT** ship a skill without a `## Gotchas` section — concrete failure modes are the body content the agent can't infer
-- **DO NOT** use abstract language - be concrete and specific
-- **DO NOT** skip the frontmatter metadata
-- **DO NOT** create skills that duplicate existing functionality
-- **DO NOT** write skills without testing activation triggers
+- **DO** check the installed skill set before creating one — two skills covering one job split activation between them
 
 ### File Operations
 
@@ -266,11 +257,7 @@ user: Create a skill for running database migrations
 [Should activate generate-skill]
 ```
 
-**If skill doesn't activate:**
-1. Check description field has specific triggers
-2. Verify frontmatter is valid YAML
-3. Ensure triggers match user's natural language
-4. Add more trigger variations
+If a skill doesn't activate, work through generate-skill's Gotchas: a coverage clause for the indirect ask ("even if they don't explicitly mention X") beats another synonym in the trigger list, and the distinctive noun belongs in the first 50 characters.
 
 ## Anti-Patterns
 
@@ -311,16 +298,6 @@ If you catch yourself doing any of these, reconsider — each has a paired ✅ a
 
 **Solution:** Add `Do NOT use this skill for X — see Y` to whichever is the wrong fit, and make the remaining triggers mutually exclusive. Activation misses and oversized bodies are covered by generate-skill's Gotchas.
 
-## Integration with Other Skills
-
-### generate-skill + existing skills
-
-When creating new skills:
-- Read existing skills for patterns
-- Use similar structure for consistency
-- Reference existing skills in "Integration" section
-- Maintain consistent quality standards
-
 ## Skill Development Philosophy
 
 **Activation over configuration:**
@@ -352,6 +329,6 @@ Treat every issue working with SkillBox as an opportunity to update this file. T
 
 ---
 
-**Last Updated:** 2026-09-02
+**Last Updated:** 2026-09-03
 **Applies To:** Claude Code 2.1.258+
 **Source:** https://antjanus.com/ai/claude-code-best-practices
