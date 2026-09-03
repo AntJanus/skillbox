@@ -38,7 +38,9 @@ Official-loop format (agentskills.io optimizing-descriptions): 19 queries, 9 sho
 | Variant | Date | Train pass | Validation pass | Selected |
 |---|---|---|---|---|
 | 6.0.0 (front-loaded SESSION_PROGRESS.md, coverage clause, track-roadmap/track-qa negative scope) | — | not run | not run | superseded |
-| 6.2.1 (work-summary added to negative scope; N2 and V9 retargeted after track-qa's 2026-09-01 deprecation) | 2026-09-02 | not run | PENDING | pending validation run |
+| 6.2.1 (work-summary added to negative scope; N2 and V9 retargeted after track-qa's 2026-09-01 deprecation) | 2026-09-02 | 9/10 (T4 0.33) | 7/9 (V3 0.33, V4 0.00) | ✓ first measured variant |
+
+Measured 2026-09-02, 6.2.1 (3 fresh sonnet sessions per query, `--max-turns 3`, empty working directory, Skill call parsed from stream-json): T1 1.00, T2 1.00, T3 1.00, T4 0.33 **FAIL**, T5 1.00, N1–N5 all 0.00; V1 1.00, V2 1.00, V3 0.33 **FAIL**, V4 0.00 **FAIL**, V5–V9 all 0.00 (both work-summary probes silent). Every miss below is a query that points at something absent from the empty directory ("this app", "this SKILL.md", "the card"); the model asked what to look at instead of invoking. All should-nots were silent. Treat trigger rates as lower bounds and give deictic queries a fixture before iterating the description against them. T4, V3 and V4 all presuppose a session file to save into or check against; none exists in the empty directory.
 
 ## Notes
 

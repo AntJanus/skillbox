@@ -39,9 +39,11 @@ Official-loop format (agentskills.io optimizing-descriptions): 20 queries, 10 sh
 | Variant | Date | Train pass | Validation pass | Selected |
 |---|---|---|---|---|
 | 4.0.0 (imperative register, front-loaded noun) — description unchanged through 6.0.1 | 2026-07-28 | not run | 7/8 | superseded |
-| 6.1.0 (adds "give my skill a letter grade"; T6/N6 added; T2 retargeted off deprecated track-qa) | 2026-09-02 | PENDING | PENDING | pending both runs |
+| 6.1.0 (adds "give my skill a letter grade"; T6/N6 added; T2 retargeted off deprecated track-qa) | 2026-09-02 | 9/12 (T3 0.00, T4 0.33, T5 0.00) | 7/8 (V4 0.00) | ✓ ties 4.0.0 on validation; V2 closed (0.33 → 1.00) |
 
 Measured rates 2026-07-28 (3 fresh sonnet sessions per query, scratch project with all 14 skills installed): V1 1.00, V2 0.33 **FAIL**, V3 1.00, V4 1.00, V5–V8 all 0.00 (all four should-nots correctly silent). V2 ("give my new skill a letter grade") under-fires because the phrasing carries no "SKILL.md"/"rate"/"audit" token — the 6.1.0 trigger addition targets it from the train side (T6), not by rewording against this validation query.
+
+Measured 2026-09-02, 6.1.0 (3 fresh sonnet sessions per query, `--max-turns 3`, empty working directory, Skill call parsed from stream-json): T1 1.00, T2 1.00, T6 1.00, T3 0.00 **FAIL**, T4 0.33 **FAIL**, T5 0.00 **FAIL**, N1–N6 all 0.00; V1 1.00, V2 1.00 (the letter-grade trigger closed the July miss), V3 1.00, V4 0.00 **FAIL**, V5–V8 all 0.00. Every miss below is a query that points at something absent from the empty directory ("this app", "this SKILL.md", "the card"); the model asked what to look at instead of invoking. All should-nots were silent. Treat trigger rates as lower bounds and give deictic queries a fixture before iterating the description against them. T3/T5/V4 all say "my/this SKILL.md" with no file present; T2 and T6, which name a path, passed 1.00.
 
 ## Notes
 
