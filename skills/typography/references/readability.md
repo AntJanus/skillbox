@@ -8,7 +8,7 @@ Load this when verifying type is actually readable, or sizing fluid/responsive t
 |---|---|---|---|
 | Body (desktop & mobile) | **16px / 1rem** | 14px | Browser default; people read screens at arm's length |
 | Form inputs (mobile) | **16px** | 16px | iOS Safari auto-zooms a focused input whose text < 16px |
-| Captions / labels / legal | 14px | **12px** | Below ~12px legibility collapses |
+| Captions / labels / legal | 14px | **14px** | The hard floor for any text — below 14px legibility collapses on screens |
 | Large text (unlocks 3:1 AA) | ≥24px or ≥18.66px bold | — | WCAG "large text" definition (18pt / 14pt bold) |
 
 - **Size in `rem`, not px.** `rem` tracks the user's browser font-size setting and zoom; hardcoding `html{font-size:14px}` or px body silently overrides their accessibility choice.
@@ -45,7 +45,7 @@ APCA is **draft / non-normative** — use it as a readability heuristic *on top 
 
 ## Weight × size × contrast
 
-The dimension WCAG2 can't see. **Body weight ≥ 400** always; never 100–300 on body or small text (thin strokes drop perceived contrast). Reserve 300 for large display only, with high contrast. **Never combine small + thin + low-contrast** — any two is risky, all three is the canonical unreadable panel.
+The dimension WCAG2 can't see. **Body weight ≥ 400** always; never 100–300 on body or small text (thin strokes drop perceived contrast). Reserve 300 for large display only, with high contrast.
 
 ## Fluid type with clamp()
 

@@ -4,7 +4,7 @@ description: Use this skill whenever the user wants typography work — sizing t
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.5.0"
+  version: "1.6.0"
   tags: [typography, type-scale, font-size, line-height, vertical-rhythm, readability, accessibility, fonts]
 ---
 
@@ -22,7 +22,7 @@ These are the recede-defaults. Meet all four and text is legible by construction
 
 | Floor | Default | Why |
 |---|---|---|
-| **Size** | body **≥ 16px / 1rem** | Browser default; iOS zooms `<input>` under 16px. Captions never < 12px. |
+| **Size** | body **≥ 16px / 1rem** | Browser default; iOS zooms `<input>` under 16px. Captions never < 14px — the hard floor for any text. |
 | **Weight** | body **≥ 400** | Weights 100–300 thin the stroke and drop perceived contrast on small text. |
 | **Contrast** | text **≥ 4.5:1** (large ≥ 3:1) | WCAG 2 AA. Re-check dark mode / thin fonts with APCA — WCAG2 overstates contrast near black. |
 | **Line-height** | body **≥ 1.5** | Cramped leading hurts reading and fails the WCAG 1.4.12 spacing override. |
@@ -75,10 +75,8 @@ body { font-size: 1rem; line-height: 1.5; font-weight: 400; color: #1e293b; } /*
 ❌ Anti-pattern
 
 ```css
-body { font-size: 13px; line-height: 1.25; font-weight: 300; color: #9ca3af; } /* small + thin + low-contrast: ≈2.5:1 */
+body { font-size: 13px; line-height: 1.25; font-weight: 300; color: #9ca3af; } /* small + thin + low-contrast (≈2.5:1), and px ignores the user's font-size setting */
 ```
-
-Why it fails: 13px is below the floor, 300 thins the stroke, `#9ca3af` on white is ≈2.5:1 — all three readability failures at once, and px ignores the user's font-size setting.
 
 ### Fluid heading
 
@@ -86,6 +84,12 @@ Why it fails: 13px is below the floor, 300 thins the stroke, `#9ca3af` on white 
 
 ```css
 h1 { font-size: clamp(1.75rem, 1.1rem + 3.2vw, 3rem); line-height: 1.1; letter-spacing: -0.02em; } /* scales, caps, still zooms */
+```
+
+❌ Anti-pattern
+
+```css
+h1 { font-size: 4vw; line-height: 1.1; } /* vw-only: does not scale on zoom, fails WCAG 1.4.4; no cap on wide screens */
 ```
 
 Why it works: `rem` bounds plus a `rem`-anchored preferred value keep it readable at 200% zoom, and the cap stops a runaway hero size.
@@ -102,10 +106,8 @@ figcaption { font-size: 0.875rem; line-height: 1.45; color: #5b6b7d; } /* 14px f
 ❌ Anti-pattern
 
 ```css
-th { font-size: 0.75rem; font-weight: 500; color: #9ca3af; } /* 12px, ≈2.5:1 */
+th { font-size: 0.75rem; font-weight: 500; color: #9ca3af; } /* 12px is under the 14px hard floor; #9ca3af on white ≈2.5:1 — chrome is where the floor breaks first */
 ```
-
-Why it fails: chrome is where the floor breaks first — 12px is under the 14px hard minimum, and `#9ca3af` on white misses 4.5:1 by half.
 
 ## Gotchas
 
@@ -118,7 +120,7 @@ Why it fails: chrome is where the floor breaks first — 12px is under the 14px 
 - **Symptom:** `line-height: clamp(1.3, 0.9rem + 0.4vw, 1.6)` silently does nothing. **Cause:** `clamp()` can't mix `<number>` bounds with a `<length>` preferred value, so the declaration is dropped. **Fix:** keep the unitless ratio and step it at a breakpoint instead of making leading fluid.
 - **Symptom:** Text over a hero image is unreadable in spots. **Cause:** no scrim; contrast varies per pixel. **Fix:** add a semi-opaque overlay or `text-shadow`, and verify the worst-case region.
 - **Symptom:** Bold looks smeared, italics weak. **Cause:** faux-synthesized weight/style the font file lacks. **Fix:** load real weights or a variable font; `font-synthesis: none` exposes the gaps.
-- **Symptom:** The theme says text should be ≥16px, but it renders small anyway. **Cause:** size-token names lie — Mantine `size="sm"`/`"xs"` and Tailwind `text-sm`/`text-xs` all compute to 14px/12px, under the floor; nested `em` units also compound multiplicatively as components nest. **Fix:** read the *computed* font-size in devtools, not the source token, and prefer `rem` for font-size so it can't compound.
+- **Symptom:** The theme says text should be ≥16px, but it renders small anyway. **Cause:** size-token names lie — Mantine `size="sm"`/`"xs"` and Tailwind `text-sm`/`text-xs` all compute to 14px/12px, under the floor; nested `em` units also compound multiplicatively as components nest. **Fix:** check the computed size (see "Verify computed, not authored" above) and prefer `rem` for font-size so it can't compound.
 - **Symptom:** Body text passes the floor but chart text is still tiny and washed out. **Cause:** charting libraries (Recharts, Mantine charts) render SVG text with their own inline `font-size`/`fill`, which never inherits your type scale or color tokens. **Fix:** target the library's text elements directly (e.g. `.recharts-wrapper text { font-size: …; fill: var(--text) }`) and re-verify computed size and color.
 - **Symptom:** Every heading — often all body text too — renders in the browser's fallback serif, even though the fonts are imported and the theme references them correctly; source review finds nothing wrong. **Cause:** `next/font` in `variable` mode combined with a UI library that injects its font-family at `:root` (Mantine does: `:root, :host { --mantine-font-family: var(--font-body) }`). If the font's `.variable` class is applied only to `<body>`, `--font-body` doesn't exist at `:root` — custom properties never inherit upward — so every `var()` reference is invalid and falls back. It only shows up in `getComputedStyle(document.body).fontFamily`. **Fix:** apply the `.variable` class to `<html>`, or follow the library's own documented pattern where one exists ([Mantine injects the resolved `font.style.fontFamily` string](https://help.mantine.dev/q/next-load-fonts)).
 - **Symptom:** Body text passes the floor everywhere you checked, but tables, nav labels, tooltips, menus, and form-field labels are still ~14px — with no `size` prop anywhere to explain it. **Cause:** component libraries ship individual components below their own base — Mantine's `Table` cell, `NavLink` label, `Tooltip`, `Menu` item, `Alert`, `Notification`, `Tabs` tab, and `Input` label/description all default to `sm` (14px) or `xs` (12px) while `Text` defaults to `md` (16px). There's no authored prop to grep for. **Fix:** override the whole size scale explicitly in the shared theme, and spot-check components you never sized rather than only the ones you did.
