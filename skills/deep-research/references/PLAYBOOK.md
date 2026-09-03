@@ -45,7 +45,7 @@ Adapt the frontmatter to the user's project conventions if they have an establis
 **Solution:** Try alternative phrasings and adjacent terms. Search for the broader category and narrow from there. If sources are genuinely thin, say so. Mark sections "Limited sources available." Do not pad with speculation.
 
 ### Problem: Output is becoming too long
-**Solution:** Default to a single, well-structured summary. If the topic genuinely needs more depth, offer the user a choice: "I have material for a deeper section on X — want me to expand?" Don't dump everything by default.
+**Solution:** Apply the Length rule under the synthesis template in SKILL.md — cut unfilled sections, offer to expand rather than expanding.
 
 ### Problem: Research keeps drifting from the user's actual question
 **Solution:** Re-anchor. Restate the original ask at the top of the summary and check every section serves it. Cut sections that don't. Cite-verify (workflow step 7) is the last chance to catch this.

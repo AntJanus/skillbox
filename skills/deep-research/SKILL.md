@@ -6,14 +6,14 @@ argument-hint: "<topic>"
 effort: high
 metadata:
   author: Antonin Januska
-  version: "2.4.0"
+  version: "2.4.1"
 ---
 
 # Deep Research
 
 ## Overview
 
-Research a topic across many sources and return a cited, structured synthesis in the conversation. Breadth of angle, depth of cross-reference, and citation discipline are what separate this from a search snippet. Cite only pages you opened this run, and keep output in chat — write a file only when asked.
+Research a topic across many sources and return a cited, structured synthesis in the conversation. Breadth of angle, depth of cross-reference, and citation discipline are what separate this from a search snippet. Keep output in chat — write a file only when asked.
 
 ## Five search angles
 
@@ -79,32 +79,30 @@ Recent developments, adoption signal, direction. Note disagreements. *Confidence
 
 **Source rules:** 8-15+ for a substantive topic; every claim traceable; annotate each source with what it contributed; include publication dates; mix official, industry, and community.
 
+**Length:** match the report to the question — a default-mode run is roughly one screen of prose plus the source list. Cut any template section the sources don't fill rather than padding it, and offer to expand a section instead of writing it speculatively.
+
 ## Examples
 
-✅ **Good** (default mode, abbreviated — step numbers match the workflow above):
+✅ **Good** (`quick` mode, abbreviated — step numbers match the workflow above):
 
 ```
-user: research htmx for me — thinking about a side project
+user: quick read on whether Bun is stable enough for a CLI tool
 assistant:
-[1] No local material. [2] Mode: default. Angles: Official, Comparative, Criticism, Currency, Community.
-[5] searches: 8 | angles: 5 | full reads: 4 | gaps: htmx + auth thin
+[1] No local material. [2] Mode: quick. Angles: Official, Criticism, Currency.
+[5] searches: 4 | angles: 3 | full reads: 3 | gaps: Windows support thin
 
-# htmx — Research Summary
-## Tl;dr
-Fits server-rendered side projects with light-to-moderate interactivity; poor fit for client-rich UX.
-*Confidence: high — official docs + three recent analyses converge.*
-## Trade-offs
-- Sentiment splits "elegant return to basics" vs "not a SPA replacement" — disagreement noted
-## Sources
-### Official — [htmx.org (2026)](url) — reference
-### Comparative — [htmx vs React (Mar 2026)](url) — benchmarks
+Bun 1.x is stable for single-binary CLIs on macOS and Linux; Windows still
+trails on a few Node APIs, so check your dependency list against the compat
+table. *Confidence: med — official compat table + two 2026 issue threads; no
+Windows production reports found.*
+Sources: [bun.sh compat table (2026-06)](url) — API coverage · [GitHub issue (2026-05)](url) — Windows gaps · [HN thread (2026-04)](url) — field reports
 ```
 
 ❌ **Bad:** one search for "htmx" → "It's a lightweight JS library, alternative to React, some people like it. Sources: htmx.org" — no local check, no plan, no cross-reference, no confidence label, one source.
 
 ✅ **Good** (disagreement handled): "Source A (official docs, 2026) says the flag defaults on; Source B (widely-cited blog, 2024) says off. The default changed in v3 — B predates it." Both cited, dates carry the resolution.
 
-Full default-mode and comparison-mode walkthroughs: [references/EXAMPLES.md](./references/EXAMPLES.md).
+Full default-mode (htmx) and comparison-mode walkthroughs: [references/EXAMPLES.md](./references/EXAMPLES.md).
 
 ## Gotchas
 
@@ -112,7 +110,7 @@ Full default-mode and comparison-mode walkthroughs: [references/EXAMPLES.md](./r
 - **WebFetch returns boilerplate or nothing on paywalled and JS-rendered pages.** That counts as not read. Say so, or search for an accessible mirror; don't backfill from the search snippet and count it toward `full reads`.
 - **Top-ranked is not authoritative.** SEO content farms and AI-written recaps outrank primary docs on most technical queries. Prefer official docs, .gov/.edu, and peer-reviewed sources for technical claims, and take the publication date from the page itself — search-result dates are often re-index dates.
 - **Pushback is not evidence.** When the user disputes a sourced claim, run another search rather than reversing. Report what the new sources say, including "they still support the original claim."
-- **Multi-agent landscape runs drift hardest.** Restate the user's original question at the top of the synthesis, then cut every section that doesn't serve it.
+- **Multi-agent landscape runs drift hardest.** Each subagent optimizes its own angle, so the consensus pass in step 6 is where the original question gets re-read — not the end.
 - **Three or more items still need the matrix, even in `quick` mode.** Prose comparison of 3+ options is unreadable; a five-row matrix costs less space than the paragraphs it replaces.
 - **A stale year in a query silently poisons currency.** Put the current year in currency-angle queries — undated results skew years old.
 - **Summaries reproduce source passages without marking them.** When a sentence is the source's wording, quote it and attribute it; otherwise reword in your own indirect speech. One short marked phrase per source is the pattern — the worked example in [references/EXAMPLES.md](./references/EXAMPLES.md) shows it.
