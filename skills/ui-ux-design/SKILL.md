@@ -1,11 +1,11 @@
 ---
 name: ui-ux-design
-description: UI/UX design — interaction states, accessibility contracts, information architecture, visual hierarchy, and design tokens. Use this skill whenever the user wants to design or critique an interface, asks to "design this screen", "what states does this button need", "what ARIA does this menu need", "make this accessible", "how should I structure the navigation", "is this UI any good", "set up design tokens", "review my UX", or "make this convert better" — even if they never say design and only describe a cluttered screen, a flow users abandon, or a component that breaks on real data. Covers type and color as applied to a UI; send pure type-scale, line-height, or palette-contrast questions to typography and color-system. Deceptive patterns too — route signups, conversion, retention, and pricing-presentation asks here. Do NOT use for chart and encoding design (see dataviz), React file structure and hooks (see ideal-react-component), or copywriting and A/B testing.
+description: UI/UX design — interaction states, accessibility contracts, information architecture, visual hierarchy, and design tokens. Use this skill whenever the user wants to design or critique an interface, asks to "design this screen", "what states does this button need", "what ARIA does this menu need", "make this accessible", "how should I structure the navigation", "is this UI any good", "set up design tokens", "review my UX", or "make this convert better" — even if they never say design and only describe a cluttered screen, a flow users abandon, or a component that breaks on real data. Covers type and color as applied to a UI; send pure type-scale or palette-contrast questions to typography and color-system. Route signups, conversion, retention, and pricing-presentation asks here. Do NOT use for aesthetic direction and visual polish (see frontend-design), chart and encoding design (see dataviz), React file structure and hooks (see ideal-react-component), or copywriting and A/B testing.
 license: MIT
 argument-hint: "[screen | flow | states | components | tokens | ethics | audit]"
 metadata:
   author: Antonin Januska
-  version: "2.1.1"
+  version: "2.1.2"
   tags: [ux, ui, interaction-design, information-architecture, design-tokens, accessibility, usability, deceptive-patterns, aria]
 ---
 
@@ -15,7 +15,7 @@ metadata:
 
 An interface is judged on whether a person can accomplish their goal, not on whether it looks finished. Most defects an agent ships are not ugly — they are the states nobody drew, the flow that assumed the happy path, and the label that broke when the data got long.
 
-Two rules generate most of what follows. **Design the states, not the screen** — a screen is the union of its loading, empty, error, and success renderings, and whichever one goes unspecified gets invented during implementation. **Name things for their role, not their appearance** — a name that survives a value change is the difference between a rebrand taking minutes and taking days.
+Two habits below prevent most of them: ship four states per surface, and name tokens for their role.
 
 ## Navigation
 
@@ -43,11 +43,7 @@ Two rules generate most of what follows. **Design the states, not the screen** �
 
 ## An approved mockup is the spec
 
-This applies to any implementation of a design the user signed off on, whether it came out of an audit or a single-screen redesign.
-
-Before reporting the implementation done, **put the approved artifact and the running screen side by side and list every element that differs.** Name each one — the hero that isn't full-bleed, the strip that stopped short of the edge, the card layout that got simplified, the data that landed in a different section than agreed. Then either fix it or say which differences you're keeping and why.
-
-"Tests pass and it renders against the dev server" answers a different question than "it matches what we agreed to," and the second one is the one that was approved. Drift concentrates in whatever nobody thought to re-open: the sections further down the page, the second posture of a two-mode screen, the component that was specified last.
+For any implementation of a design the user signed off on, put the approved artifact and the running screen side by side before reporting done, and list every element that differs — the hero that isn't full-bleed, the strip that stopped short of the edge, the card layout that got simplified, the data that landed in a different section than agreed. Fix each one or say which differences you're keeping and why. Drift concentrates in whatever nobody re-opened: the sections further down the page, the second posture of a two-mode screen, the component specified last.
 
 ## The floor
 
@@ -156,6 +152,7 @@ Three tiers, in this order:
 - ✅ Checkout as a sequential flow with "Step 2 of 4" — ❌ a four-step form that hides where you are
 - ✅ Padding raising a 20px icon button to a 44px target — ❌ bumping the icon to 44px to hit the number
 - ✅ Testing the card with a 120-character title and a missing image — ❌ shipping against the 3-word mock title
+- ✅ Before reporting done: the approved mockup and the running screen side by side, every difference listed and either fixed or kept on purpose
 
 ## Gotchas
 
@@ -177,4 +174,4 @@ Three tiers, in this order:
 - **typography** for type scales, line-height, and font pairing · **color-system** for palette construction and contrast math
 - **frontend-design** for layout execution and visual polish · **dataviz** for charts
 - **ideal-react-component** when the states land in React · **local-first-app** for the app-shaped feature set these patterns fill in
-- **track-roadmap** for the manual checks — states, zoom, keyboard paths — that automated tests can't cover; file them as roadmap sign-off items (`QA.md` and `track-qa` are deprecated)
+- **track-roadmap** for the manual checks — states, zoom, keyboard paths — that automated tests can't cover; file them as roadmap sign-off items
