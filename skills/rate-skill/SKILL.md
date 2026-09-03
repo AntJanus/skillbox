@@ -3,10 +3,10 @@ name: rate-skill
 description: Use this skill to grade a SKILL.md whenever the user wants to rate, audit, or score one. Triggers include "rate this skill", "grade this skill", "give my skill a letter grade", "audit my SKILL.md", "score this skill against best practices", or "is this SKILL.md up to spec", even if they don't use the word "rate". Returns a letter grade A-F, weighted category scores, and prioritized paste-ready patches. Do NOT use this skill for code review (see code-review) or for authoring a new skill (see generate-skill).
 license: MIT
 argument-hint: "<path/to/SKILL.md>"
-allowed-tools: Read, Glob, Grep
+allowed-tools: Read, Glob, Grep, Bash(python3 *)
 metadata:
   author: Antonin Januska
-  version: "6.1.0"
+  version: "6.2.0"
 ---
 
 # Rate Skill
@@ -28,7 +28,7 @@ Grades one `SKILL.md` and returns a letter, weighted category scores, named stre
 2. Read the whole file. Parse frontmatter and body separately. Body lines are everything after the closing `---`, blank lines included (the blank line directly after it counts too) — the number `generate-skill/scripts/measure.py` reports — and body tokens are `chars / 4`.
 3. Detect the type — the same five `generate-skill` uses, so a generated skill is graded against the profile it was built from. When two profiles fit (reference vs technical, methodology vs auditing, automation vs technical), pick the one whose required sections the body already names; never choose the profile that penalizes a heading name. A per-turn conduct skill with no phases satisfies "Workflow (phased)" with any section that states the turn's order. State the type and the tie-break in the report.
 4. Check for an eval set (`EVAL.md` in `references/` or legacy `reference/`, or `evals/evals.json`) against **Eval set check**. Missing is a standing P1.
-5. Score each category 0–100, weight, sum, map to a letter. Project the grade with P0 and P1 applied.
+5. Score each category 0–100, then run `python3 <generate-skill>/scripts/measure.py score <7 scores in rubric order>` for the weighted table and letter. Project the grade with P0 and P1 applied the same way.
 6. Emit the report in the **Output Format** shape.
 
 ## Rubric (weights sum to 100)
@@ -195,4 +195,4 @@ Every report names at least one strength, even on F-tier skills — users abando
 - **Extension keys are valid, just not portable.** `argument-hint`, `hooks`, `paths`, `when_to_use` run fine in Claude Code but are rejected by Anthropic's packaging validator (`quick_validate.py`) and absent from the universal spec. Don't penalize — raise the caveat only if the skill targets anthropics/skills.
 - **Recommend `skills-ref validate <path>`** as the structural validator. Never `npx skills lint` or `npx skills validate` — vercel-labs/skills ships no validation command.
 - **Negation is poorly handled.** Official: "Tell Claude what to do instead of what not to do," corroborated by arXiv 2503.22395. When a bare "DO NOT X" appears in a graded body, recommend pairing it with "Do Y instead."
-- **The verification rule is per-model and has flipped twice.** Required through 4.x, penalized in 5.0.0 on the Opus 5 guide, narrowed in 6.0.0 on the Fable 5.1 guide. Grade against the three carve-outs in §7 as written, and re-check the current model's prompting guide before tightening or loosening them again.
+- **The verification rule is per-model.** Grade against the three carve-outs in §7 as written, and re-check the current model's prompting guide before tightening or loosening them — each guide so far has moved this line.
