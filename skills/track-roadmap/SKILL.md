@@ -1,11 +1,11 @@
 ---
 name: track-roadmap
-description: Use this skill to maintain ROADMAP.md whenever the user wants to "add an item to the roadmap", "mark a feature done", "log the work I shipped", "create a roadmap", "what should we build next", "brainstorm features", or "audit the roadmap" — even if they don't mention the roadmap file by name. Covers the generate, update, audit, brainstorm, and resume modes. Do NOT use this skill for session-level task progress (see track-session) or free-form idea backlogs that aren't landing in a roadmap file.
+description: Use this skill to maintain ROADMAP.md whenever the user wants to "add an item to the roadmap", "mark a feature done", "log the work I shipped", "create a roadmap", "what should we build next", "brainstorm features", "audit the roadmap", or file hands-on checks like "add the release sign-off to the plan" — even if they don't mention the roadmap file by name. Covers the generate, update, audit, brainstorm, and resume modes. Do NOT use this skill for session-level task progress (see track-session) or free-form idea backlogs that aren't landing in a roadmap file.
 license: MIT
 argument-hint: "[generate|update|audit|brainstorm|resume]"
 metadata:
   author: Antonin Januska
-  version: "2.6.2"
+  version: "2.6.3"
 ---
 
 # Track Roadmap
@@ -80,23 +80,7 @@ last_updated: YYYY-MM-DDTHH:MM:SS-TZ
 
 ## Examples
 
-✅ **Good** — frontmatter, unique IDs, statuses, category slugs, strikethrough + date on completed items:
-
-```markdown
-## Core Features
-
-<!-- category:core -->
-
-- <!-- id:r_m3p7q status:in-progress started:2026-02-01 --> **Task lists** - Organize tasks into named lists (Work, Personal, Shopping).
-
-## Completed
-
-<!-- category:completed -->
-
-- <!-- id:r_k8x2m status:done completed:2026-01-15 --> ~~**Task CRUD**~~ - Create/read/update/delete tasks with title, description, due date. *(Completed: 2026-01-15)*
-```
-
-❌ **Bad** — `- tasks` / `- lists` / `- make it look good` / `- fix bugs`: no descriptions, no groupings, mixes features with tasks, no IDs or purpose.
+❌ **Bad** — `- tasks` / `- lists` / `- make it look good` / `- fix bugs`: no descriptions, no groupings, mixes features with tasks, no IDs or purpose. The format block above is the ✅ counterpart.
 
 ✅ **Good** — update mode, user says *"dark mode shipped yesterday"*: keep the id, flip the status, add the date, move the line to Completed:
 
@@ -109,20 +93,13 @@ Full ✅/❌ comparisons for generate, audit, update, brainstorm, and resume mod
 ## Integration
 
 - **track-session** — after picking a feature, use `track-session` to plan and track the implementation; SESSION_PROGRESS.md references the ROADMAP item ID.
-- Hands-on verification (a playthrough, a parity gate, a release sign-off) is filed as an ordinary roadmap item here — `QA.md` and the `track-qa` skill are deprecated (2026-09-01), so nothing files back from a separate checklist.
-
-```
-generate    → pick a feature  → /track-session → build
-brainstorm  → explore ideas   → update         → commit to plan
-resume      → check session   → pick feature   → /track-session → build
-audit       → review progress → update         → adjust plan
-```
+- Hands-on verification (a playthrough, a parity gate, a release sign-off) is an ordinary roadmap item here — there is no separate checklist file, so nothing files back from one.
 
 ## Gotchas
 
 - **Renaming a feature keeps its id.** Edit the title text but leave `<!-- id:r_XXXXX -->` alone — SESSION_PROGRESS.md `roadmap_ref` values and cc-dash history both point at it. On a merge, keep the surviving id; on a split, keep the original on one half and generate a new id for the other.
 - **`roadmap_ref` can be a list.** One session advancing several features writes `roadmap_ref: r_abc12,r_def34` — read it as comma-separated, don't assume a single id.
-- **Resume overwrites an active session plan.** If SESSION_PROGRESS.md has uncompleted tasks, ask whether to continue it before presenting the roadmap; switching features replaces that file.
+- **Resume overwrites an active session plan.** If SESSION_PROGRESS.md has uncompleted tasks, ask whether to continue it before presenting the roadmap; switching features replaces that file, so offer `/track-session save` first.
 - **Ambiguous audit evidence is `Unclear`, not a guess.** Partial or experimental code (a `src/auth/` with no tests) gets surfaced to the user for a ruling rather than being scored Done.
 - **A 30+ item roadmap is a signal, not a state to preserve.** Audit it, move speculative entries to "Future Ideas" as `status:idea`, and delete what no longer fits — git holds the history, so in-file archiving just adds noise.
 - **Roadmap drift is expected.** When the file stops matching what's being built, run audit to reconcile rather than patching individual lines from memory.
