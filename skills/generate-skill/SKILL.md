@@ -1,11 +1,12 @@
 ---
 name: generate-skill
-description: Interactive SKILL.md builder. Use this skill whenever the user asks to "create a skill", "generate a skill", "scaffold a SKILL.md", "write a SKILL.md", or "turn this workflow into a skill" — even if they don't say "skill" and only describe wanting to make a repeatable agent workflow or convention. Do NOT use for grading an existing SKILL.md (see rate-skill) or project roadmaps (see track-roadmap).
+description: Interactive SKILL.md builder. Use this skill whenever the user asks to "create a skill", "generate a skill", "scaffold a SKILL.md", "write a SKILL.md", or "turn this workflow into a skill" — even if they don't say "skill" and only describe wanting to make a repeatable agent workflow, checklist, or convention. Do NOT use for grading an existing SKILL.md (see rate-skill) or project roadmaps (see track-roadmap).
 license: MIT
 argument-hint: "[skill-topic]"
+effort: high
 metadata:
   author: Antonin Januska
-  version: "6.0.1"
+  version: "6.1.0"
 ---
 
 # Generate Skill
@@ -106,14 +107,12 @@ Full templates in [references/PATTERNS.md](references/PATTERNS.md) — load only
 
 - **No generic self-re-check steps** — cut "double-check your answer", "re-verify before responding", "add a final verification step for any non-trivial task". The fix is deletion, not rewording. Three things stay, and the last two are recommended for long-running work: checks against *external* state (run the test suite, confirm the file parses, validate against the schema); a writer-verifier pattern where a fresh-context agent judges *another* agent's output; and an evidence audit before a progress report ("only report work you can point to a tool result for"). The defect is an agent re-reading work it produced itself with nothing external to check it against.
 - **Never instruct the agent to echo its reasoning** ("show your thinking", "explain your reasoning in the response") — can trigger the `reasoning_extraction` refusal and a model fallback. Ask for conclusions and evidence instead.
-- **Never instruct the agent not to think or not to reason** — increases leakage of internal XML tags into visible output.
+- **Never instruct the agent not to think or not to reason** — increases leakage of internal XML tags into visible output. Say nothing about reasoning at all; shape the *output* instead ("one chat line, the file is the deliverable").
 - **No narration suppressors** ("hold all findings for the final response", "don't narrate", "no interim updates") and **no anti-formatting rules** ("never use bullets", "no headers", "no bold"). Both were written against models that over-narrated and over-formatted; the model does the opposite, so the lines produce silence and flat prose. Say *when* a specific update or format is wanted instead ("report scope before dispatch"; "use a table when comparing three or more items"). Shaping the final message — one chat line, the file is the deliverable — is fine.
 - **Scope delegation** when the skill uses subagents: name the scenarios that warrant one and the cap, dispatch independent agents in one message, and keep working while they run instead of blocking on each. Open-ended delegation multiplies cost; blocking delegation multiplies wall-clock.
 - **Bound the deliverable** when the skill writes a file — the output template needs a line like "match length to the task, no filler sections, redundant summaries or boilerplate." Written deliverables run long by default.
 - **State where a narrow skill stops** — models expand scope on their own, adding steps nobody requested. When the skill produces code, add the code-side line too: "Report a pre-existing bug or behavior the task doesn't mention as a follow-up rather than fixing it here. Commit tests only where the task asks or the repo already keeps tests for this kind of change, sized like the neighboring test files; scratch checks are not test files." Unrequested additions and committed test code drop substantially with this line, with no change in task success.
 - **Don't restate what the harness injects** — the autonomy block, the delivering-work scope block, the progress-update line, the overplanning nudge, the hidden-tool-output note, the batch-tool-calls nudge, the readability rules are already in every Claude Code session; a second wording makes the model reconcile the two.
-
-Length budget: aim <300 lines; the canonical cap is joint — **under 500 lines and ~5,000 tokens**, since a dense code-heavy body breaches tokens while passing lines.
 
 ### Phase 5 — Examples
 

@@ -1,10 +1,10 @@
 # generate-skill — Eval Set
 
-Official-loop format (agentskills.io optimizing-descriptions): 18 queries, 9 should-trigger / 9 should-not-trigger, split 10 train / 8 validation (~55/45) with a proportional 1:1 mix of positives and negatives in each half. Shuffled once 2026-07-28; keep the split fixed across iterations.
+Official-loop format (agentskills.io optimizing-descriptions): 20 queries, 10 should-trigger / 10 should-not-trigger, split 12 train / 8 validation (60/40) with a proportional 1:1 mix of positives and negatives in each half. Shuffled once 2026-07-28; keep the split fixed across iterations.
 
-**Protocol:** run each query in a fresh Claude session ~3 times. Trigger rate = fraction of runs where generate-skill was invoked. A should-trigger query passes above 0.5; a should-not-trigger query passes below 0.5. Iterate the description on train failures only; select the variant with the best **validation** score. Any commit that edits `description` adds a row to Results before it ships; a variant with no validation row is unselected.
+**Protocol:** run each query in a fresh Claude session ~3 times from an empty working directory — deictic queries (T6, V4, N6) get a `CHECKLIST.md` fixture in that directory so a miss measures the description, not the absence of the thing the query points at. Iterate on T-row failures only; V1 and V4 are read, never tuned against. Trigger rate = fraction of runs where generate-skill was invoked. A should-trigger query passes above 0.5; a should-not-trigger query passes below 0.5. Iterate the description on train failures only; select the variant with the best **validation** score. Any commit that edits `description` adds a row to Results before it ships; a variant with no validation row is unselected.
 
-## Train (10)
+## Train (12)
 
 | # | Query | Expected |
 |---|---|---|
@@ -13,11 +13,13 @@ Official-loop format (agentskills.io optimizing-descriptions): 18 queries, 9 sho
 | T3 | "scaffold a SKILL.md for screenshot automation" | trigger |
 | T4 | "turn this workflow into a skill" | trigger |
 | T5 | "I want a new Claude Code skill that formats SQL" | trigger |
+| T6 | "turn this checklist into a skill" (harness cwd contains `CHECKLIST.md`) | trigger |
 | N1 | "rate this skill" | no (rate-skill) |
 | N2 | "review my code" | no (code-review) |
 | N3 | "create a roadmap for this project" | no (track-roadmap) |
 | N4 | "generate screenshots for docs" | no (screenshot-local) |
 | N5 | "set up semantic release for this repo" | no (setup-semantic-release) |
+| N6 | "add these checks to the roadmap" (harness cwd contains `CHECKLIST.md`) | no (track-roadmap) |
 
 ## Validation (8)
 
@@ -37,7 +39,8 @@ Official-loop format (agentskills.io optimizing-descriptions): 18 queries, 9 sho
 | Variant | Date | Train pass | Validation pass | Selected |
 |---|---|---|---|---|
 | 4.0.0 (near-neighbor scope: +track-roadmap, +track-qa) | 2026-07-28 | not yet run | 7/8 | superseded — description rewritten 2026-09-01 |
-| 6.0.0 (track-qa scope dropped; V6 retargeted to ticket-description) | 2026-09-02 | not yet run | 6/8 | ✓ — the only variant matching the current near-neighbor scope; V1 and V4 are the open train-loop items |
+| 6.0.0 (track-qa scope dropped; V6 retargeted to ticket-description) | 2026-09-02 | not run | 6/8 | superseded — selected by scope match, not by score |
+| 6.1.0 ("checklist" restored to the coverage clause; T6/N6 with a CHECKLIST.md fixture) | 2026-09-02 | PENDING | PENDING | pending both runs |
 
 Measured rates 2026-09-02 (fresh sonnet sessions from an **empty** working directory, `--max-turns 1`, stream-json captured to files and parsed as JSON; user-scope install of the shipped description): V1 0.67 (4/6 — the two misses ran Bash to inspect the empty directory before deciding, which the one-turn cap counts as a miss), V2 1.00, V3 1.00, V4 0.00 **FAIL** (all three runs asked the user to paste the checklist the query points at — a deictic query with nothing present, not a description miss), V5–V8 all 0.00 (V5 and V7 invoked rate-skill every run, V6 invoked ticket-description once, V8 invoked pr-description once; never generate-skill). Two harness lessons from this run: the working directory must be empty — a first pass run from the directory holding the eval script produced sessions that said "this looks like an eval harness" and behaved differently; and detect the Skill call by parsing the JSON, not by regex on the serialized input, since the model sometimes emits `args` before `skill`.
 
