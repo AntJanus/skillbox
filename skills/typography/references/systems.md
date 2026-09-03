@@ -22,7 +22,7 @@ Dense dashboards, apps, dev tools, admin panels. Zero font-load cost. A 14px **c
 
 | Role | px | rem | Line-height | Weight | Tracking | Notes |
 |---|---|---|---|---|---|---|
-| caption | 12 | 0.75 | 1.4 | 500 | +0.06em | uppercase labels, metadata |
+| caption | 14 | 0.875 | 1.4 | 500 | +0.06em | uppercase labels, metadata — the 14px hard floor; differs from `small` by weight and tracking, not size |
 | small | 14 | 0.875 | 1.45 | 400 | 0 | helper text, dense cells |
 | **body** | **16** | **1** | **1.5** | **400** | 0 | reading baseline |
 | lead | 18 | 1.125 | 1.5 | 400 | 0 | intro line |
@@ -32,7 +32,7 @@ Dense dashboards, apps, dev tools, admin panels. Zero font-load cost. A 14px **c
 | h2 | 36 | 2.25 | 1.15 | 700 | −0.015em | |
 | h1 | 48 | 3 | 1.05 | 700 | −0.02em | |
 
-**Compact (14px base)** — shift body→14, small→13, lead→16, h5→18, h4→20, h3→24, h2→30, h1→38; body LH 1.43. Use only when density genuinely matters; never below 12px for any text.
+**Compact (14px base)** — shift body→14, lead→16, h5→18, h4→20, h3→24, h2→30, h1→38; body LH 1.43. `small` and `caption` stay at 14 — the floor — so body, small, and caption collapse to one size and differ only by weight and tracking. Use only when density genuinely matters; never below 14px for any text.
 
 **Data:** `font-variant-numeric: tabular-nums lining-nums;` on every metric, table cell, timer, and price so digits align and don't jitter.
 

@@ -36,7 +36,7 @@ Official-loop format (agentskills.io optimizing-descriptions): 18 queries, 9 sho
 
 | Variant | Date | Train pass | Validation pass | Selected |
 |---|---|---|---|---|
-| 1.4.0 (imperative register, quoted triggers, coverage clause) | 2026-07-28 | not yet run | not yet run | — |
+| 1.6.0 (imperative register, quoted triggers, coverage clause — description unchanged since 1.4.0) | 2026-09-02 | not yet run | not yet run | — |
 
 ## Notes
 

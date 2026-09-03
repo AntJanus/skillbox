@@ -44,7 +44,7 @@ Snapping moves each step off the exact ratio (the rounded pairs run 1.18–1.23)
 
 | Size | LH ratio | Rendered |
 |---|---|---|
-| 12px | 1.5–1.6 | 18–19px |
+| 14px | 1.5–1.6 | 21–22px |
 | 16px | 1.4–1.5 | 22–24px |
 | 24px | 1.15–1.2 | ~28px |
 | 32px | 1.05–1.1 | ~35px |
@@ -52,7 +52,7 @@ Snapping moves each step off the exact ratio (the rounded pairs run 1.18–1.23)
 
 **Always unitless.** `line-height: 1.5` inherits as a multiplier and recomputes per element. `line-height: 24px` or `1.5em` inherits a *fixed length* — an `h1` then gets 24px leading and overlaps. ([MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/line-height))
 
-**Fluid leading is a trap — `clamp()` can't mix types.** `clamp(1.3, 0.9rem + 0.4vw, 1.6)` looks reasonable and is **invalid CSS**: the bounds are `<number>`s while the preferred term is a `<length>`, so the whole declaration is dropped and you silently get the inherited leading. There's no unitless fix, because `vw` is itself a length. Two valid options:
+**Fluid leading is a trap** (the `clamp()` type-mixing gotcha in SKILL.md). There's no unitless fix, because `vw` is itself a length. Two valid options:
 
 ```css
 line-height: clamp(1.3rem, 0.9rem + 0.4vw, 1.6rem);  /* all lengths — valid */
@@ -90,7 +90,7 @@ Set in **em** so it scales with size.
 | Large display / h1 | −0.02 to −0.025 | tighten |
 | h2–h3 | −0.01 to −0.015 | slight tighten |
 | **Body** | **0** | leave alone |
-| Captions (<12px) | +0.01 to +0.02 | slight loosen |
+| Captions (14px) | +0.01 to +0.02 | slight loosen |
 | **ALL-CAPS / small labels** | **+0.05 to +0.12** | loosen |
 
 Negative on large text, zero on body, positive on all-caps/small — the optical pattern Material and Carbon both encode. Simpler systems (Bootstrap, Primer, Ant) ship zero everywhere; that's also fine.
