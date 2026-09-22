@@ -1,12 +1,12 @@
 ---
 name: ai-features
-description: AI features for an existing app — audit the codebase, propose the AI features its data can support, mock the strongest ones as screens, then wire the initial AI setup with Ollama or LM Studio locally, Anthropic or OpenAI hosted, and the right model for each job. Use this skill whenever the user wants to "add AI to my app", "what AI features could this app have", "add semantic search", "auto-tag these records", "summarize this with a local model", "set up Ollama for this project", or "should this use Claude or a local model" — even if they never say AI and only describe search that understands meaning, tags that fill themselves in, or a summary of their own data. Do NOT use this skill for pointing Claude Code itself at a local model, for building an MCP server, or for a question about the Claude API alone — see claude-api.
+description: AI features for an existing app — audit the codebase, propose the AI features its data can support, mock the strongest ones as screens, then wire the initial AI setup with Ollama or LM Studio locally, Anthropic or OpenAI hosted, and the right model for each job. Use this skill whenever the user wants to "add AI to my app", "what AI features could this app have", "add semantic search", "auto-tag these records", "summarize this with a local model", "set up Ollama for this project", or "should this use Claude or a local model" — even if they never say AI and only describe search that understands meaning, tags that fill themselves in, or a summary of their own data. Do NOT use this skill for pointing Claude Code itself at a local model (harness configuration — see update-config), for building an MCP server (see mcp-server-dev), or for a question about the Claude API alone — see claude-api.
 license: MIT
 argument-hint: "[brainstorm | setup]"
 effort: high
 metadata:
   author: Antonin Januska
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # AI Features
@@ -64,7 +64,7 @@ Sum. Below 6 of 12 goes to a later list. A risk score of 0 forces local-only reg
 
 ### Phase 4: Mock the strongest proposals
 
-For the top three to five, a static screen mock: the control or panel as the user would meet it, in its populated state and in its degraded state (runtime missing, with the message and the fix). Mocks are built on well-known example data (a reading list with *Dune* and *The Hobbit*, a trip to Lisbon, a 2016 hatchback's oil change), never on the user's records, and are labelled as examples. Match the app's existing UI patterns; a mock in a foreign visual language gets feedback about colours instead of about the feature.
+For the top three to five, one self-contained HTML page per proposal, written to the scratchpad, never into the repo: the control or panel as the user would meet it, in its populated state and in its degraded state (runtime missing, with the message and the fix), with a day/night toggle so both colour schemes are checked from one file. Use the app's own colour and type tokens (read them from its theme file) so the mock looks like the app; when the Artifact tool is available, publish the pages as one artifact with a tab per proposal, which is what Phase 5 presents. Mocks are built on well-known example data (a reading list with *Dune* and *The Hobbit*, a trip to Lisbon, a 2016 hatchback's oil change), never on the user's records, and are labelled as examples. A mock in a foreign visual language gets feedback about colours instead of about the feature.
 
 **Before proceeding:** every mock renders in both colour schemes at body-size text.
 
@@ -92,13 +92,21 @@ Only after approval, and only the shared plumbing from SETUP.md: runtime detecti
 
 ## Examples
 
+Model tags below are MODELS.md's picks as of its stated date; confirm on the library before quoting one.
+
 ### Example: a book catalog with a notes column and a tag table
 
 ✅ Desired
 
 > **Tags that suggest themselves.** When a book is saved, three tags from the existing 42-tag vocabulary appear as chips with accept and dismiss; nothing is applied until accepted. Model: `gemma4:e2b-it-qat` through Ollama with a JSON-schema enum built from the `tags` table. Plugs into the existing save action. Stores nothing until accepted; accepted tags carry `source = suggested`. Degrades to: chips absent, one line reading "Suggestions need Ollama with gemma4:e2b — pull it from Settings." Mock: the edit form with three example chips under the tag field, and the same form with the one-line notice. Estimate: half a day.
 
-Why it works: a real column, a real moment, an enforced vocabulary, a visible degraded state, and an estimate tied to what exists.
+❌ Anti-pattern
+
+> **Smart tags.** On save, the model tags the book automatically. Model: Claude. Stores the tags directly on the row.
+
+Why it fails: no vocabulary, so labels drift; applied without review, so a wrong tag is silent; hosted with no reason given for personal notes; no degraded state, so a missing key breaks save.
+
+Why the first works: a real column, a real moment, an enforced vocabulary, a visible degraded state, and an estimate tied to what exists.
 
 ### Example: a photo library with a job runner and an empty caption column
 
@@ -130,14 +138,10 @@ Why it works: the source-id requirement turns the summary's main failure mode, a
   ✅ Build the data-shape sheet first and cite only from it
 - ❌ Mocking with the user's real records to make it convincing
   ✅ Example data, labelled as such; the feature is judged on the interaction, not the rows
-- ❌ Stating the tag vocabulary in the prompt
-  ✅ An enum in the JSON schema; small models invent labels from prose and none from an enum
 - ❌ Silently falling back to keyword search when the embedder is missing
   ✅ Say which mode produced the results and what would enable the other
 - ❌ Building the first feature inside the setup phase
   ✅ Stop at plumbing; each feature is its own change with its own verification
-- ❌ Prescribing where the key lives
-  ✅ Use the store the app already uses for external services and say which one that is
 
 ## Gotchas
 

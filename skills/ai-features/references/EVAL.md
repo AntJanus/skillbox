@@ -2,7 +2,7 @@
 
 Feeds the description-optimization loop (agentskills.io/skill-creation/optimizing-descriptions).
 20 queries, 10 should-trigger and 10 should-not, split 60/40 with a proportional mix in both halves.
-Built 2026-09-22 with the 1.0.0 description.
+Built 2026-09-22 with the 1.0.0 description; 1.0.1 added two "see Y" pointers to the negative-scope clause without changing the triggers.
 
 ## Protocol
 
@@ -48,7 +48,7 @@ may not trigger even a well-described skill. Don't churn the description over th
 
 **Should NOT trigger**
 
-1. "write a Python script that calls the OpenAI API once" → claude-api or plain coding
+1. "write a Python script that calls the OpenAI API once" → plain coding (claude-api skips when OpenAI is named)
 2. "fine-tune a model on my data" → out of scope (training)
 3. "what colors should my dashboard use?" → color-system
 4. "create a skill for running database migrations" → generate-skill
@@ -64,7 +64,7 @@ If activation over-fires on them, sharpen the negative-scope clause rather than 
 
 | Description version | Train | Validation | Run |
 |---|---|---|---|
-| 1.0.0 (current) | not measured | not measured | — |
+| 1.0.1 (current) | not measured | not measured | — |
 
 The shipped description has no validation score, which rate-skill treats as a standing P1 until a
 run is recorded here.
