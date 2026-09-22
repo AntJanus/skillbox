@@ -1,11 +1,11 @@
 ---
 name: color-system
-description: Use this skill for any color decision — picking or building a palette, dark mode, contrast, chart and terminal colors. Triggers include "what colors should I use", "pick a palette for my dashboard", "set up dark mode", "does this pass WCAG contrast", "colorblind-safe chart colors", or "give me a terminal theme" — and it applies even when the user never says "color", as in "theme this app", "these status badges look wrong", or "this text is hard to read on the background". Ships curated light+dark palettes for web UI, marketing, data viz, and TUI, plus an OKLCH build-your-own recipe and WCAG/APCA thresholds. Do NOT use this skill for font size, weight, or pairing (see typography), for layout and component structure (see frontend-design), or for chart type, axis, and encoding choices that are not about color (see dataviz).
+description: Use this skill for any color decision — picking or building a palette, dark mode, contrast, chart and terminal colors. Triggers include "what colors should I use", "pick a palette for my dashboard", "set up dark mode", "does this pass WCAG contrast", "colorblind-safe chart colors", or "give me a terminal theme" — and it applies even when the user never says "color", as in "theme this app", "these status badges look wrong", "the text vanishes when the page switches to dark", or "I can't tell these lines apart" — any complaint that text is unreadable on its background or that things can't be told apart. Ships curated light+dark palettes for web UI, marketing, data viz, and TUI, plus an OKLCH build-your-own recipe and WCAG/APCA thresholds. Do NOT use this skill for font size, weight, or pairing, including text too small or thin to read (see typography), for layout and component structure (see frontend-design), or for chart type, axis, and encoding choices that are not about color (see dataviz).
 license: MIT
 argument-hint: "[ui | marketing | dataviz | tui | contrast | palette-name]"
 metadata:
   author: Antonin Januska
-  version: "1.5.1"
+  version: "1.6.0"
   tags: [color, palette, design, accessibility, dark-mode, data-viz, theme]
 ---
 
@@ -23,7 +23,8 @@ The index and role contract below answer "which palette" on their own. Load one 
 
 | Load | When |
 |---|---|
-| [references/palettes.md](references/palettes.md) | You need actual hex values — any of the four domains, light + dark; the fill/subtle/emphasis triads; the 12-step scales behind Dusk, Driftwood and Meadow |
+| [references/carbon.md](references/carbon.md) | Building a page or artifact that must use Carbon — read this file only; it holds Carbon's roles, dashboard kit and triads in both modes |
+| [references/palettes.md](references/palettes.md) | You need hex values for any other palette — the four domains, light + dark; the fill/subtle/emphasis triads; the 12-step scales behind Dusk, Driftwood and Meadow |
 | [references/contrast.md](references/contrast.md) | Verifying WCAG/APCA thresholds, colorblind safety, or debugging a pair that fails |
 | [references/build-your-own.md](references/build-your-own.md) | No library palette fits and you're generating a new scale (the OKLCH recipe) |
 | [references/theory.md](references/theory.md) | Choosing a harmony scheme, or justifying a color-space / scale decision |
@@ -59,7 +60,7 @@ Generated from 12-step OKLCH scales, which ship alongside their roles so they ca
 ### Terminal / TUI — 16-ANSI + bg/fg/cursor/selection
 - Solarized Dark · Nord · Catppuccin Mocha · Catppuccin Latte *(the one light scheme)* · Dracula · Tokyo Night
 
-→ **Full hex tables for every palette:** [references/palettes.md](references/palettes.md)
+→ **Full hex tables:** Carbon in [references/carbon.md](references/carbon.md), every other palette in [references/palettes.md](references/palettes.md)
 
 ## Semantic roles (the contract)
 
@@ -86,7 +87,7 @@ UI palettes fill these roles. Map intent to a role, then the role to a hex.
 | `{c}-subtle-border` | Border around that background | `--bs-{c}-border-subtle` | — |
 | `link` | The brand hue as text on `surface` | (split in v6) | — |
 
-Ready-made triads for all nine UI palettes are in palettes.md. Dark-mode fills are light hues, so their labels are the palette's *darkest* neutral, not white.
+Ready-made triads for all nine UI palettes are in palettes.md, except Carbon's, which are in carbon.md. Dark-mode fills are light hues, so their labels are the palette's *darkest* neutral, not white.
 
 Data-viz palettes instead provide ordered color **lists** (categorical = distinct series; sequential = low→high ramp; diverging = warm↔cool with a neutral midpoint). TUI schemes provide the 16 ANSI slots plus 4 special roles.
 
@@ -109,7 +110,7 @@ Data-viz palettes instead provide ordered color **lists** (categorical = distinc
 User: "I need colors for an admin dashboard, light and dark."
 → Recommend Carbon (deep slate-blue, dark-first, made for dense data UI) — the default;
   offer Graphite if hand-tuned light-mode parity matters more than the dashboard kit.
-→ Copy its role→hex table from palettes.md (both modes).
+→ Copy its role→hex table from carbon.md (both modes).
 → Apply by role: background→surface→border→text, primary for the main CTA,
   success/warning/error for status badges. Confirm text-primary on background ≥ 4.5:1.
 ```
@@ -163,7 +164,7 @@ Why it works: matches the data's structure to the right palette family and respe
 ## Gotchas
 
 - **Symptom:** Brand color is unreadable as body text. **Cause:** Saturated mid-tones (amber, coral, teal) often fail 4.5:1 on their own background — a fill color and a text color are different steps of the same ramp. **Fix:** keep `fill` and `link` as separate values; step the text one darker until it clears. In this library only Evergreen light diverges (`#059669` carries a button label at 4.70:1 but reaches 3.77:1 as a link on white, so its `link` is `#00875b`), which is exactly why the split gets missed.
-- **Symptom:** Status badges look correct but shout at table density. **Cause:** a solid `--error` fill behind white text is right for a button and far too loud for a row-level badge. **Fix:** use the `{c}-subtle` background with its paired `{c}-emphasis` label. Reusing the status hue as its own label on that tint misses 4.5:1 more often than not — take the paired value from palettes.md rather than assuming.
+- **Symptom:** Status badges look correct but shout at table density. **Cause:** a solid `--error` fill behind white text is right for a button and far too loud for a row-level badge. **Fix:** use the `{c}-subtle` background with its paired `{c}-emphasis` label. Reusing the status hue as its own label on that tint misses 4.5:1 more often than not — take the paired value from palettes.md (Carbon's from carbon.md) rather than assuming.
 - **Symptom:** A palette generated from a 12-step scale still fails contrast. **Cause:** the step map is not a contrast guarantee. Radix guarantees steps 11 and 12 against step 2 and nothing else; step 9 rarely carries a 4.5:1 button label, and step 8 rarely reaches 3:1 as a control edge. **Fix:** solve those two against their actual ground. In light mode commit to a white label and step the fill *darker* — solving toward whichever label already scores higher produces a pale wash that passes and looks weak.
 - **Symptom:** A palette that looks right in light mode feels muddy in dark. **Cause:** the neutral tint was chosen once and inherited. A warm hue that reads as paper at high lightness reads as brown at low lightness. **Fix:** re-decide neutral hue and chroma per mode; swinging cool at very low chroma is the usual answer. Driftwood in palettes.md does this (hue 64 light, 224 dark); Meadow's sage did not need it.
 - **Symptom:** A palette copied from Color Hunt, Coolors or a trend article cannot build an interface. **Cause:** gallery palettes are four decorative hues with no neutral ramp, no dark ink and no states — 16 of the 30 most-liked Color Hunt palettes cannot carry 4.5:1 body text with *any* pair of their colors. **Fix:** take the hues as seed material and build scales from them (build-your-own.md); Dusk, Driftwood and Meadow were made this way.
