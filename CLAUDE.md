@@ -14,7 +14,7 @@ SkillBox is a collection of utility skills for Claude Code and AI agents. Each s
 | | |
 |---|---|
 | Current release | **v10.0.0** (2026-09-03, the Fable 5.1 release) |
-| Skills | **17** (see roster below) |
+| Skills | **16** (see roster below) |
 | Install | `npx skills add antjanus/skillbox` |
 | Compatible with | Claude Code, Cursor, Cline, GitHub Copilot, and 40+ agents via [Vercel Skills](https://skills.sh) |
 | License | MIT (per-skill `license: MIT` in frontmatter) |
@@ -41,13 +41,12 @@ Verified against `skills/` on 2026-09-22. Versions come from each SKILL.md's `me
 | `record-tui` | 1.6.1 | VHS terminal/TUI demo recording |
 | `screenshot-local` | 1.5.2 | shot-scraper screenshots of local pages |
 | `setup-semantic-release` | 1.4.1 | semantic-release + conventional commits + commitlint |
-| `track-qa` | 1.4.0 | **DEPRECATED — do not run.** See below. |
 | `track-roadmap` | 2.6.3 | ROADMAP.md generate/update/audit/brainstorm/resume |
 | `track-session` | 6.2.2 | SESSION_PROGRESS.md across multi-session work |
 | `typography` | 1.6.0 | Type scale, line-height, font pairing |
 | `ui-ux-design` | 2.1.2 | Interaction states, a11y contracts, IA, tokens |
 
-**`track-qa` is deprecated (2026-09-01) and is removed in the next release.** QA.md manual-QA checklists were retired portfolio-wide on 2026-08-24. Do not run this skill, do not restore it, and do not refile its items — hands-on verification is filed as ordinary `track-roadmap` items. The directory stays on disk until the removal release; do not delete it yourself.
+**`track-qa` was removed in v10.1.0 (2026-09-22)** after its 2026-09-01 deprecation; QA.md manual-QA checklists were retired portfolio-wide on 2026-08-24. Do not restore it or refile its items — hands-on verification is filed as ordinary `track-roadmap` items. Its last version, 1.4.0, is in the v10.0.0 tag if the `cc-dash/qa@1` schema is ever needed again.
 
 `generate-skill` and `rate-skill` are the two meta-skills and are the source of truth for the authoring spec and the grading rubric respectively. When this file and one of those disagree, they win — fix this file.
 
@@ -97,7 +96,7 @@ skillbox/
 
 ### Directory naming
 
-`references/` (plural) is canonical and is what new skills use. Seven existing skills use the singular `reference/` — that is fine and is not worth churning; nothing validates directory names, and the CI validator accepts both.
+`references/` (plural) is canonical and is what new skills use. Six existing skills use the singular `reference/` — that is fine and is not worth churning; nothing validates directory names, and the CI validator accepts both.
 
 ### EVAL.md convention
 
@@ -197,8 +196,7 @@ If a skill doesn't activate, work through generate-skill's Gotchas: a coverage c
 
 - Do not add a `ROADMAP.md` — CHANGELOG + semver replaced it by decision 2026-07-27.
 - Do not open a feature branch; commit to `main` (decision 2026-09-02).
-- Do not run, restore, or refile items from `track-qa`, and do not recreate any `QA.md` (retired 2026-08-24).
-- Do not delete the `track-qa` directory — its removal is a release event, recorded in CHANGELOG.
+- Do not restore `track-qa` (removed in v10.1.0) or recreate any `QA.md` (retired 2026-08-24).
 - Do not delete or modify a skill you weren't asked to touch.
 - Do not rename a skill — names are stable references; rename only in a documented major version.
 - Do not remove a skill's `## Gotchas` or examples sections.

@@ -88,7 +88,7 @@ curl -o .claude/skills/track-session/SKILL.md \
 
 ## Available Skills
 
-17 skills. Click any name to jump to its use-cases and triggers; expand for details.
+16 skills. Click any name to jump to its use-cases and triggers; expand for details.
 
 | Skill | What it does |
 |-------|-------------|
@@ -97,7 +97,6 @@ curl -o .claude/skills/track-session/SKILL.md \
 | [⚛️ ideal-react-component](#ideal-react-component) | React component structure + hooks antipatterns |
 | [📊 rate-skill](#rate-skill) | Grade skill quality A–F with concrete fixes |
 | [🗺️ track-roadmap](#track-roadmap) | Plan, update, audit & resume a project roadmap |
-| [⚠️ track-qa](#track-qa) | **Deprecated 2026-09-01** — QA.md retired; file hands-on checks as roadmap items |
 | [📦 setup-semantic-release](#setup-semantic-release) | Automated versioning via conventional commits |
 | [📼 record-tui](#record-tui) | Polished terminal demo GIFs/MP4s with VHS |
 | [📸 screenshot-local](#screenshot-local) | Screenshot local dev servers with shot-scraper |
@@ -194,16 +193,6 @@ Seven weighted categories (description quality, frontmatter validity, length & p
 **Triggers:** When asked to "add an item to the roadmap", "mark a feature done", "log the work I shipped", "create a roadmap", "what should we build next", "brainstorm features", or "audit the roadmap"
 
 [View Documentation](./skills/track-roadmap/SKILL.md)
-</details>
-
-### track-qa
-
-<details>
-<summary><b>Deprecated 2026-09-01 — QA.md manual-QA checklists were retired on 2026-08-24. Kept for one release so the cc-dash/qa@1 schema stays documented, then removed.</b></summary>
-
-Do not run any of its modes. A behavior that needs a human to exercise it (a playthrough, a parity gate, a release sign-off) is filed as one ordinary roadmap item with `track-roadmap`; cross-session progress stays with `track-session`.
-
-[View Documentation](./skills/track-qa/SKILL.md)
 </details>
 
 ### setup-semantic-release
