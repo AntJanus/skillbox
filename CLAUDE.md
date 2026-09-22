@@ -41,8 +41,8 @@ Verified against `skills/` on 2026-09-22. Versions come from each SKILL.md's `me
 | `record-tui` | 1.6.1 | VHS terminal/TUI demo recording |
 | `screenshot-local` | 1.5.2 | shot-scraper screenshots of local pages |
 | `setup-semantic-release` | 1.4.1 | semantic-release + conventional commits + commitlint |
-| `track-roadmap` | 2.6.3 | ROADMAP.md generate/update/audit/brainstorm/resume |
-| `track-session` | 6.2.2 | SESSION_PROGRESS.md across multi-session work |
+| `track-roadmap` | 2.6.4 | ROADMAP.md generate/update/audit/brainstorm/resume |
+| `track-session` | 6.2.3 | SESSION_PROGRESS.md across multi-session work |
 | `typography` | 1.6.0 | Type scale, line-height, font pairing |
 | `ui-ux-design` | 2.1.2 | Interaction states, a11y contracts, IA, tokens |
 

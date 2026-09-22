@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "[generate|update|audit|brainstorm|resume]"
 metadata:
   author: Antonin Januska
-  version: "2.6.3"
+  version: "2.6.4"
 ---
 
 # Track Roadmap
@@ -98,7 +98,7 @@ Full ✅/❌ comparisons for generate, audit, update, brainstorm, and resume mod
 ## Gotchas
 
 - **Renaming a feature keeps its id.** Edit the title text but leave `<!-- id:r_XXXXX -->` alone — SESSION_PROGRESS.md `roadmap_ref` values and cc-dash history both point at it. On a merge, keep the surviving id; on a split, keep the original on one half and generate a new id for the other.
-- **`roadmap_ref` can be a list.** One session advancing several features writes `roadmap_ref: r_abc12,r_def34` — read it as comma-separated, don't assume a single id.
+- **`roadmap_ref` holds exactly one id.** cc-dash drops a comma list with a warning, which unlinks the session from the board. When one session advances several features, link the main one and name the rest in the session's `## Current Status`.
 - **Resume overwrites an active session plan.** If SESSION_PROGRESS.md has uncompleted tasks, ask whether to continue it before presenting the roadmap; switching features replaces that file, so offer `/track-session save` first.
 - **Ambiguous audit evidence is `Unclear`, not a guess.** Partial or experimental code (a `src/auth/` with no tests) gets surfaced to the user for a ruling rather than being scored Done.
 - **A 30+ item roadmap is a signal, not a state to preserve.** Audit it, move speculative entries to "Future Ideas" as `status:idea`, and delete what no longer fits — git holds the history, so in-file archiving just adds noise.

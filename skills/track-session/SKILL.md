@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "[start|save|resume|verify|recover]"
 metadata:
   author: Antonin Januska
-  version: "6.2.2"
+  version: "6.2.3"
 ---
 
 # Session Progress
@@ -60,7 +60,7 @@ Next: <specific next action — name files and functions, not "fix the bug">
 
 **What must survive a context reset**, in priority order: problems that came up and how they were resolved (Failed Attempts); options raised, tried, or set aside, and why (Decisions); anything the user asked for, ruled out, or set as a constraint, stated close to their own words; exactly where things stand (Current Status); what is still open or promised (Plan); and details that are hard to reconstruct — names, numbers, exact wording, links — kept exact. Be complete on these even at the cost of length. Condense your own reasoning to what it concluded.
 
-**IDs:** `t_` (task) or `f_` (failed attempt) plus a short unique token. Five random `[a-z0-9]` chars is the default; a mnemonic slug (`t_redis-mw`, `t_authfix`) also works. Keep an id stable once written, because `dep:` references point at it. Every plan item carries an `id` and a `dep` (`dep:none` or `dep:t_XXXXX`).
+**IDs:** `t_` (task) or `f_` (failed attempt) plus 1–20 `[a-z0-9_-]` chars — five random chars by default, or a mnemonic slug (`t_redis-mw`, `t_authfix`). The same shape applies to `task:` and `ref:`, which each take exactly one id. `roadmap_ref` takes exactly one roadmap id; when a session advances several features, name the others under `## Current Status`. Keep an id stable once written, because `dep:` references point at it. Every plan item carries an `id` and a `dep` (`dep:none` or `dep:t_XXXXX`).
 
 **Log every failed approach with its reason** so it isn't blindly retried. When a failure was environment-scoped — an MCP server not connected, missing credentials, a service down — say so in the entry; a later session may have a different environment, so re-checking it is correct rather than a repeat.
 
@@ -163,7 +163,7 @@ Then I'll check the git log and look through the auth directory...
 
 - **Only the top frontmatter block is parsed.** Anything below a second `---` is invisible to cc-dash, so a file with stacked sessions silently reports only the newest one.
 - **`SESSION_PROGRESS.md` is gitignored in many public repos**, which makes "just replace it, git has the history" false there. Check `git ls-files --error-unmatch` before replacing, and archive first when it comes back non-zero.
-- **The dashboard's read path is lenient about ids, its write path isn't.** Mnemonic slugs like `t_authfix` survive a read fine, so don't "fix" them into random tokens — renaming an id orphans every `dep:` pointing at it.
+- **cc-dash drops an entry whose id doesn't match, with a warning, and keeps the rest.** A comma list in `ref:` or `roadmap_ref`, or an id with a space or capital, loses that one entry or link from the dashboard. Fix the malformed value, but don't rewrite valid mnemonic ids into random tokens — renaming an id orphans every `dep:` pointing at it.
 - **Re-stamp `last_updated` on every write.** The dashboard's staleness view keys off it, so a checkpoint that skips the stamp makes active work look abandoned.
 - **`save` stops work.** Users who type it mid-flow expecting a checkpoint then wonder why you halted; a bare `/track-session` is the one that checkpoints and continues.
 - **Recovery rarely finds a clean blob.** Because updates are incremental `Edit`s, the transcript usually holds no full `Write` — expect to replay edits over the latest snapshot rather than lifting one copy out.
