@@ -23,3 +23,6 @@ node_modules/
 # Session/work-tracking scratch — holds cross-repo paths and project names; not for this public repo
 SESSION_PROGRESS.md
 SESSION_ARCHIVE_*.md
+
+# Local per-repo tool permissions — carries absolute paths; excluded globally too
+.claude/settings.local.json
