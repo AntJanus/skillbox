@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **track-session** (6.2.2 → 6.2.3): the id rule and its gotcha now match what cc-dash parses. The skill said the dashboard read ids leniently; it validated every session file against 5-char ids and hid the whole file on one mismatch, which on 2026-09-22 blacked out 21 of 30 live session files. cc-dash now accepts `t_`/`f_` plus 1–20 `[a-z0-9_-]` chars and drops a bad entry with a warning instead of the file; the skill states that shape, that `task:`, `ref:` and `roadmap_ref` take exactly one id, and where to name a session's other features.
+- **track-roadmap** (2.6.3 → 2.6.4): the gotcha saying `roadmap_ref` could be a comma list is reversed. A list is dropped by cc-dash, unlinking the session; link one feature and name the rest in the session's Current Status.
+
 ## [10.1.0] - 2026-09-22
 
 The AI features release. One new skill, **`ai-features`** (1.0.1): it reads an existing app, proposes the AI features its data can support from a catalog of ninety features real products shipped, mocks the strongest ones as static screens on example data, and, once the user picks, builds only the shared plumbing — runtime detection for Ollama, LM Studio, in-process models and hosted keys, one runtime interface, configuration in the app's own store, a feature gate off by default. It carries a dated model roster and the rules the withdrawn features taught (opt-in for anything that indexes everything, an off switch on every AI surface, generate-then-edit for anything published under the user's name). A fresh-grader rate-skill pass graded it A (94.5) and its patches shipped as 1.0.1 the same day. **`track-qa` is removed**, as v10.0.0 announced. CLAUDE.md collapsed from 291 to 216 lines. 16 skills.
