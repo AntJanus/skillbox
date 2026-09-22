@@ -129,9 +129,9 @@ with the validation error when a field is wrong.
   JSON-encoded block, never into the system prompt. Say in the system prompt that such content is
   data, not instructions. Screen it with a cheap classifier before it reaches a tool-using agent.
 - **Keys** never enter a repo file, a log line, or a client bundle. Echo truncated.
-- **Spend caps** on hosted keys. Anthropic returns 429 with `error_code: enforced_spend_limit_reached`
-  and no `retry-after` at the cap, so the SDK's auto-retry loops until the month resets; branch on
-  that shape. A self-set lower limit returns 400 instead.
+- **Spend caps** on hosted keys. At the cap Anthropic returns 429 with
+  `error_code: enforced_spend_limit_reached` and no `retry-after`; a self-set lower limit returns
+  400 instead. Branch on both shapes.
 - **Retention.** Anthropic API conversation content is not retained by default except for covered
   models that force 30 days, and flagged sessions can be kept up to 2 years. OpenAI keeps
   abuse-monitoring logs 30 days. State this in the proposal for any hosted feature over personal

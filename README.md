@@ -404,7 +404,7 @@ A six-phase methodology: inventory the machine (which runtimes, models and keys 
 
 **Triggers:** When asked "what AI features could this app have", "add semantic search", "auto-tag these records", "summarize this with a local model", "set up Ollama for this project", or "should this use Claude or a local model"
 
-Not for pointing Claude Code itself at a local model, building an MCP server, or a Claude API reference question alone (see claude-api).
+Not for pointing Claude Code itself at a local model (see update-config), building an MCP server (see mcp-server-dev), or a Claude API reference question alone (see claude-api).
 
 [View Documentation](./skills/ai-features/SKILL.md)
 </details>
