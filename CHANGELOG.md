@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **track-session** (6.2.3 → 6.3.0): fixes from a usage audit of 52 activations over 2026-08-21 → 09-22. Timestamps now come from a `date` command, because 553 of 569 real stamps ended in `:00` and about half of the checkable ones were off by more than 15 minutes, up to five hours. Routing gains a branch for a `completed` file (hand off to `/track-roadmap resume`) and says a missing file means Start, not a reconstruction; six of 25 resumes had improvised both. Ticking the last task now closes the session in the same write, after 22 of 30 files were found left `completed` or `in-progress` with every task done. New gotchas: `save` with subagents still running, invented headings kept on disk but never shown (`## Notes` was the most common), one file per repo at the root, and writing through Edit/Write because `recover` cannot replay Bash heredocs (which made up most real writes). Verify notes that cc-dash renders its section; Integration sends lasting findings to the roadmap item.
+
 ### Fixed
 
 - **track-session** (6.2.2 → 6.2.3): the id rule and its gotcha now match what cc-dash parses. The skill said the dashboard read ids leniently; it validated every session file against 5-char ids and hid the whole file on one mismatch, which on 2026-09-22 blacked out 21 of 30 live session files. cc-dash now accepts `t_`/`f_` plus 1–20 `[a-z0-9_-]` chars and drops a bad entry with a warning instead of the file; the skill states that shape, that `task:`, `ref:` and `roadmap_ref` take exactly one id, and where to name a session's other features.
