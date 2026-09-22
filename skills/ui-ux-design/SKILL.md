@@ -1,11 +1,11 @@
 ---
 name: ui-ux-design
-description: UI/UX design — interaction states, accessibility contracts, information architecture, visual hierarchy, and design tokens. Use this skill whenever the user wants to design or critique an interface, asks to "design this screen", "what states does this button need", "what ARIA does this menu need", "make this accessible", "how should I structure the navigation", "is this UI any good", "set up design tokens", "review my UX", or "make this convert better" — even if they never say design and only describe a cluttered screen, a flow users abandon, or a component that breaks on real data. Covers type and color as applied to a UI; send pure type-scale or palette-contrast questions to typography and color-system. Route signups, conversion, retention, and pricing-presentation asks here. Do NOT use for aesthetic direction and visual polish (see frontend-design), chart and encoding design (see dataviz), React file structure and hooks (see ideal-react-component), or copywriting and A/B testing.
+description: UI/UX design — interaction states, accessibility contracts, information architecture, visual hierarchy, and design tokens. Use this skill whenever the user wants to design or critique an interface, asks to "design this screen", "what states does this button need", "what ARIA does this menu need", "make this accessible", "how should I structure the navigation", "is this UI any good", "set up design tokens", "review my UX", or "make this convert better" — even if they never say design and only describe a cluttered screen, a flow users abandon, or a component that breaks on real data. Covers type and color as applied to a UI; send pure type-scale or palette-contrast questions to typography and color-system. Route signups, conversion, retention, and pricing-presentation asks here. Do NOT use for aesthetic direction and polish (see frontend-design), charts and encodings (see dataviz), React hooks (see ideal-react-component), A/B testing, or writing the copy itself (headlines, taglines, pricing text).
 license: MIT
 argument-hint: "[screen | flow | states | components | tokens | ethics | audit]"
 metadata:
   author: Antonin Januska
-  version: "2.1.2"
+  version: "2.2.0"
   tags: [ux, ui, interaction-design, information-architecture, design-tokens, accessibility, usability, deceptive-patterns, aria]
 ---
 
@@ -18,6 +18,8 @@ An interface is judged on whether a person can accomplish their goal, not on whe
 Two habits below prevent most of them: ship four states per surface, and name tokens for their role.
 
 ## Navigation
+
+**Read the project's or user's own pattern library first**, if one exists — a design-references folder, a component gallery, a saved set of screens they like. It encodes taste this file cannot, and it outranks the defaults below wherever the two disagree.
 
 | Load | When |
 |---|---|
@@ -35,13 +37,19 @@ Two habits below prevent most of them: ship four states per surface, and name to
 
 1. **Scope from the repo, not from the brief.** Read the project's own agent doc, then enumerate every route and the components each one renders. A brief that describes the wrong app still yields the right audit when the surface list comes from the code.
 2. **Build the state matrix before judging anything.** One row per surface, one column per state from the four below. A cell you can't fill by reading the code is itself a finding — that state doesn't exist.
-3. **Split into lanes only when the surface count justifies it** — three or four read-only lanes by surface family (lists, forms, chrome, accessibility), each carrying the four-states table and the floor inline so a lane doesn't depend on loading this file. Always fewer lanes than surfaces; never one per route.
+3. **Split into lanes only when the surface count justifies it** — three or four read-only lanes by surface family (lists, forms, chrome, accessibility), each carrying the four-states table and the floor inline so a lane doesn't depend on loading this file. Always fewer lanes than surfaces; never one per route. Cap each lane's report so it arrives whole: every finding gets a one-line headline, its file and line, and why it matters; code excerpts only for that lane's top three. Uncapped lane reports overflow and truncate, and the lead ends up asking for resends instead of ranking.
 4. **Publish one report, ranked by consequence, and stop.** Every visual change gets a **rendered before and after** — real markup at real sizes, side by side, with the difference named underneath. A description of a change is not a before and after. Size the report to the finding count; one longer than the fix list it produces goes unread.
 5. **Get approval per finding before implementing.** Present the ranked list and let the user accept, cut, or reorder it — audits reliably surface items the user considers not worth the pixels, and shipping those spends the credibility the real findings earned. Record what was approved, and what was cut, where the project already tracks work.
 
 **A passing verdict is a legitimate outcome.** If the surfaces hold up, say so and name what was checked. An audit that always finds ten things isn't measuring.
 
+## Presenting concept options
+
+Show each option as a **full screen in the app's own chrome** — its real nav, header, and a plausible amount of real data — not as thumbnails, isolated components, or fragments. A user cannot judge a layout they have to assemble in their head, and fragments get rejected on that ground alone. Within each screen, default to the fewest elements that answer the question being asked; add density only when the user asks for it, because a concept that reads as complex gets rejected before its idea is considered.
+
 ## An approved mockup is the spec
+
+**On approval, write it into the project's tracked plan.** Add the approved design as its own task in `SESSION_PROGRESS.md` or `ROADMAP.md` — what was approved, and the artifact URL or file path where it lives. The session that implements it may never load this skill, and a plan it reads is the only way the approval reaches it; an approval that lives only in a chat transcript gets silently dropped while every listed task still reports done.
 
 For any implementation of a design the user signed off on, put the approved artifact and the running screen side by side before reporting done, and list every element that differs — the hero that isn't full-bleed, the strip that stopped short of the edge, the card layout that got simplified, the data that landed in a different section than agreed. Fix each one or say which differences you're keeping and why. Drift concentrates in whatever nobody re-opened: the sections further down the page, the second posture of a two-mode screen, the component specified last.
 
@@ -81,7 +89,7 @@ Nielsen's 0.1/1/10 figures predate mobile networks and have no constrained-conne
 
 Then vary those by **permission and user type** — an admin, a read-only viewer, and a signed-out visitor see three different renderings of the same route.
 
-**Then break it with real data**, because placeholder content hides the failures: a label three times longer than the mock, a list with 10,000 rows, a list with one row, an image that 404s, a name with diacritics, a translated string that runs 40% longer than the English. If a component collapses when the list is empty or overflows when the label runs long, that is worth knowing before it ships.
+**Then break it with real data**, because placeholder content hides the failures: a label three times longer than the mock, a list with 10,000 rows, a list with one row, an image that 404s, a name with diacritics, a translated string that runs 40% longer than the English, and the narrowest container the component actually renders in — a sidebar, a card column, a split pane — rather than the width it was tuned at. If a component collapses when the list is empty or overflows when the label runs long, that is worth knowing before it ships.
 
 Catching a logic gap at design time costs minutes. Catching it during implementation costs days.
 
@@ -153,6 +161,7 @@ Three tiers, in this order:
 - ✅ Padding raising a 20px icon button to a 44px target — ❌ bumping the icon to 44px to hit the number
 - ✅ Testing the card with a 120-character title and a missing image — ❌ shipping against the 3-word mock title
 - ✅ Before reporting done: the approved mockup and the running screen side by side, every difference listed and either fixed or kept on purpose
+- ✅ Three concept options, each a full screen inside the app's real nav with only the elements the question needs — ❌ a grid of thumbnail fragments, each packed with every widget the screen might one day hold
 
 ## Gotchas
 
@@ -167,6 +176,8 @@ Three tiers, in this order:
 - **Symptom:** Stakeholder feedback is all about colors and copy when you needed structural input. **Cause:** The artifact was too polished for the question. **Fix:** Show it in grayscale with unstyled elements; visual polish hijacks the conversation.
 - **Symptom:** Implementation drifts from the design in small ways nobody agreed to. **Cause:** The in-between moments — hover, loading, dismissal, transitions — were never specified, so they got invented at the keyboard. **Fix:** Specify them, or accept whatever the implementation chooses.
 - **Symptom:** An implementation is reported done and the reply is that it looks nothing like what was agreed. **Cause:** It was checked against the running app rather than against the approved mockup. **Fix:** Open both side by side and list the differences before reporting done.
+- **Symptom:** A later session reports every plan task done, and the approved design was never built. **Cause:** The approval was recorded only in conversation; the implementing session never loaded this skill and its plan had no task for the design. **Fix:** On approval, add the design and its artifact location to the tracked plan as its own task.
+- **Symptom:** A stat strip or card row looks right in review and wraps or clips in the app. **Cause:** It was tuned at one width, wider than the container it really renders in. **Fix:** Render it at the narrowest real container before calling it done.
 - **Symptom:** A deep link into the app lands somewhere confusing. **Cause:** The route was designed as step 3 of a flow. **Fix:** Every route explains itself and offers a way up — any page can be the entry point.
 
 ## Integration
