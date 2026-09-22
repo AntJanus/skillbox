@@ -37,7 +37,7 @@ Divergent ideation before committing to the roadmap. Unlike Generate (structured
    - *Mature:* "What do users complain about or request most?" · "What's the most tedious part of using this today?" · "Unlimited time — what would you add?"
    - *All:* "What technical capabilities could unlock new features?" · "One wild idea you dismissed as too ambitious?"
 3. **Deepen** each promising idea across: user journey (one full interaction), inspirations (similar tools), requirements (technical needs), open questions (unknowns to research), effort/impact (weekend vs multi-month).
-4. **Capture** — Filter with the user (keep / scope-creep / separate project). Viable ideas → "Future Ideas" with `status:idea`. Note rejected ideas + why in chat (prevents re-brainstorming).
+4. **Capture** — Filter with the user (keep / scope-creep / separate project). Viable ideas → "Future Ideas" with `status:idea`, carrying the requirements, inspirations and open questions from Deepen as quoted notes under the item so they outlive the conversation. Record rejected ideas the same way — a `status:rejected` item with the reason as a note — when the user wants them kept; otherwise say why in chat.
 
 Rules: diverge before converging; user drives selection; everything starts as `status:idea`; link inspirations; open questions are valuable output.
 
@@ -50,4 +50,4 @@ Bridge the roadmap to active work.
 3. **Confirm & plan** — Summarize the selected feature, ask clarifying questions if too high-level, get approval.
 4. **Start session** — Invoke `/track-session` to create SESSION_PROGRESS.md, populate tasks from the feature, reference the ROADMAP item's ID, begin.
 
-Rules: check session state first; user picks the feature (never auto-select); one feature at a time; SESSION_PROGRESS.md must reference the ROADMAP item ID; no ROADMAP.md → tell the user to run `/track-roadmap generate` first.
+Rules: check session state first; user picks the feature (never auto-select), unless they asked to work through the whole roadmap — then take open features in file order and continue to the next when each session closes; one feature per session; SESSION_PROGRESS.md must reference the ROADMAP item ID; no ROADMAP.md → tell the user to run `/track-roadmap generate` first.

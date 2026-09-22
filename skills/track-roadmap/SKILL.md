@@ -1,11 +1,11 @@
 ---
 name: track-roadmap
-description: Use this skill to maintain ROADMAP.md whenever the user wants to "add an item to the roadmap", "mark a feature done", "log the work I shipped", "create a roadmap", "what should we build next", "brainstorm features", "audit the roadmap", or file hands-on checks like "add the release sign-off to the plan" — even if they don't mention the roadmap file by name. Covers the generate, update, audit, brainstorm, and resume modes. Do NOT use this skill for session-level task progress (see track-session) or free-form idea backlogs that aren't landing in a roadmap file.
+description: Use this skill to maintain ROADMAP.md whenever the user wants to "add an item to the roadmap", "put these in the roadmap", "update the roadmap", "mark a feature done", "log the work I shipped", "create a roadmap", "what should we build next", "brainstorm features", "audit the roadmap", "work through the roadmap", or file hands-on checks like "add the release sign-off to the plan" — even if they don't mention the roadmap file by name. Covers the generate, update, audit, brainstorm, and resume modes. Do NOT use this skill for session-level task progress (see track-session) or free-form idea backlogs that aren't landing in a roadmap file.
 license: MIT
 argument-hint: "[generate|update|audit|brainstorm|resume]"
 metadata:
   author: Antonin Januska
-  version: "2.6.4"
+  version: "2.7.0"
 ---
 
 # Track Roadmap
@@ -26,7 +26,7 @@ Every mode runs the same four beats — **read** the current state, **propose** 
 | **Brainstorm** | `/track-roadmap brainstorm` | Divergent ideation — explore directions before committing; viable ideas land in "Future Ideas" as `status:idea` |
 | **Resume** | `/track-roadmap resume` | Check session state, present remaining features, user picks one, hand off to `/track-session` |
 
-Update is the common case: adding an item, marking one done, or logging shipped work all land there. There is no `save` mode — treat `/track-roadmap save` as Update. In Update and Audit, edit the affected items in place rather than regenerating the file — ids, ordering, and untouched text survive, and a whole-file rewrite costs more tokens for the same result. Generate is the only mode that writes the file from scratch.
+Update is the common case: adding an item, marking one done, or logging shipped work all land there. There is no `save` mode — treat `/track-roadmap save` as Update. When the user asks to work through the whole roadmap, Resume takes the open features in file order, one session per feature, and moves to the next without asking once each session closes. In Update and Audit, edit the affected items in place rather than regenerating the file — ids, ordering, and untouched text survive, and a whole-file rewrite costs more tokens for the same result. Generate is the only mode that writes the file from scratch.
 
 Full per-mode procedures (discovery questions, brainstorm question banks, audit steps): **[reference/MODES.md](./reference/MODES.md)**.
 
@@ -49,6 +49,8 @@ last_updated: YYYY-MM-DDTHH:MM:SS-TZ
 <!-- category:core -->
 
 - <!-- id:r_XXXXX status:planned --> **Feature Name** - What it does and why it matters.
+  > Research finding, with its source link.
+  > Open: the question still to settle.
 - <!-- id:r_XXXXX status:in-progress started:YYYY-MM-DD --> **Feature Name** - Short description.
 
 ## Future Ideas
@@ -67,9 +69,13 @@ last_updated: YYYY-MM-DDTHH:MM:SS-TZ
 **Format rules.** The cc-dash dashboard parses this file, so a dropped marker silently removes the item from the board:
 
 - Frontmatter requires `schema`, `project`, `description`, `last_updated`.
-- Every item: an `id` (`r_` + 5 random `[a-z0-9]`, **permanent — never change**) and a `status` (`planned` / `in-progress` / `done` / `idea`).
+- Every item: an `id` and a `status`. Ids are `r_` + 2–10 `[a-z0-9_]` chars and **permanent — never change**; new ones default to 5 random chars. Grep the file for a new id before writing it, because a duplicate makes two items indistinguishable on the board.
+- Statuses: `idea` / `planned` / `in-progress` / `done`, plus `deferred` (still wanted, not now) and `dropped` / `skipped` / `rejected` / `cancelled` when the user wants a record kept of why an item stopped instead of deleting it. The last four land in the board's Closed column.
+- Optional metadata: `started:` and `completed:` as `YYYY-MM-DD`, and `depends:r_abc12,r_def34`. cc-dash ignores any other date key (`at:`, `done_date:`) and deletes it on its next write, so convert those to `completed:` when you touch the item.
 - Every category heading gets `<!-- category:slug -->` on the next line. Categories themselves are flexible — invent whatever groups fit the project.
 - One line per feature: bold title + 1-2 sentence description.
+- **Notes** hold what the description can't: research findings with their source, open questions, and rejected alternatives with the reason. Write them as `  > ` lines directly under the item; cc-dash shows them on the card and keeps them through its own writes. Keep an item to about five note lines — when research outgrows that, move it to a file under `docs/` and leave one note linking to it, because a roadmap that carries its research inline stops being readable in two minutes. Don't put notes in the description or in a second paragraph under the item; the dashboard reads neither.
+- When an item moves to Completed, cut its notes to what a later audit needs (the decision and why), since the research has done its job.
 
 ## Rules
 

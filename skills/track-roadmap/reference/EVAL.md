@@ -1,10 +1,10 @@
 # track-roadmap — Eval Set
 
-Official-loop format (agentskills.io optimizing-descriptions): 19 queries, 10 should-trigger / 9 should-not-trigger, split 11 train / 8 validation with a near-1:1 positive/negative mix in each half. Shuffled once 2026-07-28; keep the split fixed across iterations.
+Official-loop format (agentskills.io optimizing-descriptions): 22 queries, 13 should-trigger / 9 should-not-trigger, split 13 train / 9 validation with positives slightly outnumbering negatives in each half. Shuffled once 2026-07-28; keep the split fixed across iterations.
 
 **Protocol:** run each query in a fresh Claude session ~3 times. Trigger rate = fraction of runs where track-roadmap was invoked. A should-trigger query passes above 0.5; a should-not-trigger query passes below 0.5. Iterate the description on train failures only; select the variant with the best **validation** score.
 
-## Train (11)
+## Train (13)
 
 | # | Query | Expected |
 |---|---|---|
@@ -14,13 +14,15 @@ Official-loop format (agentskills.io optimizing-descriptions): 19 queries, 10 sh
 | T4 | "audit the roadmap" | trigger |
 | T5 | "we finished cloud sync — update the plan" | trigger |
 | T6 | "add the release sign-off checks to the roadmap" | trigger |
+| T7 | "let's put a few things in the roadmap" | trigger |
+| T8 | "commit this and update the roadmap" | trigger |
 | N1 | "resume work, pick up where I left off" | no (track-session) |
 | N2 | "summarize what we've done so far for a handoff doc" | no (work-summary) |
 | N3 | "save my progress before I stop" | no (track-session) |
 | N4 | "review my changes before I commit" | no (code-review) |
 | N5 | "add this idea to PROJECT_IDEAS.md" | no (backlog file, no roadmap) |
 
-## Validation (8)
+## Validation (9)
 
 | # | Query | Expected |
 |---|---|---|
@@ -28,6 +30,7 @@ Official-loop format (agentskills.io optimizing-descriptions): 19 queries, 10 sh
 | V2 | "what should we build next?" | trigger |
 | V3 | "brainstorm features for this app" | trigger |
 | V4 | "what's left to build here?" | trigger |
+| V9 | "keep going until the whole roadmap is done" | trigger |
 | V5 | "add a task to my session file" | no (track-session) |
 | V6 | "turn this bug into a Jira ticket" | no (ticket-description) |
 | V7 | "rate this skill" | no (rate-skill) |
@@ -39,6 +42,7 @@ Official-loop format (agentskills.io optimizing-descriptions): 19 queries, 10 sh
 |---|---|---|---|---|
 | 2.6.0 (front-loaded ROADMAP.md, update triggers first, negative scope vs track-session/track-qa) | 2026-07-28 | not yet run | not yet run | — |
 | 2.6.3 (N2/V6 re-targeted after track-qa deprecation; T6 added; sign-off trigger added) | 2026-09-02 | not yet run | not yet run | — |
+| 2.7.0 ("put these in", "update the roadmap", "work through the roadmap" added after a usage audit found 11 of 16 roadmap-edit asks missed; T7, T8, V9 added) | 2026-09-22 | not yet run | not yet run | — |
 
 ## Notes
 
