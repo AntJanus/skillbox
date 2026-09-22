@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **ai-features** (1.0.1 → 1.1.0): Phase 4 mocks the full screen the feature lives on, in the app's own navigation and header with the control in place, not the control cropped out alone — the fragment style is what a usage audit of ui-ux-design found users rejecting ("I can't really picture it like this"). Phase 5 files each accepted proposal in ROADMAP.md with its model, integration point, storage, degraded state, estimate and mock link as quoted notes, because an approved design that lived only in an artifact went unbuilt while a later session reported every task done.
+
 ## [10.2.0] - 2026-09-22
 
 The usage-audit release. Five skills changed after an audit of how they were actually used in a month of session transcripts, and a comparison of the two tracking skills against the cc-dash parser they write for. **`track-session`** (6.3.0) had told agents to write ids the dashboard rejected: its id rule now matches the parser, which was widened the same day so one bad entry no longer hides a whole session, and it reads timestamps from the clock, closes finished sessions and routes a completed file to the roadmap. **`track-roadmap`** (2.7.0) gains quoted notes under items for research, open questions and rejected alternatives, broader update triggers and a whole-roadmap resume pattern. **`color-system`** (1.6.0) moves Carbon into its own reference, **`typography`** (1.7.0) ships a tested computed-size floor check, and **`ui-ux-design`** (2.2.0) files approved designs in the tracked plan so they get built. 16 skills.

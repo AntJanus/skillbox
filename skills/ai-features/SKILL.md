@@ -6,7 +6,7 @@ argument-hint: "[brainstorm | setup]"
 effort: high
 metadata:
   author: Antonin Januska
-  version: "1.0.1"
+  version: "1.1.0"
 ---
 
 # AI Features
@@ -64,7 +64,7 @@ Sum. Below 6 of 12 goes to a later list. A risk score of 0 forces local-only reg
 
 ### Phase 4: Mock the strongest proposals
 
-For the top three to five, one self-contained HTML page per proposal, written to the scratchpad, never into the repo: the control or panel as the user would meet it, in its populated state and in its degraded state (runtime missing, with the message and the fix), with a day/night toggle so both colour schemes are checked from one file. Use the app's own colour and type tokens (read them from its theme file) so the mock looks like the app; when the Artifact tool is available, publish the pages as one artifact with a tab per proposal, which is what Phase 5 presents. Mocks are built on well-known example data (a reading list with *Dune* and *The Hobbit*, a trip to Lisbon, a 2016 hatchback's oil change), never on the user's records, and are labelled as examples. A mock in a foreign visual language gets feedback about colours instead of about the feature.
+For the top three to five, one self-contained HTML page per proposal, written to the scratchpad, never into the repo: the full screen the feature lives on, in the app's own navigation and header, with the new control in place — never the control cropped out on its own, because a fragment can't be judged against the screen it has to share. Show it in its populated state and in its degraded state (runtime missing, with the message and the fix), with a day/night toggle so both colour schemes are checked from one file. Use the app's own colour and type tokens (read them from its theme file) so the mock looks like the app; when the Artifact tool is available, publish the pages as one artifact with a tab per proposal, which is what Phase 5 presents. Mocks are built on well-known example data (a reading list with *Dune* and *The Hobbit*, a trip to Lisbon, a 2016 hatchback's oil change), never on the user's records, and are labelled as examples. A mock in a foreign visual language gets feedback about colours instead of about the feature.
 
 **Before proceeding:** every mock renders in both colour schemes at body-size text.
 
@@ -83,6 +83,8 @@ An artifact when the Artifact tool is available, otherwise a written list in cha
 | Estimate | "An afternoon if the search module already has a keyword index; two days if not" |
 
 Match length to the proposal count; no methodology essay, no repeated summary. The user accepts, cuts or reorders one proposal at a time. Record what was cut and why in the same report.
+
+File each accepted proposal in the project's `ROADMAP.md` through track-roadmap before Phase 6: the proposal's name and what the user sees as the item line, and the model, what it plugs into, what it stores, how it degrades, the estimate and the mock's link as quoted notes under it. The artifact is not read by a later session that builds the feature without this skill; the roadmap item is.
 
 ### Phase 6: Initial AI setup
 
@@ -158,4 +160,4 @@ Why it works: the source-id requirement turns the summary's main failure mode, a
 
 ## Integration
 
-- **local-first-app** for the settings, trash and packaging rules an AI feature inherits · **ui-ux-design** for the four states every AI surface ships (loading, empty, error with retry, success) · **track-roadmap** to file approved proposals as work items · **claude-api** for the Anthropic API reference when a hosted feature is built
+- **local-first-app** for the settings, trash and packaging rules an AI feature inherits · **ui-ux-design** for the four states every AI surface ships (loading, empty, error with retry, success) · **track-roadmap** to file approved proposals as items carrying their Phase 5 fields as quoted notes · **claude-api** for the Anthropic API reference when a hosted feature is built
