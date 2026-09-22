@@ -88,7 +88,7 @@ curl -o .claude/skills/track-session/SKILL.md \
 
 ## Available Skills
 
-16 skills. Click any name to jump to its use-cases and triggers; expand for details.
+17 skills. Click any name to jump to its use-cases and triggers; expand for details.
 
 | Skill | What it does |
 |-------|-------------|
@@ -107,6 +107,7 @@ curl -o .claude/skills/track-session/SKILL.md \
 | [🔠 typography](#typography) | Type systems, scale, rhythm + a readability floor |
 | [🧱 local-first-app](#local-first-app) | Local-first single-user app — feature set, not a code spec |
 | [🖼️ ui-ux-design](#ui-ux-design) | Interaction states, component a11y contracts, IA, hierarchy, tokens, deceptive patterns, whole-app audits |
+| [🤖 ai-features](#ai-features) | Propose, mock and set up AI features for an existing app — local models or hosted, the right model per job |
 | [💬 discuss](#discuss) | Conversation mode — Claude debates back, in condensed Simplified Technical English |
 
 ### track-session
@@ -384,6 +385,28 @@ Covers designing and critiquing interfaces end to end. Two rules generate most o
 Depth on type scales lives in [typography](#typography) and on palettes in [color-system](#color-system). Not for chart design (see dataviz) or React file structure (see [ideal-react-component](#ideal-react-component)).
 
 [View Documentation](./skills/ui-ux-design/SKILL.md)
+</details>
+
+### ai-features
+
+<details>
+<summary><b>Audit an existing app, propose the AI features its data can support, mock the strongest ones as screens, then wire the initial AI setup — Ollama or LM Studio locally, Anthropic or OpenAI hosted, and the right model for each job.</b></summary>
+
+A six-phase methodology: inventory the machine (which runtimes, models and keys actually exist), read the app's schema and search implementation, cross a catalog of shipped AI features with the app's real columns, score the survivors on usefulness, fit, cost tier and risk, mock the top proposals as static screens on example data, and, once the user picks, build only the shared plumbing: runtime detection, one runtime interface, configuration keys, a feature gate off by default, and the model pull with progress.
+
+**Covers:**
+- A catalog of AI features real products shipped, by app category, with what the user sees, the data needed, and the model tier — plus the features users rejected
+- A dated model roster: which local model for embeddings, tagging, typed decisions, summaries, natural-language filters, vision and speech; hosted prices; local-vs-hosted rules
+- Scoring and a gimmick filter, so a chat box never fronts a working search
+- Report template: what the user sees, model and runtime, plugs into, stores, degrades to, mock, estimate
+- Setup reference: runtime probes with timeouts, structured output per provider, vectors in SQLite (BLOB vs sqlite-vec), packaging, spend caps, retention, prompt-injection hygiene
+- Gotchas from real failures: prose vocabularies that invent tags, context defaults that truncate silently, uncalibrated distance ceilings, embeddings that outlive deleted rows
+
+**Triggers:** When asked "what AI features could this app have", "add semantic search", "auto-tag these records", "summarize this with a local model", "set up Ollama for this project", or "should this use Claude or a local model"
+
+Not for pointing Claude Code itself at a local model, building an MCP server, or a Claude API reference question alone (see claude-api).
+
+[View Documentation](./skills/ai-features/SKILL.md)
 </details>
 
 ### discuss
