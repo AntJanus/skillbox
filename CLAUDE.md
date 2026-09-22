@@ -31,7 +31,7 @@ Verified against `skills/` on 2026-09-22. Versions come from each SKILL.md's `me
 |---|---|---|
 | `ai-features` | 1.0.1 | Propose, mock and set up AI features for an existing app (local or hosted models) |
 | `code-review` | 2.4.3 | Multi-agent review of local changes, writes REVIEW.md |
-| `color-system` | 1.5.1 | Palettes, dark mode, contrast, chart and TUI color |
+| `color-system` | 1.6.0 | Palettes, dark mode, contrast, chart and TUI color |
 | `deep-research` | 2.4.2 | Multi-source web research with cited synthesis |
 | `discuss` | 1.1.1 | Slash-only conversation mode (`disable-model-invocation: true`) |
 | `generate-skill` | 6.2.0 | Interactive SKILL.md builder — the authoring spec |
@@ -43,8 +43,8 @@ Verified against `skills/` on 2026-09-22. Versions come from each SKILL.md's `me
 | `setup-semantic-release` | 1.4.1 | semantic-release + conventional commits + commitlint |
 | `track-roadmap` | 2.6.4 | ROADMAP.md generate/update/audit/brainstorm/resume |
 | `track-session` | 6.3.0 | SESSION_PROGRESS.md across multi-session work |
-| `typography` | 1.6.0 | Type scale, line-height, font pairing |
-| `ui-ux-design` | 2.1.2 | Interaction states, a11y contracts, IA, tokens |
+| `typography` | 1.7.0 | Type scale, line-height, font pairing |
+| `ui-ux-design` | 2.2.0 | Interaction states, a11y contracts, IA, tokens |
 
 **`track-qa` was removed in v10.1.0 (2026-09-22)** after its 2026-09-01 deprecation; QA.md manual-QA checklists were retired portfolio-wide on 2026-08-24. Do not restore it or refile its items — hands-on verification is filed as ordinary `track-roadmap` items. Its last version, 1.4.0, is in the v10.0.0 tag if the `cc-dash/qa@1` schema is ever needed again.
 
