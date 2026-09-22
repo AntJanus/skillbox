@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "[start|save|resume|verify|recover]"
 metadata:
   author: Antonin Januska
-  version: "6.2.3"
+  version: "6.3.0"
 ---
 
 # Session Progress
@@ -70,15 +70,16 @@ Next: <specific next action — name files and functions, not "fix the bug">
 
 On `/track-session` with no argument, take the first branch that matches and stop:
 
-1. No `SESSION_PROGRESS.md` at the project root → **Start**.
+1. No `SESSION_PROGRESS.md` at the project root → **Start**. Don't rebuild one from the roadmap or git history; that is `recover`, and only on request.
 2. File exists **and this conversation has produced work the file doesn't record yet** (edits, test runs, decisions since its `last_updated`) → **checkpoint**, then keep working.
-3. Otherwise — fresh context, the file is the only record → **Resume**.
+3. File is `status: completed` → say the last session closed and what it finished, then hand off to `/track-roadmap resume` to pick the next feature, or to Start if the user already named the new work.
+4. Otherwise — fresh context, the file is the only record → **Resume**.
 
-The discriminator is unrecorded work in the current conversation, not how finished the file looks. Use it as a tiebreak whenever branches 2 and 3 both seem to fit: checkpoint. Writing a near-empty delta costs one turn, whereas resuming on top of unrecorded work drops it from the file and hands the next session a stale plan.
+The discriminator is unrecorded work in the current conversation, not how finished the file looks. Use it as a tiebreak whenever branches 2 and 4 both seem to fit: checkpoint. Writing a near-empty delta costs one turn, whereas resuming on top of unrecorded work drops it from the file and hands the next session a stale plan.
 
 ### Start mode
 
-Derive `project:` from the repo (folder name, `package.json`, `pyproject.toml`) rather than inheriting it from a file you're about to overwrite. Stamp `started` and `last_updated`, set `status: in-progress`, and write at least `## Plan` and `## Current Status`.
+Derive `project:` from the repo (folder name, `package.json`, `pyproject.toml`) rather than inheriting it from a file you're about to overwrite. Stamp `started` and `last_updated` from the clock (see Checkpoint), set `status: in-progress`, and write at least `## Plan` and `## Current Status`.
 
 If a `SESSION_PROGRESS.md` already exists, read it, then check whether git tracks it — that determines whether replacing it is reversible:
 
@@ -94,6 +95,14 @@ git ls-files --error-unmatch SESSION_PROGRESS.md   # exit 0 = tracked; non-zero 
 
 Both write the current state into the file: tick completed tasks, update `## Current Status`, append decisions and failed attempts, re-stamp `last_updated`. The only difference is what happens next — a bare `/track-session` checkpoints and **keeps working**, while `/track-session save` checkpoints and **stops**.
 
+Take every timestamp from the clock rather than estimating it, because a guessed stamp drifts by hours and the dashboard's staleness view trusts it:
+
+```bash
+date +%Y-%m-%dT%H:%M:%S%z | sed -E 's/([0-9]{2})$/:\1/'   # 2026-09-22T11:19:48-06:00
+```
+
+When the last plan task is ticked, set `status: completed` in the same write and tell the user the session is closed. A finished file left `in-progress` shows as active work on the dashboard indefinitely.
+
 ### Resume mode
 
 Read the file, then lead the reply with where things actually stand — `status`, tasks done out of total, working-tree state, last commit, and the next action — before any fresh analysis. Handoffs that open with narration ("I'll read the session file now, then look at the tests") bury the state the user came back for, and they end up re-deriving it themselves.
@@ -102,7 +111,7 @@ Resume is also the natural reconciliation point: if `project:` or `status:` have
 
 ### Verify and Recover — load on demand
 
-- **`/track-session verify`** confirms `[x]` tasks actually meet their requirements — read the files, run the tests, tie each claim to evidence from this run, and append a `## Verification Results` section. Load [reference/VERIFICATION.md](./reference/VERIFICATION.md) when the user asks to verify, or when ticked boxes are the only evidence the work is done.
+- **`/track-session verify`** confirms `[x]` tasks actually meet their requirements — read the files, run the tests, tie each claim to evidence from this run, and append a `## Verification Results` section, which cc-dash renders on the session page. Load [reference/VERIFICATION.md](./reference/VERIFICATION.md) when the user asks to verify, or when ticked boxes are the only evidence the work is done.
 - **`/track-session recover`** rebuilds a deleted `SESSION_PROGRESS.md` from the Claude Code transcript. Load [reference/RECOVERY.md](./reference/RECOVERY.md) when the file is missing and the user wants it back — it carries the transcript-slug derivation and a tested Python reconstructor, which the reference explains is necessary because jq mis-parses these transcripts.
 
 ## Examples
@@ -166,11 +175,15 @@ Then I'll check the git log and look through the auth directory...
 - **cc-dash drops an entry whose id doesn't match, with a warning, and keeps the rest.** A comma list in `ref:` or `roadmap_ref`, or an id with a space or capital, loses that one entry or link from the dashboard. Fix the malformed value, but don't rewrite valid mnemonic ids into random tokens — renaming an id orphans every `dep:` pointing at it.
 - **Re-stamp `last_updated` on every write.** The dashboard's staleness view keys off it, so a checkpoint that skips the stamp makes active work look abandoned.
 - **`save` stops work.** Users who type it mid-flow expecting a checkpoint then wonder why you halted; a bare `/track-session` is the one that checkpoints and continues.
+- **`save` with subagents still running doesn't stop them.** Their results arrive after you've said you stopped. Name each in-flight agent and what it's doing under `## Current Status`, and tell the user results will still land, so the next session knows to look for them.
+- **Other headings are kept but not shown.** cc-dash displays Plan, Current Status, Decisions, Failed Attempts, Completed Work and Verification Results; a `## Notes` section survives on disk but never reaches the dashboard. Put a finding that should outlive the session on the linked roadmap item as a quoted note (see track-roadmap) rather than in an invented section.
+- **One file per repo, at the root.** Work in a subdirectory (a `godot/` or `web/` folder) still checkpoints to the root file; a second `SESSION_PROGRESS.md` deeper in the tree splits the record and the dashboard reads only one.
+- **Write the file with Edit or Write, not a Bash heredoc or `sed -i`.** `recover` rebuilds the file by replaying Edit and Write calls from the transcript, so an update made through Bash is invisible to it.
 - **Recovery rarely finds a clean blob.** Because updates are incremental `Edit`s, the transcript usually holds no full `Write` — expect to replay edits over the latest snapshot rather than lifting one copy out.
 
 ## Integration
 
-- **track-roadmap** — pick a feature from the roadmap, then link its implementation here via `roadmap_ref: r_XXXXX`.
+- **track-roadmap** — pick a feature from the roadmap, then link its implementation here via `roadmap_ref: r_XXXXX`. Research, open questions and rejected alternatives that matter beyond this session go back to that roadmap item as quoted notes before the session closes.
 - Checkpoint between commits and test phases, so the file's state lines up with a commit boundary a later session can `git show`.
 
 See [reference/TROUBLESHOOTING.md](./reference/TROUBLESHOOTING.md) for resume failures, oversized session files, and verify edge cases.
