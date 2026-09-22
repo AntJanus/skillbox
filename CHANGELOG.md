@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [10.1.0] - 2026-09-22
+
+The AI features release. One new skill, **`ai-features`** (1.0.1): it reads an existing app, proposes the AI features its data can support from a catalog of ninety features real products shipped, mocks the strongest ones as static screens on example data, and, once the user picks, builds only the shared plumbing — runtime detection for Ollama, LM Studio, in-process models and hosted keys, one runtime interface, configuration in the app's own store, a feature gate off by default. It carries a dated model roster and the rules the withdrawn features taught (opt-in for anything that indexes everything, an off switch on every AI surface, generate-then-edit for anything published under the user's name). A fresh-grader rate-skill pass graded it A (94.5) and its patches shipped as 1.0.1 the same day. **`track-qa` is removed**, as v10.0.0 announced. CLAUDE.md collapsed from 291 to 216 lines. 16 skills.
+
+### Removed
+
+- **track-qa** (1.4.0): deleted, as announced in v10.0.0. QA.md manual-QA checklists were retired portfolio-wide on 2026-08-24, the skill was deprecated on 2026-09-01, and nothing in the repo or the fleet references it live any more (the remaining mentions are historical rows in other skills' eval tables). The `cc-dash/qa@1` schema it documented lives on in the v10.0.0 tag. Hands-on verification is filed as ordinary `track-roadmap` items.
+
 ### Changed
 
 - **CLAUDE.md** rewritten (the 2026-09-08 audit restructure, which had never been committed, plus the 2026-09-22 analysis). The roster gained `ai-features` and a verification date; the singular-`reference/` count corrected from nine to seven; the stale-branch sentence dropped after `feat/ui-ux-design-2.0.0` was merged (a no-op — main was 63 commits ahead) and deleted. Five sections that restated the meta-skills' spec three to six times each (Approved patterns, Forbidden patterns, Writing descriptions, Writing bodies, Design Philosophy) collapsed into one House Conventions section that keeps only the house choices and points at `generate-skill` Phase 2, 4, 7 and 8 and `rate-skill` §6–§7 for the rest; the Validation checklist stays as the one intentional duplicate, because it is used as a gate without opening the meta-skills. "Creating a new skill" gained the README three-place sync and the CHANGELOG step; `/publish-check` is now required before every commit rather than "when in doubt". 291 → 216 lines.
@@ -1001,7 +1009,8 @@ When creating a release:
 
 ---
 
-[Unreleased]: https://github.com/antjanus/skillbox/compare/v10.0.0...HEAD
+[Unreleased]: https://github.com/antjanus/skillbox/compare/v10.1.0...HEAD
+[10.1.0]: https://github.com/antjanus/skillbox/compare/v10.0.0...v10.1.0
 [10.0.0]: https://github.com/antjanus/skillbox/compare/v9.6.0...v10.0.0
 [9.6.0]: https://github.com/antjanus/skillbox/compare/v9.5.0...v9.6.0
 [9.5.0]: https://github.com/antjanus/skillbox/compare/v9.4.0...v9.5.0
