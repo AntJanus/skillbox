@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [10.2.0] - 2026-09-22
+
+The usage-audit release. Five skills changed after an audit of how they were actually used in a month of session transcripts, and a comparison of the two tracking skills against the cc-dash parser they write for. **`track-session`** (6.3.0) had told agents to write ids the dashboard rejected: its id rule now matches the parser, which was widened the same day so one bad entry no longer hides a whole session, and it reads timestamps from the clock, closes finished sessions and routes a completed file to the roadmap. **`track-roadmap`** (2.7.0) gains quoted notes under items for research, open questions and rejected alternatives, broader update triggers and a whole-roadmap resume pattern. **`color-system`** (1.6.0) moves Carbon into its own reference, **`typography`** (1.7.0) ships a tested computed-size floor check, and **`ui-ux-design`** (2.2.0) files approved designs in the tracked plan so they get built. 16 skills.
+
 ### Changed
 
 - **track-roadmap** (2.6.4 → 2.7.0): items can carry quoted notes (`  > ` lines under the item) for research, open questions and rejected alternatives, which cc-dash now parses, displays and preserves; notes are kept to about five lines with longer research moved to `docs/`, and trimmed when an item completes. Brainstorm keeps its Deepen output as notes instead of leaving it in chat. From a usage audit of 15 activations: the description adds "put these in the roadmap", "update the roadmap" and "work through the roadmap" after 11 of 16 roadmap-edit asks went unrouted; working through the whole roadmap is a documented Resume pattern; the format rules list the full status set (`deferred`, `dropped`, `skipped`, `rejected`, `cancelled`), `depends:`, the accepted id shape and a duplicate check (53 duplicate ids were live), and say that `at:` and `done_date:` are dropped by cc-dash. Eval set 19 → 22 queries.
