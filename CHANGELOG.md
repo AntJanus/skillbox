@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [10.3.0] - 2026-09-22
+
+**`ai-features`** (1.1.0) takes two lessons from the v10.2.0 usage audit: its mocks show the full screen a feature lives on rather than the control on its own, and each accepted proposal is filed in ROADMAP.md with its model, integration point, storage, degraded state, estimate and mock link as quoted notes, so a later session that builds it without this skill still has the spec. 16 skills.
+
 ### Changed
 
 - **ai-features** (1.0.1 → 1.1.0): Phase 4 mocks the full screen the feature lives on, in the app's own navigation and header with the control in place, not the control cropped out alone — the fragment style is what a usage audit of ui-ux-design found users rejecting ("I can't really picture it like this"). Phase 5 files each accepted proposal in ROADMAP.md with its model, integration point, storage, degraded state, estimate and mock link as quoted notes, because an approved design that lived only in an artifact went unbuilt while a later session reported every task done.
