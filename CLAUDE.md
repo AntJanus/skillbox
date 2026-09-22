@@ -29,7 +29,7 @@ Verified against `skills/` on 2026-09-22. Versions come from each SKILL.md's `me
 
 | Skill | Version | Covers |
 |---|---|---|
-| `ai-features` | 1.0.1 | Propose, mock and set up AI features for an existing app (local or hosted models) |
+| `ai-features` | 1.1.0 | Propose, mock and set up AI features for an existing app (local or hosted models) |
 | `code-review` | 2.4.3 | Multi-agent review of local changes, writes REVIEW.md |
 | `color-system` | 1.6.0 | Palettes, dark mode, contrast, chart and TUI color |
 | `deep-research` | 2.4.2 | Multi-source web research with cited synthesis |
