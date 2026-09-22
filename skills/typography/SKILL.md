@@ -4,7 +4,7 @@ description: Use this skill whenever the user wants typography work — sizing t
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.6.0"
+  version: "1.7.0"
   tags: [typography, type-scale, font-size, line-height, vertical-rhythm, readability, accessibility, fonts]
 ---
 
@@ -29,7 +29,24 @@ These are the recede-defaults. Meet all four and text is legible by construction
 
 The single worst combination is **small + thin + low-contrast** — any two is risky, all three is the canonical unreadable panel.
 
-**Verify computed, not authored.** Reading the class, prop, or token in source only tells you intent — check the rendered value (devtools Computed panel, or `getComputedStyle(el).fontSize`) before calling a size fixed. A "should be 16px" edit that still renders 13px is a common failure mode, not a rare one.
+**Verify computed, not authored.** Reading the class, prop, or token in source only tells you intent — check the rendered value (devtools Computed panel, or `getComputedStyle(el).fontSize`) before calling a size fixed. A "should be 16px" edit that still renders 13px is a common failure mode, not a rare one. Grepping authored `font-size` in a static page misses the same things — nested `em` compounding, inherited sizes, SVG text — so for any page you can load, list every visible text node that renders under the 14px floor:
+
+```bash
+shot-scraper javascript page.html "
+const hits = [];
+const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+while (walker.nextNode()) {
+  const element = walker.currentNode.parentElement;
+  const text = walker.currentNode.textContent.trim();
+  if (!text || !element || !element.getClientRects().length) continue;
+  const size = parseFloat(getComputedStyle(element).fontSize);
+  if (size < 14) hits.push({ size, tag: element.tagName.toLowerCase(), className: element.getAttribute('class') || '', text: text.slice(0, 40) });
+}
+hits;
+"
+```
+
+`[]` means the page clears the floor; each hit names the element to fix. The same argument accepts a URL (`http://localhost:3000/`), and the body pasted into a devtools console with `console.table(hits)` in place of the last line does the same without shot-scraper. Run it once per theme when a theme toggle changes sizes.
 
 ## Navigation
 
@@ -123,6 +140,7 @@ th { font-size: 0.75rem; font-weight: 500; color: #9ca3af; } /* 12px is under th
 - **Symptom:** The theme says text should be ≥16px, but it renders small anyway. **Cause:** size-token names lie — Mantine `size="sm"`/`"xs"` and Tailwind `text-sm`/`text-xs` all compute to 14px/12px, under the floor; nested `em` units also compound multiplicatively as components nest. **Fix:** check the computed size (see "Verify computed, not authored" above) and prefer `rem` for font-size so it can't compound.
 - **Symptom:** Body text passes the floor but chart text is still tiny and washed out. **Cause:** charting libraries (Recharts, Mantine charts) render SVG text with their own inline `font-size`/`fill`, which never inherits your type scale or color tokens. **Fix:** target the library's text elements directly (e.g. `.recharts-wrapper text { font-size: …; fill: var(--text) }`) and re-verify computed size and color.
 - **Symptom:** Every heading — often all body text too — renders in the browser's fallback serif, even though the fonts are imported and the theme references them correctly; source review finds nothing wrong. **Cause:** `next/font` in `variable` mode combined with a UI library that injects its font-family at `:root` (Mantine does: `:root, :host { --mantine-font-family: var(--font-body) }`). If the font's `.variable` class is applied only to `<body>`, `--font-body` doesn't exist at `:root` — custom properties never inherit upward — so every `var()` reference is invalid and falls back. It only shows up in `getComputedStyle(document.body).fontFamily`. **Fix:** apply the `.variable` class to `<html>`, or follow the library's own documented pattern where one exists ([Mantine injects the resolved `font.style.fontFamily` string](https://help.mantine.dev/q/next-load-fonts)).
+- **Symptom:** A static page or artifact ships with captions, labels, or chart ticks under 14px although the brief said "legible". **Cause:** bespoke display and body faces picked for a one-off page get sized by eye at build time, and small chrome drifts to 11–13px with nothing to catch it — one artifact shipped seven declarations under the floor. **Fix:** run the computed floor check above before publishing, as part of the build, rather than as a repair after someone reports it.
 - **Symptom:** Body text passes the floor everywhere you checked, but tables, nav labels, tooltips, menus, and form-field labels are still ~14px — with no `size` prop anywhere to explain it. **Cause:** component libraries ship individual components below their own base — Mantine's `Table` cell, `NavLink` label, `Tooltip`, `Menu` item, `Alert`, `Notification`, `Tabs` tab, and `Input` label/description all default to `sm` (14px) or `xs` (12px) while `Text` defaults to `md` (16px). There's no authored prop to grep for. **Fix:** override the whole size scale explicitly in the shared theme, and spot-check components you never sized rather than only the ones you did.
 
 ## Integration
