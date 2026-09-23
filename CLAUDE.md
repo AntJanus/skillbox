@@ -36,7 +36,7 @@ Verified against `skills/` on 2026-09-22. Versions come from each SKILL.md's `me
 | `discuss` | 1.1.1 | Slash-only conversation mode (`disable-model-invocation: true`) |
 | `generate-skill` | 6.2.0 | Interactive SKILL.md builder — the authoring spec |
 | `ideal-react-component` | 1.8.2 | React file layout and hooks antipatterns |
-| `local-first-app` | 4.7.0 | Single-user SQLite app, no accounts, no backend |
+| `local-first-app` | 4.8.0 | Single-user SQLite app, no accounts, no backend |
 | `rate-skill` | 6.2.0 | Grades a SKILL.md A–F — the grading rubric |
 | `record-tui` | 1.6.1 | VHS terminal/TUI demo recording |
 | `screenshot-local` | 1.5.2 | shot-scraper screenshots of local pages |
