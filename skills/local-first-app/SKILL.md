@@ -4,7 +4,7 @@ description: Local-first single-user app — one SQLite file on disk, no account
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "4.7.0"
+  version: "4.8.0"
   tags: [nextjs, sqlite, local-first, desktop]
 ---
 
@@ -75,6 +75,8 @@ Every entity gets four addressable routes:
 - **Tables sort, filter, and explain themselves** — a legend keying whatever status colors or icons the rows use, and a row that expands in place when a record has more detail than the columns hold.
 - **Pair icons with text labels** — one per sidebar section, entity type, and status, so a screen is scannable without reading every word. The icon sits alongside the label rather than replacing it.
 - Bulk selection and bulk edit on the lists where editing one row at a time gets tedious. Past one selected row, the bulk editor takes over the sidebar column until the selection clears.
+- **Loading is per section, and the current screen stays up until the next is ready.** Each route segment, tab, and home-screen widget shows its own loading state, so a slow panel never blanks the page around it. Navigation keeps the screen you're on visible until the next one can render, rather than dropping to a full-page spinner.
+- **Errors are per section too, and say what failed.** A section that fails to load names the thing it couldn't read and why ("Couldn't load sessions: database is locked"), and offers a retry that re-runs that section alone. The rest of the screen stays usable, and nothing renders an empty list in place of a failure.
 
 ## Dynamic collections
 
@@ -125,6 +127,8 @@ Where an entity is a physical object outside the app, render it as that object r
 - ✅ A "Cartridge" theme beside light/dark on a game tracker — ❌ light and dark as the only choices
 - ✅ `/dynamic-collections/12` re-running "watched, 5 stars" on every open — ❌ a stored list of movie IDs captured at save time
 - ✅ "Filter no longer valid: unknown field `rating`" above an empty list — ❌ an empty list where a renamed field used to match
+- ✅ The sessions tab showing its own skeleton while the game's details stay on screen — ❌ the whole page blanking to a spinner on every tab switch
+- ✅ "Couldn't load sessions: database is locked" with a Retry beside it — ❌ an empty sessions tab that looks like the game has none
 
 ## Gotchas
 
@@ -145,3 +149,4 @@ Compiling to a self-contained desktop binary: **[references/PACKAGING.md](./refe
 - **typography** for the readability floor
 - **frontend-design** for layout and visual design
 - **track-roadmap** / **track-session** to drive the build feature by feature
+- **ai-features** for AI features, local models first

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **local-first-app** (4.7.0 → 4.8.0): Common UI patterns gains per-section loading and error states. Each route segment, tab and home-screen widget loads on its own and keeps the current screen visible until the next is ready, stated as the behavior rather than a client cache that every mutation would have to invalidate. A failed section names what it couldn't read, offers a retry for that section alone, and never renders an empty list in place of a failure. Two example pairs cover both, and Integration points to **ai-features**.
+
 ## [10.3.0] - 2026-09-22
 
 **`ai-features`** (1.1.0) takes two lessons from the v10.2.0 usage audit: its mocks show the full screen a feature lives on rather than the control on its own, and each accepted proposal is filed in ROADMAP.md with its model, integration point, storage, degraded state, estimate and mock link as quoted notes, so a later session that builds it without this skill still has the spec. 16 skills.
