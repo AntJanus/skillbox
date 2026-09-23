@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [10.4.0] - 2026-09-23
+
+**`local-first-app`** (4.8.0) adds per-section loading and error states to its common UI patterns: each section loads on its own without blanking the screen, and a failed section says what failed and retries on its own rather than showing an empty list. 16 skills.
+
 ### Changed
 
 - **local-first-app** (4.7.0 → 4.8.0): Common UI patterns gains per-section loading and error states. Each route segment, tab and home-screen widget loads on its own and keeps the current screen visible until the next is ready, stated as the behavior rather than a client cache that every mutation would have to invalidate. A failed section names what it couldn't read, offers a retry for that section alone, and never renders an empty list in place of a failure. Two example pairs cover both, and Integration points to **ai-features**.
@@ -1038,7 +1042,10 @@ When creating a release:
 
 ---
 
-[Unreleased]: https://github.com/antjanus/skillbox/compare/v10.1.0...HEAD
+[Unreleased]: https://github.com/antjanus/skillbox/compare/v10.4.0...HEAD
+[10.4.0]: https://github.com/antjanus/skillbox/compare/v10.3.0...v10.4.0
+[10.3.0]: https://github.com/antjanus/skillbox/compare/v10.2.0...v10.3.0
+[10.2.0]: https://github.com/antjanus/skillbox/compare/v10.1.0...v10.2.0
 [10.1.0]: https://github.com/antjanus/skillbox/compare/v10.0.0...v10.1.0
 [10.0.0]: https://github.com/antjanus/skillbox/compare/v9.6.0...v10.0.0
 [9.6.0]: https://github.com/antjanus/skillbox/compare/v9.5.0...v9.6.0
