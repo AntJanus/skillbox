@@ -26,3 +26,4 @@ SESSION_ARCHIVE_*.md
 
 # Local per-repo tool permissions — carries absolute paths; excluded globally too
 .claude/settings.local.json
+__pycache__/

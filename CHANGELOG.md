@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`eval/run_eval.py`**, a trigger-rate runner for any skill's EVAL.md. It runs fresh headless sessions, switches off the installed copy and loads the repo copy as a plugin, and takes `--ref` for control runs against an older description. It comes with **`eval/fixtures/nextjs-app`**, a small app for queries that point at "this screen" or "the card".
+
 ### Changed
 
 - **ui-ux-design** eval: 2.3.0 measured against a Next.js fixture with a 2.2.0 control under the same harness. Negatives 15/15, positives no worse than 2.2.0 (13 of 51 runs against 16 of 51, within noise), and the new X11 trigger did not fire.

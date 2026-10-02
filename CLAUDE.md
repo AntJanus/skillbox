@@ -57,7 +57,11 @@ Verified against `skills/` on 2026-09-22. Versions come from each SKILL.md's `me
 .github/scripts/validate-skills.sh skills/ # the CI validator (also runs locally)
 python3 skills/generate-skill/scripts/measure.py <path/to/SKILL.md>   # description chars, body lines, tokens
 python3 skills/generate-skill/scripts/measure.py score <7 category scores>  # rate-skill weighted grade
+python3 eval/run_eval.py <skill> --fixture eval/fixtures/nextjs-app     # trigger-rate eval from the skill's EVAL.md
+python3 eval/run_eval.py <skill> --only positives --ref <tag>           # same queries against an older description (control)
 ```
+
+**Trigger evals** (`eval/run_eval.py`) run each EVAL.md query in fresh `claude -p` sessions (3 runs, sonnet, 6 turns by default) and count runs whose stream-json holds a Skill call for the skill. Each run switches off the installed user-scope copy with `skillOverrides` and loads the repo copy as a local plugin (`evalbox:<skill>`), so an installed copy that has drifted from the repo can't be what gets measured. A separate `CLAUDE_CONFIG_DIR` was tried for isolation and fails with "Not logged in". The parser reads rows shaped `| T1 | "query" | trigger |`; ai-features, discuss and local-first-app use another table shape and are not parsed yet. A fixture lowers trigger rates sharply, because sonnet reads the code and answers directly, so compare runs only within one harness, and use `--ref` for the baseline. A run costs real usage: about 100 sessions for a 32-query set.
 
 There is no lint or build step.
 
@@ -76,6 +80,9 @@ skillbox/
 ├── CLAUDE.md                 # This file
 ├── CHANGELOG.md              # Version history — the tracking doc, in place of a ROADMAP
 ├── test-skills.sh            # Local structure + CLI discovery check
+├── eval/
+│   ├── run_eval.py           # Trigger-rate eval over a skill's EVAL.md (not shipped with any skill)
+│   └── fixtures/nextjs-app/  # Small Next.js app the deictic queries point at
 ├── logo.png
 ├── .github/
 │   ├── scripts/validate-skills.sh

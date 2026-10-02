@@ -92,7 +92,7 @@ Results:
 - **Reading:** the new trigger did not cost activation. The fixture is the reason the earlier 1.00s on T3 and T5 went to zero.
 - **X11 (the new trigger) scored 0.00.** The session wrote seven homepage directions itself, so the description isn't what's carrying that query yet.
 
-Next iteration: score with `--max-turns 3` from an empty directory and with the fixture side by side before rewording anything, since the two harnesses disagree on T3 and T5.
+Reproduce with `python3 eval/run_eval.py ui-ux-design --fixture eval/fixtures/nextjs-app`, and the control with `--only positives --ref v10.4.0`. Next iteration: before rewording anything, score with `--max-turns 3` both from an empty directory (omit `--fixture`) and with the fixture, side by side, since the two harnesses disagree on T3 and T5.
 
 ## Notes
 
