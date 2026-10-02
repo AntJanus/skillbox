@@ -77,9 +77,22 @@ N5 false-triggered in real use (not only in the harness), so 2.2.0 names writing
 | 2.1.x (adds "accessibility contracts" to the lead, "make this accessible" and "review my UX" triggers, ARIA/dataviz/ideal-react-component negative scope; 948 → 980 chars) | 2026-08-25 | not yet run | not yet run | not yet run | superseded |
 | 2.1.2 (frontend-design added to negative scope; two fragments trimmed; 1,000 chars) | 2026-09-02 | 10/12 (T2 0.33, T6 0.00) | 4/8 (V1 0.33, V2 0.00, V3 0.33, V4 0.00) | 4/8 (X2–X4 0.00, X5 0.33) | ✓ first measured variant — see the deictic note |
 | 2.2.0 (negative scope names writing the copy itself — headlines, taglines, pricing text; three negative-scope phrases shortened to fit; 1,010 chars) | 2026-09-22 | not yet run | not yet run | not yet run (X1–X10) | — |
-| 2.3.0 (adds the "mock up design options" trigger; "and encodings" dropped from the dataviz negative to fit; 1,022 chars) | 2026-10-02 | not yet run | not yet run | not yet run (X1–X12) | — |
+| 2.3.0 (adds the "mock up design options" trigger; "and encodings" dropped from the dataviz negative to fit; 1,022 chars) | 2026-10-02 | 8/12 (T2–T5 0.00) | 4/8 (V1–V3 0.00, V4 0.33) | 7/12 (X2–X4, X9, X11 0.00) | ✓ current — no worse than 2.2.0 under the same harness, see below |
 
 Measured 2026-09-02, 2.1.2 (3 fresh sonnet sessions per query, `--max-turns 3`, empty working directory, Skill call parsed from stream-json): T1 1.00, T2 0.33 **FAIL**, T3 1.00, T4 1.00, T5 1.00, T6 0.00 **FAIL**, N1–N6 all pass (N5 0.33 — the conversion clause brushed the pricing-copy negative once); V1 0.33, V2 0.00, V3 0.33, V4 0.00 — all four validation positives **FAIL**; V5–V8 all 0.00; X1 1.00, X2 0.00, X3 0.00, X4 0.00, X5 0.33, X6–X8 all 0.00. Every miss below is a query that points at something absent from the empty directory ("this app", "this SKILL.md", "the card"); the model asked what to look at instead of invoking. All should-nots were silent. Treat trigger rates as lower bounds and give deictic queries a fixture before iterating the description against them. Every validation positive here is a symptom description of a screen that does not exist in the harness ("this screen", "the card", "the onboarding flow", "this interface"), which is the case the Notes below already predicted; X4 is a pure knowledge question the model answers alone. The negatives — the hard part of this description — all held. Next iteration: give the harness a small Next.js fixture with one route and one card component, then re-run.
+
+Measured 2026-10-02, 2.3.0 (3 fresh sonnet sessions per query, `--max-turns 6`, Skill call parsed from stream-json). **The harness changed from 2026-09-02, so these numbers do not compare with that row.** Two changes:
+- **A fixture replaced the empty directory.** Each run started in a fresh copy of a small Next.js app, with a home page, dashboard, card, dropdown, table, onboarding, checkout, pricing and a test, so the deictic queries had something to point at.
+- **The repo copy was the one tested.** The installed user-scope copy still carried the 2.2.0 description, so it was switched off per run with `--settings '{"skillOverrides":{"ui-ux-design":"off"}}'`. The repo copy was loaded with `--plugin-dir`, listed as `evalbox:ui-ux-design`. A listing probe confirmed only that copy was visible.
+
+Results:
+- **All 15 negatives held at 0.00.** N2, N4 and N6 invoked color-system, ideal-react-component and setup-semantic-release respectively.
+- **Positives:** T1, T6, X1 and X5 scored 1.00, V4 0.33, and the other twelve 0.00. The misses were not harness failures. Every session read the fixture and answered the design question directly, without loading the skill. This is the capable-alone caveat, made stronger by having code to read.
+- **Control:** the same harness ran the 17 positives with the 2.2.0 description. It triggered on 16 of 51 runs against 2.3.0's 13 of 51. The difference is T3 and T4 at 0.33 against 0.00, and V4 at 0.67 against 0.33, which is noise at 3 runs per query. Every other positive matched.
+- **Reading:** the new trigger did not cost activation. The fixture is the reason the earlier 1.00s on T3 and T5 went to zero.
+- **X11 (the new trigger) scored 0.00.** The session wrote seven homepage directions itself, so the description isn't what's carrying that query yet.
+
+Next iteration: score with `--max-turns 3` from an empty directory and with the fixture side by side before rewording anything, since the two harnesses disagree on T3 and T5.
 
 ## Notes
 
