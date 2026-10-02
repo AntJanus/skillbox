@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [10.6.0] - 2026-10-02
+
+The eval-tooling release. **`eval/run_eval.py`** measures any skill's trigger rate from its EVAL.md in fresh headless sessions. It tests the repo's description even when an installed copy has drifted, and `--ref` makes a control run against an older one. Its first use measured **`ui-ux-design`** 2.3.0 against a Next.js fixture: negatives 15/15, positives no worse than 2.2.0 under the same harness. No skill versions change. 16 skills.
+
 ### Added
 
 - **`eval/run_eval.py`**, a trigger-rate runner for any skill's EVAL.md. It runs fresh headless sessions, switches off the installed copy and loads the repo copy as a plugin, and takes `--ref` for control runs against an older description. It comes with **`eval/fixtures/nextjs-app`**, a small app for queries that point at "this screen" or "the card".
@@ -1067,7 +1071,8 @@ When creating a release:
 
 ---
 
-[Unreleased]: https://github.com/antjanus/skillbox/compare/v10.5.0...HEAD
+[Unreleased]: https://github.com/antjanus/skillbox/compare/v10.6.0...HEAD
+[10.6.0]: https://github.com/antjanus/skillbox/compare/v10.5.0...v10.6.0
 [10.5.0]: https://github.com/antjanus/skillbox/compare/v10.4.0...v10.5.0
 [10.4.0]: https://github.com/antjanus/skillbox/compare/v10.3.0...v10.4.0
 [10.3.0]: https://github.com/antjanus/skillbox/compare/v10.2.0...v10.3.0
