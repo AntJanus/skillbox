@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **ui-ux-design** eval: 2.3.0 measured against a Next.js fixture with a 2.2.0 control under the same harness. Negatives 15/15, positives no worse than 2.2.0 (13 of 51 runs against 16 of 51, within noise), and the new X11 trigger did not fire.
+
 ## [10.5.0] - 2026-10-02
 
 **`ui-ux-design`** (2.3.0) takes the learnings from a multi-round site redesign and a dozen local-first apps brought to one standard. It adds the full contract for route states (five causes of an empty list, page-shaped loading, error with a way out, not-found), save feedback and undo, delete confirms matched to reversibility, list-surface components, image and palette rules, and a new reference on running a many-option design exploration. 16 skills.
