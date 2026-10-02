@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [10.5.0] - 2026-10-02
+
+**`ui-ux-design`** (2.3.0) takes the learnings from a multi-round site redesign and a dozen local-first apps brought to one standard. It adds the full contract for route states (five causes of an empty list, page-shaped loading, error with a way out, not-found), save feedback and undo, delete confirms matched to reversibility, list-surface components, image and palette rules, and a new reference on running a many-option design exploration. 16 skills.
+
 ### Changed
 
 - **ui-ux-design** (2.2.0 → 2.3.0): learnings from a multi-round site redesign and a dozen local-first apps brought to one standard, anonymized.
@@ -1055,7 +1059,8 @@ When creating a release:
 
 ---
 
-[Unreleased]: https://github.com/antjanus/skillbox/compare/v10.4.0...HEAD
+[Unreleased]: https://github.com/antjanus/skillbox/compare/v10.5.0...HEAD
+[10.5.0]: https://github.com/antjanus/skillbox/compare/v10.4.0...v10.5.0
 [10.4.0]: https://github.com/antjanus/skillbox/compare/v10.3.0...v10.4.0
 [10.3.0]: https://github.com/antjanus/skillbox/compare/v10.2.0...v10.3.0
 [10.2.0]: https://github.com/antjanus/skillbox/compare/v10.1.0...v10.2.0
