@@ -28,6 +28,7 @@ Three tiers:
 - The three tiers and the two rules that govern them (semantic → primitive only; themes are modes on one set) are in SKILL.md. This file carries the format, the naming grammar, and the handoff.
 - Cover **text, background, border, and action** first; those four roles carry most of an interface.
 - Skipping the semantic tier means every primitive change becomes a hunt through every component.
+- **After a redesign, delete the tokens nothing reads.** A dead token still looks like part of the system, so the next person or the next generator reuses it and brings the old design back piece by piece. Search for each token's usages before shipping the redesign, and remove the dead components, styles, and fonts in the same pass.
 - Store as JSON name/value pairs — machine-readable, portable across web, iOS, and Android, and the shape the W3C Design Tokens format is converging on. In CSS they surface as custom properties (`--color-action-primary`).
 - **Spacing scale: 4 → 96px, perceptually distributed.** `4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96` — steps sit close together at the small end and widen at the large end, because that's where a difference is still visible. An evenly-spaced scale wastes half its steps on distinctions nobody sees. Even values only, to avoid sub-pixel rendering; a 2px floor invites decisions below the perceptual threshold.
 
