@@ -1,6 +1,6 @@
 # Component contracts
 
-Load when building or reviewing a specific interactive component. Each entry gives the base element, the ARIA that is actually required, the keyboard contract, and the focus rule — the four things that get invented at the keyboard when they aren't written down.
+Load when building or reviewing a specific interactive component, or the list, search, and selection surfaces around a collection. Each entry gives the base element, the ARIA that is actually required, the keyboard contract, and the focus rule — the four things that get invented at the keyboard when they aren't written down.
 
 Source: Heydon Pickering's Inclusive Components (https://inclusive-components.design/) and Adrian Roselli (https://adrianroselli.com/). Where they predate a native element that now exists, the note says so.
 
@@ -22,6 +22,31 @@ Pages using ARIA average twice as many accessibility errors as pages without it.
 | **Cards** | Heading-wrapped link as the primary target: `<h2><a href="…">Title</a></h2>`. Reduce tab stops rather than nesting competing links. Style with `:focus-within` alongside `:focus`. |
 
 **Site navigation is not an ARIA menu.** A `<nav>` containing a list of links outperforms `role="menu"`, which exists for application menus and brings a keyboard contract users don't expect on a website.
+
+## List and search surfaces
+
+Contracts for the surfaces that sit around a collection. These are behavior rules, not ARIA — most of them are what goes wrong once real data and real selection arrive.
+
+| Component | Contract |
+|---|---|
+| **Row with a preview** | Two targets with two meanings: the item's **name links to its own page**; a separate labelled icon (an eye, "Preview") opens the in-place preview. Make the preview URL-driven so it can be linked and survives a reload. Never wrap a checkbox or a second control inside the row's link — the checkbox click navigates. |
+| **Batch action bar** | Exists **only while something is selected** — no permanent toolbar of grayed buttons. States the count in words ("3 photos selected"). At most five actions; extras go in an overflow menu. Per-row controls switch off while the bar is up, so there is one live scope at a time. Cancel clears the selection and nothing else. Select-all is tri-state (`indeterminate` set in script). Clear the selection after an action runs. A field the selection disagrees about reads **Mixed**. |
+| **Filter chips** | Every active filter renders as a removable chip, and the URL is the source of truth. Drive the URL grammar, the chips, the help text, and the query from one table, so a filter can't exist in one place and be missing from another. An unknown parameter or tab value falls back to the default **and says so**. |
+| **Parsed search** | The box echoes how it read the query: each recognized qualifier (`status:open`) becomes its own removable chip, an exclusion says "not" in words rather than relying on a leading dash, and unrecognized text is shown as plain text rather than silently dropped. |
+| **Command palette** | One binding opens three groups: commands, pages (with synonym keywords so "settings" finds "Preferences"), and entities. Entity search is debounced, each keystroke aborts the previous request, and a response for a query that is no longer current is dropped. End with a "See all results" row into the full search page. |
+| **Long paths** | Truncate **from the left**, dropping whole segments — `…/invoices/2026/march.pdf`. The tail is what tells two paths apart, which is exactly what a CSS end-ellipsis throws away. |
+| **Clipped scroll pane** | An inset shadow only on the edge that has more content behind it, recomputed on scroll and on content change, with a 1px tolerance so sub-pixel offsets don't flicker it. Reset `scrollTop` when the rows are replaced, or a shortened list opens scrolled past its only rows. |
+
+## Controls on a color you don't control
+
+A tile wearing a brand color, a card tinted by data, a cover someone uploaded — the fill arrives from outside, so contrast has to hold across the whole range of colors that might land.
+
+- **Nothing on the fill is translucent.** A translucent white plate inherits the fill's luminance; on a pale brand color its label drops to around 2:1. Opaque plates hold their ratio everywhere.
+- **Darken the fill toward black as a gradient**, solving the strength per color until the title clears its ratio, with a floor so the brand isn't crushed. A fixed 90% darkening only works on colors that were already dark.
+- **Two-tone focus ring** — a dark inner ring against the control, a white outer halo against the fill. One color vanishes at one end of the range.
+- **Text over artwork nobody reviewed** sits on a scrim whose alpha is a written-down number, so it can be composited against the worst-case image and checked. Text whose ink is a theme token gets a scrim of the page's own background at high alpha; fixed white ink gets a fixed black scrim held flat under every line. Never `text-shadow` as the substitute — its effect depends on the exact pixels underneath.
+- **Measure the composite**, not the color picker — the ratio someone reads is label against plate-over-fill.
+- **Let the outside color appear in as few places as possible.** A card that tints its border, text, and controls from one unknown hex has four chances to fail instead of one.
 
 ## Labeling, in order of preference
 
@@ -57,6 +82,12 @@ Where focus lands depends on the dialog, and a single rule gets it wrong somewhe
   ✅ Add it only when `scrollWidth > clientWidth`
 - ❌ `aria-label` to relabel a link's visible text
   ✅ Change the visible text; it fails WCAG 2.5.3 otherwise
+- ❌ A row whose name opens a preview and whose checkbox sits inside the link
+  ✅ The name links to the item's page, a labelled icon opens the preview, the checkbox sits outside both
+- ❌ A batch toolbar always on screen with every button grayed out
+  ✅ A bar that appears with the selection and says "3 selected"
+- ❌ `text-overflow: ellipsis` on a file path
+  ✅ Drop leading segments so the filename survives
 - ❌ A `title` attribute as the tooltip
   ✅ A real tooltip element — `title` is unreachable by keyboard and touch
 
@@ -68,3 +99,5 @@ Where focus lands depends on the dialog, and a single rule gets it wrong somewhe
 - **Symptom:** Layout jumps a pixel when a toggle receives focus. **Cause:** `outline` participates in layout in that context. **Fix:** `box-shadow` for the ring.
 - **Symptom:** An accessibility audit worsens after adding ARIA to a table. **Cause:** A working `<table>` was converted to an ARIA grid. **Fix:** Revert to semantic table markup; add `aria-sort` only for sorting.
 - **Symptom:** A translated page leaves some controls in English. **Cause:** Those names came from `aria-label`, which translation services don't process. **Fix:** Move the name into visible text or `aria-labelledby`.
+- **Symptom:** The command palette shows results for something the user already stopped typing. **Cause:** A slow response for an earlier query landed after a faster one for the current query. **Fix:** Abort the previous request on each keystroke, and drop any response whose query isn't the current one.
+- **Symptom:** A shared link applies a filter the screen doesn't show, and the user can't clear it. **Cause:** The URL accepts a parameter the chip row doesn't render. **Fix:** Drive URL parsing and chip rendering from the same table.

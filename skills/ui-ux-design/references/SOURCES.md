@@ -4,6 +4,8 @@ Load when citing a rule, checking how well-evidenced a claim is, or deciding whe
 
 Two source generations sit behind this skill. **v1.0** was built from a crawl of Figma's Resource Library "Design basics" section, roughly 50 articles, August 2026. **v2.0** rebuilt it against 20 practitioner and research sources, August 2026 — named authors and research organizations rather than a design-tool vendor's marketing library. Where the two disagree, the practitioner source wins, and the specific overrides are listed at the bottom.
 
+**v2.3 added a third kind of source: production practice.** The route-state contract, save feedback, undo and delete-confirm rules, the list-surface components, and the whole of `EXPLORATION.md` come from a multi-round site redesign and a family of a dozen local-first apps brought to one standard, September–October 2026. Each rule is evidenced by a fix that shipped or a review verdict that was recorded, not by research. Read them as field observations: well tested in one practice, not measured across many.
+
 ## Read this before "modernizing" a number
 
 Three claims here look dated and are not. Each was verified against a first-party source with the date recorded.
@@ -91,7 +93,7 @@ Three claims here look dated and are not. Each was verified against a first-part
 
 Gaps that remain after the v2.0 rebuild, so nobody assumes silence means settled:
 
-- **Motion and animation.** The single largest hole. `INTERACTION.md` has three bullets and the 100–200ms transition range; none of the 20 sources covers motion design well, and the research pass confirmed the gap rather than filling it.
+- **Motion and animation.** Still the largest hole. None of the 20 sources covers motion design well. v2.3 added duration budgets for page transitions, reveals, and load animation from practice, but there are still no easing, choreography, or spatial-continuity rules.
 - **Internationalization and RTL layout.** Mentioned only as "a translated string runs 40% longer."
 - **Dense data UI** beyond the table contract in `COMPONENTS.md`.
 - **Core Web Vitals numeric thresholds**, click-depth rules, card-sorting participant counts, and tree testing — inherited gaps from v1.0, unfilled.

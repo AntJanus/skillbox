@@ -105,7 +105,7 @@ curl -o .claude/skills/track-session/SKILL.md \
 | [🎨 color-system](#color-system) | Curated color palettes + WCAG/APCA contrast guidance |
 | [🔠 typography](#typography) | Type systems, scale, rhythm + a readability floor |
 | [🧱 local-first-app](#local-first-app) | Local-first single-user app — feature set, not a code spec |
-| [🖼️ ui-ux-design](#ui-ux-design) | Interaction states, component a11y contracts, IA, hierarchy, tokens, deceptive patterns, whole-app audits |
+| [🖼️ ui-ux-design](#ui-ux-design) | Interaction and route states, component a11y contracts, IA, hierarchy, tokens, deceptive patterns, whole-app audits, design exploration |
 | [🤖 ai-features](#ai-features) | Propose, mock and set up AI features for an existing app — local models or hosted, the right model per job |
 | [💬 discuss](#discuss) | Conversation mode — Claude debates back, in condensed Simplified Technical English |
 
@@ -349,14 +349,17 @@ Not for palette/contrast choices (see [color-system](#color-system)), font sizin
 ### ui-ux-design
 
 <details>
-<summary><b>Comprehensive UI/UX: the states every surface has to ship, per-component accessibility contracts, information architecture, visual hierarchy, design tokens, deceptive patterns, an audit mode for apps that already exist, and the research process behind them. Built from 20 practitioner and research sources.</b></summary>
+<summary><b>Comprehensive UI/UX: the states every surface has to ship, per-component accessibility contracts, information architecture, visual hierarchy, design tokens, deceptive patterns, an audit mode for apps that already exist, a method for running a many-option design exploration, and the research process behind them. Built from 20 practitioner and research sources plus a multi-round redesign and a dozen production apps.</b></summary>
 
 Covers designing and critiquing interfaces end to end. Two rules generate most of it: design the *states*, not the screen — whichever rendering goes unspecified gets invented at implementation time — and name things for their role, not their appearance.
 
 **Covers:**
 - An `audit` mode for reviewing an app that already exists — scope the surface list from the code rather than the brief, build the per-surface state matrix, publish one consequence-ranked report carrying a *rendered* before and after per visual change, then take approval finding by finding. A passing verdict is a legitimate outcome
 - The approved mockup as the spec: before reporting an implementation done, put it beside the artifact the user signed off on and list every element that differs
-- The four states every surface ships (loading, empty, error, success), varied by permission and user type, then broken deliberately with real data — long labels, empty lists, failed images, translated strings
+- The four states every surface ships (loading, empty, error, success), varied by permission and user type, then broken deliberately with real data — long labels, empty lists, failed images, translated strings. Empty has five causes, each with its own copy and action; loading is a labelled, page-shaped skeleton; error offers a retry *and* a way out; detail routes add not-found — and a test guards each
+- Save feedback chosen by the shape of the write, with sticky failures; undo instead of confirm for repeatable actions; delete confirms that name what cascades and match their wording to reversibility
+- List surfaces: batch action bars, filter chips backed by the URL, parsed search, the command palette, row previews, and controls on a color that arrives from outside
+- Design exploration: assigning each builder a direction, fixing the app shell in the brief, recording verdicts per element, and narrowing range to hybrids to finalists to one assembled system
 - Nine interaction states with their CSS hooks and the behavioral rule each carries: loading disables, error returns to clickable, disabled explains itself — via `aria-disabled`, because the native attribute puts the explanation out of keyboard reach
 - An accessibility floor that holds in *every* state — 4.5:1, 44×44px targets, `:focus-visible`, never color alone, native semantics before ARIA
 - Per-component ARIA, keyboard, and focus contracts for tabs, disclosures, notifications, data tables, menus, toggles, tooltips vs toggletips, and cards, plus the labeling hierarchy that puts `aria-label` last
@@ -369,7 +372,7 @@ Covers designing and critiquing interfaces end to end. Two rules generate most o
 - Layout: base-unit grids, soft over hard, responsive behavior, and section recipes for landing, pricing, and portfolio pages
 - Type and color applied to a UI — 60-30-10 allocation, grayscale-first, cultural constraints on palette, and the brand style guide as a governed artifact
 
-**Triggers:** When asked "what states does this button need", "what ARIA does this menu need", "make this accessible", "how should I structure the navigation", "design this screen", "set up design tokens", "review my UX", "make this convert better" — or when the description is a symptom: a cluttered screen, a flow users abandon, a component that breaks on real data
+**Triggers:** When asked "what states does this button need", "what ARIA does this menu need", "make this accessible", "how should I structure the navigation", "design this screen", "set up design tokens", "review my UX", "mock up design options", "make this convert better" — or when the description is a symptom: a cluttered screen, a flow users abandon, a component that breaks on real data
 
 Depth on type scales lives in [typography](#typography) and on palettes in [color-system](#color-system). Not for chart design (see dataviz) or React file structure (see [ideal-react-component](#ideal-react-component)).
 

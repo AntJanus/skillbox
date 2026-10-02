@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **ui-ux-design** (2.2.0 → 2.3.0): learnings from a multi-round site redesign and a dozen local-first apps brought to one standard, anonymized.
+  - **Route states.** Empty states now have five causes in precedence order (failed to load, filtered to zero, hidden by a setting, all trashed, never had any), each with its own copy and action. Loading is a labelled skeleton in the page's real shape. Error offers a retry and a way out. Detail routes add not-found. A new rule says to guard all of these with a route registry test.
+  - **Disabled controls** split by cause: a precondition gets `aria-disabled` and a reason; a write in flight gets native `disabled`; a control waiting on hydration gets `aria-disabled`.
+  - **New SKILL.md rules:** filter state lives in the URL with removable chips, and uncalibrated scores show as labelled bands.
+  - **Three new SKILL.md gotchas:** the page scrolling sideways on a phone, a restyle breaking inherited colors on pages nobody touched, and visual-regression captures coming out blank. The stat-strip gotcha now says to reflow rather than shrink.
+  - **`INTERACTION.md`** gains save feedback chosen by the shape of the write (sticky failures), undo-instead-of-confirm with separate hover and focus holds, delete confirms that name what cascades and match their wording to reversibility, long-running work reported in real states, and motion budgets beyond single controls.
+  - **`COMPONENTS.md`** gains list-surface contracts (row previews, batch action bar, filter chips, parsed search, command palette, left-truncated paths, scroll-edge shadows) and controls on a color that arrives from outside.
+  - **New `EXPLORATION.md`** covers running a many-option design exploration, and the description gains a "mock up design options" trigger, with X11 and X12 added to the eval set.
+  - **Moves to stay under the ~5,000-token body cap:** the nine-state table and the latency budgets moved to `INTERACTION.md`, and four gotchas moved to the reference files that already state their rule.
+
 ## [10.4.0] - 2026-09-23
 
 **`local-first-app`** (4.8.0) adds per-section loading and error states to its common UI patterns: each section loads on its own without blanking the screen, and a failed section says what failed and retries on its own rather than showing an empty list. 16 skills.

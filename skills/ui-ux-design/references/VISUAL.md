@@ -90,3 +90,7 @@ If asked to produce brand guidelines, these are the parameters that keep it from
 - **A logo is a family, not a file** — full lockup for wide spaces, mark alone for tight ones.
 - **SVG for screens** because it scales cleanly; raster formats for print.
 - Simplicity, timelessness over trend, and readability — an unreadable mark is an unmemorable one.
+
+## Gotchas
+
+- **Symptom:** A generated palette satisfies every color rule and is still rejected as ugly. **Cause:** It was derived from hue relationships instead of sampled from whatever it was named after. **Fix:** Read the real source first — brand values, the product's stylesheet or theme files, a screenshot — then adjust from there in OKLCH.
