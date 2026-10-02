@@ -1,6 +1,6 @@
 # Type, color, and brand applied to a UI
 
-Load when applying type and color inside an interface, or when producing brand guidelines. For type scale construction and font pairing depth see the **typography** skill; for palette construction and contrast math see **color-system**. This file covers the decisions those skills don't: proportion, ordering, governance, and the cultural constraints that can veto an otherwise valid palette.
+Load when applying type, color, or images inside an interface, retuning a palette, or producing brand guidelines. For type scale construction and font pairing depth see the **typography** skill; for palette construction and contrast math see **color-system**. This file covers the decisions those skills don't: proportion, ordering, governance, and the cultural constraints that can veto an otherwise valid palette.
 
 ## Type in an interface
 
@@ -48,6 +48,16 @@ Load when applying type and color inside an interface, or when producing brand g
 
 - **Space and gamut are different things.** A gamut is the *range* of colors available; a space is the *coordinate system* for reaching them. sRGB covers roughly 30% of what the eye perceives. The two words are used interchangeably almost everywhere, and the distinction is what makes the rest of this section make sense.
 
+**Colors sampled from images get pulled toward the brand before they're used.** Per-image accent colors — a tint from each post's cover, a glow from each album — drift off-brand on whatever image is most saturated. In order: move each hue toward the brand band with a capped pull, send near-gray swatches to the brand hue outright, cap the chroma, and clamp lightness last, so text on the result still passes 4.5:1. Extract at build time, not in the browser, since an image CDN that blocks canvas reads leaves the runtime version with nothing.
+
+**A palette retune is finished when a scanner says so.** Changing the main tokens leaves the old hue in hard-coded values: glows, gradients, SVG fills, focus rings, shadows. Scan the source for the banned hue range in every color syntax (hex, `rgb`, `hsl`, `oklch`) and rerun until it reports zero. Tell retinted sections apart by lightness and chroma within the allowed band rather than by reintroducing hue, and recheck contrast on everything that changed.
+
+## Images
+
+- **Never crop an image that may have text in it.** Banners, covers, and diagrams often carry baked-in lettering, and `object-fit: cover` slices through it. Treat very wide images (about 2.2:1 and up) as lettered by default, and show them at their own aspect ratio.
+- **Set `width` and `height` (or `aspect-ratio`) from the image's real dimensions**, measured at build time. Without them the layout jumps as images load, and a crop is the only way to force a guessed shape.
+- **On phones, stack the title below the image rather than over it.** Overlaid text that fit at desktop width covers the image's own content once the frame narrows.
+
 ## Building a ramp
 
 - **Distribute lightness exponentially, not linearly.** Even steps produce perceptual cliffs; the target is equal *contrast ratios* between steps.
@@ -89,6 +99,7 @@ If asked to produce brand guidelines, these are the parameters that keep it from
 - **The monochrome test**: strip the color. If it goes flat, the form isn't doing enough work.
 - **A logo is a family, not a file** — full lockup for wide spaces, mark alone for tight ones.
 - **SVG for screens** because it scales cleanly; raster formats for print.
+- **Recolor a single-color mark with a CSS mask** filled by a theme color (`mask-image` plus `background-color: var(--brand)`), so it follows the theme. A `filter` chain approximating the target color never lands exactly, and drifts further when the theme changes.
 - Simplicity, timelessness over trend, and readability — an unreadable mark is an unmemorable one.
 
 ## Gotchas

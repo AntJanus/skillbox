@@ -28,7 +28,7 @@ Two habits below prevent most of them: ship four states per surface, and name to
 | **[references/EXPLORATION.md](references/EXPLORATION.md)** | Generating many design options to choose between — the builder brief, structured review verdicts, and narrowing rounds to one design |
 | **[references/LAYOUT.md](references/LAYOUT.md)** | Grids, responsive behavior, and the section recipes for landing, pricing, and portfolio pages |
 | **[references/SYSTEMS.md](references/SYSTEMS.md)** | Design tokens, design systems, and design-to-code handoff |
-| **[references/VISUAL.md](references/VISUAL.md)** | Applying type and color to a UI, plus the brand style guide as a governed artifact |
+| **[references/VISUAL.md](references/VISUAL.md)** | Applying type, color, and images to a UI, palette retunes, and the brand style guide |
 | **[references/SOURCES.md](references/SOURCES.md)** | Citing a rule, or checking which claims were corrected against their source |
 | Rarely: **[ETHICS.md](references/ETHICS.md)** · **[PROCESS.md](references/PROCESS.md)** | Conversion, signups, retention, or pricing presentation — the deceptive-pattern catalogue and where the persuasion line sits · planning research, wireframe fidelity, usability tests, launch checklists |
 
