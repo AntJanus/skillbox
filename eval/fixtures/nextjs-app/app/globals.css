@@ -1,0 +1,8 @@
+body { font-family: system-ui, sans-serif; margin: 0; color: #222; }
+.topbar { display: flex; justify-content: space-between; padding: 12px 24px; background: #f4f4f4; }
+.topbar nav a { margin-left: 16px; color: #888; font-size: 12px; }
+main { padding: 24px; }
+.card { border: 1px solid #ddd; border-radius: 8px; padding: 12px; width: 220px; }
+.card h3 { white-space: nowrap; }
+.btn { background: #4f8cff; color: #fff; padding: 6px 10px; border: none; border-radius: 4px; }
+.btn:focus { outline: none; }
