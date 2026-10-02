@@ -79,3 +79,8 @@ Five test types, all of them: **usability, accessibility, performance** (speed, 
 Instrument the funnel: task success rate broken down **per feature** (a high overall number hides friction in one flow), time on task read *alongside* success rate (a slow finisher is still struggling), and satisfaction scores understood as lagging indicators that confirm what behavioral metrics already told you.
 
 **Book the feedback slot before building the prototype.** Scheduling review after the work is done is the reliable way to prevent the feedback from happening at all.
+
+## Gotchas
+
+- **Symptom:** Stakeholder feedback is all about colors and copy when you needed structural input. **Cause:** The artifact was too polished for the question. **Fix:** Show it in grayscale with unstyled elements; visual polish hijacks the conversation.
+- **Symptom:** Implementation drifts from the design in small ways nobody agreed to. **Cause:** The in-between moments — hover, loading, dismissal, transitions — were never specified, so they got invented at the keyboard. **Fix:** Specify them, or accept whatever the implementation chooses.

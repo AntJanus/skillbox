@@ -44,7 +44,7 @@ Verified against `skills/` on 2026-09-22. Versions come from each SKILL.md's `me
 | `track-roadmap` | 2.7.0 | ROADMAP.md generate/update/audit/brainstorm/resume |
 | `track-session` | 6.3.0 | SESSION_PROGRESS.md across multi-session work |
 | `typography` | 1.7.0 | Type scale, line-height, font pairing |
-| `ui-ux-design` | 2.2.0 | Interaction states, a11y contracts, IA, tokens |
+| `ui-ux-design` | 2.3.0 | Interaction states, route states, a11y contracts, IA, tokens, design exploration |
 
 **`track-qa` was removed in v10.1.0 (2026-09-22)** after its 2026-09-01 deprecation; QA.md manual-QA checklists were retired portfolio-wide on 2026-08-24. Do not restore it or refile its items — hands-on verification is filed as ordinary `track-roadmap` items. Its last version, 1.4.0, is in the v10.0.0 tag if the `cc-dash/qa@1` schema is ever needed again.
 

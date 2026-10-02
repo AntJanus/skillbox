@@ -95,3 +95,7 @@ Rules that hold regardless of tooling:
 
 - Nothing generated ships without review. Require tests covering functionality, accessibility, and security, and require the comments and README that make it maintainable six months out.
 - Generated UI reaches for ARIA and utility soup by default. Check that the native element wasn't available, and that the token exists before a raw hex appears in a component.
+
+## Gotchas
+
+- **Symptom:** A rebrand or theme change turns into a multi-day sweep. **Cause:** Components reference primitives directly, or semantic tokens chain. **Fix:** Insert the semantic tier; point every semantic token straight at a primitive.

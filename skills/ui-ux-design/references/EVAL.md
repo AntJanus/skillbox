@@ -58,6 +58,15 @@ N5 false-triggered in real use (not only in the harness), so 2.2.0 names writing
 | X9 | "how should the three pricing tiers be laid out so people can compare them?" | trigger |
 | X10 | "write a tagline for the pricing page" | no (writing the copy itself) |
 
+## Design exploration (2) — added 2026-10-02 for v2.3.0
+
+2.3.0 adds "mock up design options" to the description for the new `EXPLORATION.md`. X11 is the indirect ask; X12 is the paired negative, because aesthetic polish on a screen that already exists belongs to frontend-design. Score these two with the extension block.
+
+| # | Query | Expected |
+|---|---|---|
+| X11 | "give me a bunch of different directions for the homepage so I can pick one" | trigger |
+| X12 | "make this landing page look more premium" | no (aesthetic polish — frontend-design) |
+
 ## Results
 
 | Variant | Date | Train pass | Validation pass | Extension pass | Selected |
@@ -68,6 +77,7 @@ N5 false-triggered in real use (not only in the harness), so 2.2.0 names writing
 | 2.1.x (adds "accessibility contracts" to the lead, "make this accessible" and "review my UX" triggers, ARIA/dataviz/ideal-react-component negative scope; 948 → 980 chars) | 2026-08-25 | not yet run | not yet run | not yet run | superseded |
 | 2.1.2 (frontend-design added to negative scope; two fragments trimmed; 1,000 chars) | 2026-09-02 | 10/12 (T2 0.33, T6 0.00) | 4/8 (V1 0.33, V2 0.00, V3 0.33, V4 0.00) | 4/8 (X2–X4 0.00, X5 0.33) | ✓ first measured variant — see the deictic note |
 | 2.2.0 (negative scope names writing the copy itself — headlines, taglines, pricing text; three negative-scope phrases shortened to fit; 1,010 chars) | 2026-09-22 | not yet run | not yet run | not yet run (X1–X10) | — |
+| 2.3.0 (adds the "mock up design options" trigger; "and encodings" dropped from the dataviz negative to fit; 1,022 chars) | 2026-10-02 | not yet run | not yet run | not yet run (X1–X12) | — |
 
 Measured 2026-09-02, 2.1.2 (3 fresh sonnet sessions per query, `--max-turns 3`, empty working directory, Skill call parsed from stream-json): T1 1.00, T2 0.33 **FAIL**, T3 1.00, T4 1.00, T5 1.00, T6 0.00 **FAIL**, N1–N6 all pass (N5 0.33 — the conversion clause brushed the pricing-copy negative once); V1 0.33, V2 0.00, V3 0.33, V4 0.00 — all four validation positives **FAIL**; V5–V8 all 0.00; X1 1.00, X2 0.00, X3 0.00, X4 0.00, X5 0.33, X6–X8 all 0.00. Every miss below is a query that points at something absent from the empty directory ("this app", "this SKILL.md", "the card"); the model asked what to look at instead of invoking. All should-nots were silent. Treat trigger rates as lower bounds and give deictic queries a fixture before iterating the description against them. Every validation positive here is a symptom description of a screen that does not exist in the harness ("this screen", "the card", "the onboarding flow", "this interface"), which is the case the Notes below already predicted; X4 is a pure knowledge question the model answers alone. The negatives — the hard part of this description — all held. Next iteration: give the harness a small Next.js fixture with one route and one card component, then re-run.
 
