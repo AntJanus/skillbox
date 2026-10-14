@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "[screen | flow | states | components | tokens | ethics | audit]"
 metadata:
   author: Antonin Januska
-  version: "2.3.0"
+  version: "2.4.0"
   tags: [ux, ui, interaction-design, information-architecture, design-tokens, accessibility, usability, deceptive-patterns, aria]
 ---
 
@@ -19,17 +19,16 @@ Two habits below prevent most of them: ship four states per surface, and name to
 
 ## Navigation
 
-**Read the project's or user's own pattern library first**, if one exists — a design-references folder, a component gallery, a saved set of screens they like. It encodes taste this file cannot, and it outranks the defaults below wherever the two disagree.
+**Read the project's or user's own pattern library first**, if one exists — a design-references folder, a component gallery, a saved set of screens they like. It encodes taste this file cannot, and it outranks the defaults below wherever the two disagree. With no project library to read, [antjanus.com/patterns](https://antjanus.com/patterns) holds 40 component patterns and [antjanus.com/page-designs](https://antjanus.com/page-designs) holds 46 whole-page designs, each with a prompt written to rebuild it without the source.
 
 | Load | When |
 |---|---|
 | **[references/INTERACTION.md](references/INTERACTION.md)** | Building a control or a route's states — the nine control states, latency, save feedback, undo, delete confirms, motion, forms |
-| **[references/COMPONENTS.md](references/COMPONENTS.md)** | Building a named component — the ARIA, keyboard, and focus contract for tabs, menus, tables, tooltips, cards, plus batch bars, parsed search, and the command palette |
+| **[references/COMPONENTS.md](references/COMPONENTS.md)** | Building a named component — the ARIA, keyboard, and focus contract for tabs, menus, tables, tooltips, cards, plus batch bars, parsed search, the command palette, and data-display surfaces |
 | **[references/EXPLORATION.md](references/EXPLORATION.md)** | Generating many design options to choose between — the builder brief, structured review verdicts, and narrowing rounds to one design |
 | **[references/LAYOUT.md](references/LAYOUT.md)** | Grids, responsive behavior, and the section recipes for landing, pricing, and portfolio pages |
 | **[references/SYSTEMS.md](references/SYSTEMS.md)** | Design tokens, design systems, and design-to-code handoff |
 | **[references/VISUAL.md](references/VISUAL.md)** | Applying type, color, and images to a UI, palette retunes, and the brand style guide |
-| **[references/SOURCES.md](references/SOURCES.md)** | Citing a rule, or checking which claims were corrected against their source |
 | Rarely: **[ETHICS.md](references/ETHICS.md)** · **[PROCESS.md](references/PROCESS.md)** | Conversion, signups, retention, or pricing presentation — the deceptive-pattern catalogue and where the persuasion line sits · planning research, wireframe fidelity, usability tests, launch checklists |
 
 ## Audit mode
@@ -38,7 +37,7 @@ Two habits below prevent most of them: ship four states per surface, and name to
 
 1. **Scope from the repo, not from the brief.** Read the project's own agent doc, then enumerate every route and the components each one renders. A brief that describes the wrong app still yields the right audit when the surface list comes from the code.
 2. **Build the state matrix before judging anything.** One row per surface, one column per state from the four below. A cell you can't fill by reading the code is itself a finding — that state doesn't exist.
-3. **Split into lanes only when the surface count justifies it** — three or four read-only lanes by surface family (lists, forms, chrome, accessibility), each carrying the four-states table and the floor inline so a lane doesn't depend on loading this file. Always fewer lanes than surfaces; never one per route. Cap each lane's report so it arrives whole: every finding gets a one-line headline, its file and line, and why it matters; code excerpts only for that lane's top three. Uncapped lane reports overflow and truncate, and the lead ends up asking for resends instead of ranking.
+3. **Split into lanes only when the surface count justifies it** — three or four read-only lanes by surface family (lists, forms, chrome, accessibility), each carrying the four-states table and the floor inline so a lane doesn't depend on loading this file. Always fewer lanes than surfaces; never one per route. Cap each lane's report so it arrives whole: every finding gets a one-line headline, its file and line, and why it matters; code excerpts only for that lane's top three.
 4. **Publish one report, ranked by consequence, and stop.** Every visual change gets a **rendered before and after** — real markup at real sizes, side by side, with the difference named underneath. A description of a change is not a before and after. Size the report to the finding count; one longer than the fix list it produces goes unread.
 5. **Get approval per finding before implementing.** Present the ranked list and let the user accept, cut, or reorder it — audits reliably surface items the user considers not worth the pixels, and shipping those spends the credibility the real findings earned. Record what was approved, and what was cut, where the project already tracks work.
 
@@ -58,11 +57,11 @@ For any implementation of a design the user signed off on, put the approved arti
 
 Non-negotiable, and cheap to get right at build time rather than in an audit later.
 
-- **4.5:1 contrast for normal text, 3:1 for large — in every state, in both color schemes.** Hover, pressed, and disabled fills are where this silently breaks; nobody rechecks them. A dark scheme built after the light one breaks all three at once, so it isn't a follow-up task — it ships with the surface or the surface isn't done. Low-contrast text is the most common accessibility failure on the web, present on 79.1% of homepages.
+- **4.5:1 contrast for normal text, 3:1 for large — in every state, in both color schemes.** Hover, pressed, and disabled fills are where this silently breaks; nobody rechecks them. A dark scheme built after the light one breaks all three at once, so it ships with the surface or the surface isn't done.
 - **44×44px minimum touch target.** Grow it with padding, not font size.
-- **Never let color alone carry meaning.** Pair every color shift with an icon, a border-weight change, or an underline, or the state is invisible to the 1-in-12 men with a color vision deficiency.
+- **Never let color alone carry meaning.** Pair every color shift with an icon, a border-weight change, or an underline, or the state is invisible to colorblind users.
 - **Visible focus, via `:focus-visible`.** Never `outline: none` without a replacement ring — that cuts off keyboard and assistive-tech users entirely.
-- **Native semantic HTML before ARIA.** Pages using ARIA average *twice* as many accessibility errors as pages without it. `<header>`, `<nav>`, `<main>`, `<footer>`, and native `dialog`/`popover` carry accessibility for free.
+- **Native semantic HTML before ARIA.** ARIA layered onto generic markup adds errors rather than removing them. `<header>`, `<nav>`, `<main>`, `<footer>`, and native `dialog`/`popover` carry accessibility for free.
 - **`aria-disabled` rather than the `disabled` attribute.** A natively disabled control leaves the tab order and is exempt from contrast requirements — so the control *and* any explanation next to it become unreachable for exactly the people who needed the explanation. Set `aria-disabled="true"`, block the action in the handler, and keep the text contrast-passing. The split is by cause: a precondition the user can fix gets `aria-disabled` and a stated reason; a write already in flight gets native `disabled` plus `aria-busy`, since there is nothing to explain and it lasts a moment.
 - **Every interactive element is reachable and operable without a mouse**, in a tab order that matches reading order.
 
@@ -114,6 +113,8 @@ Three structures, chosen by how people actually look for the thing:
 - **Sequential** — one linear path, for checkout, onboarding, and tutorials. The user should not be able to wander off it.
 - **Matrix** — navigate by attribute, filtering the same set by price, size, status, or date. The right answer when there is no single correct taxonomy. **Filter state lives in the URL, and every active filter shows as a removable chip** — a filter a link can apply but the screen can't display is one the user can neither see nor clear.
 
+**Every aggregate links to the rows behind it.** A month bar, a heatmap day, a status count: each is a link or a filter into the list that produced the number. The chart shows the shape and the link does the work. If an aggregate can't link anywhere, ask whether it belongs on the page. When the counts double as filter controls, compute them from the unfiltered set, so pressing one tile doesn't change the numbers on the others.
+
 A sitemap is one component of information architecture, not a synonym for it — IA is organization plus labeling plus navigation plus search.
 
 **Any page can be the entry point.** Deep links, search results, and shared URLs mean every route has to stand on its own: it explains what it is, and offers a way up and out. Design for growth too — a category scheme that only works at today's content volume will need re-cutting.
@@ -152,16 +153,13 @@ Three tiers, in this order:
 
 - **Symptom:** Layout is fine in review, broken in production. **Cause:** Designed against placeholder content. **Fix:** Re-render every component with a long label, an empty collection, a failed image, and a translated string before calling it done.
 - **Symptom:** Feature works for the author, unusable on a phone. **Cause:** The affordance lives in a hover state. **Fix:** Move it into the default state; hover never fires on touch.
-- **Symptom:** Accessibility audit fails after adding ARIA. **Cause:** ARIA layered onto non-semantic markup. **Fix:** Use the native element first — ARIA usage correlates with *more* errors, not fewer.
 - **Symptom:** Contrast passes but the UI is still unreadable somewhere. **Cause:** Only the default state, in one color scheme, was checked. **Fix:** Measure hover, pressed, and disabled fills, in light and dark.
 - **Symptom:** A control explains why it's unavailable, and users still ask why it's unavailable. **Cause:** The native `disabled` attribute took it out of the tab order, so keyboard and screen-reader users never reach the control or the explanation. **Fix:** `aria-disabled="true"` with a guarded handler.
-- **Symptom:** Users abandon a multi-step form midway. **Cause:** Progressive disclosure without orientation. **Fix:** Show current position and steps remaining on every step.
 - **Symptom:** An implementation is reported done and the reply is that it looks nothing like what was agreed. **Cause:** It was checked against the running app rather than against the approved mockup. **Fix:** Open both side by side and list the differences before reporting done.
 - **Symptom:** A later session reports every plan task done, and the approved design was never built. **Cause:** The approval was recorded only in conversation; the implementing session never loaded this skill and its plan had no task for the design. **Fix:** On approval, add the design and its artifact location to the tracked plan as its own task.
 - **Symptom:** A stat strip or card row looks right in review and wraps or clips in the app. **Cause:** It was tuned at one width, wider than the container it really renders in. **Fix:** Render it at the narrowest real container before calling it done, and where it doesn't fit, reflow it into stacked label–value rows rather than shrinking the text.
 - **Symptom:** The whole page scrolls sideways on a phone. **Cause:** One child is wider than the viewport — a wide table, an unwrapped header action row, or a visually-hidden element with no positioned ancestor. **Fix:** Tables scroll inside their own wrapper, header rows wrap, hidden elements sit in a `position: relative` parent.
 - **Symptom:** After a restyle, text on a page nobody touched is unreadable. **Cause:** It inherited link and heading colors from the changed base styles — light text on a dark band became dark on dark. **Fix:** Any non-default surface sets its own text colors; re-open every route in both schemes after a base-style change.
-- **Symptom:** A deep link into the app lands somewhere confusing. **Cause:** The route was designed as step 3 of a flow. **Fix:** Every route explains itself and offers a way up — any page can be the entry point.
 
 ## Integration
 

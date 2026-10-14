@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **ui-ux-design** (2.3.0 → 2.4.0): rules from a public UI pattern library and page-design library, reviewed and approved one proposal at a time.
+  - **SKILL.md** gains one information-architecture rule: every aggregate (a month bar, a heatmap day, a status count) links to the rows behind it, and counts that double as filters come from the unfiltered set. With no project library to read, the Navigation section points at the two public libraries.
+  - **`COMPONENTS.md`** gains a Data display section (disputed figures with their working, numbers on a reference scale, multi-outcome progress, mark sequences, state grids, lookup matrices, multi-source dashboard cards), four list-surface rows (section rail, markers on an image, a select across kinds, toggles that drive a list), per-card controls as siblings of the link, and rules for text over images in any style, of which translucent panels are one option.
+  - **`INTERACTION.md`** gains bulk-operation dry runs and review-deck rules, empty-state copy and art, and motion between views, framed as an option rather than a default.
+  - **`EXPLORATION.md`** says generated options converge on structure before style, so briefs assign the nav, hero and listing form as well as the style. It adds a screen for generated-design tells, and keeps approved sections as records and kept designs as self-contained pages with rebuild prompts.
+  - **`VISUAL.md`** gains color that arrives at runtime: ground-referenced contrast, `light-dark()`, intensity ramps as washes over transparent, one-property variants, and stable entity colors. **`LAYOUT.md`** gains five CSS layout traps. **`SYSTEMS.md`** gains a spec shape that works with no other context.
+  - **Sources removed.** `SOURCES.md` is deleted, and named authors, studies, statistics and project anecdotes are stripped from every file, so each rule states itself. The one live rule in `SOURCES.md`, keeping WCAG 2 contrast over APCA, moved into `VISUAL.md`. Three gotchas that only restated body rules are gone, which keeps SKILL.md under its token cap.
+
 ## [10.6.0] - 2026-10-02
 
 The eval-tooling release. **`eval/run_eval.py`** measures any skill's trigger rate from its EVAL.md in fresh headless sessions. It tests the repo's description even when an installed copy has drifted, and `--ref` makes a control run against an older one. Its first use measured **`ui-ux-design`** 2.3.0 against a Next.js fixture: negatives 15/15, positives no worse than 2.2.0 under the same harness. No skill versions change. 16 skills.

@@ -1,6 +1,6 @@
 # Deceptive patterns and the persuasion boundary
 
-Load when a request is about conversion, signups, retention, engagement, or pricing presentation — or when reviewing an interface for manipulation. The catalogue is Harry Brignull's (https://www.deceptive.design/), which indexes 60 enforcement actions behind these patterns; the largest single fine to date is $245M.
+Load when a request is about conversion, signups, retention, engagement, or pricing presentation — or when reviewing an interface for manipulation. Every pattern below has been the subject of regulatory enforcement.
 
 ## When a request implies a deceptive pattern
 
@@ -23,7 +23,7 @@ These four arrive by way of ordinary engineering instincts, not bad intent. They
 | **Preselection** — 14 enforcement cases | A helpful default: newsletter opt-in, recurring billing, or data sharing pre-ticked | Require an active choice. Nothing consequential is checked on load |
 | **Hidden costs** — 10 enforcement cases | Progressive disclosure: shipping, tax, and fees revealed at checkout | Final price on the listing. Itemize fees before the user has invested time |
 | **Nagging** — 14 documented cases | Retrying a dismissed prompt, because the answer might change | A dismissal that sticks. "Not now" without a permanent "no" *is* the pattern |
-| **Addictive design** — 11+ apps catalogued | Engagement best practice: streaks, infinite scroll, variable rewards, loss-framed notifications | Design an exit. Growth.Design's own Duolingo teardown found a clear stopping point after a daily goal *improved* long-term retention |
+| **Addictive design** — 11+ apps catalogued | Engagement best practice: streaks, infinite scroll, variable rewards, loss-framed notifications | Design an exit. A clear stopping point after a daily goal can *improve* long-term retention |
 
 That last row is the useful one to hold onto: the honest alternative was also the better-performing one. "Ethical" and "converts worse" are not synonyms, and assuming they are is how the tradeoff gets skipped.
 
@@ -62,7 +62,7 @@ State this rather than implying a settled rule, because the sources do not agree
 - ❌ Satisfying a conversion request with a catalogued pattern because it was the shortest path
   ✅ Name the pattern, price the honest alternative, let the user decide
 - ❌ Treating "it's industry standard" as settling the question
-  ✅ Standard practice and defensible practice are different claims — Baymard finds 67% of benchmarked mobile navigation scores mediocre or worse, so the field is not a baseline worth copying
+  ✅ Standard practice and defensible practice are different claims — what most sites do is not a baseline worth copying
 - ❌ A "Not now" button with no permanent decline
   ✅ One dismissal that persists
 - ❌ Fees appearing for the first time at checkout
