@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "[start|save|resume|verify|recover]"
 metadata:
   author: Antonin Januska
-  version: "6.3.0"
+  version: "6.4.0"
 ---
 
 # Session Progress
@@ -31,6 +31,13 @@ status: in-progress           # in-progress | paused | completed | blocked
 
 # Session Progress
 
+## Bench note
+
+- **Did:** <what got finished, in plain words>
+- **Next:** <what happens next, in plain words>
+- **Needs you:** <a question or decision waiting on the user; drop the line if none>
+- **Acted on:** n_ab12c, <a few words on what was done; only when a note id was given>
+
 ## Plan
 
 - [ ] <!-- id:t_a1b2c dep:none --> Task: description
@@ -54,7 +61,17 @@ Next: <specific next action — name files and functions, not "fix the bug">
 - <!-- ref:t_d3e4f at:YYYY-MM-DDTHH:MM:SS-TZ --> What was done
 ```
 
-`## Plan` and `## Current Status` are load-bearing; `## Decisions`, `## Failed Attempts`, and `## Completed Work` are optional — add them when there's something real to record.
+`## Plan` and `## Current Status` are load-bearing; `## Bench note` is expected, and `## Decisions`, `## Failed Attempts`, and `## Completed Work` are optional — add them when there's something real to record.
+
+### Bench note
+
+The Bench note is a short status for the person running the agents, written the way you'd tell a colleague where things stand. It has no task ids, no file paths and no jargon the reader would have to look up; that detail belongs in `## Current Status`, which is written for the next agent. cc-dash reads it from its heading, wherever it sits in the file.
+
+- **`Did`** and **`Next`**: one sentence each.
+- **`Needs you`**: a question or decision that is waiting on the user. Leave the line out when nothing is.
+- **`Acted on`**: when the user's prompt or a note carries an id like `n_ab12c`, record it once you have acted on it: the id, a comma, then a few words on what you did. One line per note. Write it only for ids you were given and have acted on, because cc-dash takes the line as proof and never guesses.
+
+Rewrite the section, don't append to it, at every checkpoint and save and before you end the session or stop to ask the user something. Carry earlier `Acted on` lines forward within the session. Keep it to about four lines, each a sentence; a note that needs scrolling is a second Current Status.
 
 **Length:** one line per task; Decisions and Failed Attempts get 1–2 sentences each. The file is a state record, not a narrative — no filler sections, no restated summaries, no recap of work already listed under Completed Work.
 
@@ -79,7 +96,7 @@ The discriminator is unrecorded work in the current conversation, not how finish
 
 ### Start mode
 
-Derive `project:` from the repo (folder name, `package.json`, `pyproject.toml`) rather than inheriting it from a file you're about to overwrite. Stamp `started` and `last_updated` from the clock (see Checkpoint), set `status: in-progress`, and write at least `## Plan` and `## Current Status`.
+Derive `project:` from the repo (folder name, `package.json`, `pyproject.toml`) rather than inheriting it from a file you're about to overwrite. Stamp `started` and `last_updated` from the clock (see Checkpoint), set `status: in-progress`, and write at least `## Plan`, `## Current Status` and `## Bench note`.
 
 If a `SESSION_PROGRESS.md` already exists, read it, then check whether git tracks it — that determines whether replacing it is reversible:
 
@@ -93,7 +110,7 @@ git ls-files --error-unmatch SESSION_PROGRESS.md   # exit 0 = tracked; non-zero 
 
 ### Checkpoint (bare invocation) and Save
 
-Both write the current state into the file: tick completed tasks, update `## Current Status`, append decisions and failed attempts, re-stamp `last_updated`. The only difference is what happens next — a bare `/track-session` checkpoints and **keeps working**, while `/track-session save` checkpoints and **stops**.
+Both write the current state into the file: tick completed tasks, update `## Current Status`, rewrite `## Bench note`, append decisions and failed attempts, re-stamp `last_updated`. The only difference is what happens next — a bare `/track-session` checkpoints and **keeps working**, while `/track-session save` checkpoints and **stops**.
 
 Take every timestamp from the clock rather than estimating it, because a guessed stamp drifts by hours and the dashboard's staleness view trusts it:
 
@@ -166,6 +183,26 @@ Then I'll check the git log and look through the auth directory...
 - Redis didn't work, trying something else
 ```
 
+✅ A Bench note the user can read in ten seconds:
+
+```markdown
+## Bench note
+
+- **Did:** Landed the forest and sand vistas.
+- **Next:** Town vistas, then stop for review.
+- **Needs you:** Dusk or noon light for the town?
+- **Acted on:** n_ab12c, stopped after sand as asked.
+```
+
+❌ A Bench note written for the agent, or one that can't be matched:
+
+```markdown
+## Bench note
+
+- **Did:** t_a1b2c done, patched src/scene/vista.ts L40-88, tests green
+- **Acted on:** stopped after sand as asked
+```
+
 ✅ Every good version names the file, the id, and the reason; every weak one makes the reader rebuild context from scratch.
 
 ## Gotchas
@@ -176,7 +213,8 @@ Then I'll check the git log and look through the auth directory...
 - **Re-stamp `last_updated` on every write.** The dashboard's staleness view keys off it, so a checkpoint that skips the stamp makes active work look abandoned.
 - **`save` stops work.** Users who type it mid-flow expecting a checkpoint then wonder why you halted; a bare `/track-session` is the one that checkpoints and continues.
 - **`save` with subagents still running doesn't stop them.** Their results arrive after you've said you stopped. Name each in-flight agent and what it's doing under `## Current Status`, and tell the user results will still land, so the next session knows to look for them.
-- **Other headings are kept but not shown.** cc-dash displays Plan, Current Status, Decisions, Failed Attempts, Completed Work and Verification Results; a `## Notes` section survives on disk but never reaches the dashboard. Put a finding that should outlive the session on the linked roadmap item as a quoted note (see track-roadmap) rather than in an invented section.
+- **A Bench note line cc-dash can't read is dropped with a warning; the rest still counts.** Keep the labels exact (`Did`, `Next`, `Needs you`, `Acted on`) and start every `Acted on` with a lowercase `n_` id of five characters. Two Bench note sections mean only the first is read, so rewrite in place.
+- **Other headings are kept but not shown.** cc-dash reads Plan, Current Status, Bench note, Decisions, Failed Attempts and Completed Work, and displays Verification Results; a `## Notes` section survives on disk but never reaches the dashboard. Put a finding that should outlive the session on the linked roadmap item as a quoted note (see track-roadmap) rather than in an invented section.
 - **One file per repo, at the root.** Work in a subdirectory (a `godot/` or `web/` folder) still checkpoints to the root file; a second `SESSION_PROGRESS.md` deeper in the tree splits the record and the dashboard reads only one.
 - **Write the file with Edit or Write, not a Bash heredoc or `sed -i`.** `recover` rebuilds the file by replaying Edit and Write calls from the transcript, so an update made through Bash is invisible to it.
 - **Recovery rarely finds a clean blob.** Because updates are incremental `Edit`s, the transcript usually holds no full `Write` — expect to replay edits over the latest snapshot rather than lifting one copy out.

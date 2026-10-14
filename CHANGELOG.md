@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **track-session** (6.3.0 → 6.4.0): adds the **Bench note**, an optional `## Bench note` section of `SESSION_PROGRESS.md` (`cc-dash/session@1`, additive). It is a plain-language status for the person running the agents: `Did`, `Next`, an optional `Needs you`, and `Acted on: n_xxxxx, <words>` lines that record a note id once the agent has acted on it. The skill says to rewrite it at every checkpoint, save and session end, and the file template now includes it. The description is unchanged, so `EVAL.md` is too.
 - **ui-ux-design** (2.3.0 → 2.4.0): rules from a public UI pattern library and page-design library, reviewed and approved one proposal at a time.
   - **SKILL.md** gains one information-architecture rule: every aggregate (a month bar, a heatmap day, a status count) links to the rows behind it, and counts that double as filters come from the unfiltered set. With no project library to read, the Navigation section points at the two public libraries.
   - **`COMPONENTS.md`** gains a Data display section (disputed figures with their working, numbers on a reference scale, multi-outcome progress, mark sequences, state grids, lookup matrices, multi-source dashboard cards), four list-surface rows (section rail, markers on an image, a select across kinds, toggles that drive a list), per-card controls as siblings of the link, and rules for text over images in any style, of which translucent panels are one option.
