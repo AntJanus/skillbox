@@ -21,7 +21,7 @@ Load when applying type, color, or images inside an interface, retuning a palett
 - **Saturation carries accidental meaning.** A fully saturated red reads as an alert whether or not you meant one. Adjust saturation and value rather than switching hue — but not so far that it fails contrast.
 - **Per-hue dosage rules**, distinct from what a hue *means*: red sparingly, or everything feels urgent · orange with restraint, or the product reads as unserious · purple lightly · large fields of black read heavy · brown needs a complement or it goes drab. **Yellow is disqualified as a text color** — put it on a dark background, use it as an accent, or use it as a fill behind dark text.
 - **A four-hue palette needs neutrals to hold it down**, or it overwhelms.
-- **Contrast is a ratio of relative luminance**, `(L1 + 0.05) / (L2 + 0.05)` — not "one color is 4.5× lighter". Thresholds are 4.5:1 for normal text, 3:1 for large text and UI components. These are still current in 2026 — see the currency note in [SOURCES.md](SOURCES.md) before reaching for APCA.
+- **Contrast is a ratio of relative luminance**, `(L1 + 0.05) / (L2 + 0.05)` — not "one color is 4.5× lighter". Thresholds are 4.5:1 for normal text, 3:1 for large text and UI components. They are still the standard: don't replace them with APCA, which was dropped from the WCAG 3 draft, and WCAG 3 contrast is unsettled.
 - Colors shift across displays and ambient light. Check on more than the machine it was designed on.
 - **User state can outrank brand palette.** For products used under distress, muted and darker palettes outperform bright cheerful ones — users read cheerfulness as dismissal of what they're dealing with. One of the few cases where a palette's emotional register is a functional requirement rather than brand expression.
 
@@ -51,6 +51,15 @@ Load when applying type, color, or images inside an interface, retuning a palett
 **Colors sampled from images get pulled toward the brand before they're used.** Per-image accent colors — a tint from each post's cover, a glow from each album — drift off-brand on whatever image is most saturated. In order: move each hue toward the brand band with a capped pull, send near-gray swatches to the brand hue outright, cap the chroma, and clamp lightness last, so text on the result still passes 4.5:1. Extract at build time, not in the browser, since an image CDN that blocks canvas reads leaves the runtime version with nothing.
 
 **A palette retune is finished when a scanner says so.** Changing the main tokens leaves the old hue in hard-coded values: glows, gradients, SVG fills, focus rings, shadows. Scan the source for the banned hue range in every color syntax (hex, `rgb`, `hsl`, `oklch`) and rerun until it reports zero. Tell retinted sections apart by lightness and chroma within the allowed band rather than by reintroducing hue, and recheck contrast on everything that changed.
+
+## Color that arrives at runtime
+
+- **Solve contrast against the page's ground token, not white or black.** Themed grounds are tints, and solving against pure white undershoots. Precompute the light and dark answers and ship `color: light-dark(a, b)`.
+- **`light-dark()` follows the used `color-scheme`.** A later `color-scheme: light dark` declaration hands the choice back to the OS, so a page forced to dark renders the light branches. Leave a comment where that declaration would go.
+- **Intensity ramps are washes over transparent,** `color-mix(in srgb, var(--accent) 34%, transparent)`, so each step reads correctly on the ground and on every panel. Level 0 is a neutral wash (about 22% of the dim token), not the palest accent, or "none" and "a little" merge. Mixing into one ground token instead makes level 0 vanish on any panel that isn't that ground.
+- **One custom property per variant family.** A base rule derives border, fill and dot from `--tone` at fixed strengths, and each variant sets only `--tone`, pointed at a semantic token. Text stays at ink. A closed set gets a class per variant; an open set (people, projects) gets `[data-tone]` with a neutral fallback.
+- **An entity keeps its color.** Assign the slot from a stable id, never a list position, or people change color when the table sorts. Past the palette, hash the id to a hue and pin lightness and chroma in OKLCH: `oklch(50% 0.12 h)` clears 4.5:1 for white initials at every hue, while HSL at a fixed lightness fails on many hues, yellows worst.
+- **Edges and pressed states mix toward the ink token, not black.** Ink is dark in light mode and light in dark mode, so one expression gives a shadow in one theme and a lit bezel in the other.
 
 ## Images
 

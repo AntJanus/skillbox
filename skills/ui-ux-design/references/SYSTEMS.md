@@ -34,9 +34,9 @@ Three tiers:
 
 ## Component tiers and how much may change
 
-**Atomic Design's vocabulary** (Frost, 2013) is still the shared language most systems use: **atoms** (HTML primitives and abstract values — a label, an input, a color), **molecules** (a few atoms bonded into something that does one job — label + input + button = a search form), **organisms** (distinct interface sections — a masthead, a product grid), **templates** (organisms arranged, showing structure), **pages** (templates filled with real content).
+**Atomic Design's vocabulary** is still the shared language most systems use: **atoms** (HTML primitives and abstract values — a label, an input, a color), **molecules** (a few atoms bonded into something that does one job — label + input + button = a search form), **organisms** (distinct interface sections — a masthead, a product grid), **templates** (organisms arranged, showing structure), **pages** (templates filled with real content).
 
-The tier that earns its place is the last one. **Templates-to-pages exists specifically to expose variation** — text lengths, data volumes, missing values — which is the same job as "break it with real data" in SKILL.md, with a name and a citation. A component-only model has nowhere for that step to happen.
+The tier that earns its place is the last one. **Templates-to-pages exists specifically to expose variation** — text lengths, data volumes, missing values — which is the same job as "break it with real data" in SKILL.md, with a name. A component-only model has nowhere for that step to happen.
 
 **State how much each component may be changed**, because a token hierarchy answers what values exist and not who may deviate:
 
@@ -58,18 +58,9 @@ The consumer of a design system is now often an agent, and an agent fills gaps b
 
 A side effect worth expecting: writing the spec files surfaces undocumented decisions that were never actually agreed.
 
-## Systems worth reading before building your own
+## What holds up
 
-| System | Notable for |
-|---|---|
-| Material Design 3 | Dynamic color adapting to user preference; the most complete public spec |
-| IBM Carbon | Documents design *and* front-end code together, with strong accessibility standards |
-| Shopify Polaris | Content and voice guidelines alongside the components |
-| Atlassian | Cross-product consistency across separately branded products |
-| Apple HIG | The definitive reference for Apple platforms |
-| Uber Base | One framework under services with distinct user-facing identities |
-
-The pattern to copy: the systems that hold up ship **content guidelines and accessibility standards as part of the system**, not as a separate document nobody opens.
+Ship **content guidelines and accessibility standards as part of the system**, not as a separate document nobody opens.
 
 ## Handoff
 
@@ -87,6 +78,7 @@ What an implementer should actually receive: component properties and variants, 
 Rules that hold regardless of tooling:
 
 - **Automation is not documentation.** Generated specs remove the back-and-forth on measurements; they capture nothing about intent. Intent still has to be written down somewhere findable.
+- **Write a component spec so it works with no other context:** what to build in the first sentence; when to reach for it, naming real surfaces, and when to walk away; each load-bearing rule as a bold lead sentence followed by the failure it prevents; the accessibility specifics; and a closing line on theme tokens. A spec that says only what to build gets rebuilt without the rule that made it work.
 - **Structure precedes automation.** Inconsistent naming produces inconsistently generated output. Fix the naming first.
 - **Mappings rot.** What was accurate six months ago may not describe production now; treat the mapping as maintained, not configured once.
 - **Validate before handing off**, so nobody implements a design that hasn't survived its own edge cases.

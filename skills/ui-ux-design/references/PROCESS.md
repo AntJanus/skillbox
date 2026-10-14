@@ -29,7 +29,7 @@ They fail differently and are not substitutes.
 
 **Usability testing** asks *can a person do this?* It needs users.
 
-- **3–5 participants per group.** Five find roughly 85% of usability problems. Run several small batches rather than one large study.
+- **3–5 participants per group.** Five surface most of the problems. Run several small batches rather than one large study.
 - Seven steps: define the goal and audience → set evaluation criteria *before* testing → recruit → write the script (intro, consent, tasks, follow-up) → **run a pilot** to check the script and tooling → analyze → iterate.
 - Four question types: background, task-based (neutral, outcome-worded, never leading), follow-up (the "why" when behavior surprises you), reflection.
 - Measure: task completion rate, time on task, error rate, clicks to completion, drop-off point. SUS scores read as 80+ excellent, 68–79 above average, 60–68 average, 50–60 okay, below 50 poor.

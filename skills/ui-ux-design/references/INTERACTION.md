@@ -62,11 +62,11 @@ Four thresholds, and they don't conflict — each measures something different:
 | Budget | Governs | What the UI owes |
 |---|---|---|
 | **100ms** | Perceived instantaneity | Nothing. Render the result |
-| **400ms** | Sustained productivity on a repeated action (Doherty, IBM 1982) | Stay under it for anything in an inner loop |
+| **400ms** | Sustained productivity on a repeated action | Stay under it for anything in an inner loop |
 | **1s** | Thought flow | Optional subtle feedback — the delay registers without breaking concentration |
 | **10s** | Attention | Progress indicator *and* a cancel affordance; assume the user leaves and returns |
 
-Nielsen's 0.1/1/10 figures predate mobile networks and have no constrained-connection variant. Treat them as floors, not as targets measured on a phone over cellular.
+The 0.1/1/10 figures predate mobile networks and have no constrained-connection variant. Treat them as floors, not as targets measured on a phone over cellular.
 
 ## Route states in full
 
@@ -84,6 +84,8 @@ The contract behind the four-states table in SKILL.md, for every route that read
   | Never had any | What this list will hold | Create the first one |
 
   Collapsing these into one "No items yet" sends the person with forty trashed items to a create button.
+
+  The sentence under the headline adds something the headline didn't, such as what the import does first or where items come from, rather than repeating "nothing here". Give each state exactly one action, or none when there is genuinely nothing to do (the queue is clear). If there's art, it's inline SVG stroked in `currentColor` with `aria-hidden="true"` and `focusable="false"`, one stroke weight across the whole set, so it themes for free and announces nothing.
 - **Error** — log it, name what failed in the user's words, show an error id they can quote, and offer both a retry and a way out (up to the list, or home). Say whether their data is unchanged when that's true; it's the first thing a person fears after a failure.
 - **Root-level failure** — the outermost error page must not depend on the theme, providers, or data layer that may be what failed. Make it self-contained, with inline styles and no shared components.
 - **Not found** — on a detail route, name what wasn't found ("No document with that id") and link to its list. A generic 404 on a record route reads as a broken app.
@@ -125,6 +127,14 @@ Keep a confirm dialog only for a delete that is final when it runs. A dialog in 
 - **Name the thing on the button** — "Delete Moonlight Sessions", not "Delete". Errors stay on the dialog.
 - **Delete sits in the same corner of every edit form**, so nobody hunts for it and nobody hits it by habit where Save usually is.
 
+### Bulk operations and review queues
+
+- **Preview a bulk operation before writing anything.** Show the destinations as a tree: what each holds now, what it would hold, and arrivals and departures as separate figures, because a net zero hides a move. Status rolls up, so a parent reads unchanged only when every child does. Warn about the shape of the result ("this folder would hold 4,000 files") while the plan can still change. A `role="status"` summary says plainly that nothing has been written. Approve and Discard sit together at the end.
+- **A review deck snapshots its batch when it opens.** Each action shortens the live list, so a deck that indexes it skips every other card. Address the frozen copy by position; a position equal to the length means done, and it can live in the URL.
+- **Advance only on success.** A failed action shows inline and leaves the card where it was.
+- **Skip writes nothing.** The card comes back next batch. A skip recorded as a decision makes fast review unsafe.
+- **When choosing one candidate deletes the other, the confirmation says so in words**, "Keep A, delete B", never inferred from which side was clicked.
+
 ## Long-running work
 
 - **Report states you actually know, never an invented percentage.** An upload is waiting, uploading, stored, already stored, or failed. A job with an unknown total gets an indeterminate bar plus a running count. A made-up percentage that stalls at 90% is worse than none.
@@ -136,7 +146,7 @@ Keep a confirm dialog only for a delete that is final when it runs. A dialog in 
 
 ## Error messages
 
-Six checks, condensed from Nielsen Norman Group's 2023 twelve-item rubric. The first and the fourth are the ones that get skipped.
+Six checks. The first and the fourth are the ones that get skipped.
 
 1. **Name the exact problem.** "An error occurred" and "Invalid input" fail this. The message says which value, and what about it.
 2. **Put it next to its cause**, not in a summary at the top.
@@ -151,7 +161,7 @@ Don't validate prematurely — real-time feedback earns its place on error-prone
 
 ## Where controls go
 
-**The three laws of locality** (Kennedy). Users expect a control where its effect happens, so placement is a signal, not a layout preference:
+**The three laws of locality.** Users expect a control where its effect happens, so placement is a signal, not a layout preference:
 
 - Put a control **where it takes effect**.
 - A control governing a **larger region sits above that region** — recursive from app-level, to page-level, to section-level.
@@ -159,7 +169,7 @@ Don't validate prematurely — real-time feedback earns its place on error-prone
 
 ## Depth and shadow
 
-Hobday's geometry, which is checkable rather than a matter of taste:
+Geometry that is checkable rather than a matter of taste:
 
 - **Blur = 2× the distance value.** A 4px offset takes an 8px blur.
 - **Reduce opacity as the shadow approaches the light source.**
@@ -173,6 +183,11 @@ Hobday's geometry, which is checkable rather than a matter of taste:
 - Animation has a load cost. Scroll-driven animation and view transitions have native APIs now; prefer them over scripted equivalents, which also gets you the accessibility behavior for free.
 - Respect `prefers-reduced-motion`.
 - **Budgets beyond a single control**, so "feels slow" becomes a number in the spec: UI state changes 150–250ms, page transitions 250–400ms, scroll reveals 300–450ms with no long staggers, a load animation under about 1.5s that plays once, and any ambient loop paused while the tab is hidden.
+- **Animating between views is an option, not a default.** Many good interfaces cut straight to the new view. When a design does animate the change:
+  - **Direction carries meaning.** Forward enters from the right, back from the left. One direction for both makes Back feel like a step forward.
+  - **When the old view is already gone** (a server page swap, a re-rendered step), snap the new view to its entry transform and release it: transitions off, set the transform, read a layout property to force a flush, transitions on, clear the transform. Skip the read and nothing moves. Run it before paint, in a layout effect, or the content flashes in its final place first.
+  - **A second input replaces the running animation.** Four presses of Next land on the fourth item; they don't queue four animations.
+  - **Under reduced motion, keep the change and drop the movement.** A card flip becomes an instant reveal; the reveal is the function.
 - **Content is visible at rest.** A reveal enhances a section that already renders; it never holds one at opacity 0 waiting for an observer that may not fire — in a screenshot, a print, or a slow device.
 
 ## UX laws that change code decisions
@@ -206,7 +221,7 @@ Hobday's geometry, which is checkable rather than a matter of taste:
 
 - Inline validation beats a submit-time error list. Say what's wrong next to the thing that's wrong.
 - **A disabled submit button is the most common form dead-end**, and a natively disabled one is worse than it looks: the user can't focus it to find out why. Enable it and validate on submit, or use `aria-disabled` with the missing requirement stated next to it.
-- **Prevent the error rather than message it.** Nielsen's fifth heuristic is to eliminate error-prone conditions, or check for them and confirm before the user commits — constraints, good defaults, and a confirmation step outrank any error copy. Make the invalid state unreachable, which is not the same as making the button unclickable.
+- **Prevent the error rather than message it.** Eliminate error-prone conditions, or check for them and confirm before the user commits — constraints, good defaults, and a confirmation step outrank any error copy. Make the invalid state unreachable, which is not the same as making the button unclickable.
 - Real-world input breaks forms first: long names, non-Latin characters, pasted values with whitespace, autofill.
 - Label every field visibly. A placeholder is not a label — it vanishes exactly when the user needs it.
 
@@ -239,3 +254,4 @@ Hobday's geometry, which is checkable rather than a matter of taste:
 - **Symptom:** Clicking a tab or button right after page load does nothing, intermittently. **Cause:** The server-rendered control was clickable before its handler hydrated. **Fix:** Render it `aria-disabled` until hydration completes.
 - **Symptom:** An optimistic edit stays on screen after the save failed. **Cause:** Rollback was wired to thrown errors only, and the action returned an error result instead. **Fix:** Roll back on both.
 - **Symptom:** Visual-regression screenshots show whole sections blank. **Cause:** Scroll-reveal content sits at opacity 0 until it enters the viewport, which a full-page capture never scrolls. **Fix:** Capture with reduced motion on, and make content visible at rest — reveals enhance an already-visible section.
+- **Symptom:** After the first approval, the review deck skips every other item. **Cause:** It indexes the live list, which shrinks on revalidation. **Fix:** Snapshot the batch at mount.

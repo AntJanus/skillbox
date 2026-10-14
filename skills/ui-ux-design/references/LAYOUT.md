@@ -5,7 +5,7 @@ Load when setting up a grid, deciding responsive behavior, or building a page wh
 ## Grid
 
 - **Pick a base unit of 8px and express it in rem** (`0.5rem`), with 4px available for fine adjustment. Every size, gap, and padding is a multiple. Pixel-locked spacing breaks when a user zooms.
-- **Baseline *alignment* is not achievable on the web; baseline *multiples* are still mandatory.** Sub-pixel rendering, webfont loading shifts, and variable content heights defeat pixel-perfect snapping — Rutter calls it not worth the cost. What survives from print is the arithmetic: every vertical measurement is a multiple of the base leading unit. Body at 16px with `line-height: 1.5` sets a 24px unit — so paragraph margins are `1.5em`, and a 20px heading takes `line-height: 1.2` to land back on 24px. Choosing the leading is judgment; everything downstream of it is mechanical.
+- **Baseline *alignment* is not achievable on the web; baseline *multiples* are still mandatory.** Sub-pixel rendering, webfont loading shifts, and variable content heights defeat pixel-perfect snapping, and it isn't worth the cost. What survives from print is the arithmetic: every vertical measurement is a multiple of the base leading unit. Body at 16px with `line-height: 1.5` sets a 24px unit — so paragraph margins are `1.5em`, and a 20px heading takes `line-height: 1.2` to land back on 24px. Choosing the leading is judgment; everything downstream of it is mechanical.
 - **Soft grids over hard grids** for columns. A consistent base unit, loosely held, is the digital default. Pixel perfection is not the goal — vertical rhythm is the exception, per the rule above.
 - **Columns: 2–12, and three is the sweet spot** for content laid side by side. The 12-column reflex is a container for column *spans*, not a mandate to use twelve visible tracks.
 - **Gutter width is a grouping signal.** Two cards a half-gutter apart read as one unit; that's Gestalt proximity doing the work, so set gutters deliberately.
@@ -25,7 +25,7 @@ Numbers rather than judgment, so they can be checked against a built screen:
 
 ## Build order
 
-The order to *construct* a page, distinct from the emphasis order used within a section. Thomas's sequence, which front-loads reading and defers identity:
+The order to *construct* a page, distinct from the emphasis order used within a section. This sequence front-loads reading and defers identity:
 
 **content → measure → typeface → spacing → contrast → primary color → secondary colors → webfont → imagery.**
 
@@ -49,9 +49,17 @@ img, video { max-width: 100%; height: auto; }
 
 - Prefer intrinsic sizing (`auto-fit`, `minmax`, `clamp`) over a ladder of breakpoints. Add a breakpoint when the layout actually breaks, not at a number someone published.
 - **Navigation simplifies as the viewport shrinks** — a full menu becomes a hamburger, an accordion, or tabs. Collapse or hide secondary navigation before it compromises the primary content.
-- **Don't put content sections behind horizontal tabs on a detail page.** Baymard finds users miss what's inside them; expanded sections on desktop and accordions on mobile test better. Scope matters — this is about tabs hiding *content on a single record's page*, not about tabs as a navigation pattern, which remain fine.
+- **Don't put content sections behind horizontal tabs on a detail page.** Users miss what's inside them; expanded sections on desktop and accordions on mobile test better. Scope matters — this is about tabs hiding *content on a single record's page*, not about tabs as a navigation pattern, which remain fine.
 - Test at 200% zoom, not just at narrow widths. They fail differently.
 - Hover-triggered tooltips need a tap-triggered equivalent, or the content is unreachable on touch.
+
+## Layout traps
+
+- **`minmax(0, 1fr)` in any fixed-height grid.** A bare `1fr` keeps a `min-content` floor, so a real photo pushes the track past the container and over the caption.
+- **CSS columns only when order means nothing.** `columns: 3 13rem` with `break-inside: avoid` reflows with no breakpoints, but reading and tab order run down each column, so a ranked list reads 1, 2, 3 down the left. Space stacked cards with their own margin; `column-gap` is horizontal only.
+- **Hairline separators come from a 1px grid gap** over a border-colored container, with each tile painting the surface. Pin column counts to divisors of the tile count (four tiles: 4 → 2 → 1), because `auto-fit` leaves empty cells that paint as solid blocks.
+- **Buttons in a wrapping row take `flex: 1 0 auto; min-width: fit-content`,** not `flex: 1`, which zeroes the basis and clips the longest label.
+- **Container queries over viewport queries** for any component that renders at more than one width on a page: a sidebar, a card column, a split pane.
 
 ## Where the eye goes
 
