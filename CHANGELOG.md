@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [10.7.0] - 2026-10-20
+
+**`track-session`** (6.4.0) adds the Bench note, a plain-language status in `SESSION_PROGRESS.md` for the person running the agents, rewritten at every checkpoint. **`ui-ux-design`** (2.4.0) takes in rules from a public UI pattern library and page-design library, adds a Data display section, and removes its source citations so each rule stands on its own. 16 skills.
+
 ### Changed
 
 - **track-session** (6.3.0 → 6.4.0): adds the **Bench note**, an optional `## Bench note` section of `SESSION_PROGRESS.md` (`cc-dash/session@1`, additive). It is a plain-language status for the person running the agents: `Did`, `Next`, an optional `Needs you`, and `Acted on: n_xxxxx, <words>` lines that record a note id once the agent has acted on it. The skill says to rewrite it at every checkpoint, save and session end, and the file template now includes it. The description is unchanged, so `EVAL.md` is too.
