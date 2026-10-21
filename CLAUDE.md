@@ -13,7 +13,7 @@ SkillBox is a collection of utility skills for Claude Code and AI agents. Each s
 
 | | |
 |---|---|
-| Current release | **v10.7.0** (2026-10-20) |
+| Current release | **v10.8.0** (2026-10-21) |
 | Skills | **16** (see roster below) |
 | Install | `npx skills add antjanus/skillbox` |
 | Compatible with | Claude Code, Cursor, Cline, GitHub Copilot, and 40+ agents via [Vercel Skills](https://skills.sh) |
