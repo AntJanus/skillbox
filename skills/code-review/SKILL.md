@@ -6,7 +6,7 @@ argument-hint: "[path | --staged | --branch <base> | --repo [--blueprint <skill>
 allowed-tools: Read, Write, Glob, Grep, Bash, Agent
 metadata:
   author: Antonin Januska
-  version: "2.4.3"
+  version: "2.5.0"
 ---
 
 # Code Review — Multi-Agent Local Review
@@ -15,7 +15,7 @@ metadata:
 
 Runs narrow-lane reviewer agents in parallel, then a verifier that keeps only findings with real impact, distills the "fix first" shortlist, and suppresses the nit tail — merged into `REVIEW.md` at the repo root. **Core principle:** a review is worth reading when it finds *wrong answers*, not style. The lanes are aimed at correctness and structural soundness; the verifier defaults low-impact findings to DROP so the signal isn't buried. The skill scopes, dispatches, and renders — the reviewers and verifier judge.
 
-**Not for:** trivial one-line or doc-only changes — five lanes cost more than they can find there. Pass `model: "sonnet"` on every lane and verifier call unless the user names a model.
+**Light path.** A doc-only diff (prose and comments, no code, config or dependency change) dispatches no lanes; REVIEW.md says `**Lanes:** none — doc-only` and `**Verifier:** not run`. A change too small for architecture and testing to judge — a one-line fix, a config value, a dependency bump — dispatches the correctness lane and the verifier, headed `**Lanes:** correctness (light path)`, because a one-line regex behind an alert or a version bump for a CVE still needs a traced input. Anything that adds a branch, a function or a file gets every lane. Pass `model: "sonnet"` on every lane and verifier call unless the user names a model.
 
 ## Modes & flags
 
@@ -49,22 +49,26 @@ Parse flags first. Resolve files to review, in priority order: `--repo` (all sou
 
 **Filter out** binary/image assets, generated files, build/dependency/venv output. **Do NOT filter** lockfiles, package manifests, env templates, or project docs — `hygiene` needs them. **Detect UI scope:** if the file list includes components/templates/styles/design-token files, include the **ui-ux** lane; otherwise skip it.
 
+**Pin the repo root.** Resolve `git rev-parse --show-toplevel` of the tree under review to an absolute path and put it, inside the [shared preamble](./reference/AGENTS.md#shared-preamble), at the top of every lane and verifier prompt — Gotchas explains why.
+
 Dispatch only once you hold a concrete file list **and** the diff text (for `--repo`, the "diff" is the full current content of the in-scope files), because reviewer subagents start with no conversation context and can read nothing you didn't pass them. Report scope to the user first ("Reviewing N files: …"). If scope is empty in a diff mode, stop rather than inventing work. (`--repo` is never empty; that's its purpose.)
 
 ## Phase 2: Parallel dispatch
 
-**Send the reviewer Agent calls in a single message** so they run concurrently; `subagent_type: Explore` for all (read-only). Always dispatch **correctness, architecture, testing, hygiene**; add **ui-ux** only if UI scope was detected. Each prompt includes the file list + diff, the lane and what to ignore, the output format, and demands `file:line` specificity. Use the exact skeletons in [reference/AGENTS.md](./reference/AGENTS.md). When `--blueprint <skill>` is set, load that skill and pass its name/rules into the architecture and ui-ux prompts.
+**Send the reviewer Agent calls in a single message** so they run concurrently; `subagent_type: general-purpose` for all, kept read-only by the shared preamble. Explore reads excerpts to locate code, and a lane has to read whole functions and their callers. Always dispatch **correctness, architecture, testing, hygiene**; add **ui-ux** only if UI scope was detected. Each prompt includes the file list + diff, the lane and what to ignore, the output format, and demands `file:line` specificity. Use the exact skeletons in [reference/AGENTS.md](./reference/AGENTS.md). When `--blueprint <skill>` is set, load that skill and pass its name/rules into the architecture and ui-ux prompts.
 
 ## Phase 2.5: Verification + impact floor
 
-Dispatch **one verifier** (single Agent, `Explore`) with the file list, diff, and merged candidates. Full prompt: [reference/AGENTS.md#verifier](./reference/AGENTS.md). It is a **signal filter**, not just a false-positive filter:
+Dispatch **one verifier** (single Agent, `general-purpose`, shared preamble) with the file list, diff, and merged candidates. Full prompt: [reference/AGENTS.md#verifier](./reference/AGENTS.md). If every lane returned `NO FINDINGS`, skip it: the header says `**Verifier:** skipped — no candidates` and the STRENGTHS block is omitted. The verifier is a **signal filter**, not just a false-positive filter:
 
 - **Evidence:** re-read each finding's cited `file:line`; if the citation is wrong, DROP.
+- **Diff anchor** (diff modes only; `--repo` has no diff): a finding on a line the diff adds or changes stands. A finding on an untouched line stays only when a changed line causes it, labeled `Outside the diff — caused by path:line`; otherwise DROP, counted as off-diff.
 - **Impact floor:** a surviving finding must name a *concrete bad outcome* it prevents (wrong result, data loss, security, real regression, genuine reader-trap). If the worst realistic outcome is cosmetic/stylistic/doc-only/"inconsistent but nothing breaks", it FAILS the floor → routed to the nit bucket (if tagged `[Nit]`) or DROPPED. **When in doubt about impact, DROP.**
 - **Severity** by blast radius is authoritative (replaces the lane's).
+- **Also noted:** up to 3 dropped findings that carry a real but non-blocking consequence (a deploy-order step, a follow-up test worth writing) are held as one line each. A drop that is merely low-impact stays dropped.
 - **STRENGTHS:** the verifier lists 2-4 things the code does right that it *confirmed by reading*, each tied to the file or line where it checked — grounded praise flips the felt tone from nitpicking to reviewing; ungrounded praise reads as filler.
 
-The verifier returns: STRENGTHS, the "what to fix first" distillation (3-6 items), the kept blocking findings at re-rated severities, a NITS section (only if `--nits`), and `Verifier summary: kept N blocking of M; dropped J (W wrong-evidence, L low-impact); H nits held.`
+The verifier returns: STRENGTHS, the "what to fix first" distillation (3-6 items), the kept blocking findings at re-rated severities, ALSO NOTED, a NITS section (only if `--nits`), and `Verifier summary: kept N blocking of M; dropped J (W wrong-evidence, O off-diff, L low-impact); A also noted; H nits held.`
 
 ## Phase 3: Synthesis
 
@@ -72,12 +76,15 @@ The verifier already judged evidence, impact, and priority — synthesis only fo
 
 1. Render **`## What the repo does well`** (the STRENGTHS block) first, if present.
 2. Render **`## What to fix first`** next, each the verifier's one-line `path:line — why it matters`, in order. If it returned `Nothing blocking — only polish remains.`, render that single line.
-3. Group kept findings by **re-rated** severity (Critical → Major → Minor), then by file. Apply the verifier's severity as-is; keep any `Verifier note:`. A `[Secret]` finding always appears (Critical).
-4. **Nits:** only if `--nits` was passed, render a `## Nit` block grouped by file, terse one-liners. Otherwise omit entirely — the summary line still reports how many were held.
-5. Dedupe: if multiple lanes flag the same line, keep the most severe and note the lanes.
-6. **Write to `REVIEW.md` at the repo root** (`git rev-parse --show-toplevel`) with Write, overwriting. Print one chat line: `REVIEW.md written — X Critical, Y Major, Z Minor; H nits held (--nits to show)`.
+3. Group kept findings by **re-rated** severity (Critical → Major → Minor), then by file. Apply the verifier's severity as-is; keep any `Verifier note:` and `Outside the diff` label. A `[Secret]` finding always appears (Critical).
+4. **Also noted:** the verifier's held lines, if any, as `## Also noted` after Minor.
+5. **Nits:** only if `--nits` was passed, render a `## Nit` block grouped by file, terse one-liners. Otherwise omit entirely — the summary line still reports how many were held.
+6. Dedupe: if multiple lanes flag the same line, keep the most severe and note the lanes.
+7. **Write to `REVIEW.md` at the repo root** (`git rev-parse --show-toplevel`) with Write, overwriting. On a direct run, print one chat line: `REVIEW.md written — X Critical, Y Major, Z Minor; H nits held (--nits to show)`.
 
-Always write REVIEW.md even when clean (zeroed header + the STRENGTHS block + `Nothing blocking — only polish remains.`). **Synthesizer scope is structural** — no fresh findings, no re-judging, no dumping the report into chat.
+Always write REVIEW.md even when clean (zeroed header + the STRENGTHS block + `Nothing blocking — only polish remains.`). **Synthesizer scope is structural** — no fresh findings, no re-judging, no dumping the report into chat on a direct run.
+
+**A caller's brief wins on format.** When another agent or a wrapper skill runs the review, return what its brief asks for — that hand-back is the report — and still write REVIEW.md. If the brief names its own severity labels (say Blocking / Should fix / Nit), map Critical, Major and Minor onto them and use them throughout REVIEW.md, the verifier line included, instead of mixing two vocabularies. A caller's stricter rule, such as dropping every off-diff finding, replaces the skill's.
 
 ## Background mode
 
@@ -93,17 +100,21 @@ Always write REVIEW.md even when clean (zeroed header + the STRENGTHS block + `N
 
 ## Output format
 
-`REVIEW.md` at repo root, section order: **header** (`Generated` / `Scope` / `Lanes` / `Verifier: kept N blocking of M; dropped …; H nits held` / `Total`) → **`## What the repo does well`** → **`## What to fix first`** → **`## Critical` → `## Major` → `## Minor`** (blocks: `[lane]` `line` — issue, risk/evidence + fix; re-rated findings carry a `Verifier note:`) → **`## Nit`** (only with `--nits`). Full worked report: **[reference/EXAMPLE-REVIEW.md](./reference/EXAMPLE-REVIEW.md)**.
+`REVIEW.md` at repo root, section order: **header** (`Generated` / `Scope` / `Lanes` / `Verifier: kept N blocking of M; dropped …; H nits held` / `Total`) → **`## What the repo does well`** → **`## What to fix first`** → **`## Critical` → `## Major` → `## Minor`** (blocks: `[lane]` `line` — issue, risk/evidence + fix; re-rated findings carry a `Verifier note:`) → **`## Also noted`** (if any) → **`## Nit`** (only with `--nits`). Full worked report: **[reference/EXAMPLE-REVIEW.md](./reference/EXAMPLE-REVIEW.md)**.
 
 ## Examples
 
 ✅ **Good:** reviewer Agent calls in one message → wait → verifier Agent → write REVIEW.md → chat shows only `REVIEW.md written — 1 Critical, 2 Major, 0 Minor; 5 nits held (--nits to show)`. A good correctness finding is specific: `[correctness] src/allowance.ts:42 — detail page shows $10/wk but accrual pays $5/wk forever (rate-row shadowing); trigger: any item with a weekly rate; fix: read the rate from the accrual row, not the display row`.
 
-❌ **Bad:** reviewers dispatched sequentially; the full report dumped into chat instead of REVIEW.md; a kept finding like "consider renaming this variable" (no concrete bad outcome — should have failed the impact floor); the nit tail shown by default and drowning the two findings that matter.
+❌ **Bad:** reviewers dispatched sequentially; on a direct run, the full report dumped into chat instead of REVIEW.md; a kept finding like "consider renaming this variable" (no concrete bad outcome — should have failed the impact floor); the nit tail shown by default and drowning the two findings that matter.
 
 ✅ **Scope detection, backend-only diff:** no components, styles or token files in the list → ui-ux lane skipped, four lanes dispatched. Empty diff scope → stop and say so rather than widening to `--repo`.
 
 ❌ **Bad:** ui-ux dispatched on a CLI-only diff, then its findings kept because they were technically true.
+
+✅ **Light path, one-line regex fix:** correctness lane and verifier only, header `Lanes: correctness (light path)`.
+
+❌ **Bad:** the same fix gets no agents at all, and REVIEW.md still says `Verifier: kept 0 blocking of 0` — a header claiming a verified pass that never ran.
 
 ✅ **A verifier DROP working correctly:** `[architecture] src/db.ts:88 — differs from the pattern in src/cache.ts`. No stated consequence → fails the impact floor → DROPPED, counted in `dropped J (L low-impact)`.
 
@@ -114,18 +125,21 @@ Always write REVIEW.md even when clean (zeroed header + the STRENGTHS block + `N
 - Every kept finding names a concrete bad outcome; correctness findings name a triggering input.
 - Architecture findings argue from the code's *purpose* (a real consequence), not "a sibling differs."
 - Severities reflect the verifier's impact judgment; low-impact truths are dropped, not demoted-and-kept.
-- REVIEW.md is the deliverable (chat gets one line), overwritten in place.
+- Every cited line is on the diff, or labeled with the changed line that causes it.
+- REVIEW.md is the deliverable (chat gets one line on a direct run), overwritten in place.
 
 ## Gotchas
 
 - **Never pass `name` on a lane dispatch.** Naming an agent makes it a teammate, and a teammate cannot spawn teammates — inside a delegated review the whole batch is rejected with `Teammates cannot spawn other teammates`. It retries and recovers, but it costs a round-trip per lane. The lanes are never addressed by name, so leave the parameter off.
+- **Lanes start in the session's directory, not the tree under review.** When that directory holds other checkouts of the same repo (a main clone beside a dozen PR worktrees), a relative path or a symbol search resolves into another branch, and the review cites lines that don't exist on this one, or a bug from a different feature. The absolute repo root in the shared preamble is the fix; the verifier's diff anchor catches what slips through.
+- **Line numbers from concatenated output are wrong.** `cat a.py; cat b.py` numbers the combined stream, so a lane cites line 192 for what is line 72 of the second file. The preamble requires `grep -n`, `nl` or Read on one file.
 - **A worktree reviewer sees a clean tree.** The `isolation: "worktree"` checkout shares HEAD, so `git diff` inside it returns nothing. Reviewers read the diff from their prompt; never let a lane re-derive it.
 - **`--repo` mode has no diff.** What the lanes receive is full file content, so a lane hunting `+` lines returns NO FINDINGS on real problems. Pass the mode into the prompt so lanes review whole files.
 - **Dropped findings are the product, not a bug.** The verifier deletes true-but-trivial findings on purpose; `--nits` is the recovery path. A floor-failed finding is dropped or held as a nit, never kept at a lower severity.
 - **The ui-ux lane is conditional.** If it fires on a backend/CLI diff, Phase-1 UI detection matched a non-UI file — fix detection rather than accepting the lane's noise.
 - **Complexity is two-tier by design.** Egregious complexity (4+ nesting levels, ~cyclomatic >10) that conceals behavior blocks via the architecture lane and must name the trap — which path a future editor misses and what breaks. Moderate complexity is hygiene's `[Nit]`. A complexity finding with no named trap failing the impact floor is the floor working, not a lost finding.
 - **Architecture findings drift back to "a peer differs."** A finding without a stated consequence is not a finding; re-dispatch the lane with its exact prompt.
-- **REVIEW.md is overwritten every run** and written at the true repo root (`git rev-parse --show-toplevel`, not a worktree). The prior review is gone — add it to `.gitignore`.
+- **REVIEW.md is overwritten every run** and written at the true repo root (`git rev-parse --show-toplevel`, not a worktree). The prior review is gone — add it to `.gitignore`. A gitignore does not stop a build that copies the project root: a standalone Next.js build has shipped a root REVIEW.md in its output, so add it to `.dockerignore` and any build-copy excludes too.
 
 ## Troubleshooting
 

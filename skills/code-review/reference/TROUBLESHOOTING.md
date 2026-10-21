@@ -10,6 +10,12 @@ Extended troubleshooting for the `code-review` skill. SKILL.md keeps the single 
 
 **Solution:** Re-dispatch that one agent with the exact skeleton from `reference/AGENTS.md`. Include "no preamble, no summary — only findings in the specified format."
 
+### Problem: Findings cite lines that aren't in the change, or come from another branch
+
+**Cause:** The lanes read from the wrong checkout. Subagents start in the session's working directory, and when it holds other clones or worktrees of the same repo, relative paths and symbol searches land on another branch. A second cause is line numbers read off concatenated output (`cat a; cat b`).
+
+**Solution:** Confirm every lane and the verifier got the [shared preamble](./AGENTS.md#shared-preamble) with the absolute repo root filled in, not a placeholder or a relative path. The verifier's diff anchor drops an off-diff finding nothing in the change causes; if they still reach REVIEW.md, the verifier ran without the diff or in the wrong mode.
+
 ### Problem: Correctness lane returns only style/hygiene observations
 
 **Cause:** The lane reverted to surface reading instead of tracing data flow.
@@ -44,7 +50,7 @@ Extended troubleshooting for the `code-review` skill. SKILL.md keeps the single 
 
 **Cause:** Either the citation didn't hold against current code (evidence drop), or the finding was true but failed the impact floor (no concrete bad outcome on this change).
 
-**Solution:** Drops are intentional — the skill removes low-impact truths on purpose. If the user believes it was high-impact, re-run with `--nits` (a floor-failed finding tagged `[Nit]` is preserved in the held bucket), or re-stage and re-run so line numbers align if it was an evidence drop from drift. A floor-failed finding is never kept at a lower severity.
+**Solution:** Drops are intentional — the skill removes low-impact truths on purpose. A dropped finding with a real follow-up (a deploy-order step, a test worth writing) belongs in `## Also noted`; if one is missing there, the verifier skipped that step. If the user believes it was high-impact, re-run with `--nits` (a floor-failed finding tagged `[Nit]` is preserved in the held bucket), or re-stage and re-run so line numbers align if it was an evidence drop from drift. A floor-failed finding is never kept at a lower severity.
 
 ### Problem: `## What to fix first` is empty or missing
 
@@ -78,4 +84,4 @@ Extended troubleshooting for the `code-review` skill. SKILL.md keeps the single 
 
 ### Problem: REVIEW.md shows up as a dirty file in git
 
-**Solution:** Add `REVIEW.md` to `.gitignore` (project) or `~/.config/git/ignore` (global). It's an ephemeral artifact, always overwritten at the repo root.
+**Solution:** Add `REVIEW.md` to `.gitignore` (project) or `~/.config/git/ignore` (global). It's an ephemeral artifact, always overwritten at the repo root. A build that copies the project root ignores `.gitignore`, so add it to `.dockerignore` and any bundler copy excludes as well.

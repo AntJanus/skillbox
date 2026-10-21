@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **code-review** (2.4.3 → 2.5.0): lessons from a month of real runs, most of them one review per pull request in its own worktree.
+  - **Findings stay on the change.** Every lane and the verifier now get a shared preamble with the absolute repo root, because lanes start in the session's directory, and when that holds other checkouts of the same repo they cited lines from other branches. The verifier gains a diff anchor: a finding on an untouched line stays only when a changed line causes it, labeled `Outside the diff — caused by path:line`, and is otherwise dropped and counted as off-diff.
+  - **Line numbers come from one file.** The preamble requires `grep -n`, `nl` or Read on a single file, after a lane cited a line number from two files' concatenated output.
+  - **A defined light path** replaces the "Not for: trivial changes" line, which orchestrators read as permission to skip every agent. Doc-only diffs dispatch no lanes; any small code, config or dependency change gets the correctness lane and the verifier. Headers say what did not run rather than `kept 0 blocking of 0`.
+  - **The verifier is skipped when every lane returns NO FINDINGS**, and says so in the header.
+  - **`## Also noted`** holds up to three dropped findings with a real follow-up (a deploy-order step, a test worth writing), after runs where those were the items acted on next.
+  - **A caller's brief wins on format.** A delegating agent gets the report its brief asks for, in its own severity labels, and REVIEW.md uses one vocabulary throughout. The one-chat-line rule applies to direct runs.
+  - **Lanes and the verifier run as general-purpose agents** instead of Explore, kept read-only by the preamble. This was not measured side by side; EVAL.md's lane-quality check gains an off-diff case and is the first evidence either way.
+  - A gotcha that a gitignored REVIEW.md still ships in builds that copy the project root.
+
 ## [10.7.0] - 2026-10-20
 
 **`track-session`** (6.4.0) adds the Bench note, a plain-language status in `SESSION_PROGRESS.md` for the person running the agents, rewritten at every checkpoint. **`ui-ux-design`** (2.4.0) takes in rules from a public UI pattern library and page-design library, adds a Data display section, and removes its source citations so each rule stands on its own. 16 skills.

@@ -12,7 +12,7 @@ The report is written to `REVIEW.md` at the repo root, always — even when clea
 **Generated:** YYYY-MM-DD HH:MM
 **Scope:** N files (list)
 **Lanes:** correctness, architecture, testing, ui-ux, hygiene
-**Verifier:** kept N blocking of M; dropped J (W wrong-evidence, L low-impact); H nits held
+**Verifier:** kept N blocking of M; dropped J (W wrong-evidence, O off-diff, L low-impact); A also noted; H nits held
 **Total:** X Critical, Y Major, Z Minor
 
 ---
@@ -60,6 +60,13 @@ The report is written to `REVIEW.md` at the repo root, always — even when clea
   - Risk: on a slow upstream the retry loop exits silently and the import is dropped with a success status
   - Fix: add a test that simulates the timeout and asserts the retry counter + surfaced error
 
+### src/reports/export.ts
+
+- **[correctness]** `line 112` — Outside the diff — caused by `src/api/import.ts:40`
+  - Trigger: an import now stores `amount` in cents; the untouched export still divides by 100 on read
+  - Wrong result: exported totals come out a hundredth of their value
+  - Fix: drop the division in the export, or keep `amount` in dollars at the import boundary
+
 ## Minor
 
 ### src/ui/SummaryCard.tsx
@@ -68,6 +75,10 @@ The report is written to `REVIEW.md` at the repo root, always — even when clea
   - Standard: typography readability floor is 16px for prose the user must read
   - Who it harms: everyone, low-vision users most; this is the sentence stating the actual result
   - Fix: drop the `size` prop (inherit body 16px); keep small tokens for the caption only
+
+## Also noted
+
+- `src/db/migrations/014_cents.sql:1` — run this migration before deploying the import change, or existing rows read as cents
 
 ---
 
@@ -83,13 +94,30 @@ _H nits held — re-run with `--nits` to show dead code, typos, and doc drift._
 **Generated:** YYYY-MM-DD HH:MM
 **Scope:** N files
 **Lanes:** correctness, architecture, testing, hygiene
-**Verifier:** kept 0 blocking of M; dropped J (W wrong-evidence, L low-impact); H nits held
+**Verifier:** kept 0 blocking of M; dropped J (W wrong-evidence, O off-diff, L low-impact); A also noted; H nits held
 
 ## What the repo does well
 
 - <2-4 verified strengths, if any>
 
 Nothing blocking — only polish remains.
+```
+
+## Light path and skipped verifier (say what did not run)
+
+```markdown
+**Lanes:** correctness (light path)
+**Verifier:** kept 0 blocking of 2; dropped 2 (0 wrong-evidence, 1 off-diff, 1 low-impact); 0 also noted; 0 nits held
+```
+
+```markdown
+**Lanes:** correctness, architecture, testing, hygiene — all returned NO FINDINGS
+**Verifier:** skipped — no candidates
+```
+
+```markdown
+**Lanes:** none — doc-only
+**Verifier:** not run
 ```
 
 ## Chat-side one-liner after writing the file

@@ -8,6 +8,30 @@ Substitute `<list>` with the file paths and `<diff content>` with the actual dif
 
 ---
 
+## Shared preamble
+
+Put this block, filled in, at the top of every lane prompt and the verifier prompt. Subagents start in the session's working directory, not the tree under review, and that directory may hold other checkouts of the same repo on other branches.
+
+```
+Repo root: <absolute path from git rev-parse --show-toplevel>. Every Read,
+Grep, Glob and git command uses this path. Never read from any other
+checkout of this repo — other clones and worktrees sit on other branches
+with different line numbers.
+Mode: <diff | repo>. In diff mode, a finding belongs on a line the diff adds
+or changes; a problem in untouched code counts only when a changed line
+causes it, and the finding names that line. In repo mode there is no diff:
+review the full files.
+Read-only: do not edit, write, or create files, and run no git command that
+changes state.
+Line numbers: take them from grep -n, nl, or Read on a single file. Never
+from output that concatenates several files, where the numbering runs
+across all of them.
+```
+
+A caller's brief can carry a stricter rule (for example, drop every finding not on a changed line). Paste it in place of the `Mode:` paragraph.
+
+---
+
 ## Agent 1: correctness
 
 ```
@@ -25,7 +49,9 @@ Diff:
 Read the current full contents of each changed function and the code it
 calls, not just the diff, so you can trace values end to end — a bug is
 usually the interaction between the changed line and code the diff doesn't
-show, which reviewing the hunk alone can never surface.
+show, which reviewing the hunk alone can never surface. When the wrong
+behavior lands in untouched code, cite that line and name the changed line
+that causes it.
 
 Hunt specifically for these classes (they recur and reviewers miss them):
 - Boundary / off-by-one: date math (month-end rollover — "Jan 31 + 1 month",
@@ -389,7 +415,15 @@ current code (not just the diff snippet). Re-do the small check the reviewer
 should have done (read the sibling, the test, the .env.example). Then:
 - WRONG — the cited line doesn't show the claimed issue, or the line no
   longer exists → DROP (count only).
-- HOLDS — the issue is real → go to Stage 2.
+- HOLDS — the issue is real → go to the diff anchor.
+
+DIFF ANCHOR (diff mode only — skip in repo mode):
+- The cited line is one the diff adds or changes → go to Stage 2.
+- The cited line is untouched, but a changed line causes the problem (a
+  changed signature breaks an untouched caller) → go to Stage 2, and label
+  the finding `Outside the diff — caused by path:line`.
+- The cited line is untouched and nothing in the diff causes it → DROP
+  (count as off-diff). A pre-existing problem is not this change's finding.
 
 STAGE 2 — IMPACT FLOOR (the gate that kills nitpicks):
 For each finding whose evidence HOLDS, you must be able to name a concrete
@@ -409,6 +443,12 @@ hang, perf cliff), or a genuine reader-trap that will cause a future bug.
   nit bucket. Otherwise drop it — a true-but-trivial finding kept at a lower
   severity is how a report fills with noise.
 - When in doubt about impact, drop.
+
+ALSO NOTED — at most 3: a dropped finding whose consequence is real but
+not a defect in this change (a deploy-order step the change needs, a
+follow-up test worth writing) is held as one line,
+`path:line — what to do and why`. A finding dropped for wrong evidence,
+off-diff, or merely low impact never goes here.
 
 Severity is authoritative here — it replaces the lane reviewer's. When you
 move it, add a one-line `Verifier note:` naming the concrete outcome that
@@ -447,31 +487,33 @@ WHAT TO FIX FIRST
 
 Then the kept blocking findings (Critical → Major → Minor, grouped by file)
 in the reviewers' per-finding format, each at its final severity with any
-`[Secret]` tag and `Verifier note:`.
+`[Secret]` tag, `Outside the diff` label and `Verifier note:`.
+
+Then ALSO NOTED, if anything was held there.
 
 Then, only if --nits was passed, a `NITS` section with the [Nit] bucket
 grouped by file, one terse line each.
 
 Then a single summary line:
-   Verifier summary: kept N blocking of M; dropped J (W wrong-evidence, L low-impact); H nits held.
+   Verifier summary: kept N blocking of M; dropped J (W wrong-evidence, O off-diff, L low-impact); A also noted; H nits held.
 
 If nothing survives as blocking, output:
 
 WHAT TO FIX FIRST
 Nothing blocking — only polish remains.
 
-Verifier summary: kept 0 blocking of M; dropped J (W wrong-evidence, L low-impact); H nits held.
+Verifier summary: kept 0 blocking of M; dropped J (W wrong-evidence, O off-diff, L low-impact); A also noted; H nits held.
 ```
 
 ---
 
 ## Dispatch Pattern
 
-Dispatch the reviewer prompts **in a single message**, one Agent tool call each, `subagent_type: Explore` (read-only). Always send **correctness, architecture, testing, hygiene**; add **ui-ux** only when the scope includes user-facing UI files. In `--repo`/`--blueprint` mode, pass the blueprint skill name into the architecture (and ui-ux) prompts so they judge against the blueprint, not the nearest sibling.
+Dispatch the reviewer prompts **in a single message**, one Agent tool call each, `subagent_type: general-purpose`, each prompt opening with the [shared preamble](#shared-preamble) (which keeps the lane read-only). On the light path, send only correctness. Always send **correctness, architecture, testing, hygiene**; add **ui-ux** only when the scope includes user-facing UI files. In `--repo`/`--blueprint` mode, pass the blueprint skill name into the architecture (and ui-ux) prompts so they judge against the blueprint, not the nearest sibling.
 
 **Omit the `name` parameter on every lane call.** Naming an agent makes it a teammate, and when this skill is itself running inside a teammate the whole batch is rejected with `Teammates cannot spawn other teammates — the team roster is flat.` The retry costs a round-trip per lane; the lanes never need addressing by name, so leave `name` off and the call works at any depth.
 
-After the reviewers return, dispatch the **verifier** in a single Agent call (`Explore`) with the merged candidate list.
+After the reviewers return, dispatch the **verifier** in a single Agent call (`general-purpose`, shared preamble) with the merged candidate list. If every lane returned `NO FINDINGS`, skip it and say so in the header.
 
 After the verifier returns, the orchestrating skill renders the STRENGTHS block, the "what to fix first" distillation, the kept blocking findings at their re-rated severities, the NITS section (only if `--nits`), and the summary line into the synthesis report described in SKILL.md.
 
