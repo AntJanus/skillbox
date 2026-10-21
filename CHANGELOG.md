@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [10.8.0] - 2026-10-21
+
+**`code-review`** (2.5.0) takes the lessons from a month of real runs. Findings stay on the change: every reviewer gets the absolute repo root, and the verifier drops off-diff findings unless a changed line causes them. Small changes get a defined light path instead of no review at all, delegating callers get the report format they ask for, and a short `## Also noted` list keeps follow-ups the verifier would otherwise drop. 16 skills.
+
 ### Changed
 
 - **code-review** (2.4.3 → 2.5.0): lessons from a month of real runs, most of them one review per pull request in its own worktree.
@@ -1098,7 +1102,9 @@ When creating a release:
 
 ---
 
-[Unreleased]: https://github.com/antjanus/skillbox/compare/v10.6.0...HEAD
+[Unreleased]: https://github.com/antjanus/skillbox/compare/v10.8.0...HEAD
+[10.8.0]: https://github.com/antjanus/skillbox/compare/v10.7.0...v10.8.0
+[10.7.0]: https://github.com/antjanus/skillbox/compare/v10.6.0...v10.7.0
 [10.6.0]: https://github.com/antjanus/skillbox/compare/v10.5.0...v10.6.0
 [10.5.0]: https://github.com/antjanus/skillbox/compare/v10.4.0...v10.5.0
 [10.4.0]: https://github.com/antjanus/skillbox/compare/v10.3.0...v10.4.0
