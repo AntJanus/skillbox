@@ -13,7 +13,7 @@ SkillBox is a collection of utility skills for Claude Code and AI agents. Each s
 
 | | |
 |---|---|
-| Current release | **v10.0.0** (2026-09-03, the Fable 5.1 release) |
+| Current release | **v10.7.0** (2026-10-20) |
 | Skills | **16** (see roster below) |
 | Install | `npx skills add antjanus/skillbox` |
 | Compatible with | Claude Code, Cursor, Cline, GitHub Copilot, and 40+ agents via [Vercel Skills](https://skills.sh) |
@@ -216,6 +216,6 @@ Treat every issue working with SkillBox as an opportunity to update this file. T
 
 ---
 
-**Last Updated:** 2026-09-22
+**Last Updated:** 2026-10-21
 **Applies To:** Claude Code 2.1.258+
 **Source:** https://antjanus.com/ai/claude-code-best-practices
