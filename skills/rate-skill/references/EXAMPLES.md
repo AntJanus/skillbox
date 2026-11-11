@@ -123,6 +123,7 @@ A skill body that restates any of these is a §6 deduction. Re-check the list wh
 - The delivering-work scope block ("The user's request — or the plan they approved — sets the scope…")
 - The progress-update line ("Before you start, say in a line what you're about to do…")
 - The overplanning nudge ("When you have enough information to act, act")
+- The finishing-work block ("Ending your turn means your work stops there…"), seen on 2.1.322, 2026-11-11
 - The hidden-tool-output note ("Only you see that command's output…")
 - The batch-tool-calls nudge ("First privately list what you need next…")
 - The readability rules (outcome first, complete sentences, no arrow chains, no invented labels)

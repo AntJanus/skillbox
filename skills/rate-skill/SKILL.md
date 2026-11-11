@@ -6,7 +6,7 @@ argument-hint: "<path/to/SKILL.md>"
 allowed-tools: Read, Glob, Grep, Bash(python3 *)
 metadata:
   author: Antonin Januska
-  version: "6.2.0"
+  version: "7.0.0"
 ---
 
 # Rate Skill
@@ -121,11 +121,13 @@ Apply the official cut test to every instruction: **"Would the agent get this wr
 
 - **Verification scaffolding** — deduct for generic re-checks with no external referent: "double-check your answer", "re-verify before responding", "add a final verification step for any non-trivial task". The fix is deletion, not rewording. **Three things are not this and score fine:** checks against external state ("run the test suite", "confirm the file parses", "validate against the schema"); a writer-verifier pattern where a fresh-context agent judges *another* agent's output; and an evidence audit before a progress report ("only report work you can point to a tool result for"). The last two are recommended for long-running work, not merely tolerated (platform 5.1 guidance, marked tentative there). The defect is an agent re-reading work it produced itself with nothing external to check it against.
 - **Reasoning-echo** ("show your thinking", "explain your reasoning in the response"). Can trigger the `reasoning_extraction` refusal — always **also** emit a P0. A hard failure mode, not a style issue.
-- **"Do not think" / "do not reason"** — increases leakage of internal XML tags into visible output. Delete; a rule naming the tags is less effective than saying nothing.
+- **"Do not think" / "do not reason"** — increases leakage of internal XML tags into visible output. Delete; a rule naming the tags is less effective than saying nothing. A think-less line ("answer without deliberating") is the same finding: it has no effect from `medium` effort up, and the patch is `effort` in the frontmatter.
 - **Narration suppressors** ("hold all findings for the final response", "don't narrate", "no interim updates"). The model already under-narrates during long tool chains; these lines make the user watch silence. Delete first; if the skill wants one specific update, it should say when ("report scope before dispatch"). A rule shaping the *final* message (one chat line, the file is the deliverable) is not this.
 - **Anti-formatting rules** ("never use bullets", "no headers", "no bold"). Written against models that over-formatted; the model under-formats, so the rule strips structure the reader wanted. Replace with a when-formatting-fits rule.
-- **Unscoped or blocking delegation** — subagent instructions with no statement of which scenarios warrant one or how many, or that make the orchestrator stop and wait on each agent in turn. Open-ended delegation multiplies cost; blocking delegation multiplies wall-clock. Independent agents dispatch in one message and the lead keeps working.
-- **Unbounded scope on a narrow job** — models add steps that weren't requested, so a one-job skill should say where it stops. For skills that produce code, the same rule covers the code: unrequested fixes to nearby behavior are reported as follow-ups, and scratch checks don't become committed test files.
+- **Unscoped or blocking delegation** — subagent instructions with no statement of which scenarios warrant one or how many, or that make the orchestrator stop and wait on each agent in turn. Open-ended delegation multiplies cost; blocking delegation multiplies wall-clock. Independent agents dispatch in one message and the lead keeps working. A delegation line also says when the work is cheaper inline.
+- **Bare absolute rules, written budgets, hard style caps** — a `never` with no scope, reason or allowed case is applied where the author didn't mean it; a token budget in the body changes spend; a cap like "20 words or fewer per sentence" makes prose choppy. Patch: rewrite the `never` as an ask-first rule or add its scope and reason, and replace the budget or cap with the reader and the length the job needs.
+- **Blanket approval gates and stop conditions** — "confirm all changes", "ask before each step", "stop at the first error". The model follows them closely and holds routine work the user already asked for. Patch: name the actions that wait for a go-ahead, and state that a change the user stated is applied directly.
+- **Unbounded scope on a narrow job** — models add steps that weren't requested, so a one-job skill should say where it stops. For skills that produce code, the same rule covers the code: unrequested fixes to nearby behavior are reported as follow-ups, and scratch checks don't become committed test files. An ownership sentence ("you are the owner and long-term maintainer of this codebase") beside a scope-limit line is a finding: the scope line does not cancel it.
 
 ## Eval set check
 
