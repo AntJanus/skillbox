@@ -6,7 +6,7 @@ argument-hint: "[path | --staged | --branch <base> | --repo [--blueprint <skill>
 allowed-tools: Read, Write, Glob, Grep, Bash, Agent
 metadata:
   author: Antonin Januska
-  version: "2.5.0"
+  version: "3.0.0"
 ---
 
 # Code Review — Multi-Agent Local Review
@@ -149,4 +149,4 @@ Empty scope, huge diffs, blueprint not found, worktree cleanup: **[reference/TRO
 
 ## Integration
 
-Pairs with `/security-review` (security), `/review` (fetching an open PR by number), `track-session` (track fixes), `typography` + `color-system` (the ui-ux lane's standard), and blueprint skills like `local-first-app` via `--blueprint`. Typical loop: edit → `/code-review` → read REVIEW.md, fix what's first → re-run (overwrites) → commit when clean. For a big pass, `/code-review --repo --blueprint <skill> --background` and keep working. **Reviewing incoming PRs:** check each PR out into its own worktree and run `--branch <base>` there, one delegated agent per PR — REVIEW.md lands in that worktree's root, so several PRs review concurrently without colliding. Add `REVIEW.md` to `.gitignore`. Not a replacement for CI linting or human PR review — a pre-commit pass that catches wrong answers linters miss.
+Pairs with `/security-review` (security), `/review` (fetching an open PR by number), `track-session` (track fixes), `typography` + `color-system` (the ui-ux lane's standard), and blueprint skills like `local-first-app` via `--blueprint`. Typical loop: edit → `/code-review` → read REVIEW.md, fix what's first → re-run (overwrites) → commit when clean. For a big pass, `/code-review --repo --blueprint <skill> --background` and keep working. **Reviewing incoming PRs:** check each PR out into its own worktree and run `--branch <base>` there, one delegated agent per PR — REVIEW.md lands in that worktree's root, so several PRs review concurrently without colliding. Each review is five or six agents (four or five lanes and the verifier), and every lane reads the whole diff, so three PRs at once is about twenty agents. Say the agent count before dispatching more than one PR. Add `REVIEW.md` to `.gitignore`. Not a replacement for CI linting or human PR review — a pre-commit pass that catches wrong answers linters miss.
