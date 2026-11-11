@@ -6,7 +6,7 @@ argument-hint: "[skill-topic]"
 effort: high
 metadata:
   author: Antonin Januska
-  version: "6.2.0"
+  version: "7.0.0"
 ---
 
 # Generate Skill
@@ -33,7 +33,7 @@ Two principles drive every phase below:
 
 ## Workflow
 
-Use AskUserQuestion, one question at a time — never bulk-dump the questionnaire. After each phase show the artifact and confirm before moving on.
+Use AskUserQuestion, one question at a time, for the Phase 1 answers the request does not already give; a whole questionnaire in one message gets skimmed. Confirm at the two points where the choice is the user's: the description draft (Phase 2) and the finished skill before the eval spot-check (Phase 8). Show the output of the other phases as you go and keep working.
 
 ### Phase 1 — Discovery
 
@@ -79,7 +79,7 @@ metadata:
 ---
 ```
 
-`effort` defaults by type: automation and reference `low`, technical `medium`, auditing and methodology `high`, multi-source synthesis and agentic coding `xhigh`. A skill whose deliverable is a long file stays at `high` — at `xhigh`/`max` the model drafts it twice, once in reasoning and once as output. Omit the key to inherit; rationale and the live-verification note are in FRONTMATTER.md.
+`effort` defaults by type: automation and reference `low`, technical `medium`, auditing, methodology, multi-source synthesis and agentic coding `high`. Move a skill to `xhigh` only after a run on its own tasks shows a gain: above `high` the gains are uneven and the token cost is much higher. A skill whose deliverable is a long file stays at `high` — at `xhigh`/`max` the model drafts it twice, once in reasoning and once as output. Omit the key to inherit; rationale and the live-verification note are in FRONTMATTER.md.
 
 Other optional fields, frontmatter anti-patterns and the three-tier portability rules: **[references/FRONTMATTER.md](references/FRONTMATTER.md)**.
 
@@ -107,12 +107,16 @@ Full templates in [references/PATTERNS.md](references/PATTERNS.md) — load only
 
 - **No generic self-re-check steps** — cut "double-check your answer", "re-verify before responding", "add a final verification step for any non-trivial task". The fix is deletion, not rewording. Three things stay, and the last two are recommended for long-running work: checks against *external* state (run the test suite, confirm the file parses, validate against the schema); a writer-verifier pattern where a fresh-context agent judges *another* agent's output; and an evidence audit before a progress report ("only report work you can point to a tool result for"). The defect is an agent re-reading work it produced itself with nothing external to check it against.
 - **Never instruct the agent to echo its reasoning** ("show your thinking", "explain your reasoning in the response") — can trigger the `reasoning_extraction` refusal and a model fallback. Ask for conclusions and evidence instead.
-- **Never instruct the agent not to think or not to reason** — increases leakage of internal XML tags into visible output. Say nothing about reasoning at all; shape the *output* instead ("one chat line, the file is the deliverable").
+- **Never instruct the agent not to think or not to reason** — increases leakage of internal XML tags into visible output. Say nothing about reasoning at all; shape the *output* instead ("one chat line, the file is the deliverable"). A line asking it to think less ("answer without deliberating") has no effect from `medium` effort up; set `effort` in the frontmatter instead.
 - **No narration suppressors** ("hold all findings for the final response", "don't narrate", "no interim updates") and **no anti-formatting rules** ("never use bullets", "no headers", "no bold"). Both were written against models that over-narrated and over-formatted; the model does the opposite, so the lines produce silence and flat prose. Say *when* a specific update or format is wanted instead ("report scope before dispatch"; "use a table when comparing three or more items"). Shaping the final message — one chat line, the file is the deliverable — is fine.
-- **Scope delegation** when the skill uses subagents: name the scenarios that warrant one and the cap, dispatch independent agents in one message, and keep working while they run instead of blocking on each. Open-ended delegation multiplies cost; blocking delegation multiplies wall-clock.
+- **Scope delegation** when the skill uses subagents: name the scenarios that warrant one and the cap, dispatch independent agents in one message, and keep working while they run instead of blocking on each. Open-ended delegation multiplies cost; blocking delegation multiplies wall-clock. Say what a subagent adds to the session's cost and when the work is cheaper inline.
+- **Write the exception into an absolute rule** — the model treats a line that contains `never` as absolute and applies it where the author did not mean it. When the action is allowed with a go-ahead, make the go-ahead the rule: "ask before pushing", not "never push". A `never` that stays carries its scope and its reason.
+- **Name what waits for a go-ahead and what does not** — the model follows an approval rule closely, so "confirm before any change" also holds the routine write the user just asked for. List the actions that wait (a destructive or irreversible step, a change that is the agent's own judgment) and say that a change the user stated is applied directly. Treat stop conditions the same way: "stop at the first error" blocks work that a retry would finish.
+- **No token budgets or hard style caps in the body** — a budget written into the text changes how much the model spends, and a cap like "20 words or fewer per sentence" makes its prose choppy. Name the reader and the length the job needs.
 - **Bound the deliverable** when the skill writes a file — the output template needs a line like "match length to the task, no filler sections, redundant summaries or boilerplate." Written deliverables run long by default.
 - **State where a narrow skill stops** — models expand scope on their own, adding steps nobody requested. When the skill produces code, add the code-side line too: "Report a pre-existing bug or behavior the task doesn't mention as a follow-up rather than fixing it here. Commit tests only where the task asks or the repo already keeps tests for this kind of change, sized like the neighboring test files; scratch checks are not test files." Unrequested additions and committed test code drop substantially with this line, with no change in task success.
-- **Don't restate what the harness injects** — the autonomy block, the delivering-work scope block, the progress-update line, the overplanning nudge, the hidden-tool-output note, the batch-tool-calls nudge, the readability rules are already in every Claude Code session; a second wording makes the model reconcile the two.
+- **Say who owns the code when the skill builds or restructures it** — with nothing said, the model adds to the existing structure, even when that copies code already there. For a skill that builds a new app or owns a refactor, name the reuse you want ("extend the existing form component before writing a second one"). Use the full ownership sentence ("You are the owner and long-term maintainer of this codebase") only where unrequested changes are acceptable: it raises output by roughly 70 to 80 percent, and a scope line in the same body does not cancel it.
+- **Don't restate what the harness injects** — the autonomy block, the finishing-work block, the delivering-work scope block, the progress-update line, the overplanning nudge, the hidden-tool-output note, the batch-tool-calls nudge, the readability rules are already in every Claude Code session; a second wording makes the model reconcile the two.
 
 ### Phase 5 — Examples
 
