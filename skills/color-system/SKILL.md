@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "[ui | marketing | dataviz | tui | contrast | palette-name]"
 metadata:
   author: Antonin Januska
-  version: "1.6.0"
+  version: "2.0.0"
   tags: [color, palette, design, accessibility, dark-mode, data-viz, theme]
 ---
 

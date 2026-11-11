@@ -6,6 +6,12 @@ Two things live here beyond the role tables: the [Triads section](#triads--every
 
 ---
 
+## A good green
+
+`#1e7a34` light / `#5fd47a` dark. It works as a "success" or "ready" color, and it has been tried and liked in a real dashboard. As a solid fill behind a header, it carries white text at 5.40:1 in light mode. In dark mode it carries `#10131a` text at 9.90:1, and as text on a `#262b36` surface it reaches 7.55:1. Use it when a success state should read as good news rather than as a muted status.
+
+---
+
 ## Web App UI (light + dark)
 
 13 roles each. In dark mode, `surface-elevated` is intentionally lighter than `surface` (elevation = lighter). The six palettes in this first group were authored as flat roles; **Dusk**, **Driftwood** and **Meadow** were generated from 12-step scales and ship those scales alongside their roles.
