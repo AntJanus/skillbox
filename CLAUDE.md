@@ -13,7 +13,7 @@ SkillBox is a collection of utility skills for Claude Code and AI agents. Each s
 
 | | |
 |---|---|
-| Current release | **v10.8.0** (2026-10-21) |
+| Current release | **v11.0.0** (2026-11-11) |
 | Skills | **16** (see roster below) |
 | Install | `npx skills add antjanus/skillbox` |
 | Compatible with | Claude Code, Cursor, Cline, GitHub Copilot, and 40+ agents via [Vercel Skills](https://skills.sh) |
@@ -25,26 +25,26 @@ SkillBox is a collection of utility skills for Claude Code and AI agents. Each s
 
 ## Skill Roster
 
-Verified against `skills/` on 2026-09-22. Versions come from each SKILL.md's `metadata.version`.
+Verified against `skills/` on 2026-11-11. Versions come from each SKILL.md's `metadata.version`.
 
 | Skill | Version | Covers |
 |---|---|---|
-| `ai-features` | 1.1.0 | Propose, mock and set up AI features for an existing app (local or hosted models) |
-| `code-review` | 2.5.0 | Multi-agent review of local changes, writes REVIEW.md |
-| `color-system` | 1.6.0 | Palettes, dark mode, contrast, chart and TUI color |
-| `deep-research` | 2.4.2 | Multi-source web research with cited synthesis |
-| `discuss` | 1.1.1 | Slash-only conversation mode (`disable-model-invocation: true`) |
-| `generate-skill` | 6.2.0 | Interactive SKILL.md builder — the authoring spec |
-| `ideal-react-component` | 1.8.2 | React file layout and hooks antipatterns |
-| `local-first-app` | 4.8.0 | Single-user SQLite app, no accounts, no backend |
-| `rate-skill` | 6.2.0 | Grades a SKILL.md A–F — the grading rubric |
-| `record-tui` | 1.6.1 | VHS terminal/TUI demo recording |
-| `screenshot-local` | 1.5.2 | shot-scraper screenshots of local pages |
-| `setup-semantic-release` | 1.4.1 | semantic-release + conventional commits + commitlint |
-| `track-roadmap` | 2.7.0 | ROADMAP.md generate/update/audit/brainstorm/resume |
-| `track-session` | 6.4.0 | SESSION_PROGRESS.md across multi-session work |
-| `typography` | 1.7.0 | Type scale, line-height, font pairing |
-| `ui-ux-design` | 2.4.0 | Interaction states, route states, a11y contracts, IA, tokens, design exploration |
+| `ai-features` | 2.0.0 | Propose, mock and set up AI features for an existing app (local or hosted models) |
+| `code-review` | 3.0.0 | Multi-agent review of local changes, writes REVIEW.md |
+| `color-system` | 2.0.0 | Palettes, dark mode, contrast, chart and TUI color |
+| `deep-research` | 3.0.0 | Multi-source web research with cited synthesis |
+| `discuss` | 2.0.0 | Slash-only conversation mode (`disable-model-invocation: true`) |
+| `generate-skill` | 7.0.0 | Interactive SKILL.md builder — the authoring spec |
+| `ideal-react-component` | 2.0.0 | React file layout and hooks antipatterns |
+| `local-first-app` | 5.0.0 | Single-user SQLite app, no accounts, no backend |
+| `rate-skill` | 7.0.0 | Grades a SKILL.md A–F — the grading rubric |
+| `record-tui` | 2.0.0 | VHS terminal/TUI demo recording |
+| `screenshot-local` | 2.0.0 | shot-scraper screenshots of local pages |
+| `setup-semantic-release` | 2.0.0 | semantic-release + conventional commits + commitlint |
+| `track-roadmap` | 3.0.0 | ROADMAP.md generate/update/audit/brainstorm/resume |
+| `track-session` | 7.0.0 | SESSION_PROGRESS.md across multi-session work |
+| `typography` | 2.0.0 | Type scale, line-height, font pairing |
+| `ui-ux-design` | 3.0.0 | Interaction states, route states, a11y contracts, IA, tokens, design exploration |
 
 **`track-qa` was removed in v10.1.0 (2026-09-22)** after its 2026-09-01 deprecation; QA.md manual-QA checklists were retired portfolio-wide on 2026-08-24. Do not restore it or refile its items — hands-on verification is filed as ordinary `track-roadmap` items. Its last version, 1.4.0, is in the v10.0.0 tag if the `cc-dash/qa@1` schema is ever needed again.
 
@@ -118,7 +118,7 @@ Frontmatter: `name`, `description`, `license`, `argument-hint` (top-level, quote
 The authoring spec lives in the meta-skills and is not restated here. What this section adds is the house choice where the spec leaves one open, and the pointer for everything else.
 
 - **Descriptions:** the form, the trigger count, the coverage clause, the negative-scope clause, the 1024-char cap and the coverage-vs-intensity reading are `generate-skill` Phase 2. House choice: third-person directive register, distinctive noun in the first ~50 chars.
-- **Bodies:** required sections by type are `generate-skill` Phase 4; the agentic-calibration list (no self-re-check scaffolding, no reasoning-echo or don't-think rules, no narration suppressors or anti-formatting rules, scoped non-blocking delegation, bounded written deliverables, no restatement of harness-injected text) is the same phase and is graded by `rate-skill` §6–§7. House choices: gates check external state only; ✅ / ❌ are the example labels, ✅ first, never `<Good>` / `<Bad>` tags; every ❌ carries a paired ✅; "Do X because Y" over ALL-CAPS mandates.
+- **Bodies:** required sections by type are `generate-skill` Phase 4; the agentic-calibration list (no self-re-check scaffolding, no reasoning-echo or don't-think rules, no narration suppressors or anti-formatting rules, scoped non-blocking delegation, exceptions written into absolute rules, named approval gates, stated code ownership, no token budgets or hard style caps, bounded written deliverables, no restatement of harness-injected text) is the same phase and is graded by `rate-skill` §6–§7. House choices: gates check external state only; ✅ / ❌ are the example labels, ✅ first, never `<Good>` / `<Bad>` tags; every ❌ carries a paired ✅; "Do X because Y" over ALL-CAPS mandates.
 - **Length:** under 300 lines aimed, 500 hard cap, overflow to `references/` one level deep (`generate-skill` Phase 7).
 - **Eval sets:** `generate-skill` Phase 8 and the EVAL.md convention above.
 
@@ -179,7 +179,7 @@ Full workflow — commit conventions, when to increment, the 4-phase release pro
 - [ ] Integration points documented when concrete; dropped if filler
 - [ ] Under 300 lines (cap 500); overflow in `references/`
 - [ ] `references/EVAL.md` present and current
-- [ ] No generic self-re-check scaffolding, reasoning-echo, don't-think rules, narration suppressors, anti-formatting rules, unscoped or blocking delegation, or unbounded deliverable length (rate-skill §7); no restatement of harness-injected text (rate-skill §6)
+- [ ] No generic self-re-check scaffolding, reasoning-echo, don't-think rules, narration suppressors, anti-formatting rules, unscoped or blocking delegation, bare absolute rules, blanket approval gates, an ownership sentence beside a scope line, written token budgets, hard style caps, or unbounded deliverable length (rate-skill §7); no restatement of harness-injected text (rate-skill §6)
 - [ ] `effort` set when the skill's job warrants a level other than the session's (rate-skill §2 accepts it; generate-skill Phase 3 has the defaults by type)
 - [ ] Code blocks specify a language
 - [ ] No top-level `version`, `author`, `tags`, `category` — they live under `metadata`; `argument-hint`, `hooks` and `disable-model-invocation` are valid top-level Claude Code keys
@@ -216,6 +216,6 @@ Treat every issue working with SkillBox as an opportunity to update this file. T
 
 ---
 
-**Last Updated:** 2026-10-21
+**Last Updated:** 2026-11-11
 **Applies To:** Claude Code 2.1.258+
 **Source:** https://antjanus.com/ai/claude-code-best-practices
