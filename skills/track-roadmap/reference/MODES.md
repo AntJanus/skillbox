@@ -14,10 +14,10 @@ Create a new ROADMAP.md interactively.
 Modify an existing ROADMAP.md.
 
 1. Read the current file.
-2. Ask what changed: features to add / remove / deprioritize / mark complete / reword.
-3. Apply, present for confirmation, write.
+2. If the request does not say what changed, ask: features to add / remove / deprioritize / mark complete / reword.
+3. Apply and write, then show the changed lines.
 
-Rules: move completed features to the Completed section (don't delete); ask which category new features belong to; user confirms all changes.
+Rules: move completed features to the Completed section (don't delete); put a new feature in the category that fits and say which one, asking only when two fit equally; confirm only changes the user did not state.
 
 ## Audit
 
@@ -45,7 +45,7 @@ Rules: diverge before converging; user drives selection; everything starts as `s
 
 Bridge the roadmap to active work.
 
-1. **Check session** — If SESSION_PROGRESS.md has uncompleted tasks, ask whether to continue (delegate to `/track-session resume` and stop) or pick a new item.
+1. **Check session** — If SESSION_PROGRESS.md has uncompleted tasks, ask whether to continue (hand off to `/track-session resume`, which takes over from here) or pick a new item.
 2. **Present roadmap** — Read ROADMAP.md, filter out completed, present remaining grouped by category; ask which feature to work on.
 3. **Confirm & plan** — Summarize the selected feature, ask clarifying questions if too high-level, get approval.
 4. **Start session** — Invoke `/track-session` to create SESSION_PROGRESS.md, populate tasks from the feature, reference the ROADMAP item's ID, begin.

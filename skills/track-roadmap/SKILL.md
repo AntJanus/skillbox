@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "[generate|update|audit|brainstorm|resume]"
 metadata:
   author: Antonin Januska
-  version: "2.7.0"
+  version: "3.0.0"
 ---
 
 # Track Roadmap
@@ -16,12 +16,12 @@ Maintain `ROADMAP.md` in the project root as a living, high-level feature plan, 
 
 ## Workflow
 
-Every mode runs the same four beats — **read** the current state, **propose** a change, **confirm** with the user, **write** the file. Only the middle two differ:
+Every mode **reads** the current state and **writes** the file. Whether it proposes and waits in between depends on where the change came from. A change the user stated ("add X", "dark mode shipped yesterday", "drop the export item") is written directly and reported in one line. A change that is your own judgment (a generated feature list, an audit ruling, a reword or removal nobody asked for) is proposed first and written after the user confirms. Per mode:
 
 | Mode | Command | Propose / confirm |
 |------|---------|-------------------|
 | **Generate** | `/track-roadmap` or `generate` | Offer a codebase scan, ask 4 discovery questions, propose a feature list, write after the user confirms |
-| **Update** | `/track-roadmap update` | Ask what changed (add/remove/complete/reword), apply after confirmation |
+| **Update** | `/track-roadmap update` | Apply what the user stated; ask what changed only when the request does not say |
 | **Audit** | `/track-roadmap audit` | Scan code to mark each feature Done/In-Progress/Not-Started/Unclear, review relevance with the user, update |
 | **Brainstorm** | `/track-roadmap brainstorm` | Divergent ideation — explore directions before committing; viable ideas land in "Future Ideas" as `status:idea` |
 | **Resume** | `/track-roadmap resume` | Check session state, present remaining features, user picks one, hand off to `/track-session` |
@@ -79,7 +79,7 @@ last_updated: YYYY-MM-DDTHH:MM:SS-TZ
 
 ## Rules
 
-- **The user drives the roadmap** — propose changes and wait for confirmation rather than adding, rewording, or removing features on your own judgment.
+- **The user drives the roadmap** — write what the user asked for without a second confirmation, and propose and wait only for additions, rewords or removals that are your own judgment.
 - **High-level only** — "User authentication", not "Add bcrypt to hash passwords".
 - **`ROADMAP.md` is the source of truth** — if it's not in the file, it's not on the roadmap.
 - **Completed features move, they don't disappear** — relocate them to the Completed section with a `completed:` date instead of deleting, because audits use that history as evidence.
