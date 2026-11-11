@@ -4,7 +4,7 @@ description: Use this skill whenever the user wants typography work — sizing t
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.7.0"
+  version: "2.0.0"
   tags: [typography, type-scale, font-size, line-height, vertical-rhythm, readability, accessibility, fonts]
 ---
 

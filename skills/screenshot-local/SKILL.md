@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "<url-or-file> [--output filename.png]"
 metadata:
   author: Antonin Januska
-  version: "1.5.2"
+  version: "2.0.0"
 ---
 
 # Screenshot Local — shot-scraper

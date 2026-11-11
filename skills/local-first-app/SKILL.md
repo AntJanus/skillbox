@@ -4,7 +4,7 @@ description: Local-first single-user app — one SQLite file on disk, no account
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "4.8.0"
+  version: "5.0.0"
   tags: [nextjs, sqlite, local-first, desktop]
 ---
 

@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "<app-command> [output-format]"
 metadata:
   author: Antonin Januska
-  version: "1.6.1"
+  version: "2.0.0"
 ---
 
 # Record TUI — VHS Terminal Recording

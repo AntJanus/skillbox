@@ -4,7 +4,7 @@ description: React component structure and hooks antipatterns — a seven-sectio
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.8.2"
+  version: "2.0.0"
   tags: [react, components, hooks, useeffect, refactoring, typescript]
 ---
 

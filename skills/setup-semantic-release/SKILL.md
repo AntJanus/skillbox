@@ -4,7 +4,7 @@ description: Use this skill to set up semantic-release and conventional commits 
 license: MIT
 metadata:
   author: Antonin Januska
-  version: "1.4.1"
+  version: "2.0.0"
 ---
 
 # Setup Semantic Release & Conventional Commits
