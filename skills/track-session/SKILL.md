@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "[start|save|resume|verify|recover]"
 metadata:
   author: Antonin Januska
-  version: "6.4.0"
+  version: "7.0.0"
 ---
 
 # Session Progress
@@ -79,13 +79,13 @@ Rewrite the section, don't append to it, at every checkpoint and save and before
 
 **IDs:** `t_` (task) or `f_` (failed attempt) plus 1–20 `[a-z0-9_-]` chars — five random chars by default, or a mnemonic slug (`t_redis-mw`, `t_authfix`). The same shape applies to `task:` and `ref:`, which each take exactly one id. `roadmap_ref` takes exactly one roadmap id; when a session advances several features, name the others under `## Current Status`. Keep an id stable once written, because `dep:` references point at it. Every plan item carries an `id` and a `dep` (`dep:none` or `dep:t_XXXXX`).
 
-**Log every failed approach with its reason** so it isn't blindly retried. When a failure was environment-scoped — an MCP server not connected, missing credentials, a service down — say so in the entry; a later session may have a different environment, so re-checking it is correct rather than a repeat.
+**Log every failed approach with its reason** so it isn't blindly retried. Where you can name it, end the entry with what would make a retry worth it. When a failure was environment-scoped — an MCP server not connected, missing credentials, a service down — say so in the entry; a later session may have a different environment, so re-checking it is correct rather than a repeat.
 
 ## Workflow
 
 ### Routing a bare invocation
 
-On `/track-session` with no argument, take the first branch that matches and stop:
+On `/track-session` with no argument, take the first branch that matches and skip the rest:
 
 1. No `SESSION_PROGRESS.md` at the project root → **Start**. Don't rebuild one from the roadmap or git history; that is `recover`, and only on request.
 2. File exists **and this conversation has produced work the file doesn't record yet** (edits, test runs, decisions since its `last_updated`) → **checkpoint**, then keep working.
@@ -104,7 +104,7 @@ If a `SESSION_PROGRESS.md` already exists, read it, then check whether git track
 git ls-files --error-unmatch SESSION_PROGRESS.md   # exit 0 = tracked; non-zero = untracked or ignored
 ```
 
-- **Same work, unfinished** → this isn't Start, it's Resume. Stop here.
+- **Same work, unfinished** → this isn't Start, it's Resume. Switch to Resume mode.
 - **Tracked, and the prior session is `completed`/`paused` and unrelated** → confirm with the user, then replace the file; git holds the old copy.
 - **Untracked or gitignored** → archive to `SESSION_ARCHIVE_<topic>.md` first, then write the clean file. Replacing an untracked file destroys it permanently; public repos commonly gitignore `SESSION_PROGRESS.md` on purpose. When they do, offer to add `SESSION_ARCHIVE_*.md` to `.gitignore` too, so the archive doesn't become the thing that leaks.
 
@@ -124,7 +124,7 @@ When the last plan task is ticked, set `status: completed` in the same write and
 
 Read the file, then lead the reply with where things actually stand — `status`, tasks done out of total, working-tree state, last commit, and the next action — before any fresh analysis. Handoffs that open with narration ("I'll read the session file now, then look at the tests") bury the state the user came back for, and they end up re-deriving it themselves.
 
-Resume is also the natural reconciliation point: if `project:` or `status:` have drifted from reality, fix them in place while you're there.
+Resume is also the natural reconciliation point: if `project:` or `status:` have drifted from reality, fix them in place while you're there. Read `## Decisions` and `## Failed Attempts` as records with reasons, not as standing bans. Where an entry's reason no longer holds (the dependency was upgraded, the service is back, the user changed course), say so and update the entry. An entry about a destructive or irreversible action stays until the user lifts it.
 
 ### Verify and Recover — load on demand
 
