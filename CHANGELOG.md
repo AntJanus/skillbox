@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [11.0.0] - 2026-11-11
+
+Every skill was reviewed against Anthropic's Claude Fable 5.2 prompting guide, and every skill moves up one major version. Eight skills change their instructions: approval rules name what waits for a go-ahead, delegation lines say what a subagent costs, hard style limits become defaults, and notes a later session reads are treated as records with reasons. `generate-skill` (7.0.0) and `rate-skill` (7.0.0) carry the same rules for new skills. 16 skills.
+
+### Changed
+
+- **generate-skill** and **rate-skill** (6.2.0 → 7.0.0): the agentic-calibration list and the §7 rubric take in the Claude Fable 5.2 prompting guide. A line asking the model to think less has no effect from `medium` effort up, so the fix is `effort` in the frontmatter. An absolute rule carries its scope, its reason and the case that is allowed. A body holds no token budget and no hard style cap. A delegation line says what a subagent costs and when the work is cheaper inline. Both `SOURCES.md` files cite the guide. The same bump adds four more rules from the guide. New skills default to `high` effort and move to `xhigh` only after a measured gain. An approval rule names what waits for a go-ahead and what does not. A skill that builds or restructures code says who owns it, and an ownership sentence beside a scope line is a finding. The list of harness-injected text gains the finishing-work block. `generate-skill` itself now confirms at two points (the description and the finished skill) instead of after every phase. The descriptions are unchanged, so both `EVAL.md` files are too.
+- **track-roadmap** (2.7.0 → 3.0.0): a change the user stated is written directly and reported in one line. Only a change that is the agent's own judgment (a generated list, an audit ruling, an unrequested reword or removal) is proposed first. The Resume hand-off says what takes over instead of "stop".
+- **track-session** (6.4.0 → 7.0.0): Resume reads Decisions and Failed Attempts as records with reasons and updates an entry whose reason no longer holds; an entry about a destructive or irreversible action stays until the user lifts it. A failed-attempt entry can end with what would make a retry worth it. Two lines that said "stop" where they meant "switch" now say what happens next.
+- **discuss** (1.1.1 → 2.0.0): the language contract is a set of defaults, not limits, and keeps connected sentences where ideas depend on each other. The read-only rule covers the user's repository and names the artifact page as allowed. The research example answers a one-search question inline, and the Research section says what an agent costs.
+- **deep-research** (2.4.2 → 3.0.0): the landscape playbook says what a subagent brief holds, what a run costs, and when to cover the angles inline.
+- **code-review** (2.5.0 → 3.0.0): the note on reviewing several PRs at once states the agent count and asks for it to be said before dispatch.
+- **ui-ux-design** (2.4.0 → 3.0.0): audit mode stays inline up to about fifteen surfaces before it splits into lanes, and an exploration's first round size is agreed before dispatch.
+- **ai-features** (1.1.0 → 2.0.0): `MODELS.md` and `SETUP.md` name the current Claude models (`claude-haiku-5-5`, `claude-sonnet-5-5`, `claude-opus-5-5`, `claude-fable-5-2`) with prices checked against the vendor price page on 2026-11-11, including the Haiku 5.5 rate for prompts over 100,000 tokens and the per-model cache-hit multiples. The Haiku 4.5 ticket-volume example is removed because it was priced at the old rate.
+- **color-system** (1.6.0 → 2.0.0): `palettes.md` gains a tested success green (`#1e7a34` light, `#5fd47a` dark) with its measured contrast ratios. The review against the guide found no change needed to its instructions.
+- **ideal-react-component** (1.8.2 → 2.0.0), **local-first-app** (4.8.0 → 5.0.0), **record-tui** (1.6.1 → 2.0.0), **screenshot-local** (1.5.2 → 2.0.0), **setup-semantic-release** (1.4.1 → 2.0.0), **typography** (1.7.0 → 2.0.0): reviewed against the Claude Fable 5.2 prompting guide and found to need no change to their instructions. The major version marks the review; every skill moves up one major with this release.
+
 ## [10.8.0] - 2026-10-21
 
 **`code-review`** (2.5.0) takes the lessons from a month of real runs. Findings stay on the change: every reviewer gets the absolute repo root, and the verifier drops off-diff findings unless a changed line causes them. Small changes get a defined light path instead of no review at all, delegating callers get the report format they ask for, and a short `## Also noted` list keeps follow-ups the verifier would otherwise drop. 16 skills.
@@ -1102,7 +1119,8 @@ When creating a release:
 
 ---
 
-[Unreleased]: https://github.com/antjanus/skillbox/compare/v10.8.0...HEAD
+[Unreleased]: https://github.com/antjanus/skillbox/compare/v11.0.0...HEAD
+[11.0.0]: https://github.com/antjanus/skillbox/compare/v10.8.0...v11.0.0
 [10.8.0]: https://github.com/antjanus/skillbox/compare/v10.7.0...v10.8.0
 [10.7.0]: https://github.com/antjanus/skillbox/compare/v10.6.0...v10.7.0
 [10.6.0]: https://github.com/antjanus/skillbox/compare/v10.5.0...v10.6.0
