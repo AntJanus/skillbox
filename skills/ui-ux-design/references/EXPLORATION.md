@@ -20,7 +20,7 @@ Generated options converge on structure before style. Most come back as the same
 - **Screen for the tells before review,** and send back options carrying several: a serif display on everything, many mixed faces, a wild range of sizes, rectangles on a strict grid with visible grid lines, purple, rounded bordered cards, a left border on every block, gradients everywhere.
 - **Ask past the obvious directions.** Distinct options come once the obvious directions are used up and the brief asks for the ones beyond them.
 - **Check the saved libraries before generating.** A new run tends to reproduce designs that already exist, so start from a kept design when one fits.
-- **State the cost up front.** Expect several rounds. Iterating on generated options can take longer than sketching one concept by hand and having it built. Offer that path when the user already has an idea.
+- **State the cost up front, and agree the size of the first round before dispatching it.** Each builder is one agent building a full page, so a round of forty is forty agents. Expect several rounds. Iterating on generated options can take longer than sketching one concept by hand and having it built. Offer that path when the user already has an idea.
 
 ## Collecting verdicts
 

@@ -5,7 +5,7 @@ license: MIT
 argument-hint: "[screen | flow | states | components | tokens | ethics | audit]"
 metadata:
   author: Antonin Januska
-  version: "2.4.0"
+  version: "3.0.0"
   tags: [ux, ui, interaction-design, information-architecture, design-tokens, accessibility, usability, deceptive-patterns, aria]
 ---
 
@@ -37,7 +37,7 @@ Two habits below prevent most of them: ship four states per surface, and name to
 
 1. **Scope from the repo, not from the brief.** Read the project's own agent doc, then enumerate every route and the components each one renders. A brief that describes the wrong app still yields the right audit when the surface list comes from the code.
 2. **Build the state matrix before judging anything.** One row per surface, one column per state from the four below. A cell you can't fill by reading the code is itself a finding — that state doesn't exist.
-3. **Split into lanes only when the surface count justifies it** — three or four read-only lanes by surface family (lists, forms, chrome, accessibility), each carrying the four-states table and the floor inline so a lane doesn't depend on loading this file. Always fewer lanes than surfaces; never one per route. Cap each lane's report so it arrives whole: every finding gets a one-line headline, its file and line, and why it matters; code excerpts only for that lane's top three.
+3. **Audit inline up to about fifteen surfaces. Past that, split into three or four read-only lanes** by surface family (lists, forms, chrome, accessibility), each carrying the four-states table and the floor inline so a lane doesn't depend on loading this file. A lane starts with none of this context and re-reads the routes it covers, so on a small app it costs more than it saves. Always fewer lanes than surfaces; never one per route. Cap each lane's report so it arrives whole: every finding gets a one-line headline, its file and line, and why it matters; code excerpts only for that lane's top three.
 4. **Publish one report, ranked by consequence, and stop.** Every visual change gets a **rendered before and after** — real markup at real sizes, side by side, with the difference named underneath. A description of a change is not a before and after. Size the report to the finding count; one longer than the fix list it produces goes unread.
 5. **Get approval per finding before implementing.** Present the ranked list and let the user accept, cut, or reorder it — audits reliably surface items the user considers not worth the pixels, and shipping those spends the credibility the real findings earned. Record what was approved, and what was cut, where the project already tracks work.
 
