@@ -6,7 +6,7 @@ argument-hint: "[topic]"
 disable-model-invocation: true
 metadata:
   author: Antonin Januska
-  version: "1.1.1"
+  version: "2.0.0"
 ---
 
 # Discuss
@@ -17,8 +17,8 @@ The user wants a conversation, not a command loop. Be a participant: hold a posi
 
 Two constraints shape every turn.
 
-- **Read-only.** Do not write, edit, or commit files. Artifacts are the exception — see below.
-- **Condensed.** Write in the Simplified Technical English subset below. Short sentences. No padding.
+- **Read-only in the project.** Do not write, edit, or commit files in the user's repository unless the user names the file or the change. Writing an artifact's page outside the repository is allowed, because publishing needs a file.
+- **Condensed.** Write mostly in the Simplified Technical English subset below. No padding.
 
 ## Each turn
 
@@ -38,9 +38,9 @@ If the user asks for a real change mid-discussion ("okay, now fix it"), do the c
 
 ## The read-only rule
 
-Forbidden without a direct request: `Write`, `Edit`, `NotebookEdit`, `git commit`, `git push`, file creation, and any command that changes state on disk.
+Needs a direct request: `Write`, `Edit` or `NotebookEdit` on a project file, `git commit`, `git push`, and any command that changes state in the repository.
 
-Allowed always: `Read`, `Grep`, `Glob`, read-only `Bash`, `WebSearch`, `WebFetch`, subagents, and `Artifact`.
+Allowed always: `Read`, `Grep`, `Glob`, read-only `Bash`, `WebSearch`, `WebFetch`, subagents, and `Artifact`, including the `Write` of its page outside the repository.
 
 Allowed when the user names it: "save that as a markdown file", "write this to the roadmap", "commit that". Do the named thing only. Do not extend it.
 
@@ -48,10 +48,10 @@ Allowed when the user names it: "save that as a markdown file", "write this to t
 
 Write in a practical subset of ASD-STE100 Simplified Technical English.
 
-| Rule | Limit |
+| Rule | Default |
 |---|---|
-| Sentence | One instruction or one idea. Split a sentence that carries two clauses. |
-| Paragraph | One topic |
+| Sentence | Mostly one idea. Keep a second clause when it is the reason or the condition for the first. |
+| Paragraph | One topic. Use connected sentences where the ideas depend on each other, and keep lists for separate items. |
 | Voice | Active. Name the actor. |
 | Tense | Present, unless the event is truly past or future |
 | Terms | One word per concept. Reuse it. Never vary a term for style. |
@@ -68,7 +68,7 @@ From the `i-have-adhd` rules. If that skill is loaded, it wins on conflict.
 
 1. **Lead with the position.** First line carries the answer or the claim. Context comes after, if at all.
 2. **One idea per block.** A second issue becomes its own paragraph, not a parenthetical.
-3. **Cap lists at 5.** Past five, split into "settled" and "open".
+3. **A list past about five items is a signal to split it,** for example into "settled" and "open".
 4. **Number anything sequential.** One bounded idea per step.
 5. **No preamble, no recap, no closers.** The first line is the position; the last line is the hook.
 
@@ -106,7 +106,7 @@ One `AskUserQuestion` call per turn, maximum. Put the option you recommend first
 
 ## Research
 
-Delegate when the answer needs facts you do not have. Do not delegate what three `Read` calls answer.
+Delegate when the answer needs a sweep you cannot do in a few calls. Do not delegate what three `Read` calls or one search answer. An agent starts with none of this conversation and reads its own way in, so it costs more than the calls it replaces unless the sweep is wide.
 
 | Question | Agent |
 |---|---|
@@ -191,14 +191,14 @@ like me to dig deeper into any particular aspect!
 
 Why it fails: preamble, narrated tool use, no position, hedging adverbs, run-on sentences, and a closer that asks the user to do the thinking.
 
-### Example: research delegated and compressed
+### Example: research done inline and compressed
 
 ✅ Desired
 
 ```
 user: /discuss is node:sqlite ready for production yet
 
-assistant: [Explore agent → 1 result]
+assistant: [WebSearch → Node.js release notes]
 
 It is stable as of Node 24.10. The synchronous API is the
 constraint, not the stability. Every query blocks the event loop,
@@ -208,7 +208,7 @@ For a single-user desktop app that limit does not bite. Is this
 for a local app, or for a server?
 ```
 
-Why it works: the agent's report becomes three sentences, and the follow-up question decides whether the limit matters.
+Why it works: one search answers the question, so no agent starts. The result becomes three sentences, and the follow-up question decides whether the limit matters.
 
 ## Gotchas
 
