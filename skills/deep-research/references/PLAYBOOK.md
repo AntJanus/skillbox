@@ -5,14 +5,14 @@
 For `landscape` mode, or when a topic genuinely spans multiple distinct sub-domains:
 
 1. Decompose the topic into 3-5 angles or sub-topics
-2. Dispatch one research subagent per angle, in parallel — each gets its own brief, search budget, and angle assignment
-3. Each subagent returns structured findings + sources
+2. Dispatch one research subagent per angle, all in one message. Each brief carries the user's question in their own words, the one angle to cover, and the return shape: claims, each with the URL the subagent fetched and the page's date, and no report prose. Cover one angle yourself while they run.
+3. Each subagent returns its claims and sources
 4. The orchestrator synthesizes a consensus report:
    - What all subagents agreed on (high confidence)
    - Where they diverged (call out explicitly)
    - What no subagent found (gaps)
 
-This pattern outperforms a single-agent run for breadth-heavy topics but uses substantially more tokens — reserve for landscape-scope work.
+Each subagent runs its own searches and full reads, so a run costs about as many default-mode runs as it has angles. Use it when the topic has three or more sub-domains that share few sources. Otherwise cover the angles inline, which is what default mode does.
 
 ## Save-as-Note Handoff
 
