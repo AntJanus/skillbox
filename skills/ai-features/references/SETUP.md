@@ -56,7 +56,7 @@ existing convention wins, and the proposal states which one it follows. Whatever
 | `ai.model.vision` | the roster pick | Captions and scans. |
 | `ai.hosted.provider` | unset | `anthropic` or `openai`. |
 | `ai.hosted.key` | unset | Verified live on save; echoed truncated. Never written to a file in the repo. |
-| `ai.hosted.model` | `claude-sonnet-5` | Never a model with forced retention for personal data. |
+| `ai.hosted.model` | `claude-sonnet-5-5` | Never a model with forced retention for personal data. |
 | `ai.semantic.ceiling` | measured | Cosine-distance cutoff, calibrated from random pairs, with a calibrated flag. |
 
 Two failure messages, not one. The gate answers intent: "AI features are off. Enable them in

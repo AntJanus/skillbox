@@ -23,14 +23,14 @@ A 256K context on a 27B model does not fit beside its weights in 64 GB.
 | Job | Local pick | Size | Hosted pick | Rule |
 |---|---|---|---|---|
 | Embeddings for search and related items | `embeddinggemma:300m` (2K context); `qwen3-embedding:0.6b` when inputs run past 2K tokens (32K context, Matryoshka dims) | 622 MB / 639 MB | Usually none. OpenAI `text-embedding-3-small` $0.02 per 1M tokens if the app is hosted anyway | Never mix dimensions in one index. Changing the model invalidates the index; say so and rebuild. |
-| Tagging, routing, classification | `gemma4:e2b-it-qat` or `qwen3.5:4b`, JSON-schema enum over the app's own vocabulary | 4.3 GB / 3.4 GB | `claude-haiku-4-5` for bulk runs | Enum over the app's own vocabulary, never prose (SKILL.md gotcha 1). Dedupe in the resolver. |
+| Tagging, routing, classification | `gemma4:e2b-it-qat` or `qwen3.5:4b`, JSON-schema enum over the app's own vocabulary | 4.3 GB / 3.4 GB | `claude-haiku-5-5` for bulk runs | Enum over the app's own vocabulary, never prose (SKILL.md gotcha 1). Dedupe in the resolver. |
 | Typed decisions with a probability | Read logprobs through llama.cpp or MLX, or use a 400M decision encoder (Laya, von) | under 1 GB | Jev (hosted only, closed weights) | Ollama's OpenAI-compatible route drops logprobs. A model asked to emit a confidence number emits a plausible number. Calibrate on labeled rows from the app. |
-| Summaries, rewrites, drafts | `gemma4:26b` (MoE, fast decode) or `gemma4:e4b` for short text | 19 GB / 9.6 GB | `claude-sonnet-5` | Every claim carries a source id back to a row or timestamp. Hosted when the text is published under the user's name. |
-| Natural language to filters | `qwen3.5:9b` up to `qwen3.8:27b-mlx`, JSON schema whose enums are the real filter vocabularies | 6.6 GB / 18 GB | `claude-sonnet-5` when accuracy decides | Show the resolved filter as editable chips. Reject out-of-vocabulary values. Text-to-SQL tops out near 82% on BIRD against a 93% human baseline. |
-| Vision: captions, receipts, screenshots | `qwen3.5:9b` (native image input); `deepseek-ocr` for document pipelines; tesseract for plain OCR without a model | 6.6 GB | `claude-sonnet-5` with structured outputs | Messy scans go hosted into a prefilled form the user saves. Clean text stays local. |
+| Summaries, rewrites, drafts | `gemma4:26b` (MoE, fast decode) or `gemma4:e4b` for short text | 19 GB / 9.6 GB | `claude-sonnet-5-5` | Every claim carries a source id back to a row or timestamp. Hosted when the text is published under the user's name. |
+| Natural language to filters | `qwen3.5:9b` up to `qwen3.8:27b-mlx`, JSON schema whose enums are the real filter vocabularies | 6.6 GB / 18 GB | `claude-sonnet-5-5` when accuracy decides | Show the resolved filter as editable chips. Reject out-of-vocabulary values. Text-to-SQL tops out near 82% on BIRD against a 93% human baseline. |
+| Vision: captions, receipts, screenshots | `qwen3.5:9b` (native image input); `deepseek-ocr` for document pipelines; tesseract for plain OCR without a model | 6.6 GB | `claude-sonnet-5-5` with structured outputs | Messy scans go hosted into a prefilled form the user saves. Clean text stays local. |
 | Speech to text | whisper.cpp `large-v3-turbo` (99 languages); parakeet-mlx for English on Apple Silicon | 809 MB | OpenAI `gpt-transcribe` $0.0045 per minute | Not an Ollama job. Gate on voice activity (SKILL.md gotcha 9). |
 | Reranking | `llama-server --reranking` with `bge-reranker-v2-m3` | about 1 GB | Voyage or Cohere rerank | Ollama has no rerank endpoint (PR #14172 open since Feb 2026). Reranking cut retrieval failures from 2.9% to 1.9% in Anthropic's measurement. |
-| Agentic loops, coding | `qwen3.8:27b-mlx` | 18 GB | `claude-opus-5` or `claude-sonnet-5` | Local for exploration and privacy; hosted when consistent tool calling over many turns decides completion. |
+| Agentic loops, coding | `qwen3.8:27b-mlx` | 18 GB | `claude-opus-5-5` or `claude-sonnet-5-5` | Local for exploration and privacy; hosted when consistent tool calling over many turns decides completion. |
 
 **Current generations, for orientation:** Qwen 3.5 / 3.6 / 3.8 (vision native, 0.8B to 122B),
 Gemma 4 (12B, 26B MoE, 31B, e2b/e4b edge with audio), Meta's muse-glimmer 30B for local agents,
@@ -41,15 +41,16 @@ Qwen3.5-Embedding exists; the embedding line lags the chat line.
 
 | Model | Input | Output | Batch in / out | Note |
 |---|---|---|---|---|
-| `claude-haiku-4-5` | $1 | $5 | $0.50 / $2.50 | Bulk classification. Vendor example: 10,000 tickets at 3,700 tokens each for about $37. |
-| `claude-sonnet-5` | $2 | $10 | $1 / $5 | Default hosted tier. |
-| `claude-opus-5` | $5 | $25 | $2.50 / $12.50 | Agentic loops. |
-| `claude-fable-5-1` | $10 | $50 | $5 / $25 | Requires 30-day retention and is unavailable under zero-data-retention. Wrong tier for personal data. |
+| `claude-haiku-5-5` | $0.10 | $0.50 | $0.05 / $0.25 | Bulk classification. A prompt over 100,000 tokens pays $0.50 / $2.50 (batch $0.25 / $1.25). |
+| `claude-sonnet-5-5` | $2 | $10 | $1 / $5 | Default hosted tier. |
+| `claude-opus-5-5` | $4 | $20 | $2 / $10 | Agentic loops. |
+| `claude-fable-5-2` | $8 | $40 | $4 / $20 | Requires 30-day retention and is unavailable under zero-data-retention. Wrong tier for personal data. |
 | `gpt-5.6-luna` | $0.20 | $1.20 | $0.10 / $0.60 | OpenAI's cheap tier. |
 | `gpt-5.6-terra` | $2 | $12 | $1 / $6 | |
 | `gpt-6-astra` | $10 | $50 | $5 / $25 | OpenAI's top tier. |
 
-Prompt-cache hits cost a tenth of base input on Claude and do not count toward the input rate limit.
+Claude rows checked 2026-11-11. Prompt-cache hits cost 0.1x base input on Haiku 5.5, 0.05x on
+Sonnet 5.5 and Opus 5.5, and 0.025x on Fable 5.2, and do not count toward the input rate limit.
 Batch is half price both ways. Anthropic prices from
 https://platform.claude.com/docs/en/about-claude/pricing; OpenAI from
 https://developers.openai.com/api/docs/pricing.
